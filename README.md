@@ -1,7 +1,17 @@
-# Generator Dokumentów Długich v3.0 — Claude Code
+# Generator Dokumentacji — Claude Code
 
-Projekt Claude Code produkujący dokumenty 50+ stron. Silnik `docgen` trzyma stan
-i egzekwuje reguły policzalne; subagenty piszą i audytują w izolowanych kontekstach.
+Projekt Claude Code z dwoma systemami generowania dokumentów:
+
+- **Generator Dokumentów Długich v3.0** — pakiety 50+ stron w trybach PRAWNY,
+  BIZNESOWY, NAUKOWY, SF-4A. Silnik `docgen` trzyma stan i egzekwuje reguły
+  policzalne; subagenty piszą i audytują w izolowanych kontekstach.
+  Specyfikacja: `GENERATOR_v3.0.md`.
+- **Generator Dokumentacji Uniwersalnej v1.0** — pojedyncze dokumenty dowolnej
+  branży (od startupu po korporację i instytucję rządową), dowolnego etapu
+  projektu (0-12) i dowolnego typu z katalogu (biznes, marketing, sprzedaż,
+  logistyka, zarządzanie, AI, IT, cyberbezpieczeństwo, nauka, medycyna,
+  projekty ustaw, dokumenty fikcyjne Science Fiction), bez manifestu.
+  Specyfikacja: `GENERATOR_UNIWERSALNY.md`.
 
 ## Uruchomienie
 
@@ -13,7 +23,7 @@ claude
 Sprawdź, czy subagenty się wczytały: `/agents`. Jeżeli ich nie ma — zrestartuj
 sesję (katalog `.claude/agents/` jest skanowany przy starcie).
 
-## Pierwszy dokument
+## Pierwszy dokument (pakiet 50+ stron)
 
 ```
 /nowy Strategia transformacji cyfrowej 2026-2030, biznesowy, 50 stron
@@ -23,6 +33,13 @@ sesję (katalog `.claude/agents/` jest skanowany przy starcie).
 ...
 /audyt
 /zloz
+```
+
+## Pierwszy dokument (uniwersalny, jeden przebieg)
+
+```
+/dokument Polityka bezpieczeństwa dla startupu FinTech, etap 8 (produkcja)
+/ustawa Ustawa o rejestrze dostawców usług chmurowych
 ```
 
 ## Bez Claude Code — sam silnik
@@ -43,14 +60,21 @@ python3 -m docgen assemble --outdir out
 
 | Plik | Rola |
 |---|---|
-| `CLAUDE.md` | instrukcja orkiestratora — reguły wiążące sesji głównej |
-| `.claude/agents/architekt-dokumentu.md` | brief, próg wiarygodności, aktualność podstawy |
-| `.claude/agents/redaktor-sekcji.md` | pisze sekcję, kontekst = tylko prompt |
-| `.claude/agents/audytor-sekcji.md` | audyt bez skrzywienia autora |
-| `.claude/agents/weryfikator-zrodel.md` | weryfikacja w sieci, okresy ważności |
-| `.claude/commands/` | `/nowy` `/blok` `/audyt` `/stan` `/zloz` |
+| `CLAUDE.md` | instrukcja orkiestratora — reguły wiążące sesji głównej, oba systemy |
+| `GENERATOR_v3.0.md` | pełna specyfikacja Systemu 1 (dokumenty długie) |
+| `GENERATOR_UNIWERSALNY.md` | pełna specyfikacja Systemu 2 (dokumentacja uniwersalna) |
+| `.claude/agents/architekt-dokumentu.md` | System 1 — brief, próg wiarygodności, aktualność podstawy |
+| `.claude/agents/redaktor-sekcji.md` | System 1 — pisze sekcję, kontekst = tylko prompt |
+| `.claude/agents/audytor-sekcji.md` | System 1 — audyt bez skrzywienia autora |
+| `.claude/agents/architekt-dokumentacji.md` | System 2 — branża, etap, typ, wymagania prawne, struktura |
+| `.claude/agents/ekspert-prawno-regulacyjny.md` | System 2 — zgodność z RODO, AI Act, NIS2, DORA, MDR/IVDR, CRA, Data Act/DGA, EHDS, Konstytucją RP i prawem UE |
+| `.claude/agents/redaktor-dokumentu.md` | System 2 — pisze dokument samodzielny wg formatu 16 punktów |
+| `.claude/agents/generator-ustaw.md` | System 2 — projekty ustaw i aktów normatywnych, w tym fikcyjnych |
+| `.claude/agents/audytor-dokumentu.md` | System 2 — audyt dokumentu samodzielnego |
+| `.claude/agents/weryfikator-zrodel.md` | współdzielony — weryfikacja w sieci, okresy ważności |
+| `.claude/commands/` | `/nowy` `/blok` `/audyt` `/stan` `/zloz` (System 1) · `/dokument` `/ustawa` (System 2) |
 | `.claude/settings.json` | uprawnienia — docgen i pandoc bez pytania |
-| `docgen/` | silnik (biblioteka standardowa, bez zależności) |
+| `docgen/` | silnik Systemu 1 (biblioteka standardowa, bez zależności) |
 
 ## Dlaczego audytor jest osobnym subagentem
 
