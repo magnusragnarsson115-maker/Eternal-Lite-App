@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.work/
+manifest.json
+out/*.md
+out/*.docx

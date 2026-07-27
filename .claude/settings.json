@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m docgen:*)",
+      "Bash(pandoc:*)",
+      "Read(./**)",
+      "Write(./out/**)",
+      "Write(./.work/**)"
+    ],
+    "deny": [
+      "Write(./docgen/**)"
+    ]
+  }
+}
