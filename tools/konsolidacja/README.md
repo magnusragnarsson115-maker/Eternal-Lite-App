@@ -1,6 +1,6 @@
 # Konsolidacja korpusu Eternal
 
-Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje czternaście
+Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje szesnaście
 dokumentów wynikowych. Skrypty są tu po to, żeby wynik dało się odtworzyć — same
 dokumenty nie są wersjonowane (patrz `.gitignore`).
 
@@ -25,6 +25,8 @@ python3 build_komponenty_docx.py     # architektura komponentów        → DOCX
 python3 build_komponenty_xlsx.py     # macierz komponentów             → XLSX
 python3 build_prd_docx.py            # PRD 43 modułów                  → DOCX
 python3 build_master_docx.py         # dokument nadrzędny 26 sekcji    → DOCX
+python3 build_architektura_docx.py   # A1 wzorcowy, adapter/brama/mapper → DOCX
+python3 build_rynek_xlsx.py          # odpowiedniki rynkowe            → XLSX
 python3 build_roadmap.py             # roadmapa całości                → HTML
 python3 build_app_html.py            # roadmapa aplikacji              → HTML
 node    decks.js                     # pitch aplikacja + ekosystem     → PPTX
@@ -76,6 +78,13 @@ nieoczywistą: agregacja całego modułu sama w sobie nie kosztuje kontroli (med
 Kontrolę traci się przez brak adaptera, brak własnej kopii danych albo oddanie
 dostawcy wniosku końcowego — a to trzecie bywa decyzją słuszną.
 
+**Test otwartego standardu poprzedza regułę 33%.** Korpus zawiera
+`ETERNAL_Macierz_Dostawcow.xlsx` z pytaniem, które jest wcześniejsze niż pytanie
+o liczbę dostawców: czy istnieje publiczna specyfikacja tego, co kupuję? TAK —
+mogę odejść, bo mogę to napisać sam. NIE — wolno z tego zrobić funkcję, nigdy
+fundament. Na 22 pozycjach 15 pozwala budować rdzeń, 7 nie. Reguła 33% mówi,
+ilu dostawców; test mówi, czy wolno na nich w ogóle stanąć.
+
 **Sprzeczności nie są rozstrzygane po cichu.** Tam, gdzie źródła mówią różne
 rzeczy, obie wersje trafiają do dokumentu z zaznaczeniem, która jest nowsza.
 Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
@@ -97,6 +106,8 @@ Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
 | `komponenty.py` | przypisanie klasy komponentu i warstwy zgodności do każdej z 337 funkcji |
 | `dane_moduly.py` | 43 moduły: kandydat na cały moduł, pokrycie, kontrola %, OSS, adapter, kubełek wellness→med |
 | `dane_master.py` | treść dokumentu nadrzędnego — 26 sekcji od wizji po załączniki |
+| `dane_rynek.py` | 22 pozycje macierzy dostawców z testem otwartego standardu, 8 agregatorów, odpowiedniki funkcji A1 |
+| `dane_architektura.py` | adapter, brama, mapper, Universal Sync, 14 modułów kontrolnych, modularność, strategia integracji |
 | `DECK30.json` | struktura oficjalnego pitch decku (32 slajdy) wyeksportowana z PDF |
 | `mkdocx.py`, `builder.py` | wspólne narzędzia generowania DOCX |
 | `build_*.py`, `decks.js` | generatory poszczególnych dokumentów |
