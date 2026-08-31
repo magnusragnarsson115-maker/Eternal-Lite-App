@@ -1,6 +1,6 @@
 # Konsolidacja korpusu Eternal
 
-Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje dwanaście
+Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje czternaście
 dokumentów wynikowych. Skrypty są tu po to, żeby wynik dało się odtworzyć — same
 dokumenty nie są wersjonowane (patrz `.gitignore`).
 
@@ -23,6 +23,8 @@ python3 build_analiza_docx.py        # analiza poprawności             → DOCX
 python3 build_index_docx.py          # indeks 159 źródeł               → DOCX
 python3 build_komponenty_docx.py     # architektura komponentów        → DOCX
 python3 build_komponenty_xlsx.py     # macierz komponentów             → XLSX
+python3 build_prd_docx.py            # PRD 43 modułów                  → DOCX
+python3 build_master_docx.py         # dokument nadrzędny 26 sekcji    → DOCX
 python3 build_roadmap.py             # roadmapa całości                → HTML
 python3 build_app_html.py            # roadmapa aplikacji              → HTML
 node    decks.js                     # pitch aplikacja + ekosystem     → PPTX
@@ -67,6 +69,13 @@ i z treści nazwy funkcji, a pole źródłowe zachowuje wyłącznie jako ślad, 
 Kontrola: korpus wskazuje A3.5, A6.5, A6.8 i D2.x jako warstwę C — reguły odtwarzają
 wszystkie cztery przypadki niezależnie.
 
+**Kontrola jest liczona jawnym wzorem, nie oceniana.** `dane_moduly.py` liczy ją jako
+0,40 x (szczebel/5) + 0,25 x dane + 0,20 x wymienialność + 0,15 x wniosek. Wagi są
+arbitralne, ale jawne — spór dotyczy wtedy wag, a nie wyniku. Wynik pokazał rzecz
+nieoczywistą: agregacja całego modułu sama w sobie nie kosztuje kontroli (mediana 74%).
+Kontrolę traci się przez brak adaptera, brak własnej kopii danych albo oddanie
+dostawcy wniosku końcowego — a to trzecie bywa decyzją słuszną.
+
 **Sprzeczności nie są rozstrzygane po cichu.** Tam, gdzie źródła mówią różne
 rzeczy, obie wersje trafiają do dokumentu z zaznaczeniem, która jest nowsza.
 Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
@@ -86,6 +95,8 @@ Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
 | `dane_analiza.py` | dane analizy własnej: 14 ustaleń, rachunek finansowy, źródła zewnętrzne |
 | `dane_komponenty.py` | rejestr 30 klas komponentów, dostawcy A/B/C, ekonomia per user, wyzwalacze zmiany |
 | `komponenty.py` | przypisanie klasy komponentu i warstwy zgodności do każdej z 337 funkcji |
+| `dane_moduly.py` | 43 moduły: kandydat na cały moduł, pokrycie, kontrola %, OSS, adapter, kubełek wellness→med |
+| `dane_master.py` | treść dokumentu nadrzędnego — 26 sekcji od wizji po załączniki |
 | `DECK30.json` | struktura oficjalnego pitch decku (32 slajdy) wyeksportowana z PDF |
 | `mkdocx.py`, `builder.py` | wspólne narzędzia generowania DOCX |
 | `build_*.py`, `decks.js` | generatory poszczególnych dokumentów |

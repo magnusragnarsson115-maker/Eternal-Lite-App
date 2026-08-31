@@ -11,6 +11,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 from dane_komponenty import (K, WARSTWA, SZCZEBEL, WYZWALACZE, SKLADOWE,
                              EKONOMIA, MODULY, BEZPIECZENSTWO)
+from dane_moduly import M as MOD, KUBELKI
 
 R = json.load(open('build/KOMPONENTY.json'))
 OUT = '/home/user/Eternal-Lite-App/out/ETERNAL_MACIERZ_KOMPONENTOW.xlsx'
@@ -131,6 +132,53 @@ arkusz('Certyfikacja — zakres',
   for m, n in mod_c.most_common()],
  [40, 12, 22, 22, 50], naglowek_fill=RDZA)
 
+# --- 8. Modul jako calosc: kupic / zarzadzac / budowac --------------------
+FUN = collections.Counter(r['modul'] for r in R)
+
+
+def postawa(pokr):
+    if pokr >= 80:
+        return 'AGREGUJEMY — kandydat na cały moduł'
+    if pokr >= 30:
+        return 'ZARZĄDZAMY — kandydat częściowy, moduł składamy sami'
+    return 'BUDUJEMY — brak kandydata rynkowego'
+
+
+arkusz('Moduł jako całość',
+ ['Moduł', 'Nazwa', 'Funkcji', 'Postawa', 'Kandydat na cały moduł', 'Pokrycie %',
+  'Kontrola %', 'Co zostaje nasze bezwzględnie', 'Alternatywa open source',
+  'Kiedy budujemy własne', 'Adapter', 'Uzasadnienie adaptera', 'Priorytet', 'Owner'],
+ [[k, v[0], str(FUN.get(k, 0)), postawa(v[7]), v[6], v[7], v[8], v[9], v[10], v[11],
+   v[12][0], v[12][1], v[14], v[15]]
+  for k, v in sorted(MOD.items(),
+                     key=lambda x: (x[0][0], int(x[0][1:])))],
+ [7, 34, 8, 34, 46, 9, 9, 40, 46, 40, 8, 40, 8, 12])
+ws = wb['Moduł jako całość']
+for row in ws.iter_rows(min_row=2):
+    v = str(row[3].value or '')
+    row[3].fill = (TLA['A'] if v.startswith('AGREG') else
+                   TLA['B'] if v.startswith('ZARZ') else TLA['C'])
+    row[3].font = Font(size=9, bold=True)
+
+# --- 9. Wellness -> medyczne: cztery kubelki ------------------------------
+arkusz('Wellness → medyczne',
+ ['Moduł', 'Nazwa', 'Kubełek', 'Co znaczy', 'Co z tym robić', 'Funkcji',
+  'Warstwa A', 'Warstwa B', 'Warstwa C'],
+ [[k, v[0], v[13], KUBELKI[v[13]][0] + ' — ' + KUBELKI[v[13]][1], KUBELKI[v[13]][2],
+   str(FUN.get(k, 0)),
+   str(sum(1 for r in R if r['modul'] == k and r['warstwa'] == 'A')),
+   str(sum(1 for r in R if r['modul'] == k and r['warstwa'] == 'B')),
+   str(sum(1 for r in R if r['modul'] == k and r['warstwa'] == 'C'))]
+  for k, v in sorted(MOD.items(), key=lambda x: (x[0][0], int(x[0][1:])))],
+ [7, 34, 8, 60, 50, 8, 9, 9, 9], naglowek_fill=RDZA)
+ws = wb['Wellness → medyczne']
+KOL = {'W': 'D7F0DD', 'W>M': 'E3EDFA', 'M>W': 'F3E3C3', 'M': 'F8D7DA'}
+for row in ws.iter_rows(min_row=2):
+    v = str(row[2].value or '')
+    if v in KOL:
+        row[2].fill = PatternFill('solid', fgColor=KOL[v])
+        row[2].font = Font(size=9, bold=True)
+
 # --- 8. Warstwy i szczeble (legenda) --------------------------------------
 ws = wb.create_sheet('Legenda', 0)
 ws.append(['ETERNAL LIFE — MACIERZ KOMPONENTÓW'])
@@ -156,6 +204,12 @@ info = [
   'agregatory wearables: co dają, czego nie dają, jaka postawa i kiedy ją zmienić.'],
  ['Bezpieczeństwo bramy', 'Osiem zasad, bez których brama jest tylko routerem.'],
  ['Certyfikacja — zakres', 'Które moduły wymagają certyfikacji i którą ścieżką.'],
+ ['Moduł jako całość', 'Dla każdego z 43 modułów: czy istnieje kandydat na cały moduł, '
+  'jakie ma pokrycie, ile kontroli zostawia i co mimo wszystko zostaje nasze. '
+  'Postawa AGREGUJEMY / ZARZĄDZAMY / BUDUJEMY wynika z pokrycia, nie z preferencji.'],
+ ['Wellness → medyczne', 'Cztery kubełki: wellness na zawsze, wellness dziś a medyczna '
+  'docelowo, medyczna z natury wydana jako wellness (najwyższe ryzyko), medyczna od '
+  'początku.'],
  [],
  ['Warstwy zgodności'],
  ['Warstwa', 'Zakres', 'Charakter', 'Certyfikacja', 'Funkcji', 'Co to znaczy w praktyce'],
@@ -185,6 +239,11 @@ info += [
   'Warstwa zgodności jest wyprowadzona z definicji Master 5.4 i z treści nazwy funkcji.'],
  ['Kontrola poprawności: korpus wskazuje A3.5, A6.5, A6.8 i D2.x jako warstwę C. '
   'Wszystkie cztery przypadki reguły odtwarzają niezależnie.'],
+ ['Kontrola % liczona jawnym wzorem: 0,40 × (szczebel/5) + 0,25 × dane + 0,20 × '
+  'wymienialność + 0,15 × wniosek. Wagi są arbitralne, ale jawne — mówią, co uznajemy '
+  'za kontrolę. Zmiana wag zmienia wynik i to jest cecha, nie wada.'],
+ ['Pokrycie modułu przez kandydata rynkowego jest oceną autorską opartą na znajomości '
+  'rynku, nie pomiarem. Wymaga potwierdzenia w rozmowie z dostawcą.'],
  ['Wartości oznaczone [SZACUNEK] to przeliczenie wolumenu na użytkownika, nie cennik '
   'dostawcy. [BRAK] oznacza pozycję bez danych. Kursy: 1 USD = 4,00 PLN, 1 EUR = 4,30 PLN.'],
 ]
