@@ -40,7 +40,11 @@ K = {
    'tego samego parametru. Vitalera i Terra na tym samym urządzeniu źródłowym to jeden '
    'punkt awarii w dwóch opakowaniach — liczyć redundancję technologii, nie dostawcy',
    'HealthKit + Health Connect od dnia 1. Terra dopiero gdy klient B2B zażąda Garmina/Oura. '
-   'Vitalera wchodzi tam, gdzie funkcja jest w warstwie C i dostawca musi mieć własne CE',
+   'KOREKTA (ETL-031, plik #119): oznakowanie CE dostawcy obejmuje KONKRETNĄ FUNKCJĘ '
+   'W JEGO APLIKACJI I W JEGO PRZEZNACZENIU. Dane surowe pobrane przez interfejs '
+   'programistyczny NIE są objęte tym certyfikatem — cudzego oznakowania nie da się '
+   'odziedziczyć przez adapter. CE Vitalery podnosi wiarygodność pomiaru i nie zdejmuje '
+   'z nas ani jednego obowiązku',
    3, ['I', 'III', 'IV'], 'Master 5.4 §11 + analiza Vitalera (Pytania i odpowiedzi)'),
 
  'K02': ('Model danych i mapowanie FHIR',
@@ -398,8 +402,10 @@ WYZWALACZE = [
  ('W3', 'Zmiana warstwy zgodności funkcji',
   'Funkcja przechodzi z warstwy A lub B do C — pojawia się własna ocena, próg kliniczny '
   'albo predykcja ryzyka',
-  'Dostawca wellness przestaje być dopuszczalny. Albo dostawca ma własne CE (model proxy, '
-  'K28), albo my bierzemy dossier. Trzeciej drogi nie ma',
+  'Albo bierzemy dossier, albo model proxy w ścisłym sensie: przekazujemy CUDZY WYNIK '
+  'bez zmiany i z nazwą wykonawcy (K28). UWAGA: samo pobranie danych przez API od dostawcy '
+  'z CE nie jest proxy i nie zdejmuje obowiązku — cudzego oznakowania nie da się '
+  'odziedziczyć przez adapter (ETL-031, plik #119)',
   'Master 5.4 §4.2 i definicja warstw'),
  ('W4', 'Marka własna na cudzym produkcie',
   'Logo Eternal na obudowie albo w interfejsie wyniku bez nazwy wykonawcy',
@@ -446,7 +452,7 @@ EKONOMIA = [
   '399 USD/mies ÷ 750 userów [SZACUNEK]'),
  ('K01', 'Junction/Vital', 'per użytkownik', 2.00, 11,
   '0,50 USD/user/mies, minimum 300 USD — próg opłacalności ~600 userów'),
- ('K01', 'Vitalera', 'per użytkownik, dostawca z własnym CE', 0.00, 0,
+ ('K01', 'Vitalera', 'per użytkownik; CE dotyczy jego wyrobu, nie naszego', 0.00, 0,
   'Cennik niepubliczny — pozycja zarezerwowana dla funkcji warstwy C [BRAK]'),
  ('K03', 'Hetzner/OVH + PostgreSQL + MinIO', 'ryczałt za serwer', 0.05, 67,
   '~200 EUR/mies infrastruktury ÷ 17 tys. userów [SZACUNEK]'),
@@ -539,7 +545,10 @@ MODULY = [
   'Agregatory danych z wearables klasy konsumenckiej',
   'Pokrycie Garmina, Oury i Fitbita, którego HealthKit i Health Connect nie dają '
   'w modelu B2B',
-  'Klasa wellness — nie mają własnego CE, więc nie obsłużą funkcji warstwy C. '
+  'Klasa wellness. UWAGA — wcześniejszy zapis, że dostawca z własnym CE obsłuży '
+  'warstwę C, jest błędny: cudzego oznakowania nie da się odziedziczyć przez adapter. '
+  'Różnica między G1 a G2 dotyczy wiarygodności pomiaru i profilu zgodności, '
+  'nie zdjęcia z nas obowiązku. '
   'Trzej dostawcy sięgający po ten sam SDK producenta opaski to jedna zależność '
   'w trzech opakowaniach',
   'Wariant B w klasie K01, uruchamiany dopiero gdy klient B2B zażąda konkretnego '

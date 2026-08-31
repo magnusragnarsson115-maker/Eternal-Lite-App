@@ -62,7 +62,8 @@ M = {
  'Znormalizowany zasób FHIR R4B w Eternal Standard, z proweniencją: które źródło, '
  'kiedy, jaką ścieżką',
  'Vitalera (FOLLOWHEALTH S.L.) — zunifikowane API/SDK, FHIR R5, webhooki, deklarowane '
- 'CE wg MDR. Alternatywy: Terra API, Rook, Junction/Vital — wszystkie klasy wellness',
+ 'CE wg MDR (dotyczy JEGO wyrobu — nie dziedziczymy go przez adapter, ETL-031 #119). '
+ 'Alternatywy: Terra API, Rook, Junction/Vital, Thryve, Validic',
  85, kontrola(2, 1, 1, 1),
  'Model danych (Eternal Standard), mapper, polityka proweniencji, decyzja o tym, '
  'który parametr z którego źródła wygrywa przy rozbieżności',

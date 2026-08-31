@@ -15,7 +15,11 @@ from docx.enum.section import WD_ORIENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from mkdocx import setup, toc
-from dane_architektura import MODULY, KONTROLNE, MODULARNOSC, INTEGRACJA, HIERARCHIA
+from dane_architektura import (MODULY, KONTROLNE, MODULARNOSC, INTEGRACJA, HIERARCHIA,
+                               PRZEBIEG, FILTR_TWARDY, PUNKTACJA, TRYBY, LOKALNE_GLOBALNE,
+                               BRAMA_BEZPIECZENSTWO, BRAMA_ZASTRZEZENIA, POZIOMY_SPRZEDAZY,
+                               REGULA_KATALOGU, DOWOD, PRZEPISANIE, WERDYKTY,
+                               REGULA_KRZYWEJ, PULAPKA_E5, ZRODLA_SEKCJI)
 from dane_rynek import TEST, POZYCJE, AGREGATORY, A1_FUNKCJE
 from dane_moduly import M as MOD
 
@@ -98,6 +102,24 @@ p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 r = p.add_run('Stan na %s' % TODAY)
 r.font.size = Pt(10)
 doc.add_page_break()
+
+doc.add_heading('Nota — druga wersja po audycie pokrycia źródeł', 1)
+akapit(doc, 'Pierwsza wersja tego dokumentu powstała bez trzech plików korpusu, które '
+ 'opisują dokładnie to samo, i opisują lepiej: **#117 ETL-034 „Eternal API Gateway", '
+ '#119 ETL-031 „Model orkiestratora" i #118 ETL-032 „Wykonalność naukowa i kontrola '
+ 'technologii".** Wypadły z mojego pola widzenia, bo nie zawierają kodów funkcji '
+ 'i przez to nie ma ich w rejestrze funkcji, z którego pracowałem. Ich treść jest '
+ 'w specyfikacji scalonej — nie było jej w moim rozumowaniu.')
+akapit(doc, 'Ta wersja jest przepisana wokół nich. **Jedno twierdzenie z poprzedniej '
+ 'wersji było błędne i zostało poprawione**: napisałem, że dostawca z własnym oznakowaniem '
+ 'CE obsłuży naszą funkcję warstwy C w modelu proxy. ETL-031 rozstrzyga inaczej '
+ 'i ma rację — oznakowanie obejmuje konkretną funkcję w aplikacji producenta i w jego '
+ 'przeznaczeniu, dane surowe z interfejsu nie są nim objęte, a cudzego oznakowania '
+ 'nie da się odziedziczyć przez adapter.')
+tab(doc, [['Sekcja', 'Pliki korpusu, na których stoi']] + [list(x) for x in ZRODLA_SEKCJI],
+    [6.0, 20.0], naglowek='B8431F')
+doc.add_page_break()
+
 doc.add_heading('Spis treści', 1)
 toc(doc)
 doc.add_page_break()
@@ -220,7 +242,64 @@ for (kod, nazwa, jedno, dzialanie, przezn, zczego, kto, kiedy, wlasne, kontrola,
               [widzi, produkt, monet]], [8.0, 6.0, 11.0], naglowek='5D6B8A')
     doc.add_paragraph()
 
-doc.add_heading('2.1 Czternaście modułów kontrolnych', 2)
+doc.add_heading('2.1 Brama — przebieg jednego zapytania (ETL-034, plik #117)', 2)
+akapit(doc, 'Brama nie pyta o dostawcę — pyta o **zdolność**. Nie „pobierz dane z konta '
+ 'użytkownika u dostawcy X", tylko „podaj tętno z ostatnich siedmiu dni". '
+ 'Jedenaście kroków, z których każdy ma warunek zatrzymujący:')
+tab(doc, [['Krok', 'Co się dzieje', 'Co blokuje']] + [list(x) for x in PRZEBIEG],
+    [4.0, 13.0, 9.0])
+
+doc.add_heading('2.2 Jak brama wybiera — filtr twardy przed punktacją', 2)
+akapit(doc, '**Najpierw odrzucenie binarne, dopiero potem ocena.** Odrzucony nie wraca '
+ 'do punktacji — to jest różnica między filtrem a wagą. Moja poprzednia wersja opisywała '
+ 'cztery filtry w kolejności; poprawna konstrukcja to siedem kryteriów binarnych, '
+ 'a następnie ranking ważony.')
+tab(doc, [['Kryterium odrzucenia', 'Dlaczego']] + [list(x) for x in FILTR_TWARDY],
+    [10.0, 16.0])
+doc.add_paragraph()
+tab(doc, [['Kryterium punktacji', 'Waga', 'Co mierzy']] + [list(x) for x in PUNKTACJA],
+    [7.0, 2.0, 17.0])
+doc.add_paragraph()
+tab(doc, [['Tryb rozstrzygnięcia', 'Kiedy', 'Jak działa']] + [list(x) for x in TRYBY],
+    [4.0, 7.0, 15.0])
+
+doc.add_heading('2.3 Lokalne czy globalne — rezydencja per zdolność', 2)
+akapit(doc, '**Podróż użytkownika nie zmienia regionu przetwarzania.** Gdy użytkownik jest '
+ 'za granicą, jego dane nadal są przetwarzane w regionie macierzystym. Zmienia się tylko '
+ 'to, co brama może dodatkowo udostępnić na miejscu. Zmiana regionu wymagałaby osobnej '
+ 'zgody i osobnej podstawy prawnej.')
+tab(doc, [['Rodzaj zdolności', 'Reguła', 'Bez wyjątku?']]
+    + [list(x) for x in LOKALNE_GLOBALNE], [7.0, 15.0, 4.0])
+
+doc.add_heading('2.4 Dziesięć mechanizmów zabezpieczających bramy', 2)
+akapit(doc, 'Pytanie „jak to zabezpiecza" ma dziesięć odpowiedzi, które działają razem. '
+ 'Żadna z osobna nie wystarcza.')
+tab(doc, [['Mechanizm', 'Przed czym chroni']]
+    + [list(x) for x in BRAMA_BEZPIECZENSTWO], [8.0, 18.0])
+
+doc.add_heading('2.5 Cztery zastrzeżenia, których nie wolno pominąć', 2)
+tab(doc, [['Zastrzeżenie', 'Na czym polega', 'Źródło']]
+    + [list(x) for x in BRAMA_ZASTRZEZENIA], [7.0, 15.0, 4.0], naglowek='B8431F')
+
+doc.add_heading('2.6 Trzy poziomy dostępności zdolności — to jest model sprzedaży', 2)
+akapit(doc, 'Odpowiedź na pytanie, co jest zintegrowane, co wyszukane, a co składane '
+ 'na zamówienie. To nie jest kwestia techniczna — to jest cennik.')
+tab(doc, [['Poziom', 'Stan', 'Czas', 'Kto płaci', 'Cena']]
+    + [list(x) for x in POZIOMY_SPRZEDAZY], [5.4, 8.0, 4.0, 3.6, 5.0])
+doc.add_paragraph()
+p = doc.add_paragraph()
+r = p.add_run(REGULA_KATALOGU[0])
+r.font.size = Pt(11); r.bold = True
+r.font.color.rgb = RGBColor.from_string('B8431F')
+akapit(doc, REGULA_KATALOGU[1])
+tab(doc, [['Wariant dla zamawiającego', 'Co dostaje', 'Cena']]
+    + [list(x) for x in REGULA_KATALOGU[2]], [6.0, 12.0, 8.0])
+akapit(doc, '**To jest odpowiedź na pytanie o mapper integracji i o to, kto za niego '
+ 'zapłaci.** Katalog rośnie na cudzy koszt, a każdy kolejny klient dostaje więcej '
+ 'za tę samą cenę. Wyłączności trwałej nie oferujemy, bo trwale blokuje wartość, '
+ 'którą sprzedajemy wszystkim pozostałym.')
+
+doc.add_heading('2.7 Czternaście modułów kontrolnych', 2)
 akapit(doc, 'Lista pochodzi z Master 5.4 wraz z oceną stanu. **Pięć z czternastu nie '
  'istnieje wcale**, jeden jest ukryty w orkiestratorze zamiast być wydzielony. '
  'To nie są moduły opcjonalne — to jest warstwa, bez której nie ma dossier ani sprzedaży B2B.')
@@ -299,9 +378,46 @@ for tyt, krotka, dluga, koszt in MODULARNOSC:
     akapit(doc, dluga)
     akapit(doc, koszt)
 
+# ---------------------------------------------------------------- 7a
+doc.add_page_break()
+doc.add_heading('7. Ocena technologii — czego nie budować i dlaczego (ETL-032, plik #118)', 1)
+akapit(doc, '**Dwie zasady rozstrzygają większość pozycji, zanim zacznie się je oceniać.** '
+ 'Pierwsza: brak zaprzeczenia nie jest dowodem — że czegoś nie obalono, znaczy tylko tyle, '
+ 'że nikt tego nie sprawdził. Druga: cel nie jest technologią. „Chcemy nanoboty" nie jest '
+ 'celem; celem jest „działać precyzyjnie w tkance bez otwierania ciała" — a to otwiera '
+ 'listę alternatyw dostępnych dziś.')
+tab(doc, [['Stopień dowodu', 'Co znaczy', 'Co wolno na tej podstawie']]
+    + [list(x) for x in DOWOD], [6.0, 9.0, 11.0], naglowek='B8431F')
+
+doc.add_heading('7.1 Przepisanie celów z technologii na funkcje', 2)
+akapit(doc, 'To ćwiczenie **zdejmuje z planu więcej pozycji niż jakakolwiek analiza '
+ 'kosztowa** — i jest bezpośrednią odpowiedzią na pytanie, jak nie budować rzeczy '
+ 'wartych miliardy.')
+tab(doc, [['Zapis w macierzy', 'Cel po przepisaniu', 'Co jest dostępne dziś']]
+    + [list(x) for x in PRZEPISANIE], [6.0, 8.0, 12.0])
+akapit(doc, '**„Nanomedycyna JUŻ JEST na rynku — tylko nie wygląda jak roje robotów. '
+ 'Nasza rola nie leży w nośniku, tylko w danych o tym, komu i kiedy."** To zdanie '
+ 'z korpusu jest całą strategią wobec moonshotów w jednym wierszu.')
+
+doc.add_heading('7.2 Werdykty dla pięciu projektów', 2)
+tab(doc, [['Projekt', 'Dowód', 'TRL', 'Werdykt', 'Warunek']]
+    + [list(x) for x in WERDYKTY], [7.4, 4.0, 2.0, 5.0, 7.6])
+doc.add_paragraph()
+p = doc.add_paragraph()
+r = p.add_run('Pułapka wzorcowa: ' + PULAPKA_E5[0])
+r.font.size = Pt(11); r.bold = True
+r.font.color.rgb = RGBColor.from_string('B8431F')
+akapit(doc, PULAPKA_E5[1])
+doc.add_paragraph()
+p = doc.add_paragraph()
+r = p.add_run(REGULA_KRZYWEJ[0])
+r.font.size = Pt(11); r.bold = True
+r.font.color.rgb = RGBColor.from_string('B8431F')
+akapit(doc, REGULA_KRZYWEJ[1])
+
 # ---------------------------------------------------------------- 7
 doc.add_page_break()
-doc.add_heading('7. Hierarchia ekosystemu', 1)
+doc.add_heading('8. Hierarchia ekosystemu', 1)
 akapit(doc, 'Korpus zostawia tę sprawę nierozstrzygniętą: w dotychczasowych pracach '
  'przyjęto „cel → projekt → produkt → funkcja" (projekt nad produktem), a w Macierzy 40 '
  'jest odwrotnie. **Rekomendacja korpusu, którą przyjmuję: produkt → projekt → funkcja**, '
@@ -314,7 +430,7 @@ akapit(doc, '**Luka planistyczna wskazana w korpusie i nadal otwarta**: filar Di
  'i symulację ryzyka. Cały ekosystem zależy od filaru, który nie ma budżetu ani terminu '
  'przed 2028 rokiem. Filar Hub nie ma ani jednego projektu.')
 
-doc.add_heading('7.1 Moonshoty — czym są w tej strukturze', 2)
+doc.add_heading('8.1 Moonshoty — czym są w tej strukturze', 2)
 akapit(doc, 'Moonshot nie jest projektem produktowym. Jest **najlepszym dostępnym '
  'rozwiązaniem komponentu, środowiska albo architektury**, wybranym z horyzontem, '
  'w którym jeszcze nie jest dostępne. Dwa rodzaje:')

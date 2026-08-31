@@ -152,9 +152,12 @@ AGREGATORY = [
   'Cennik niepubliczny [BRAK]', 85, 80,
   'Rośnie w stronę RPM i EHDS — najbliżej kierunku Eternal',
   'Średnia — FHIR R5 wymaga mapowania na R4B używane w PL',
-  'JEDYNY z całej szóstki deklarujący własne oznakowanie CE wg MDR. To go stawia '
-  'w innej kategorii: obsłuży funkcję warstwy C w modelu proxy, czego G1 nie zrobi '
-  'niezależnie od jakości'),
+  'JEDYNY z całej szóstki deklarujący własne oznakowanie CE wg MDR. KOREKTA wobec '
+  'wcześniejszej wersji tego zestawienia: to NIE znaczy, że obsłuży naszą funkcję '
+  'warstwy C. Oznakowanie obejmuje konkretną funkcję w JEGO aplikacji i w JEGO '
+  'przeznaczeniu; dane surowe z interfejsu nie są nim objęte, a cudzego CE nie da się '
+  'odziedziczyć przez adapter (ETL-031, plik #119). Realna przewaga: wyższa '
+  'wiarygodność pomiaru, profil RODO i system jakości po stronie dostawcy'),
  ('Validic', 'G2 — agregatory medyczne (RPM)', 'medyczny',
   'Enterprise, cennik niepubliczny', 80, 60,
   'Dojrzały, ale zorientowany na rynek amerykański i HIPAA',

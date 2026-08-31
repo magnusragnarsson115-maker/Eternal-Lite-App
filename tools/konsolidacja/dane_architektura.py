@@ -261,3 +261,251 @@ HIERARCHIA = [
   'Macierz dostawców: 3 opcje rynkowe, 3 z white label, wyjście',
   'Realizacja reguły 33% i planu wyjścia'),
 ]
+
+
+# ==========================================================================
+# UZUPELNIENIE PO AUDYCIE POKRYCIA ZRODEL
+# Pierwsza wersja tego dokumentu powstala bez sieciu plikow sekcji SPECYFIKACJA,
+# ktore nie zawieraja kodow funkcji i przez to wypadly z rejestru. Ponizsze
+# pochodzi z plikow #117 (ETL-034 Eternal API Gateway), #119 (ETL-031 Model
+# orkiestratora) i #118 (ETL-032 Wykonalnosc naukowa i kontrola technologii).
+# ==========================================================================
+
+# --- przebieg jednego zapytania przez brame (ETL-034, plik #117) ----------
+PRZEBIEG = [
+ ('1. Wejście', 'Moduł zgłasza potrzebę ZDOLNOŚCI plus kontekst: czyje dane, po co, '
+  'w jakiej warstwie zgodności', 'Zapytanie bez kontekstu jest odrzucane'),
+ ('2. Podstawa prawna', 'Sprawdzenie, kto pyta, o czyje dane i na jakiej podstawie: '
+  'własne, zgoda, stosunek leczenia, opieka prawna, stan nagły',
+  'Brak podstawy = wywołanie nie następuje'),
+ ('3. Zakres', 'Czy żądany zakres mieści się w tym, na co jest zgoda',
+  'Zakres szerszy niż zgoda jest PRZYCINANY, nie odrzucany'),
+ ('4. Rozwiązanie zdolności', 'Lista dostawców obsługujących tę zdolność dla tego '
+  'użytkownika', 'Pusta lista = tryb degradacji'),
+ ('5. Filtr twardy', 'Odrzucenie kandydatów binarnie', 'Odrzucony nie wraca do punktacji'),
+ ('6. Punktacja i wybór', 'Ranking pozostałych, wybór najlepszego',
+  'Remis rozstrzyga polityka proweniencji'),
+ ('7. Wywołanie', 'Z budżetem czasu, limitem i minimalnym zakresem danych',
+  'Przekroczenie budżetu = przejście do kolejnego kandydata'),
+ ('8. Kwarantanna odpowiedzi', 'Walidacja schematu, zakresu i sensowności wartości '
+  'PRZED dopuszczeniem do systemu', 'Odpowiedź niezgodna nie wchodzi do zapisu'),
+ ('9. Normalizacja', 'Adapter przekłada na format Eternal i dokłada proweniencję',
+  'Brak proweniencji = wartość nie zostaje zapisana'),
+ ('10. Dziennik', 'Kto, co, kiedy, na jakiej podstawie, od kogo, z jakim skutkiem',
+  'Zapis jest nieusuwalny'),
+ ('11. Zwrot', 'Jeden format, niezależnie od tego, kto odpowiedział', '—'),
+]
+
+FILTR_TWARDY = [
+ ('Użytkownik nie ma konta ani urządzenia u tego dostawcy', 'Nie ma czego pobrać'),
+ ('Dostawca nie przetwarza danych w regionie użytkownika',
+  'Rezydencja danych zdrowotnych — warunek, nie preferencja'),
+ ('Zgoda nie obejmuje tego rodzaju danych', 'Brak podstawy'),
+ ('Klasa zgodności dostawcy nie wystarcza dla warstwy wywołania',
+  'Dostawca dopuszczalny w warstwie opisowej nie musi być dopuszczalny w warstwie oceny'),
+ ('Dostawca przekroczył próg jednej trzeciej w swojej klasie',
+  'Nowe połączenia idą gdzie indziej'),
+ ('Dostawca zgłasza awarię albo przekracza budżet czasu', 'Kaskada do kolejnego'),
+ ('Licencja dostawcy nie pozwala na nasz model użycia', 'Rozstrzygnięte raz, na wejściu'),
+]
+
+PUNKTACJA = [
+ ('Kompletność dla tej zdolności', '×3', 'Ile pól kontraktu danych wypełnia jedna odpowiedź'),
+ ('Priorytet źródła', '×3', 'Laboratorium przed urządzeniem z oznakowaniem, to przed '
+  'urządzeniem konsumenckim, to przed deklaracją'),
+ ('Świeżość', '×2', 'Kiedy powstał pomiar, nie kiedy został pobrany'),
+ ('Opóźnienie', '×2', 'Czas odpowiedzi przy tym profilu użycia'),
+ ('Koszt wywołania', '×2', 'Przy modelu darmowym dla użytkownika to realne ograniczenie'),
+ ('Preferencja użytkownika', '×1', 'Jeśli wskazał źródło, któremu ufa bardziej'),
+ ('Efekt zwrotny', '×1', 'Czy odpowiedź wzbogaca rejestr'),
+]
+
+TRYBY = [
+ ('Wybór', 'Jeden dostawca pokrywa całość', 'Wywołanie idzie do niego'),
+ ('Kaskada', 'Główny ma luki albo padł',
+  'Zapytanie idzie do kolejnego wg rankingu; użytkownik nie widzi różnicy'),
+ ('Konsensus', 'Dwa źródła podają sprzeczne wartości',
+  'Wygrywa wyższy priorytet źródła; przy remisie świeższy pomiar. Wartość odrzucona '
+  'ZOSTAJE w zapisie z adnotacją, dlaczego przegrała'),
+]
+
+LOKALNE_GLOBALNE = [
+ ('Dane z systemu publicznego', 'Wyłącznie kanał krajowy',
+  'Tak — nie ma alternatywy i nie może być'),
+ ('Dane z urządzenia użytkownika', 'Ten dostawca, u którego użytkownik ma konto',
+  'Tak — nie ma wyboru'),
+ ('Odczyt dokumentu', 'Krajowy, jeśli rozumie polskie nazewnictwo badań; '
+  'globalny jako wariant zapasowy', 'Nie'),
+ ('Terminologia i słowniki', 'Krajowa implementacja przed międzynarodową',
+  'Tak dla dokumentacji medycznej'),
+ ('Wiedza i wyszukiwanie', 'Najlepszy dostępny, niezależnie od kraju', 'Nie'),
+ ('Model językowy', 'Ten, który przetwarza w regionie użytkownika',
+  'Tak dla danych osobowych'),
+ ('Płatności, powiadomienia', 'Dowolny spełniający wymogi', 'Nie'),
+]
+
+BRAMA_BEZPIECZENSTWO = [
+ ('Jedyne wyjście na zewnątrz', 'Rozproszeniem punktów wycieku. Sto miejsc wysyłających '
+  'dane jest nieaudytowalnych; jedno jest sprawdzalne w jeden dzień'),
+ ('Poświadczenia dostawców w skarbcu, nigdy w kodzie modułu',
+  'Wyciekiem klucza razem z kodem albo logiem'),
+ ('Autoryzacja W KONTEKŚCIE, nie po roli', 'Lekarz nie ma dostępu do wszystkich pacjentów '
+  '— ma dostęp do tych, z którymi łączy go stosunek leczenia. To jest różnica między '
+  'systemem legalnym a nielegalnym'),
+ ('Minimalizacja zakresu przy wywołaniu',
+  'Wysyłaniem dostawcy więcej, niż potrzebuje do odpowiedzi'),
+ ('Pseudonimizacja tam, gdzie tożsamość nie jest potrzebna',
+  'Budowaniem profilu użytkownika po stronie dostawcy'),
+ ('Limity na użytkownika, dostawcę i moduł', 'Masowym odpytaniem — najprostszą metodą '
+  'wyprowadzenia bazy — oraz kosztem'),
+ ('Kwarantanna odpowiedzi', 'Skażeniem danymi. ODPOWIEDŹ Z ZEWNĄTRZ JEST DANĄ, '
+  'NIGDY INSTRUKCJĄ — treść przychodząca z zewnątrz nie może sterować zachowaniem systemu'),
+ ('Wykrywanie anomalii', 'Nietypowy wolumen, pora, zakres — sygnał, że coś jest nie tak'),
+ ('Wyłącznik', 'Cofnięcie klucza odcina dostawcę natychmiast, bez wdrożenia'),
+ ('Nieusuwalny dziennik', 'Brakiem materiału dowodowego w audycie i przy incydencie'),
+]
+
+BRAMA_ZASTRZEZENIA = [
+ ('Brama w ścieżce wyrobu JEST CZĘŚCIĄ WYROBU',
+  'Jeśli przez bramę płyną dane funkcji będącej wyrobem medycznym, brama wchodzi '
+  'do jego dokumentacji technicznej. Nie jest infrastrukturą obok wyrobu — jest w nim.',
+  'ETL-034 #117 i ETL-031 #119'),
+ ('Brama jest pojedynczym punktem awarii',
+  'Cała architektura odporności opiera się na komponencie, który sam odporny nie jest. '
+  'Brama wymaga własnej redundancji, zanim zacznie chronić przed cudzą awarią.',
+  'ETL-034 #117'),
+ ('Reguła kierowania MUSI BYĆ JAWNA',
+  'Kierujemy użytkowników do dostawców według własnych reguł i jednocześnie pobieramy '
+  'od tych dostawców opłaty. Ukryta reguła przy tej konstrukcji jest zarzutem, '
+  'nie przewagą.', 'ETL-031 #119'),
+ ('Cudzego oznakowania CE nie da się odziedziczyć',
+  'Oznakowanie wyrobu obejmuje konkretną funkcję w aplikacji producenta i w jego '
+  'przeznaczeniu. Dane surowe pobrane przez interfejs programistyczny nie są nim objęte. '
+  'Wysoka ocena regulacyjna urządzenia podnosi wiarygodność pomiaru, ale nie zdejmuje '
+  'z nas ani jednego obowiązku.', 'ETL-031 #119'),
+]
+
+# --- trzy poziomy dostepnosci zdolnosci = model sprzedazy (ETL-034 #117) --
+POZIOMY_SPRZEDAZY = [
+ ('1 — W katalogu', 'Adapter działa, dostawca w rejestrze, testy przechodzą',
+  'Natychmiast', 'Nikt osobno', 'W abonamencie'),
+ ('2 — W rejestrze Forge, bez adaptera', 'Dostawca znany i oceniony, adapter nie istnieje',
+  'Dni do tygodni', 'Zamawiający', 'Opłata jednorazowa za uruchomienie'),
+ ('3 — Poza rejestrem', 'Dostawca nieznany albo nieoceniony', 'Tygodnie do miesięcy',
+  'Zamawiający', 'Wyższa — obejmuje rozpoznanie, ocenę, budowę adaptera i test kontrolny'),
+]
+
+REGULA_KATALOGU = (
+ 'ADAPTER ZBUDOWANY NA ZAMÓWIENIE WCHODZI DO KATALOGU I OBNIŻA CENĘ DLA NASTĘPNYCH.',
+ 'Klient płaci za BYCIE PIERWSZYM, nie za wyłączność. Drugi zamawiający tej samej '
+ 'zdolności płaci ułamek, dziesiąty nie płaci nic — bo pozycja jest już na poziomie '
+ 'pierwszym. To jest mechanizm, w którym katalog rośnie na cudzy koszt, a każdy kolejny '
+ 'klient dostaje więcej za tę samą cenę.',
+ [('Standardowy', 'Adapter działa u niego i u wszystkich następnych', 'Podstawowa'),
+  ('Wyłączność czasowa', 'Adapter nie wchodzi do katalogu przez ustalony okres',
+   'Wielokrotność ceny podstawowej — bo blokuje efekt sieciowy'),
+  ('Wyłączność trwała', 'NIE OFERUJEMY',
+   'Trwale blokuje wartość, którą sprzedajemy wszystkim pozostałym')])
+
+# --- aparat oceny technologii (ETL-032, plik #118) ------------------------
+DOWOD = [
+ ('D5 — potwierdzone w praktyce', 'Produkty na rynku, wytyczne kliniczne',
+  'Budować, planować przychód'),
+ ('D4 — potwierdzone u ludzi', 'Badania z udziałem ludzi, walidacja prospektywna',
+  'Budować z rezerwą na walidację własną'),
+ ('D3 — wykazane w laboratorium', 'Zwierzęta, warunki kontrolowane',
+  'Finansować cudze badania. NIE planować produktu'),
+ ('D2 — brak zaprzeczenia', 'Wiarygodne, nikt nie sprawdził',
+  'Obserwować. ZERO budżetu na budowę'),
+ ('D1 — brak ścieżki', 'Sprzeczne ze stanem wiedzy albo bez metody weryfikacji',
+  'Nie występuje w dokumentacji operacyjnej'),
+]
+
+PRZEPISANIE = [
+ ('Nanoboty terapeutyczne', 'Dostarczyć substancję do konkretnej tkanki, omijając resztę',
+  'Koniugaty przeciwciało-lek, radioligandy celowane, nanocząstki lipidowe — '
+  'wszystkie JUŻ stosowane klinicznie'),
+ ('Roje wykonujące edycję genów in vivo', 'Zmienić funkcję komórki bez operacji',
+  'Edycja genów poza organizmem jest zatwierdzona i stosowana; w organizmie — '
+  'w badaniach z ludźmi'),
+ ('Kopia świadomości', 'Zachować to, co po człowieku zostaje, w formie użytecznej '
+  'dla bliskich', 'Archiwum narracyjne plus model językowy — z zastrzeżeniem, że to '
+  'symulacja stylu, nie ciągłość osoby. Nazwanie tego inaczej byłoby sprzedażą iluzji '
+  'ludziom w żałobie'),
+ ('Wydłużenie życia do konkretnej liczby lat',
+  'Wydłużyć lata w zdrowiu i opóźnić wielochorobowość',
+  'Mierzalne markery, ciągły zapis, interwencje stylu życia — to jest dokładnie '
+  'nasz obszar'),
+ ('Implant mierzący wszystko', 'Mieć ciągły zapis zamiast przekrojów',
+  'Urządzenia noszone plus dokumenty plus deklaracje — ciągłość bez wchodzenia w ciało'),
+ ('Pełna immersja', 'Zwiększyć przestrzeganie zaleceń i zaangażowanie',
+  'Przypomnienia, wspólnota, rozliczalność — tańsze i lepiej udowodnione'),
+ ('Autonomiczna medycyna', 'Skrócić drogę od pomiaru do decyzji',
+  'Triage z człowiekiem w pętli, dokumentacja automatyczna, teleopieka'),
+]
+
+WERDYKTY = [
+ ('E1 Aplikacja i warstwa danych', 'D5', '9', 'Wykonalne dziś',
+  'Żaden — to jest wykonanie, nie badanie'),
+ ('E2 Station — pomiar podstawowy', 'D5', '7–8', 'Wykonalne jako zestaw',
+  'Art. 22 MDR, komponenty z oznakowaniem, framing wellness'),
+ ('E2 Station — biochemia domowa', 'D3 dla panelu pełnego', '4–6',
+  'Warunkowo, jako wyrób profesjonalny', 'Reżim IVDR, nie MDR'),
+ ('E2 Station — dozowanie na podstawie pomiaru', 'D4 w warunkach szpitalnych', '5',
+  'POZA PLANEM', 'Klasa III'),
+ ('E3 Capsule — transponder weterynaryjny', 'D5', '8–9', 'Wykonalne 2027–2028',
+  'Przychód z linii Pet'),
+ ('E3 Capsule — transponder u człowieka, wellness', 'D4', '6–7', 'Realnie 2030–2031',
+  'Kompetencja produkcyjna z weterynarii'),
+ ('E3 Capsule — implant klasy IIb', 'D4', '5–6', '2035–2037',
+  'Partner z systemem jakości ORAZ finansowanie w milionach euro'),
+ ('E3 Capsule — biosensor metaboliczny wszczepialny', 'D3', '4',
+  'NIE własnymi siłami', 'Dekada i kapitał, którego nie mamy'),
+ ('E3 Capsule — roje terapeutyczne', 'D2–D1', '1–2',
+  'Poza dokumentacją operacyjną', '—'),
+ ('E4 Digital Twin — wizualizacja', 'D5', '9', 'Wykonalne dziś',
+  'Bez oceny klinicznej pozostaje poza reżimem wyrobu'),
+ ('E4 Digital Twin — predykcja ryzyka', 'D3–D4', '4–5', 'Warunkowo',
+  'Walidacja prospektywna. Bez niej model nie jest wyrobem, tylko wykresem'),
+ ('E4 Digital Twin — model przyczynowy', 'D3', '4', 'Program badawczy',
+  'Kohorta z ciągłością, nie z masą'),
+ ('E5 Matrix — technologia', 'D5', '9', 'Technicznie gotowe',
+  'Silniki i sprzęt działają od lat'),
+ ('E5 Matrix — wartość kliniczna', 'D2', '3', 'REKOMENDACJA: NIE ROBIĆ',
+  'Technologia dojrzała, cel niepotwierdzony. 33 funkcje zależności i jedyny komponent '
+  'zamknięty w stosie'),
+]
+
+REGULA_KRZYWEJ = (
+ 'Rzeczy, które się deprecjonują, kupować później. Rzeczy, które się kumulują, '
+ 'zaczynać dziś.',
+ 'Deprecjonują się: krzem, modele, czujniki, moc obliczeniowa — każdy rok czekania '
+ 'obniża cenę. Kumulują się: zapis, zaufanie, pozycja w standardzie, dorobek — '
+ 'każdy rok czekania podnosi koszt nadrobienia. To jest cała odpowiedź na pytanie, '
+ 'co robić najpierw, i jest ważniejsza niż rachunek kosztów.')
+
+PULAPKA_E5 = (
+ 'Wysoka gotowość technologiczna przy niskim dowodzie wartości.',
+ 'Sprzęt działa, silnik działa, wszystko da się zbudować — i nikt nie wykazał, '
+ 'że to komukolwiek pomaga. GOTOWOŚĆ TECHNOLOGII JEST NAJCZĘSTSZYM POWODEM, '
+ 'DLA KTÓREGO BUDUJE SIĘ RZECZY NIEPOTRZEBNE. Sprawdzanie stopnia dowodu ODDZIELNIE '
+ 'od gotowości chroni przed tym błędem.')
+
+# --- indeks zrodel per sekcja --------------------------------------------
+ZRODLA_SEKCJI = [
+ ('0. Trzy zdania', 'Master 5.4 §7 (#126), ETL-034 Eternal API Gateway (#117)'),
+ ('1. Moduł A1', 'Master 5.4 §11 (#126), Macierz Dostawców (#86), '
+  'AGREGACJA DANYCH Z WEARABLES (#135), ETL-AGREGACJA-KONTROLA (#28)'),
+ ('2. Moduły architektury', 'ETL-034 Gateway (#117), ETL-031 Model orkiestratora (#119), '
+  'Master 5.4 §4.3 (#126)'),
+ ('3. Sześć agregatorów', 'Macierz Dostawców (#86), Pytania i odpowiedzi (#101), '
+  'ETL-031 (#119) — korekta o nieodziedziczalności CE'),
+ ('4. Test otwartego standardu', 'ETERNAL_Macierz_Dostawcow.xlsx (#86)'),
+ ('5. Integracja zamiast budowy', 'ETL-032 Wykonalność naukowa i kontrola technologii '
+  '(#118), ETL-AGREGACJA-KONTROLA (#28), Model agregacyjny bez certyfikacji (#88)'),
+ ('6. Modularność', 'Master 5.4 (#126), Struktura warstwowa (#43), '
+  'ETL-031 §5 klinika mobilna (#119)'),
+ ('7. Hierarchia ekosystemu', 'Eternal_Projekty_P1-P5_definicja (#151), '
+  'Macierz 40 Projektów v2 (#128), Struktura Cel-Projekt-Produkt-Funkcja (#153)'),
+ ('8. Ocena technologii', 'ETL-032 (#118)'),
+]
