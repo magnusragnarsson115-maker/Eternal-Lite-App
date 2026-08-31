@@ -1,6 +1,6 @@
 # Konsolidacja korpusu Eternal
 
-Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje dziesięć
+Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje dwanaście
 dokumentów wynikowych. Skrypty są tu po to, żeby wynik dało się odtworzyć — same
 dokumenty nie są wersjonowane (patrz `.gitignore`).
 
@@ -14,12 +14,15 @@ python3 consolidate.py R 158 159 154 151 152 136 128 144
 python3 consolidate.py P 138 111 110 140 74 75
 python3 filtr_artefaktow.py S R B P # drugi przebieg: duplikaty międzyformatowe
 python3 tematy.py                    # przekrojowy indeks 16 zagadnień
-python3 macierz.py                   # macierz 337 funkcji
+python3 macierz.py                   # macierz 337 funkcji (monetyzacja)
+python3 komponenty.py                # przypisanie komponentow do 337 funkcji
 python3 build_spec2.py               # specyfikacja wg źródeł          → DOCX
 python3 build_tematyczna.py          # specyfikacja wg zagadnień       → DOCX
 python3 build_bp.py                  # biznesplan                      → DOCX
 python3 build_analiza_docx.py        # analiza poprawności             → DOCX
 python3 build_index_docx.py          # indeks 159 źródeł               → DOCX
+python3 build_komponenty_docx.py     # architektura komponentów        → DOCX
+python3 build_komponenty_xlsx.py     # macierz komponentów             → XLSX
 python3 build_roadmap.py             # roadmapa całości                → HTML
 python3 build_app_html.py            # roadmapa aplikacji              → HTML
 node    decks.js                     # pitch aplikacja + ekosystem     → PPTX
@@ -56,6 +59,14 @@ Wcześniejsze wersje pipeline'u generowały HTML dla wszystkiego — zostało to
 cofnięte, a generatory HTML analizy, indeksu i pitcha usunięte, żeby nie
 odtwarzały plików w niewłaściwym formacie.
 
+**Warstwa zgodności jest wyprowadzana z definicji, nie z pola źródłowego.** Rejestr
+funkcji ma pole „klasa MDR" (IIA/IIB/III), ale jest ono artefaktem ekstrakcji: jako
+klasa IIb oznaczone są w nim „Dashboard główny" i „Ręczne dodawanie danych", które
+wyrobem nie są. `komponenty.py` wyprowadza warstwę A/B/C z definicji Master 5.4
+i z treści nazwy funkcji, a pole źródłowe zachowuje wyłącznie jako ślad, z adnotacją.
+Kontrola: korpus wskazuje A3.5, A6.5, A6.8 i D2.x jako warstwę C — reguły odtwarzają
+wszystkie cztery przypadki niezależnie.
+
 **Sprzeczności nie są rozstrzygane po cichu.** Tam, gdzie źródła mówią różne
 rzeczy, obie wersje trafiają do dokumentu z zaznaczeniem, która jest nowsza.
 Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
@@ -73,6 +84,8 @@ Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
 | `macierz.py` | macierz funkcji: monetyzacja, potrzeba, duplikacja w efekcie |
 | `marka.py` | identyfikacja wizualna odtworzona z logo: paleta i wektorowy znak |
 | `dane_analiza.py` | dane analizy własnej: 14 ustaleń, rachunek finansowy, źródła zewnętrzne |
+| `dane_komponenty.py` | rejestr 30 klas komponentów, dostawcy A/B/C, ekonomia per user, wyzwalacze zmiany |
+| `komponenty.py` | przypisanie klasy komponentu i warstwy zgodności do każdej z 337 funkcji |
 | `DECK30.json` | struktura oficjalnego pitch decku (32 slajdy) wyeksportowana z PDF |
 | `mkdocx.py`, `builder.py` | wspólne narzędzia generowania DOCX |
 | `build_*.py`, `decks.js` | generatory poszczególnych dokumentów |
