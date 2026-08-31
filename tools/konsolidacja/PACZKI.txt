@@ -1,0 +1,8 @@
+P1|Zestawienia 115 funkcji (files_5, xlsx/html)|99 100 101 102 103 104 105 106 107
+P2|Specyfikacje Master/App 3.0/3.1/5.4|108 109 125 126 129 148
+P3|ETL 028-037 + biznesplan/plan korp./pitche (files_4)|110 111 112 113 114 115 116 117 118 119 120 121 122 123 124
+P4|Macierz 40 projektow + normy|127 128
+P5|Konwersacje i rejestry pytan|130 131 132 139 146
+P6|eternal_2 - dokumenty krotkie i srednie|133 134 135 136 137 138 140 141 142 143 144 145
+P7|Moonshoty roadmapa (3 warianty)|149 150 151
+P8|Roadmap checklisty HTML v2-v5|147 152 153 154 155 156 157 158 159

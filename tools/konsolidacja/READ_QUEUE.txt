@@ -1,0 +1,159 @@
+7228	text/faea6dbd-files_7/ETL-PLAN-90DNI-019.md.txt
+7577	text/faea6dbd-files_7/ETL-POKRYCIE-API-014.md.txt
+8023	text/faea6dbd-files_7/ETL-PLAN-WOBEC-IKP-012.md.txt
+8592	text/faea6dbd-files_7/ETL-KATALOG-URZADZEN-013.md.txt
+8693	text/faea6dbd-files_7/ETL-OCENA-MODULOW-026.md.txt
+8745	text/faea6dbd-files_7/ETL-CAPSULE-FINAL-020.md.txt
+9321	text/faea6dbd-files_7/ETL-EPP-AGREGACJA-008.md.txt
+9772	text/faea6dbd-files_7/ETL-KLASY-KOMPONENTOW-023.md.txt
+9835	text/faea6dbd-files_7/ETL-MARKETPLACE-HUB-FORGE-021.md.txt
+10001	text/faea6dbd-files_7/ETL-SEKWENCJA-WYKONAWCZA-028.md.txt
+10087	text/faea6dbd-files_7/ETL-MODULY-KONTROLNE-025.md.txt
+10274	text/faea6dbd-files_7/ETL-MODEL-SOFTWARE-009.md.txt
+10540	text/faea6dbd-files_7/ETL-TAKSONOMIA-MASTER-022.md.txt
+11077	text/faea6dbd-files_7/ETL-WERDYKT-PLAN-011.md.txt
+11192	text/faea6dbd-files_7/ETL-PODSTAWY-MONETYZACJA-017.md.txt
+11582	text/faea6dbd-files_7/ETL-SKALA-CZAS-KONTROLA-018.md.txt
+11756	text/faea6dbd-files_7/ETL-PODMIOT-ZGODY-010.md.txt
+11804	text/faea6dbd-files_7/ETL-BRAKI-SPECYFIKACJI-024.md.txt
+11847	text/faea6dbd-files_7/ETL-STATUT-FUNDACJI-016.md.txt
+11932	text/faea6dbd-files_7/ETL-PODPROJEKTY-MACIERZ-007.md.txt
+12663	text/faea6dbd-files_7/ETL-MODEL-STRUKTURALNY-006.md.txt
+12866	text/faea6dbd-files_7/ETL-RENTOWNOSC-WLASNOSC-029.md.txt
+12886	text/faea6dbd-files_7/ETL-ARCHITEKTURA-50LAT-015.md.txt
+13651	text/faea6dbd-files_7/ETL-BCI-OEM-LICENCJA-003.md.txt
+14146	text/faea6dbd-files_7/ETL-CERTYFIKACJA-KONTROLA-027.md.txt
+14958	text/faea6dbd-files_7/ETL-POLSKA-EZDROWIE-2030-004.md.txt
+18073	text/faea6dbd-files_7/ETL-MAPOWANIE-PANSTWO-005.md.txt
+21854	text/faea6dbd-files_7/ETL-AGREGACJA-KONTROLA-002.md.txt
+24572	text/faea6dbd-files_7/ETL-KONKURENCJA-EKOSYSTEM-001.md.txt
+26073	text/faea6dbd-files_7/ETL-CAPSULE-KONTROLA-001.md.txt
+8530	text/5458e7dd-files_6/Eternal_Profil_agenci_wiarygodnosc.md.txt
+10518	text/5458e7dd-files_6/Eternal_Rejestr_FINALNY_309.docx.txt
+10545	text/5458e7dd-files_6/Eternal_IKP_i_P1_do_2030.docx.txt
+10660	text/5458e7dd-files_6/Eternal_Dane_zweryfikowane.docx.txt
+11158	text/5458e7dd-files_6/Eternal_Punkt5_Splaszczenie.docx.txt
+11178	text/5458e7dd-files_6/Eternal_IKP_P1_do_2031.docx.txt
+11779	text/5458e7dd-files_6/Eternal_Marketing_i_wspoldecydowanie.md.txt
+12262	text/5458e7dd-files_6/Eternal_Punkt_zerowy.docx.txt
+12348	text/5458e7dd-files_6/Eternal_App_23_moduly.docx.txt
+12468	text/5458e7dd-files_6/Eternal_Model_doboru_projektow.md.txt
+12747	text/5458e7dd-files_6/Eternal_Przebieg_MVP_odczyt_wyniku.md.txt
+12803	text/5458e7dd-files_6/Eternal_Sprzet_noszony_i_diagnostyka.docx.txt
+13039	text/5458e7dd-files_6/Eternal_Struktura_warstwowa.md.txt
+13197	text/5458e7dd-files_6/Eternal_Capsule_realizacja_tania.docx.txt
+14079	text/5458e7dd-files_6/Eternal_Pole_gry_IKP_i_konkurencja.docx.txt
+14562	text/5458e7dd-files_6/Eternal_Skad_roznica_kosztow.docx.txt
+14910	text/5458e7dd-files_6/Eternal_Status_kliniki_freemium.docx.txt
+15067	text/5458e7dd-files_6/Eternal_Dokument_ujednolicony.docx.txt
+15070	text/5458e7dd-files_6/Eternal_Piec_projektow_i_moonshoty.md.txt
+15164	text/5458e7dd-files_6/Eternal_Struktura_Cel-Projekt-Produkt-Funkcja.md.txt
+15205	text/5458e7dd-files_6/Eternal_Rejestr_scalony_299.docx.txt
+15495	text/5458e7dd-files_6/Eternal_Model_monetyzacji.docx.txt
+15605	text/5458e7dd-files_6/Eternal_Punkt2_Moonshoty.docx.txt
+15686	text/5458e7dd-files_6/Eternal_Piec_punktow_v2.docx.txt
+16057	text/5458e7dd-files_6/Eternal_Wizja_2036-2046.md.txt
+16313	text/5458e7dd-files_6/Eternal_Funkcje_ewolucja_i_luki.md.txt
+16442	text/5458e7dd-files_6/Eternal_Punkt5_Pelny_40_projektow.docx.txt
+16549	text/5458e7dd-files_6/Eternal_Modele_monetyzacji_pivoty.docx.txt
+16912	text/5458e7dd-files_6/Eternal_Projekty_P1-P5_definicja.md.txt
+17001	text/5458e7dd-files_6/Eternal_Analiza_macierzy_i_modele.md.txt
+17219	text/5458e7dd-files_6/Eternal_Audyt_185_funkcji.docx.txt
+17265	text/5458e7dd-files_6/Eternal_Warstwy_produkty_monetyzacja.md.txt
+17755	text/5458e7dd-files_6/Eternal_Punkt3_Otwarty_system.docx.txt
+17965	text/5458e7dd-files_6/Eternal_Punkt1_Dekompozycja.docx.txt
+18023	text/5458e7dd-files_6/Eternal_Macierz_skondensowana_v3.docx.txt
+18115	text/5458e7dd-files_6/Eternal_Trzy_warianty_wykonania.docx.txt
+18202	text/5458e7dd-files_6/Eternal_Architektura_komponentow.md.txt
+18414	text/5458e7dd-files_6/Eternal_Struktura_merytoryczna.md.txt
+18654	text/5458e7dd-files_6/Eternal_Jak_to_zbudowac.md.txt
+18896	text/5458e7dd-files_6/Eternal_Weryfikacja_hipotez.docx.txt
+19031	text/5458e7dd-files_6/Eternal_Projekty_forma_lata_kolejnosc.md.txt
+19037	text/5458e7dd-files_6/Eternal_Punkt4_Trzon_i_kontrola.docx.txt
+19512	text/5458e7dd-files_6/Eternal_Dekompozycja_i_sekwencja.docx.txt
+19769	text/5458e7dd-files_6/Eternal_Co_nas_wyroznia.docx.txt
+20615	text/5458e7dd-files_6/Eternal_Karty_produktowe_1-20.docx.txt
+21058	text/5458e7dd-files_6/Eternal_jako_projekt_publiczny.docx.txt
+22685	text/5458e7dd-files_6/Eternal_Piec_rozstrzygniec.docx.txt
+24460	text/5458e7dd-files_6/Eternal_30_modulow_pelna_analiza.docx.txt
+25447	text/5458e7dd-files_6/Eternal_Piec_odpowiedzi_poprawione.docx.txt
+38533	text/5458e7dd-files_6/Eternal_Specyfikacja_i_architektura.docx.txt
+40937	text/5458e7dd-files_6/Eternal_Piec_odpowiedzi.docx.txt
+110581	text/5458e7dd-files_6/Eternal_Dokumentacja_kompletna.docx.txt
+6328	text/000d1922-eternal_1/ETL-23-MODULY-160-FUNKCJI-031.md.txt
+9416	text/000d1922-eternal_1/ETL-STRUKTURA-PRZYCHODY-030.md.txt
+13675	text/000d1922-eternal_1/ETL-SPECYFIKACJA-SCALONA-032.md.txt
+9447	text/992528f0-files_5/ETERNAL_Macierz_Dostawcow.xlsx.txt
+10345	text/992528f0-files_5/ETERNAL_Analiza_ChatGPT.html.txt
+12540	text/992528f0-files_5/ETERNAL_Model_Agregacyjny_Czy_Bez_Certyfikacji.md.txt
+13375	text/992528f0-files_5/ETERNAL_Komponenty_Linki.md.txt
+13706	text/992528f0-files_5/ETERNAL_Specyfikacja_Master_3_1.docx.txt
+18278	text/992528f0-files_5/ETERNAL_Produkty_Moduly_Posrednie.xlsx.txt
+19707	text/992528f0-files_5/ETERNAL_Kiedy_MDR_115_funkcji.xlsx.txt
+21165	text/992528f0-files_5/ETERNAL_Audyt_Odpowiedzi.html.txt
+24130	text/992528f0-files_5/ETERNAL_Analiza_Krytyczna_Dokumentu_Koszty_Certyfikacja.md.txt
+24282	text/992528f0-files_5/ETERNAL_App_Specyfikacja_Funkcjonalna.docx.txt
+26129	text/992528f0-files_5/ETERNAL_Punkty_Wspolne_TRESC.xlsx.txt
+28091	text/992528f0-files_5/ETERNAL_Rozwiazania_MDR_IKP.xlsx.txt
+35542	text/992528f0-files_5/ETERNAL_Odpowiedzi_Certyfikacja_Kontrola_Struktura.md.txt
+36350	text/992528f0-files_5/ETERNAL_3_Zestawienia_po_audycie.xlsx.txt
+36569	text/992528f0-files_5/ETERNAL_Odpowiedzi_na_pytania.docx.txt
+38010	text/992528f0-files_5/ETERNAL_Analiza_Relacyjna_115.xlsx.txt
+39889	text/992528f0-files_5/ETERNAL_Alternatywy_Koszty_Kontrola.xlsx.txt
+40509	text/992528f0-files_5/ETERNAL_Funkcje_Certyfikacja_Licencje.xlsx.txt
+44057	text/992528f0-files_5/ETERNAL_Analiza_Zbiorcza.html.txt
+45910	text/992528f0-files_5/ETERNAL_115_Funkcji_Grupy_Agregacja_System.xlsx.txt
+53347	text/992528f0-files_5/ETERNAL_Odpowiedzi_pytanie_po_pytaniu.docx.txt
+85828	text/992528f0-files_5/ETERNAL_System_Punktow_Wspolnych.xlsx.txt
+602569	text/992528f0-files_5/ETERNAL_App_Specyfikacja_3_1.docx.txt
+922034	text/992528f0-files_5/ETERNAL_Specyfikacja_Master_3_1_KOMPLETNA.docx.txt
+4519	text/9ec4eb8f-files_4/ETERNAL_Pitch_App.pptx.txt
+9039	text/9ec4eb8f-files_4/ETERNAL_Pitch_Ekosystem.pptx.txt
+11798	text/9ec4eb8f-files_4/ETL-036_Rejestr_pytan_ujednolicony.docx.txt
+11837	text/9ec4eb8f-files_4/ETL-035_Weryfikacja_odpowiedzi_zewnetrznych.docx.txt
+12197	text/9ec4eb8f-files_4/ETL-033_Audyt_pokrycia_zrodel.docx.txt
+12907	text/9ec4eb8f-files_4/ETL-037_Model_odpowiedzi.docx.txt
+13015	text/9ec4eb8f-files_4/ETERNAL_Roadmapa_Wykonawcza_2_0.docx.txt
+14557	text/9ec4eb8f-files_4/ETL-034_Eternal_API_Gateway.docx.txt
+18614	text/9ec4eb8f-files_4/ETL-032_Wykonalnosc_naukowa_i_kontrola_technologii.docx.txt
+22309	text/9ec4eb8f-files_4/ETL-031_Model_orkiestratora.docx.txt
+22552	text/9ec4eb8f-files_4/ETL-029_Hub_i_Forge.docx.txt
+22553	text/9ec4eb8f-files_4/ETL-AUDYT-OCENY-WYKONALNOSCI-028.html.txt
+29836	text/9ec4eb8f-files_4/ETERNAL_Biznesplan_4_0.docx.txt
+30903	text/9ec4eb8f-files_4/ETERNAL_Plan_Korporacyjny_5_1.docx.txt
+32131	text/9ec4eb8f-files_4/ETL-030_Dwie_powierzchnie_etapy_waga.docx.txt
+752667	text/9ec4eb8f-files_4/ETERNAL_App_Specyfikacja_5_4_FINAL.docx.txt
+1072132	text/9ec4eb8f-files_4/ETERNAL_Specyfikacja_Master_5_4_FINAL.docx.txt
+2032	text/d93dbff3-Eternal_Macierz_40_Projektow/Normy aplikacji med - przestrzeganie, ocena, analiza (specyfikacja aplikacji) (1).pdf.txt
+48601	text/d93dbff3-Eternal_Macierz_40_Projektow/Eternal_Macierz_40_Projektow_v2_z_PDF.docx (1).pdf.txt
+744973	text/d93dbff3-Eternal_Macierz_40_Projektow/Eternal_Specyfikacja_Master_3.0_KOMPLETNA (1) (1).docx.txt
+39022	text/4415899f-Chat_GPT__konwersacja_/Pytania - bez odpowiedzi do claude_ odpowiedzi dodam lub same z claude inny plik + link tu.docx.txt
+190082	text/4415899f-Chat_GPT__konwersacja_/Chat GPT - konwersacja .docx.txt
+267964	text/4415899f-Chat_GPT__konwersacja_/Chat GPT - Konwersacja drugie konto .docx.txt
+1215	text/bf194d26-eternal_2/eternal 2/Master WBS Holdingu.dc.html.txt
+9321	text/bf194d26-eternal_2/eternal 2/Moduły .pdf.txt
+15943	text/bf194d26-eternal_2/eternal 2/AGRAGACJA DANYCH Z WEARABLES.pdf.txt
+22464	text/bf194d26-eternal_2/eternal 2/eternal_etapy_7_11_fikcja_sf_lore (1).html.txt
+26236	text/bf194d26-eternal_2/eternal 2/deepseek_html_20260802_a599d1.html.txt
+31295	text/bf194d26-eternal_2/eternal 2/Oficjalny Pitch deck .pptx (1).pdf.txt
+40534	text/bf194d26-eternal_2/eternal 2/same pytania - oceń i usuń powtarzające się wątki pytania, ujednolicamy .docx.txt
+53046	text/bf194d26-eternal_2/eternal 2/Podsumowanie wykonawcze.docx.txt
+64117	text/bf194d26-eternal_2/eternal 2/deepseek_html_20260705_5d6d38.html.txt
+79721	text/bf194d26-eternal_2/eternal 2/deepseek_html_20260705_5f7054.html.txt
+115609	text/bf194d26-eternal_2/eternal 2/deepseek_html_20260708_5c7a80 (1).html.txt
+187961	text/bf194d26-eternal_2/eternal 2/eternal_stage2_budowa_firmy_kompletna.html.txt
+403702	text/bf194d26-eternal_2/eternal 2/eternal_ecosystem_biznesplan_rozszerzony.pdf.txt
+591796	text/bf194d26-eternal_2/eternal 2/Pytania + odpowiedzi - sprawdz legiotność i daj swoje odpowiedzi .docx.txt
+653225	text/bf194d26-eternal_2/eternal 2/eternal_roadmap_checklist_v2_realny.html.txt
+756326	text/bf194d26-eternal_2/eternal 2/Eternal_Specyfikacja_Master_3.0_KOMPLETNA (1).docx.pdf.txt
+776268	text/bf194d26-eternal_2/eternal 2/moonshoty_z_html_roadmapa_od_nowa (1).html.txt
+808292	text/bf194d26-eternal_2/eternal 2/moonshoty_z_html_roadmapa_od_nowa_1DO1_PLUS_WSKAZANE_EPIKI_STRATEGICZNE_TASK_SUBTASK_SF.html.txt
+823735	text/bf194d26-eternal_2/eternal 2/moonshoty_z_html_roadmapa_od_nowa_1DO1_PLUS_STRATEGICZNE_EPIC_TASK_SUBTASK_SF.html.txt
+1152460	text/bf194d26-eternal_2/eternal 2/eternal_roadmap_checklist_v5_etap711.html.txt
+1453137	text/bf194d26-eternal_2/eternal 2/eternal_roadmap_checklist_v3_pelny.html.txt
+1473784	text/bf194d26-eternal_2/eternal 2/eternal_roadmap_checklist_v4_alternatywy (1).html.txt
+1702351	text/bf194d26-eternal_2/eternal 2/eternal_roadmap_checklist_v5_SKROCONA_etap16.html.txt
+1750722	text/bf194d26-eternal_2/eternal 2/eternal_roadmap_checklist.html.txt
+2779291	text/bf194d26-eternal_2/eternal 2/eternal_roadmap_checklist_v5_pelna_analiza.html.txt
+2880533	text/bf194d26-eternal_2/eternal 2/eternal_roadmap_checklist_v5_pelna_analiza_PWNS.html.txt
+3000693	text/bf194d26-eternal_2/eternal 2/eternal_roadmap_checklist_enriched.html.txt

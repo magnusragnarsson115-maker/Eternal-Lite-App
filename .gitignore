@@ -5,3 +5,5 @@ manifest.json
 out/*.md
 out/*.docx
 out/*.html
+out/*.xlsx
+out/*.pptx
