@@ -1,6 +1,6 @@
 # Konsolidacja korpusu Eternal
 
-Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje osiem
+Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje dziesięć
 dokumentów wynikowych. Skrypty są tu po to, żeby wynik dało się odtworzyć — same
 dokumenty nie są wersjonowane (patrz `.gitignore`).
 
@@ -15,13 +15,14 @@ python3 consolidate.py P 138 111 110 140 74 75
 python3 filtr_artefaktow.py S R B P # drugi przebieg: duplikaty międzyformatowe
 python3 tematy.py                    # przekrojowy indeks 16 zagadnień
 python3 macierz.py                   # macierz 337 funkcji
-python3 build_spec2.py               # specyfikacja wg źródeł
-python3 build_tematyczna.py          # specyfikacja wg zagadnień
-python3 build_bp.py                  # biznesplan
-python3 build_roadmap.py             # roadmapa całości
-python3 build_app_html.py            # roadmapa aplikacji
-python3 build_index.py               # indeks źródeł
-node    decks.js                     # pitch PPTX (aplikacja + ekosystem)
+python3 build_spec2.py               # specyfikacja wg źródeł          → DOCX
+python3 build_tematyczna.py          # specyfikacja wg zagadnień       → DOCX
+python3 build_bp.py                  # biznesplan                      → DOCX
+python3 build_analiza_docx.py        # analiza poprawności             → DOCX
+python3 build_index_docx.py          # indeks 159 źródeł               → DOCX
+python3 build_roadmap.py             # roadmapa całości                → HTML
+python3 build_app_html.py            # roadmapa aplikacji              → HTML
+node    decks.js                     # pitch aplikacja + ekosystem     → PPTX
 python3 finish.py                    # macierz XLSX + wstrzyknięcie rozstrzygnięć
 ```
 
@@ -46,6 +47,15 @@ Usunięcie ich rozbiłoby komplet 185 kart funkcji w biznesplanie rozszerzonym.
 tnie się inaczej, więc hasze bloków się nie zgadzają, choć treść jest identyczna.
 `filtr_artefaktow.py` porównuje treść jako podciąg materiału przyjętego wcześniej.
 
+**Format wynika z przeznaczenia dokumentu, nie z wygody generatora.** HTML jest
+zarezerwowany wyłącznie dla roadmap — tam interaktywność (przełączanie widoków,
+liczniki, zwijane etapy) jest treścią, nie ozdobą. Specyfikacja, biznesplan,
+analiza poprawności i indeks źródeł idą w DOCX, bo są czytane i drukowane
+liniowo oraz komentowane w edytorze. Pitch decki idą w PPTX, bo są prezentowane.
+Wcześniejsze wersje pipeline'u generowały HTML dla wszystkiego — zostało to
+cofnięte, a generatory HTML analizy, indeksu i pitcha usunięte, żeby nie
+odtwarzały plików w niewłaściwym formacie.
+
 **Sprzeczności nie są rozstrzygane po cichu.** Tam, gdzie źródła mówią różne
 rzeczy, obie wersje trafiają do dokumentu z zaznaczeniem, która jest nowsza.
 Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
@@ -61,6 +71,9 @@ Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
 | `filtr_artefaktow.py` | drugi przebieg — duplikaty PDF vs DOCX |
 | `tematy.py` | przekrojowy indeks 16 zagadnień ze wszystkich sekcji naraz |
 | `macierz.py` | macierz funkcji: monetyzacja, potrzeba, duplikacja w efekcie |
+| `marka.py` | identyfikacja wizualna odtworzona z logo: paleta i wektorowy znak |
+| `dane_analiza.py` | dane analizy własnej: 14 ustaleń, rachunek finansowy, źródła zewnętrzne |
+| `DECK30.json` | struktura oficjalnego pitch decku (32 slajdy) wyeksportowana z PDF |
 | `mkdocx.py`, `builder.py` | wspólne narzędzia generowania DOCX |
 | `build_*.py`, `decks.js` | generatory poszczególnych dokumentów |
 | `finish.py` | macierz XLSX i wstrzyknięcie rozstrzygnięć do roadmap |
