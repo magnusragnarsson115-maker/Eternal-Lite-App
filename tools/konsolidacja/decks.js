@@ -253,7 +253,7 @@ function deckApp() {
 
   s = slide(p); head(s, 'Monetyzacja', 'Aplikacja pacjenta jest darmowa', 'kanał → nazwa → istota i stawka');
   table(s, ['Kanał', 'Nazwa', 'Istota'], MONET.slice(0, 6), 2.3, [1.0, 3.5, 7.7]);
-  warn(s, 'Darmowa aplikacja nie wygrywa z IKP i nie ma wygrywać — ceny zera nie da się podciąć, a IKP ma mandat ustawowy i 20 mln kont. To decyzja dystrybucyjna, nie konkurencyjna. Wygrywamy tym, czego państwo zrobić nie może: zlecić badanie, leczyć, zinterpretować. Cennik rozjechany w korpusie (29,99/49,99, 49, 19–29 PLN) — obowiązuje Master 5.4: darmowa w całości.', 4.75);
+  warn(s, 'Paradoks przychodowy: 95–105 funkcji niecertyfikowanych jest tanich i ma najsłabszą skłonność do płacenia, a 14–35 certyfikowanych jest drogich i to jedyne, za które ktoś zapłaci. Dojście do 10 mln zł z samego abonamentu wymaga 1–5% populacji Polski. Darmowa aplikacja nie wygrywa z IKP i nie ma wygrywać — ceny zera nie da się podciąć, a IKP ma mandat ustawowy i 20 mln kont. To decyzja dystrybucyjna, nie konkurencyjna. Wygrywamy tym, czego państwo zrobić nie może: zlecić badanie, leczyć, zinterpretować. Cennik rozjechany w korpusie (29,99/49,99, 49, 19–29 PLN) — obowiązuje Master 5.4: darmowa w całości.', 4.75);
   src(s, ['rodo']);
 
   s = slide(p); head(s, 'Monetyzacja', 'Kanały K6–K11 — tam, gdzie są pieniądze', 'kanał → nazwa → istota i stawka');
@@ -276,7 +276,7 @@ function deckApp() {
   cards(s, [['Warstwa A — poza MDR', 'Agregacja, przechowywanie i pokazywanie własnych danych, eksport. Zakres MVP.'],
             ['Warstwa B — poza MDR', 'Transkrypcja, dokumentacja, umawianie wizyt, prezentacja danych. Zakres MLP.'],
             ['Warstwa C — klasa IIa+', 'Interpretacja z oceną, alerty progowe z oceną kliniczną. Po certyfikacji.']], 2.3, 3);
-  warn(s, 'Reguła produktowa: fakt i porównanie do własnej historii są bezpieczne; ocena, próg i zalecenie nie są. Zbiera, normalizuje, łączy — bezpieczne. Automatyzuje, personalizuje — granica. Jedna warstwa decyzyjna to wyrób. Agregacja nie omija certyfikacji, tylko ją odracza. Osobno obowiązuje AI Act — załącznik III.', 4.3);
+  warn(s, 'Dziedziczenie klasy: komponent obsługujący jednocześnie funkcję wellness i funkcję klasy IIa dziedziczy klasę wyższą dla całości — dzielenie komponentów oszczędza pieniądze i podnosi klasę. Reguła produktowa: fakt i porównanie do własnej historii są bezpieczne; ocena, próg i zalecenie nie są. Zbiera, normalizuje, łączy — bezpieczne. Automatyzuje, personalizuje — granica. Jedna warstwa decyzyjna to wyrób. Agregacja nie omija certyfikacji, tylko ją odracza. Osobno obowiązuje AI Act — załącznik III.', 4.3);
   src(s, ['mdcg', 'mdr', 'aiact']);
 
   s = slide(p); head(s, 'Zespół', 'Kto to buduje', 'osoba → rola → zakres odpowiedzialności');

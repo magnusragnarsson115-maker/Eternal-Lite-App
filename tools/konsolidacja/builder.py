@@ -4,6 +4,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mkdocx import *
 from docx import Document
 from dane_ustalenia import U, KAT
+from dane_pliki import P as UPL
 
 
 def _ustalenia(doc, sec):
@@ -25,6 +26,23 @@ def _ustalenia(doc, sec):
         rows.append([kod, KAT[kat][0], tyt + ' — ' + ust, zm, pl])
     add_table(doc, rows)
     doc.add_page_break()
+
+    W = {'KOR': 'KOREKTA', 'ROZ': 'ROZSTRZYGNIĘCIE', 'NOW': 'NOWE', 'RYZ': 'RYZYKO',
+         'POT': 'POTWIERDZENIE'}
+    mine = [i for i, (sc, st, ro) in sorted(M.items()) if sec in sc.split(',') and i in UPL]
+    if mine:
+        doc.add_heading('CZĘŚĆ 0B — USTALENIE Z KAŻDEGO PLIKU TEJ SEKCJI', 1)
+        doc.add_paragraph(
+            'Przejście po kolei przez wszystkie %d plików przypisanych do tej sekcji, '
+            'w paczkach po dziesięć. Każdy plik ma jeden wpis: co z niego wynika i jaką '
+            'ma wagę. Pełny rejestr wszystkich 159 plików: '
+            'ETERNAL_USTALENIA_PER_PLIK.docx.' % len(mine))
+        r2 = [['#', 'Plik', 'Waga', 'Ustalenie z tego pliku']]
+        for i in mine:
+            u, wg = UPL[i]
+            r2.append([str(i), INV[i]['name'].replace('.txt', '')[:52], W[wg], u])
+        add_table(doc, r2)
+        doc.add_page_break()
 
 def build(sec, tytul, podtytul, podstawa, nota, wersje, kanon, klastry, reszta_tytul, out):
     PARTS={x[0]:(x[1],x[2],x[3]) for x in json.load(open('build/PARTS_%s.json'%sec))}

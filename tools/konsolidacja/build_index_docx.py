@@ -19,6 +19,7 @@ from docx.oxml import OxmlElement
 from mkdocx import setup, toc
 from mapa import M
 from dane_ustalenia import U
+from dane_pliki import P as UPL
 
 INV = {r['idx']: r for r in json.load(open('INVENTORY.json'))}
 TODAY = datetime.date.today().strftime('%d.%m.%Y')
@@ -136,6 +137,10 @@ for t in [
     'Przeczytane osobno, dały %d ustaleń z 32 plików — kolumna „Ustalenia" wskazuje, które '
     'pozycje z ETERNAL_USTALENIA_KORPUSU.docx z danego pliku wynikają. Pliki bez wpisu '
     'w tej kolumnie nie wniosły treści wykraczającej poza już ujętą.' % len(U),
+    'RUNDA TRZECIA — PRZEJŚCIE PO KOLEI PRZEZ WSZYSTKIE 159 PLIKÓW, w szesnastu paczkach '
+    'po dziesięć. Każdy plik ma teraz wpis w kolumnie „Ustalenie z tego pliku" i wagę: '
+    'korekta, rozstrzygnięcie, treść nowa, ryzyko albo potwierdzenie. Pełny rejestr: '
+    'ETERNAL_USTALENIA_PER_PLIK.docx.',
 ]:
     doc.add_paragraph(t)
 
@@ -152,11 +157,12 @@ for k, nazwa, wynik in SEK:
                       'lub duplikatów: %d — ich treść zawiera się w wersji nowszej wskazanej '
                       'w statusie.' % (wynik, len(r) - len(dup), len(dup)))
     tabela(doc, [['#', 'Plik źródłowy', 'Znaków', 'Status', 'Bloków', 'Ustalenia',
-                  'Co z niego wchodzi do tej sekcji']]
+                  'Waga', 'Ustalenie z tego pliku']]
            + [[str(i), n[:70], format(c, ',').replace(',', ' '), st,
-               str(len(PARTS[k].get(i, []))), ', '.join(UST.get(i, [])) or '—', rola]
+               str(len(PARTS[k].get(i, []))), ', '.join(UST.get(i, [])) or '—',
+               UPL.get(i, ('', '—'))[1], UPL.get(i, ('—',))[0]]
               for i, n, c, st, ss, rola in r],
-           [1.1, 6.4, 1.7, 2.4, 1.4, 2.8, 8.2], statuscol=3)
+           [1.0, 4.6, 1.5, 2.2, 1.2, 2.2, 1.6, 11.2], statuscol=3)
     doc.add_page_break()
 
 multi = [x for x in ROWS if len(x[4]) > 1]

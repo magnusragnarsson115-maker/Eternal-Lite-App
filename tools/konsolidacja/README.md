@@ -1,6 +1,6 @@
 # Konsolidacja korpusu Eternal
 
-Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje siedemnaście
+Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje osiemnaście
 dokumentów wynikowych. Skrypty są tu po to, żeby wynik dało się odtworzyć — same
 dokumenty nie są wersjonowane (patrz `.gitignore`).
 
@@ -27,8 +27,11 @@ python3 build_prd_docx.py            # PRD 43 modułów                  → DOC
 python3 build_master_docx.py         # dokument nadrzędny 26 sekcji    → DOCX
 python3 build_architektura_docx.py   # A1 wzorcowy, adapter/brama/mapper → DOCX
 python3 build_rynek_xlsx.py          # odpowiedniki rynkowe            → XLSX
-python3 build_ustalenia_docx.py      # 61 ustaleń z plików bez funkcji → DOCX
-python3 inject_ustalenia_html.py     # wstrzyknięcie ustaleń do roadmap → HTML
+python3 build_ustalenia_docx.py      # 81 ustaleń korpusu               → DOCX
+python3 paczka.py 1 10               # zrzut paczki plików do odczytu (1..159)
+python3 build_pliki_docx.py          # ustalenie per plik, 159 pozycji   → DOCX
+python3 inject_ustalenia_html.py     # wstrzyknięcie ustaleń do roadmap  → HTML
+python3 inject_pliki_html.py         # wstrzyknięcie rejestru per plik   → HTML
 python3 build_roadmap.py             # roadmapa całości                → HTML
 python3 build_app_html.py            # roadmapa aplikacji              → HTML
 node    decks.js                     # pitch aplikacja + ekosystem     → PPTX
@@ -92,8 +95,25 @@ kody funkcji. Siedemdziesiąt cztery pliki ze stu pięćdziesięciu dziewięciu 
 zawierają — trzydzieści trzy z nich w sekcji SPECYFIKACJA. Ich treść trafiła do dokumentów
 scalonych, ale nie do rozumowania przy budowie dokumentów analitycznych, bo te powstawały
 z rejestru. Przeczytane osobno, dały 61 ustaleń, w tym sześć korekt obalających wcześniejsze
-twierdzenia. `dane_ustalenia.py` je przechowuje, `builder.py` wstawia je jako CZĘŚĆ 0
-do specyfikacji i biznesplanu, a `inject_ustalenia_html.py` do obu roadmap.
+twierdzenia; kolejne przebiegi podniosły ten zbiór do 81. `dane_ustalenia.py` je
+przechowuje, `builder.py` wstawia je jako CZĘŚĆ 0 do specyfikacji i biznesplanu,
+a `inject_ustalenia_html.py` do obu roadmap.
+
+**Ekstraktor twierdzeń szukał `**pogrubienia**`, którego w konwersjach DOCX nie ma.**
+Przez to dziewiętnaście plików DOCX, PPTX i PDF przeszło pierwsze sito z zerem trafień —
+wśród nich plik 77 (status FINAL) i plik 93, czyli audyt licencji, który obalił cztery
+założenia o stosie (MinIO AGPL od 2021, Grafana i Loki AGPL od kwietnia 2021, Redis
+AGPL/SSPL 2024-25, OpenPose 25 tys. USD rocznie zamiast licencji niekomercyjnej).
+Dlatego `paczka.py` nie opiera się na formatowaniu: nagłówki rozpoznaje po kształcie
+linii, a zdania kluczowe po słownictwie rozstrzygnięcia.
+
+**Każdy plik ma własne ustalenie, nie tylko wkład w scalenie.** Korpus przeszedł
+przebieg po kolei, paczkami po dziesięć plików: 159 pozycji, każda z jednym zdaniem
+rozstrzygnięcia i wagą — 22 KOR (korekta wcześniejszego twierdzenia), 65 ROZ
+(rozstrzygnięcie), 26 NOW (treść nowa), 16 RYZ (ryzyko), 30 POT (potwierdzenie
+bez nowej treści). `dane_pliki.py` je przechowuje, `build_pliki_docx.py` składa
+z nich osobny dokument, a `builder.py` wstawia CZĘŚĆ 0B — wiersze plików właściwych
+dla danej sekcji: 82 w specyfikacji, 77 w biznesplanie.
 
 **Sprzeczności nie są rozstrzygane po cichu.** Tam, gdzie źródła mówią różne
 rzeczy, obie wersje trafiają do dokumentu z zaznaczeniem, która jest nowsza.
@@ -118,7 +138,9 @@ Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
 | `dane_master.py` | treść dokumentu nadrzędnego — 26 sekcji od wizji po załączniki |
 | `dane_rynek.py` | 22 pozycje macierzy dostawców z testem otwartego standardu, 8 agregatorów, odpowiedniki funkcji A1 |
 | `dane_architektura.py` | adapter, brama, mapper, Universal Sync, 14 modułów kontrolnych, modularność, strategia integracji |
-| `dane_ustalenia.py` | 61 ustaleń z 32 plików bez kodów funkcji: korekty, rozstrzygnięcia, treść nowa, ryzyka |
+| `dane_ustalenia.py` | 81 ustaleń korpusu w 9 kategoriach: korekty, rozstrzygnięcia, treść nowa, ryzyka |
+| `dane_pliki.py` | ustalenie i waga (KOR/ROZ/NOW/RYZ/POT) dla każdego ze 159 plików, w 16 paczkach |
+| `paczka.py` | zrzut paczki plików do odczytu — nagłówki po kształcie linii, nie po pogrubieniu |
 | `DECK30.json` | struktura oficjalnego pitch decku (32 slajdy) wyeksportowana z PDF |
 | `mkdocx.py`, `builder.py` | wspólne narzędzia generowania DOCX |
 | `build_*.py`, `decks.js` | generatory poszczególnych dokumentów |
