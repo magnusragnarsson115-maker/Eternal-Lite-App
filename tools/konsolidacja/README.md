@@ -1,6 +1,6 @@
 # Konsolidacja korpusu Eternal
 
-Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje szesnaście
+Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje siedemnaście
 dokumentów wynikowych. Skrypty są tu po to, żeby wynik dało się odtworzyć — same
 dokumenty nie są wersjonowane (patrz `.gitignore`).
 
@@ -27,6 +27,8 @@ python3 build_prd_docx.py            # PRD 43 modułów                  → DOC
 python3 build_master_docx.py         # dokument nadrzędny 26 sekcji    → DOCX
 python3 build_architektura_docx.py   # A1 wzorcowy, adapter/brama/mapper → DOCX
 python3 build_rynek_xlsx.py          # odpowiedniki rynkowe            → XLSX
+python3 build_ustalenia_docx.py      # 61 ustaleń z plików bez funkcji → DOCX
+python3 inject_ustalenia_html.py     # wstrzyknięcie ustaleń do roadmap → HTML
 python3 build_roadmap.py             # roadmapa całości                → HTML
 python3 build_app_html.py            # roadmapa aplikacji              → HTML
 node    decks.js                     # pitch aplikacja + ekosystem     → PPTX
@@ -85,6 +87,14 @@ mogę odejść, bo mogę to napisać sam. NIE — wolno z tego zrobić funkcję,
 fundament. Na 22 pozycjach 15 pozwala budować rdzeń, 7 nie. Reguła 33% mówi,
 ilu dostawców; test mówi, czy wolno na nich w ogóle stanąć.
 
+**Rejestr funkcji nie jest rejestrem korpusu.** Rejestr powstał z plików zawierających
+kody funkcji. Siedemdziesiąt cztery pliki ze stu pięćdziesięciu dziewięciu kodów nie
+zawierają — trzydzieści trzy z nich w sekcji SPECYFIKACJA. Ich treść trafiła do dokumentów
+scalonych, ale nie do rozumowania przy budowie dokumentów analitycznych, bo te powstawały
+z rejestru. Przeczytane osobno, dały 61 ustaleń, w tym sześć korekt obalających wcześniejsze
+twierdzenia. `dane_ustalenia.py` je przechowuje, `builder.py` wstawia je jako CZĘŚĆ 0
+do specyfikacji i biznesplanu, a `inject_ustalenia_html.py` do obu roadmap.
+
 **Sprzeczności nie są rozstrzygane po cichu.** Tam, gdzie źródła mówią różne
 rzeczy, obie wersje trafiają do dokumentu z zaznaczeniem, która jest nowsza.
 Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
@@ -108,6 +118,7 @@ Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
 | `dane_master.py` | treść dokumentu nadrzędnego — 26 sekcji od wizji po załączniki |
 | `dane_rynek.py` | 22 pozycje macierzy dostawców z testem otwartego standardu, 8 agregatorów, odpowiedniki funkcji A1 |
 | `dane_architektura.py` | adapter, brama, mapper, Universal Sync, 14 modułów kontrolnych, modularność, strategia integracji |
+| `dane_ustalenia.py` | 61 ustaleń z 32 plików bez kodów funkcji: korekty, rozstrzygnięcia, treść nowa, ryzyka |
 | `DECK30.json` | struktura oficjalnego pitch decku (32 slajdy) wyeksportowana z PDF |
 | `mkdocx.py`, `builder.py` | wspólne narzędzia generowania DOCX |
 | `build_*.py`, `decks.js` | generatory poszczególnych dokumentów |

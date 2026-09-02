@@ -3,6 +3,28 @@ import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mkdocx import *
 from docx import Document
+from dane_ustalenia import U, KAT
+
+
+def _ustalenia(doc, sec):
+    """Czesc 0 — ustalenia z plikow bez kodow funkcji, wlasciwe dla tej sekcji."""
+    GR = {'S': ('C', 'K', 'T', 'D', 'M', 'S'), 'B': ('P', 'E', 'S', 'K', 'M'),
+          'R': ('S', 'T', 'D'), 'P': ('P', 'E', 'C')}
+    poz = [u for u in U if u[0][0] in GR.get(sec, ())]
+    if not poz:
+        return
+    doc.add_heading('CZĘŚĆ 0 — USTALENIA Z PLIKÓW BEZ KODÓW FUNKCJI', 1)
+    doc.add_paragraph(
+        'Siedemdziesiąt cztery pliki korpusu nie zawierają kodów funkcji i przez to nie '
+        'występowały w rejestrze, z którego budowano dokumenty analityczne. Ich treść była '
+        'w częściach poniżej — nie była w żadnym wniosku. Ta część zbiera %d ustaleń '
+        'właściwych dla tej sekcji, z numerem pliku źródłowego przy każdym. '
+        'Pełny rejestr %d ustaleń: ETERNAL_USTALENIA_KORPUSU.docx.' % (len(poz), len(U)))
+    rows = [['Kod', 'Kategoria', 'Ustalenie', 'Co zmienia', 'Pliki']]
+    for kod, kat, tyt, ust, zm, pl in poz:
+        rows.append([kod, KAT[kat][0], tyt + ' — ' + ust, zm, pl])
+    add_table(doc, rows)
+    doc.add_page_break()
 
 def build(sec, tytul, podtytul, podstawa, nota, wersje, kanon, klastry, reszta_tytul, out):
     PARTS={x[0]:(x[1],x[2],x[3]) for x in json.load(open('build/PARTS_%s.json'%sec))}
@@ -19,6 +41,7 @@ def build(sec, tytul, podtytul, podstawa, nota, wersje, kanon, klastry, reszta_t
     if wersje:
         doc.add_heading("Łańcuch wersji i pliki zastąpione",2); add_table(doc,wersje)
     doc.add_page_break(); doc.add_heading("Spis treści",1); toc(doc); doc.add_page_break()
+    _ustalenia(doc, sec)
 
     uzyte=set()
     for i,(ktyt,kopis) in kanon:

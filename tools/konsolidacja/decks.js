@@ -253,7 +253,7 @@ function deckApp() {
 
   s = slide(p); head(s, 'Monetyzacja', 'Aplikacja pacjenta jest darmowa', 'kanał → nazwa → istota i stawka');
   table(s, ['Kanał', 'Nazwa', 'Istota'], MONET.slice(0, 6), 2.3, [1.0, 3.5, 7.7]);
-  warn(s, 'Cennik to najbardziej rozjechana pozycja w korpusie: oficjalny deck 29,99/49,99 PLN, checklisty 49 PLN, plan operacyjny 19–29 PLN, a Specyfikacja Master 5.4 mówi, że aplikacja pacjenta jest darmowa w całości. Przyjęto wersję z Master 5.4 jako najnowszą.', 4.75);
+  warn(s, 'Darmowa aplikacja nie wygrywa z IKP i nie ma wygrywać — ceny zera nie da się podciąć, a IKP ma mandat ustawowy i 20 mln kont. To decyzja dystrybucyjna, nie konkurencyjna. Wygrywamy tym, czego państwo zrobić nie może: zlecić badanie, leczyć, zinterpretować. Cennik rozjechany w korpusie (29,99/49,99, 49, 19–29 PLN) — obowiązuje Master 5.4: darmowa w całości.', 4.75);
   src(s, ['rodo']);
 
   s = slide(p); head(s, 'Monetyzacja', 'Kanały K6–K11 — tam, gdzie są pieniądze', 'kanał → nazwa → istota i stawka');
@@ -276,7 +276,7 @@ function deckApp() {
   cards(s, [['Warstwa A — poza MDR', 'Agregacja, przechowywanie i pokazywanie własnych danych, eksport. Zakres MVP.'],
             ['Warstwa B — poza MDR', 'Transkrypcja, dokumentacja, umawianie wizyt, prezentacja danych. Zakres MLP.'],
             ['Warstwa C — klasa IIa+', 'Interpretacja z oceną, alerty progowe z oceną kliniczną. Po certyfikacji.']], 2.3, 3);
-  warn(s, 'Dziewięć funkcji MDSW pozostaje wyłączonych z zakresu niecertyfikowanego na podstawie MDCG 2019-11. Triaż AI i wstępna diagnoza nie mogą trafić do wersji przed certyfikacją. Osobno obowiązuje AI Act — system zdrowotny to wysokie ryzyko z załącznika III.', 4.3);
+  warn(s, 'Reguła produktowa: fakt i porównanie do własnej historii są bezpieczne; ocena, próg i zalecenie nie są. Zbiera, normalizuje, łączy — bezpieczne. Automatyzuje, personalizuje — granica. Jedna warstwa decyzyjna to wyrób. Agregacja nie omija certyfikacji, tylko ją odracza. Osobno obowiązuje AI Act — załącznik III.', 4.3);
   src(s, ['mdcg', 'mdr', 'aiact']);
 
   s = slide(p); head(s, 'Zespół', 'Kto to buduje', 'osoba → rola → zakres odpowiedzialności');
@@ -365,7 +365,7 @@ function deckEko() {
   cards(s, [['Lite — portfel danych', 'Inteligentny parser OCR, uniwersalna synchronizacja, oś czasu zdrowia.'],
             ['Premium — centrum dowodzenia', 'Silnik Bio-Physics, telemedycyna, e-recepty przez P1, pulpit lekarza.'],
             ['Model', 'Aplikacja pacjenta darmowa; przychód z kanałów wokół niej.']], 2.3, 3);
-  warn(s, 'Master 5.4: aplikacja pacjenta darmowa w całości. Plan operacyjny: 19–29 PLN. Oficjalny deck: 29,99/49,99 PLN. Budżet MVP w decku 110 tys. PLN, w specyfikacji 160–190 tys. przy orkiestracji, przy czym wcześniejsze wyceny pomijały wynagrodzenia.', 4.3);
+  warn(s, 'Aplikacja jest kanałem dystrybucji, nie produktem — najwyżej marżowe pozycje (parser dla laboratoriów, dokumentacja dla klinik, kohorta, dane nadzoru) nie są skierowane do pacjenta. Zlecając badanie wytwarzamy EDM i mamy do niej dostęp z mocy ustawy: ten sam ruch daje przychód i dane. Budżet MVP: deck 110 tys. PLN, specyfikacja 160–190 tys. przy orkiestracji.', 4.3);
   src(s, ['p1', 'mdcg']);
 
   s = slide(p); head(s, 'Faza 3', 'Eternal Station — domowe laboratorium', 'model sprzedaży → cena → koszt → marża');

@@ -18,6 +18,7 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from mkdocx import setup, toc
 from mapa import M
+from dane_ustalenia import U
 
 INV = {r['idx']: r for r in json.load(open('INVENTORY.json'))}
 TODAY = datetime.date.today().strftime('%d.%m.%Y')
@@ -37,6 +38,12 @@ for k, _, _ in SEK:
 
 ROWS = [(i, INV[i]['name'].replace('.txt', ''), INV[i]['chars'], st, s.split(','), rola)
         for i, (s, st, rola) in sorted(M.items())]
+
+# ustalenia per plik — z rundy analizy plikow bez kodow funkcji
+UST = {}
+for u in U:
+    for p_ in u[5].replace('#', '').split(', '):
+        UST.setdefault(int(p_), []).append(u[0])
 
 
 def cien(cell, hexcol):
@@ -124,6 +131,11 @@ for t in [
     'rozpadłyby się karty 185 funkcji w biznesplanie rozszerzonym.',
     'Drugi przebieg (filtr artefaktów) łapie duplikaty międzyformatowe: ten sam dokument w PDF '
     'i w DOCX tnie się na inne bloki, więc hasze się nie zgadzają, choć treść jest identyczna.',
+    'RUNDA ANALIZY PLIKÓW BEZ KODÓW FUNKCJI. Siedemdziesiąt cztery pliki nie zawierają kodów '
+    'funkcji i przez to nie występowały w rejestrze, z którego budowano dokumenty analityczne. '
+    'Przeczytane osobno, dały %d ustaleń z 32 plików — kolumna „Ustalenia" wskazuje, które '
+    'pozycje z ETERNAL_USTALENIA_KORPUSU.docx z danego pliku wynikają. Pliki bez wpisu '
+    'w tej kolumnie nie wniosły treści wykraczającej poza już ujętą.' % len(U),
 ]:
     doc.add_paragraph(t)
 
@@ -139,11 +151,12 @@ for k, nazwa, wynik in SEK:
     doc.add_paragraph('Dokument wynikowy: %s. Plików wnoszących treść: %d. Plików zastąpionych '
                       'lub duplikatów: %d — ich treść zawiera się w wersji nowszej wskazanej '
                       'w statusie.' % (wynik, len(r) - len(dup), len(dup)))
-    tabela(doc, [['#', 'Plik źródłowy', 'Znaków', 'Status', 'Bloków', 'Co z niego wchodzi do tej sekcji']]
+    tabela(doc, [['#', 'Plik źródłowy', 'Znaków', 'Status', 'Bloków', 'Ustalenia',
+                  'Co z niego wchodzi do tej sekcji']]
            + [[str(i), n[:70], format(c, ',').replace(',', ' '), st,
-               str(len(PARTS[k].get(i, []))), rola]
+               str(len(PARTS[k].get(i, []))), ', '.join(UST.get(i, [])) or '—', rola]
               for i, n, c, st, ss, rola in r],
-           [1.1, 7.0, 1.8, 2.6, 1.5, 9.5], statuscol=3)
+           [1.1, 6.4, 1.7, 2.4, 1.4, 2.8, 8.2], statuscol=3)
     doc.add_page_break()
 
 multi = [x for x in ROWS if len(x[4]) > 1]

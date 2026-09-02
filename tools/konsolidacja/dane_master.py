@@ -92,6 +92,20 @@ sek('05', 'Model biznesowy',
  'Powód nie jest ideologiczny. Darmowa aplikacja maksymalizuje bazę, a wszystkie '
  'jedenaście kanałów przychodu wymaga bazy jako warunku wstępnego. Subskrypcja '
  'ograniczyłaby bazę o rząd wielkości i zabiła dziesięć kanałów, żeby uratować jeden.',
+ 'KOREKTA PO ANALIZIE PLIKU #15. Darmowa aplikacja **nie wygrywa z IKP i nie ma wygrywać** '
+ '— ceny zera nie da się podciąć, a IKP ma mandat ustawowy i dwadzieścia milionów kont '
+ 'przy zaangażowaniu 500 tys. osób miesięcznie. To jest **decyzja dystrybucyjna, '
+ 'nie konkurencyjna**: sprawia, że pytanie „kto wygra z IKP" przestaje być właściwym '
+ 'pytaniem. Wygrywamy tym, czego IKP zrobić nie może — zlecić badanie, leczyć, '
+ 'zinterpretować, przyjąć dane, których państwo nie ma.',
+ 'MECHANIZM, KTÓRY POWINIEN BYĆ OSIĄ MODELU (plik #3 i #15). Jako podmiot leczniczy '
+ 'zlecamy badanie → **wytwarzamy elektroniczną dokumentację medyczną → mamy do niej dostęp '
+ 'z mocy ustawy**, bez zgody i bez pośrednictwa IKP. Ten sam ruch, który generuje przychód, '
+ 'generuje dane. To jedyne miejsce w całym projekcie, gdzie pieniądze i dane przychodzą '
+ 'tą samą drogą.',
+ 'NAJWYŻEJ MARŻOWE PRODUKTY NIE SĄ SKIEROWANE DO PACJENTA (plik #122): parser dla '
+ 'laboratoriów, dokumentacja dla klinik, kohorta, protokół, dane nadzoru. Wszystkie '
+ 'powstają jako produkt uboczny czegoś, co i tak budujemy.',
  ('T', ['Kanał', 'Co sprzedajemy', 'Kiedy startuje'], [
   ['K0', 'Aplikacja pacjenta — darmowa, kanał dystrybucji', '2026'],
   ['K1', 'Subskrypcje poza rdzeniem: Pet, Legacy, immersja', '2027'],
@@ -228,7 +242,21 @@ sek('11', 'Regulacje i compliance',
   ['ISO 13485 / 14971', 'System jakości i zarządzanie ryzykiem — warunek dossier', '2028'],
  ], [4.4, 9.6, 3.0]),
  '**AI Act jest osobnym reżimem obok MDR, nie jego częścią.** W pitch decku nie występuje '
- 'wcale — to jest ustalenie 7 analizy poprawności i pozostaje otwarte.')
+ 'wcale — to jest ustalenie 7 analizy poprawności i pozostaje otwarte.',
+ 'PARADOKS AGREGACJI (plik #88). **Bezpieczeństwo regulacyjne modelu agregacyjnego jest '
+ 'odwrotnie proporcjonalne do jego wartości produktowej.** Czysta rura jest legalna '
+ 'i mało warta. Warstwa decyzyjna jest warta dużo i jest wyrobem. Model agregacyjny '
+ 'nie omija certyfikacji — **odracza ją**.',
+ 'SZEŚĆ CZASOWNIKÓW — operacyjny test granicy, ostrzejszy niż podział na warstwy: '
+ '**zbiera, normalizuje, łączy** (jako zestawienie obok siebie) są bezpieczne; '
+ '**automatyzuje, personalizuje** to granica; **jedna warstwa decyzyjna to jest wyrób**.',
+ 'REGUŁA PRODUKTOWA W JEDNYM ZDANIU (plik #122): **fakt i porównanie do własnej historii '
+ 'są bezpieczne regulacyjnie; ocena, próg i zalecenie nie są.** Ta sama funkcja po jednej '
+ 'stronie granicy jest darmowa, po drugiej kosztuje dossier.',
+ 'WARSTWA OCENY JEST PRZEKROJEM PRZEZ MODUŁY, NIE MODUŁEM (plik #123). Żaden z modułów '
+ 'pierwszej fali nie jest wyrobem. Rozdzielenie tych dwóch rzeczy pozwala sprzedawać '
+ 'od pierwszego dnia — i zmienia sposób liczenia zakresu dossier: nie „które moduły", '
+ 'tylko „która warstwa w których modułach".')
 
 sek('12', 'IP i własność technologiczna',
  'Właścicielem kluczowego IP jest Fundacja, która licencjonuje je do spółki operacyjnej '
@@ -343,6 +371,20 @@ sek('19', 'Model operacyjny i ład korporacyjny',
    'a nie tylko mu na to pozwala',
    'Novo ma cztery takie zapisy. „Fundacja może utrzymać kontrolę" nie jest ochroną'],
  ], [7.0, 10.0]),
+ 'ROLA, KTÓRA DAJE KONTROLĘ BEZ PREZESURY (plik #23), nazwana wprost: **nie prezes spółki '
+ 'operacyjnej, tylko przewodniczący podmiotu, który posiada IP i trzyma weto, plus autor '
+ 'standardu.** Odwołanie licencji boli tylko wtedy, gdy przedmiotem jest standard, rejestr '
+ 'albo dossier — rzecz, której nie da się odtworzyć bez powtórzenia całej drogi. '
+ 'Kod się przepisze w rok.',
+ 'DWA BRAKI, KTÓRYCH NIE MA W PLANIE (plik #71). Po pierwsze: skoro założyciel odchodzi '
+ 'z operacji po MVP, **MVP jest kamieniem milowym przekazania, nie produktu** — wszystko '
+ 'musi dać się prowadzić bez niego. Po drugie: **następca operacyjny nie istnieje**, '
+ 'a jego wprowadzenie wymaga dwóch–trzech lat wspólnej pracy. Zaczynając szukać w 2028, '
+ 'odchodzi się w 2031. To najpilniejsza rekrutacja w całym przedsięwzięciu.',
+ 'MECHANIZM FINANSOWANIA CELÓW DALEKICH (pliki #71 i #120): **stały, zapisany w statucie '
+ 'odsetek przychodu przekazywany automatycznie na fundusz badawczy, którym dysponuje RADA, '
+ 'a nie zarząd.** Zarząd operacyjny nigdy nie sfinansuje badań o horyzoncie dwudziestoletnim '
+ '— nie ze złej woli, tylko dlatego, że jest rozliczany z czegoś innego.',
  '**Ostrzeżenie z korpusu, dosłownie**: *statutu Fundacji nie da się nadrobić, bo jego '
  'wartość zależy od tego, kto ma siłę go narzucić w momencie podpisania. Bosch '
  'przebudowywał ład korporacyjny dwadzieścia pięć lat przed śmiercią — nie dlatego, '
@@ -363,7 +405,14 @@ sek('20', 'Finanse',
  'milowym.',
  '**Największa pozycja kosztowa nie występuje w rejestrze kosztów: wynagrodzenia.** '
  'Wśród siedemnastu kosztów stałych nie ma ani jednego. Test spójności: MVP za 150–200 tys. zł '
- 'przez 12–18 miesięcy to 10–13 tys. zł miesięcznie na cały zespół.')
+ 'przez 12–18 miesięcy to 10–13 tys. zł miesięcznie na cały zespół.',
+ 'SPRZECZNOŚĆ DO ROZSTRZYGNIĘCIA, NIE DO PRZEMILCZENIA (plik #69). Korpus zawiera '
+ 'ustalenie wprost przeciwne do planu rundy seed: **nie brać kapitału venture do '
+ 'spółki-matki** — jest strukturalnie sprzeczny z horyzontem trzydziestoletnim. '
+ 'Jeśli w ogóle, to wyłącznie do wydzielonych spółek celowych pod konkretne produkty '
+ 'sprzętowe. Trzydziestoletnie przedsięwzięcie utrzymuje **przepływ gotówki, nie kapitał**: '
+ 'trzeba mieć działalność przynoszącą pieniądze co miesiąc, niezależnie od tego, '
+ 'czy wizja postępuje. Plan seed 6,0–6,7 mln zł i to ustalenie nie mogą obowiązywać naraz.')
 
 sek('21', 'KPI',
  ('T', ['Wskaźnik', 'Co mierzy', 'Próg'], [
