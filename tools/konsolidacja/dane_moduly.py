@@ -289,7 +289,9 @@ M = {
 'A13': ('Eternal Pet',
  'Objąć zwierzę tym samym systemem monitoringu co człowieka — i sprawdzić na nim '
  'technologię, zanim trafi do ludzi.',
- 'Ścieżka weterynaryjna nie ma ściany MDR. To najtańszy sposób zwalidowania czujników '
+ 'Ścieżka weterynaryjna podlega ODRĘBNEMU reżimowi, nie lżejszemu (#75) — europejskie '
+ 'prawo wyrobów medycznych nie obejmuje zastosowań weterynaryjnych. Wartością jest '
+ 'przenośność kompetencji: to najtańszy sposób zwalidowania czujników '
  'i firmware przed wejściem w reżim wyrobu medycznego.',
  'Właściciel zwierzęcia; lecznica weterynaryjna.',
  'Dane z obroży, waga, aktywność, wizyty',
@@ -440,8 +442,8 @@ M = {
  'i rehabilitacji nikt nie pokrywa w integrowalnej formie',
  30, kontrola(5, 1, 1, 1),
  'Prawie cały moduł — to jest obszar, w którym nie ma czego kupić',
- 'MediaPipe (Apache 2.0) do kontroli wykonania ćwiczeń. UWAGA: OpenPose ma licencję '
- 'niekomercyjną, a wger jest na AGPL-3.0 — obu nie używać',
+ 'MediaPipe (Apache 2.0) do kontroli wykonania ćwiczeń. UWAGA: OpenPose kosztuje '
+ '25 000 USD/rok z wyłączeniem zastosowań sportowych (#93), a wger jest na AGPL-3.0',
  'Od razu własne',
  ('TAK', 'Analiza ruchu wymienna'),
  'W>M', 'P1', 'Product'),
@@ -559,7 +561,8 @@ M.update({
  'Pacjent z implantem; ratownik.', 'Odczyt NFC/RFID', 'Identyfikator, rejestr implantów',
  'CZĘŚCIOWY: znaczniki RFID są towarem, wszczepialne wymagają dossier',
  40, kontrola(4, 1, 1, 1), 'Rejestr implantów i protokół odczytu',
- 'Brak dla części wszczepialnej', 'Zacząć od Pet Bio-Tag — brak ściany MDR',
+ 'Brak dla części wszczepialnej', 'Zacząć od Pet Bio-Tag — odrębny reżim weterynaryjny, '
+ 'nie lżejszy (#75); wartością jest przenośność kompetencji',
  ('TAK', 'Producent znacznika wymienny'), 'M', 'P2', 'Hardware'),
 'C2': ('Bio-Monitor (Capsule)', 'Mierzyć od wewnątrz to, czego nie da się zmierzyć z zewnątrz.',
  'Ciągły pomiar wewnątrzustrojowy jest jedyną drogą do części parametrów.',
@@ -652,7 +655,8 @@ STOS_WSPOLNY = [
  ('Frontend', 'Flutter (iOS, Android) + PWA na tym samym kodzie; Web dla panelu B2B'),
  ('Backend', 'Python FastAPI, warstwa adapterów per klasa komponentu, orkiestrator '
   'jednoagentowy'),
- ('Database', 'PostgreSQL 16 z pgvector (jedna baza zamiast dwóch), MinIO/S3 na pliki, '
+ ('Database', 'PostgreSQL 16 z pgvector (jedna baza zamiast dwóch), SeaweedFS albo Garage na pliki '
+  '(nie MinIO — AGPL od 2021), '
   'rezydencja UE — Hetzner Falkenstein + backup Gravelines'),
  ('Authentication', 'Keycloak (OIDC) self-host; Węzeł Krajowy przy integracji z P1; '
   'RBAC + ABAC na zakresach zgód'),
@@ -666,15 +670,16 @@ STOS_WSPOLNY = [
   'widoczny dla użytkownika; logi techniczne w OpenTelemetry'),
  ('Error handling', 'Tryb degradacji: brak dostawcy nie wyłącza funkcji, tylko obniża '
   'ją do wariantu zapasowego; komunikat mówi użytkownikowi, co przestało działać'),
- ('Caching', 'Redis na sesje i wyniki wywołań idempotentnych; danych zdrowotnych '
-  'nie cachujemy poza sesją'),
+ ('Caching', 'Valkey (BSD) na sesje i wyniki wywołań idempotentnych — nie Redis, '
+  'który przeszedł na AGPL/SSPL w 2024–2025; danych zdrowotnych nie cachujemy poza sesją'),
  ('Queues', 'RabbitMQ — retencja komunikatu w godzinach, kolejka martwych listów, '
   'idempotencja po kluczu zdarzenia'),
  ('Testing', 'pytest z pokryciem ścieżek zgód; test regresyjny parsera na 200 realnych '
   'wynikach przed każdą zmianą silnika; kontrakt adaptera testowany osobno od dostawcy'),
  ('Deployment', 'Docker + Kubernetes, GitHub Actions → ArgoCD, wdrożenia niebiesko-zielone'),
- ('Monitoring', 'OpenTelemetry + Grafana; osobny licznik reguły 33% per klasa komponentu '
-  '— bez niego reguła nie jest egzekwowalna'),
+ ('Monitoring', 'OpenTelemetry + Prometheus + VictoriaMetrics (nie Grafana ani Loki — '
+  'AGPL-3.0 od kwietnia 2021); osobny licznik reguły 33% per klasa komponentu — '
+  'bez niego reguła nie jest egzekwowalna'),
 ]
 
 STOS_ROZNICE = {

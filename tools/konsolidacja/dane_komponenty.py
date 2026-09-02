@@ -58,7 +58,9 @@ K = {
    5, ['I', 'IV'], 'Master 5.4 §11'),
 
  'K03': ('Storage, baza, backup',
-   'PostgreSQL + MinIO/S3-compatible, Hetzner/OVH (UE)',
+   'PostgreSQL + SeaweedFS albo Garage (S3-kompatybilne), Hetzner/OVH (UE). '
+   'KOREKTA (#93): MinIO przeszedł na AGPL-3.0 w 2021, a w 2025 wycofał interfejs — '
+   'nie nadaje się do modelu usługowego',
    'AWS RDS + S3 (UE), Google Cloud SQL, Azure — 3–6× drożej przy tej skali',
    'Własny schemat, polityka retencji, szyfrowanie at-rest',
    'Nie wychodzimy — zmieniamy hostingodawcę, nie technologię',
@@ -192,7 +194,7 @@ K = {
    'Kemtai, Exer, Onyx — SDK komercyjne',
    'Własna baza ćwiczeń + wideo techniki',
    'Nie wychodzimy z MediaPipe',
-   'OpenPose ma LICENCJĘ NIEKOMERCYJNĄ — nie używać. wger jest AGPL-3.0 — ten sam problem '
+   'OpenPose kosztuje 25 000 USD rocznie, z wyłączeniem zastosowań sportowych (#93) — kwestia ceny i zakresu, nie zakazu. wger jest AGPL-3.0 — ten sam problem '
    'co Gadgetbridge. Ocena techniki i ostrzeganie przed kontuzją może być wyrobem',
    'MediaPipe. Omijać OpenPose i wger',
    3, ['I', 'III'], 'Master 5.4 §11'),
@@ -230,11 +232,13 @@ K = {
 
  'K20': ('Integracja P1 / e-zdrowie',
    'Brak opcji OSS — to system państwowy',
-   'Certyfikat P1 WSS (dostęp do środowiska integracyjnego bezpłatny) + KS-BLOZ '
-   '(baza leków) ~10 000 zł/rok',
+   'Certyfikaty P1 (TLS i WSS) BEZPŁATNE — wniosek w RPWDL 2.0, ważność 2 lata (#93). '
+   'KS-BLOZ (baza leków) ~10 000 zł/rok',
    'Nie da się zastąpić — monopol państwowy',
    'Nie wychodzimy — nie ma dokąd',
-   'WYMAGA statusu usługodawcy (wpis RPWDL). Bez tego certyfikat jest bezużyteczny. '
+   'WYMAGA statusu usługodawcy (wpis RPWDL). KOREKTA (#34): przez P1 uzyskuje się INDEKS '
+   'i mechanizm żądania dokumentu, ale dokument pochodzi z repozytorium placówki — '
+   'to jedna integracja PLUS pobranie od każdej placówki osobno, nie jedna zamiast stu. '
    'Reguła 33% tu NIE OBOWIĄZUJE — odpowiedzią na monopol jest stanie się niezbędnym, '
    'nie redundancja',
    'Odłożyć do momentu, gdy jest podmiot leczniczy (RPWDL 2029–2030)',
@@ -246,8 +250,10 @@ K = {
    'suplementy ~30% prowizji',
    'Własny marketplace w Forge',
    'Nie dotyczy — to przychód, nie koszt',
-   'Konflikt interesu: rekomendacja + prowizja. Wymaga jawności wobec użytkownika przy '
-   'każdej rekomendacji, nie w regulaminie',
+   'Konflikt interesu: rekomendacja + prowizja. Wymaga jawności przy każdej rekomendacji, '
+   'nie w regulaminie. KOREKTA (#93): KEL 2025 nie zniósł zakazu reklamy — zastąpił ją '
+   'węższym „informowaniem o usługach", więc prowizja za kierowanie pacjenta pozostaje '
+   'ryzykowna i wymaga opinii prawnej PRZED uruchomieniem kanału',
    'Dietly przez Circlewise OD ZARAZ. Zero negocjacji, przychód od pierwszego miesiąca',
    3, ['I', 'IV'], 'Master 5.4 §11'),
 
@@ -273,7 +279,9 @@ K = {
    5, ['II', 'III', 'IV'], 'Master 5.4 §11'),
 
  'K24': ('Kolejki, zadania i przetwarzanie asynchroniczne',
-   'RabbitMQ (MPL-2.0), Redis Streams, NATS, Celery',
+   'RabbitMQ (MPL-2.0), Valkey Streams (BSD), NATS, Celery. '
+   'KOREKTA (#93): Redis przeszedł na AGPL/SSPL w latach 2024–2025 — Valkey jest '
+   'forkiem na BSD utrzymywanym przez Linux Foundation',
    'AWS SQS/EventBridge, Confluent Cloud, Google Pub/Sub — per komunikat',
    'Własna polityka ponowień, kolejka martwych listów i idempotencja',
    'Nie wychodzimy — RabbitMQ w środowisku własnym',

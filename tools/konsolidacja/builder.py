@@ -8,8 +8,8 @@ from dane_ustalenia import U, KAT
 
 def _ustalenia(doc, sec):
     """Czesc 0 — ustalenia z plikow bez kodow funkcji, wlasciwe dla tej sekcji."""
-    GR = {'S': ('C', 'K', 'T', 'D', 'M', 'S'), 'B': ('P', 'E', 'S', 'K', 'M'),
-          'R': ('S', 'T', 'D'), 'P': ('P', 'E', 'C')}
+    GR = {'S': ('C', 'K', 'T', 'D', 'M', 'S', 'L'), 'B': ('P', 'E', 'S', 'K', 'M', 'L'),
+          'R': ('S', 'T', 'D', 'L'), 'P': ('P', 'E', 'C', 'L')}
     poz = [u for u in U if u[0][0] in GR.get(sec, ())]
     if not poz:
         return

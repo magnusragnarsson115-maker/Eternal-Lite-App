@@ -459,3 +459,147 @@ KAT = {
  'NOWE': ('NOWE', '2E7D32', 'wnosi treść nieobecną gdzie indziej'),
  'RYZYKO': ('RYZYKO', 'B07419', 'wskazuje zagrożenie nieujęte w rejestrze ryzyk'),
 }
+
+# ===== RUNDA DRUGA: 23 pliki, ktore przeszly przez sito pierwszej ekstrakcji =====
+# Ekstraktor pierwszej rundy szukal **pogrubienia**, ktorego w konwersji z DOCX nie ma.
+# Dziewietnascie plikow DOCX/PPTX/PDF przeszlo bez trafien. Ponizej to, co z nich wynika.
+U += [
+('L1', 'KOREKTA', 'MinIO nie jest już wolną licencją — a rekomendowałem go',
+ 'MinIO przeszedł na AGPL-3.0 w 2021, a w 2025 wycofał interfejs użytkownika. '
+ 'W moim rejestrze klas komponentów MinIO stoi jako rekomendacja open source w klasie K03 '
+ '(storage) i w stosie technologicznym PRD.',
+ 'Zamiana na SeaweedFS, Garage albo S3 w regionie UE. AGPL przy modelu usługowym '
+ 'jest tym samym problemem co Gadgetbridge, który sam wskazuję jako blokujący.', '#93'),
+
+('L2', 'KOREKTA', 'Grafana i Loki są na AGPL-3.0 od kwietnia 2021',
+ 'W stosie technologicznym PRD podałem Grafanę jako warstwę monitoringu bez zastrzeżeń '
+ 'licencyjnych.',
+ 'Zamiana na Prometheus plus VictoriaMetrics. To samo zastrzeżenie co przy MinIO.', '#93'),
+
+('L3', 'KOREKTA', 'Redis przeszedł na AGPL/SSPL w latach 2024–2025',
+ 'Redis występuje w moim stosie jako pamięć podręczna i w klasie K24 jako Redis Streams. '
+ 'Podawałem go jako rozwiązanie bez ryzyka licencyjnego.',
+ 'Zamiana na Valkey (BSD) — fork utrzymywany przez Linux Foundation. '
+ 'Sentry podobnie: FSL od listopada 2023, source-available, nie open source.', '#93'),
+
+('L4', 'KOREKTA', 'OpenPose to 25 000 USD rocznie, nie „licencja niekomercyjna"',
+ 'W trzech miejscach napisałem, że OpenPose ma licencję niekomercyjną. '
+ 'W rzeczywistości jest to licencja płatna — 25 000 USD rocznie, z wyłączeniem '
+ 'zastosowań sportowych.',
+ 'Rekomendacja się nie zmienia (MediaPipe), ale uzasadnienie tak: to kwestia ceny '
+ 'i zakresu, nie zakazu.', '#93'),
+
+('L5', 'KOREKTA', 'KEL 2025 nie zniósł zakazu reklamy — zawęził pojęcie',
+ 'Kodeks Etyki Lekarskiej zastąpił „reklamę" węższym „informowaniem o usługach". '
+ 'Prowizja za kierowanie pacjenta pozostaje ryzykowna.',
+ 'Bezpośrednio dotyczy kanałów K5 (prowizja telemedyczna 20–30%) i K21 (marketplace). '
+ 'To są kanały startujące w pierwszym roku — konstrukcję prowizji trzeba sprawdzić '
+ 'z prawnikiem przed uruchomieniem, nie po.', '#93'),
+
+('L6', 'KOREKTA', 'P1 nie daje dokumentu, daje indeks i mechanizm żądania',
+ 'Teza „wystarczy podłączyć się do platformy zamiast do setek placówek" jest nieprawdziwa. '
+ 'Przez P1 uzyskuje się INDEKS i mechanizm żądania dokumentu, ale dokument fizycznie '
+ 'pochodzi z repozytorium placówki. To nie jest jedna integracja zamiast stu — '
+ 'to jedna integracja PLUS mechanizm pobrania od każdej placówki osobno.',
+ 'Zmienia wycenę i harmonogram integracji z P1 (klasa K20) oraz obietnicę produktową '
+ '„wszystkie dane w jednym miejscu".', '#34'),
+
+('L7', 'KOREKTA', 'Reżim weterynaryjny nie jest lżejszy — jest inny',
+ 'Europejski reżim wyrobów medycznych nie obejmuje zastosowań weterynaryjnych. '
+ 'To nie jest ścieżka łatwiejsza — to ODRĘBNY reżim, oparty na innych przepisach.',
+ 'Poprawia moje własne sformułowania o „braku ściany MDR" w linii zwierzęcej. '
+ 'Argument za linią Pet zostaje (przenośność kompetencji, domknięcie cyklu życia), '
+ 'ale nie jest nim lżejsza regulacja.', '#75'),
+
+('L8', 'NOWE', 'Arytmetyka, która przesądza o modelu darmowym',
+ 'Dojście do dziesięciu milionów złotych przychodu wyłącznie z abonamentu konsumenckiego '
+ 'wymaga od 334 tysięcy do 2,1 miliona zarejestrowanych — czyli od jednego do pięciu '
+ 'procent populacji Polski.',
+ 'To jest liczbowe uzasadnienie rekomendacji darmowej aplikacji, mocniejsze '
+ 'niż argument dystrybucyjny. Do umieszczenia w biznesplanie i w decku.', '#70'),
+
+('L9', 'NOWE', 'Jeden moduł z siedmiu odpowiada za 87% kosztu',
+ 'Po kondensacji do siedmiu modułów jeden odpowiada za osiemdziesiąt siedem procent '
+ 'kosztu całości. To jedyna liczba, która wymaga świadomej decyzji — reszta kondensacji '
+ 'jest porządkowaniem.',
+ 'Do rozdziału o kosztach: koncentracja kosztu jest większa niż koncentracja funkcji.',
+ '#77'),
+
+('L10', 'NOWE', 'Osiem pozycji z dwudziestu to trzy czwarte kosztu',
+ 'Osiem pozycji z dwudziestu odpowiada za blisko trzy czwarte kosztu całej listy. '
+ 'To nie jest lista dwudziestu porównywalnych rzeczy do zrobienia.',
+ 'Ten sam wzorzec co L9 na innym poziomie. Uzasadnia kolejność jako główne narzędzie '
+ 'zarządzania, nie optymalizację.', '#75'),
+
+('L11', 'NOWE', 'Oznaczenie pewności przy każdym wpisie jako wyróżnik główny',
+ 'Żaden dostępny interfejs w tej dziedzinie nie mówi odbiorcy, na ile pewna jest '
+ 'przekazywana wartość. To funkcja, która kosztuje niewiele, a zmienia charakter danych '
+ 'z surowca w informację. Łączny koszt ośmiu takich wyróżników: 300–400 tys. zł.',
+ 'Spina się z ustaleniem D1 („oznaczamy dane, nie ludzi"). To jest ta sama funkcja '
+ 'widziana od strony produktu i od strony etyki.', '#74, #31'),
+
+('L12', 'NOWE', 'Usługi regulacyjne to najkrótsza droga do pierwszej faktury',
+ 'Usługi regulacyjne mogą zacząć przynosić przychód szybciej niż jakikolwiek produkt — '
+ 'nie wymagają zbudowania niczego poza kompetencją, która i tak jest potrzebna.',
+ 'Kanał przychodowy nieujęty w modelu jedenastu kanałów. Do dopisania jako K12.', '#74'),
+
+('L13', 'NOWE', 'Oprogramowanie dla lecznicy weterynaryjnej — podprodukt o najwyższym priorytecie',
+ 'Kartoteka, wizyty, przypomnienia, dokumentacja, komunikacja z właścicielem. '
+ 'Koszt 100–150 tys. zł, pierwszy klient w kilka miesięcy, sprzedaż osobista. '
+ 'Pozycji nie ma w macierzy czterdziestu.',
+ 'To jest „przepływ z nudnego biznesu" z ustalenia E4, nazwany konkretnie. '
+ 'Najkrótsza droga do przychodu bieżącego finansującego resztę.', '#75, #69'),
+
+('L14', 'NOWE', 'Wkłady komponowane to działalność farmaceutyczna, nie sprzęt',
+ 'Cały przychód powtarzalny stacji zależy od wkładów komponowanych — a to jest '
+ 'compounding, prawo farmaceutyczne, magazyn i dostawa. Pozycji nie ma w macierzy. '
+ 'Możliwy odrębny podmiot albo partner.',
+ 'Uzupełnia ustalenie E1 („sprzęt to dostęp do produktu") o to, czym ten produkt '
+ 'faktycznie jest — i o reżim prawny, którego w planie nie ma.', '#75'),
+
+('L15', 'ROZSTRZ', 'Pivot, który usuwa problem etyczny scoringu',
+ 'Wynik przestaje służyć SELEKCJI, a zaczyna służyć INTERWENCJI. Zamiast sprzedawać '
+ 'ubezpieczycielowi ocenę ryzyka do różnicowania składki, sprzedaje się program '
+ 'interwencyjny dla osób o podwyższonym ryzyku.',
+ 'To jest odpowiedź na ustalenie 6 analizy poprawności (scoring wobec art. 22 RODO). '
+ 'Pivot usuwa profilowanie o skutku prawnym i jest jednocześnie łatwiejszy do sprzedania.',
+ '#58'),
+
+('L16', 'NOWE', 'Odwrócenie bodźca jako główny argument wobec płatnika',
+ 'System oparty na ciągłym zapisie zarabia wtedy, gdy pacjent NIE trafia do szpitala. '
+ 'Szpital pochłania niemal połowę środków na świadczenia, a marnotrawstwo w systemie '
+ 'szacowane jest na 14–18 mld zł rocznie.',
+ 'Najmocniejsze sformułowanie propozycji wartości dla kanału K6 (płatnicy), '
+ 'nieobecne w decku.', '#76'),
+
+('L17', 'KOREKTA', 'Wycena publiczna: nie kotwiczyć na cudzym koszcie',
+ 'Zakotwiczenie wyceny na koszcie cudzego wdrożenia oznacza przyjęcie cudzej '
+ 'nieefektywności jako punktu wyjścia. Prawidłowa wycena buduje się od dołu — '
+ 'z zakresu prac, liczby integracji i wymaganego poziomu dostępności. '
+ 'Pilotaż za 8–15 mln zł odpowiada na pytanie, na które wycena za 8 mld tylko obiecuje '
+ 'odpowiedzieć.',
+ 'Metoda wyceny do zastosowania także wobec moich własnych szacunków kosztu '
+ 'na użytkownika.', '#46'),
+
+('L18', 'NOWE', 'Dziewiętnaście moonshotów w trzech klasach',
+ 'Klasa A — sześć pozycji obniżających koszt projektu głównego (baterie diamentowe, '
+ 'źródła energii, grafen, nośniki inne niż krzem, komputery kwantowe, druk 3D). '
+ 'Klasa B — osiem rozszerzających (AGI medyczna, waluta cyfrowa, roboty humanoidalne, '
+ 'metawersum, immersja, interfejsy). Klasa C — pięć bez punktu styku z żadnym projektem.',
+ 'Klasa C to kandydaci do archiwum. Pozycja 40 (Forge) nie jest moonshotem — '
+ 'jest platformą z MVP na Q4 2026.', '#53'),
+
+('L19', 'RYZYKO', 'Konkurent stosuje utrudnianie wyjścia jawnie',
+ 'Mechanizm, który w dokumentacji opisywano jako pozorną dźwignię — utrudnianie wyjścia '
+ '— jest stosowany przez konkurenta i jawnie zadeklarowany. Ceny płatnych rozwiązań '
+ 'zaczynają się od 56–75 zł miesięcznie: to SUFIT dla nowego wejścia, nie punkt wyjścia.',
+ 'Do rozdziału o konkurencji i do polityki przenośności danych jako kontrargumentu.',
+ '#34'),
+
+('L20', 'NOWE', 'Audyt odpowiedzi: 8 błędów na 59 pytań',
+ 'Korpus zawiera własny audyt: 32 odpowiedzi potwierdzone źródłowo, 7 wymagało korekty, '
+ '14 niezweryfikowanych, 6 odmów, 8 błędów. Dwa z ośmiu zmieniają decyzje, '
+ 'cztery psują część stosu technicznego.',
+ 'Cztery z tych ośmiu błędów przeniosłem do własnych dokumentów, nie czytając tego pliku '
+ '— MinIO, Grafana, Redis i OpenPose. Ustalenia L1–L4 je naprawiają.', '#93'),
+]
