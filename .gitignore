@@ -4,3 +4,5 @@ __pycache__/
 manifest.json
 out/*.md
 out/*.docx
+out/zrodla/
+out/*.zip
