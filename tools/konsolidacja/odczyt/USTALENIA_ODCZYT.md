@@ -10451,3 +10451,2526 @@ być warstwa integracyjna, kluczowe IP, dane/algorytmy, marka, relacja z
 użytkownikiem, API i rozwój · ekosystem ma **zarabiać i zwiększać kapitał**, a
 nie być projektem badawczym pochłaniającym pieniądze · ma dać później wejście
 w znacznie większy deep-tech.
+
+## D060 — #33 (IKP i P1 do 2030) i #39 (dwadzieścia trzy moduły aplikacji)
+
+**Pytania założyciela zamykające wątek #146** (do uwzględnienia w dokumentach
+wyjściowych, część odpowiedzi w dalszych plikach): opisać funkcje po kolei wraz
+z etapem i terminem wykonania · ocenić, czy założenia są adekwatne teraz i
+później · **Eternal Edible Pill** — kapsułka z kamerą, powiadamiająca jak bolus
+w żwaczu krowy, wariant smakowy dający sytość, tani, niekaloryczny, bez wzdęć,
+do budowy mięśni i odchudzania *„zamiast nanotech (później sama może je mieć
+lub być tańsza)"* · monetyzacja przez wyszukiwanie nowoczesnych terapii z
+dopasowaniem do NFZ / ubezpieczenia / prywatnie i marketing celowany *„do tego,
+czego użytkownik potrzebuje i na co go stać"* · newsletter, „Netflix dla
+zdrowia", „Genspark dla zdrowia", orkiestrator z alternatywnym ubezpieczeniem,
+konferencje do czasu powstania społeczności i metaversum, treści o
+transhumanizmie, książki, podcasty, pokoje rozmów (Twitter/Discord) ·
+**dla każdej funkcji: pivot + 1 alternatywa + alternatywa wykonania** (nie
+komponentu, nie działania produktu — sposobu wykonania) · weryfikator na każdym
+etapie: czy funkcję certyfikować, czy jest potrzebna ekosystemowi i
+użytkownikowi · **Eternal Capsule rozbita na 10+ lat**: integracja obcych,
+konsorcjum, czekanie aż stanieje, metoda małych kroków, metoda dużych kroków
+(tylko projekt finalny), wykupienie prosperującej firmy, licencja, integracja
+rozwiązań „gorszych" (zaawansowanych, ale starszych) · pytać klientów, jaki
+produkt budować i w jakim trybie (sami / z komponentów / komponent / moonshot /
+opcje alternatywne jak Eternal Laboratoria).
+
+**⚠️ Rozbieżność liczb zgłoszona przez założyciela:** *„w tamtym aplikacja miała
+ponad 140 funkcji, nie 105 czy 115, i było wspomniane coś o 23 modułach"*;
+prośba o odnalezienie pliku **`Eternal_Funkcje_ewolucja_i_luki.md`** mówiącego o
+~261 funkcjach oraz o scalenie **265 + to z 239, czego nie ma w 265**, a
+następnie usunięcie duplikatów jako wersji finalnej. To jest źródło ósmego
+wariantu liczby funkcji w korpusie (zob. zestawienie rozbieżności).
+
+**Model monetyzacji sformułowany przez założyciela (do weryfikacji w dalszych
+plikach — „jedenaście sposobów, wszystkie twoje"):** aplikacja **bezpłatna dla
+B2C**, przychód z B2B · pośrednictwo/afiliacja przy sprzedaży sprzętu, badań,
+telemedycyny, konsultacji · **podział 80/20 za udostępnianie zanonimizowanych
+wyników i danych medycznych** · udostępnianie API.
+Pytanie kontrolne wraca dwukrotnie: *„czy mówiłem w tej konwersacji o sposobach
+monetyzacji, np. sprzedaży zanonimizowanych danych, telemedycynie, pozyskiwaniu
+pieniędzy z B2B (kliniki)?"* — z odpowiedzią, że **wszystkie jedenaście pochodzi
+od asystenta, nie od założyciela**. Istotne dla autorstwa i dla oceny, które
+założenia są zweryfikowane, a które zaproponowane.
+Pozostaje pytanie otwarte: *„nadal trzeba być jednostką do tego uprawnioną
+medycznie — jak zgarniać klientów i monetyzować się (stały dochód SaaS,
+niestały sprzęt), jak dyktować warunki, jak kontrolować i rozwijać technologie."*
+
+### #33 — IKP i P1 do 2030: dwie osie rozwoju
+
+**TYLKO NOWE — harmonogram krajowy i EHDS są już w CZYT.md wyżej; poniżej to,
+czego tam nie ma.**
+
+**Rozdzielenie dwóch osi (kluczowa teza pliku):** oś krajowa (KPO 1,256 mld zł,
+FERC Faza 3, ustawa z 11 maja 2026; horyzont 2026–2028) **dodaje funkcje**;
+oś europejska (rozporządzenie EHDS, 810 mln EUR z Komisji; 2027–2029)
+**zmienia zasady dostępu do danych** — *„i to ona jest ważniejsza dla Eternal"*.
+
+**Rok 2027 — trzy bezpośrednie odpowiedniki funkcji z planu:** **e-Profil
+Pacjenta** (agregacja i analiza danych z wielu systemów, wstępnie przeanalizowana
+przez algorytmy eksperckie lub uczenie maszynowe, dla lekarza POZ) · Faza 3 FERC:
+e-karta ciąży, e-karta zdrowia dziecka, e-zlecenia na badania laboratoryjne,
+profilaktyka w IKP · rozszerzenie e-rejestracji o kolejnych osiem świadczeń ·
+certyfikowane narzędzia AI w diagnostyce, zwłaszcza obrazowej.
+**2028:** domowa opieka medyczna — teleporady z urządzeniami (cukier, puls,
+ciśnienie przesyłane bezpośrednio do lekarza) · e-konsylia · pełne wdrożenie
+e-Profilu u lekarzy POZ. **2026:** asystent głosowy opóźniony o 3 miesiące.
+
+**Prognoza skali (mojeIKP / IKP aktywni):** 2026 — 5 mln / 21 mln · 2027 — ~7 /
+~23 · 2028 — ~9 / ~25 · 2029 — ~11 / ~27 · **2030 — ~13 mln / ~28 mln, blisko
+sufitu populacyjnego**. Podstawa: ostatni milion dołączył w sześć miesięcy,
+wcześniejsze dojście do czterech milionów zajęło ponad cztery lata.
+
+**Finansowanie EHDS:** 810 mln EUR z Komisji na wdrożenie + 14 mld EUR na
+cyfryzację w planach odbudowy.
+
+**⚠️ AKTUALIZACJA AUDYTU 185 FUNKCJI — sześć funkcji zmienia status:**
+A11.3 tłumaczenie interfejsu i treści (bezpieczne → **wzmocnione**, powód:
+transgraniczność od 2029) · A1.5 normalizacja FHIR (→ wzmocnione, wymogi
+interoperacyjności EHDS) · D1.6 integracja z EHR/EMR (wzmocnione → **silnie
+wzmocnione**) · D1.5 rejestr niezmienności zgód (→ wzmocnione, bo opt-out czyni
+jawny rejestr zgód wyróżnikiem) · A2.6 i D1.4 eksport danych (→ wzmocnione,
+EHDS wymaga przenoszalności). Bez zmiany pozostają zagrożone: A4.3 raport SBAR
+i D2.3 dashboard lekarza — z powodu e-Profilu Pacjenta w 2027.
+**Zaktualizowany rozkład:** bezpieczne 142 → **136** · wzmocnione 4 → **10** ·
+zagrożone 28 · zajęte 11. *„To nie jest pogorszenie, tylko podniesienie
+priorytetu."*
+
+**Trzy okna czasowe (co robić i czego nie budować):**
+- **Do końca 2027** — zbudować parser dokumentów papierowych (*„AI w IKP działa
+  na danych w systemie, nie na zdjęciu kartki"*), zbudować agregację urządzeń
+  (*„nikt tego nie robi i nie zapowiada"*), uruchomić linię weterynaryjną.
+  **Nie budować** symptom checkera, wideokonsultacji, rezerwacji wizyt —
+  dostarcza je państwo.
+- **2027–2029** — zbudować dorobek naukowy (warunek statusu badawczego), zamknąć
+  kohortę, wejść w gremia standaryzacyjne (*„wymogi interoperacyjności powstają
+  teraz"*), przygotować wniosek do organu dostępu.
+- **Od marca 2029** — złożyć wniosek o dostęp do danych populacyjnych, uruchomić
+  model przyczynowy na danych populacyjnych, rozważyć rynki poza Polską.
+
+**Cztery obszary niezagrożone do 2030 i dalej** (poza zakresem obu osi):
+dokumenty papierowe i spoza systemu (*„P1 działa na tym, co placówka
+zaraportowała… poza zasięgiem na zawsze"*) · agregacja urządzeń noszonych
+(*„nie ma tego ani w KPO, ani w Fazie 3, ani w EHDS"*) · linia weterynaryjna ·
+ciągłość zapisu przez dekady (*„nie jest przedmiotem żadnego projektu ani
+krajowego, ani europejskiego"*).
+
+**Zdanie zamykające #33:** *„Do 2027 państwo zajmie wszystko, co dotyczy
+dokumentacji już w systemie, ale marzec 2029 otwiera drogę, której dziś nie ma —
+dostęp do danych populacyjnych dla podmiotu badawczego bez wpisu do rejestru
+podmiotów leczniczych, a warunkiem skorzystania z niej jest dorobek i kohorta
+gotowe przed tą datą."*
+
+### #39 — dwadzieścia trzy moduły aplikacji (16 obecnych + 7 nowych = 169 funkcji)
+
+**⚠️ To jest wersja uzgodniona numeracji modułów — różni się od wariantu
+z D-wcześniejszych (tam A17 Autonomia, A20 Bezpieczeństwo farmakoterapii,
+A21 Kobiety). Numeracja obowiązująca wg #39:**
+
+| # | Moduł | Funkcje | Status |
+|---|---|---|---|
+| A1 | Agregacja i synchronizacja danych | 10 | obecny |
+| A2 | OCR i digitalizacja dokumentów | 8 | obecny |
+| A3 | Dashboard, monitoring i alerty | 9 | obecny |
+| A4 | Raporty i eksport | 5 | obecny |
+| A5 | Telemedycyna i zdalna opieka | 9 | obecny |
+| A6 | AI, RAG i chatboty | 9 | obecny |
+| A7 | Planowanie i rekomendacje | 9 | obecny |
+| A8 | Zdrowie psychiczne | 10 | obecny |
+| A9 | Społeczność, edukacja, gamifikacja | 6 | obecny |
+| A10 | Marketplace | 8 | obecny |
+| A11 | Geolokalizacja i regionalizacja | 5 | obecny |
+| A12 | Nagrywanie, ankiety, dokumentacja | 5 | obecny |
+| A13 | Eternal Pet | 6 | obecny |
+| A14 | Powiadomienia i eskalacja | 3 | obecny |
+| A15 | Hub Innowatora | 6 | obecny |
+| A16 | Forge — platforma agregacyjna | 7 | obecny |
+| **A17** | **Zgodność i nadzór nad wyrobem** | 12 | nowy |
+| **A18** | **Nadzór nad sztuczną inteligencją** | 7 | nowy |
+| **A19** | **Bezpieczeństwo farmakoterapii** | 6 | nowy |
+| **A20** | **Zdrowie kobiet, rodziny i dziecka** | 10 | nowy |
+| **A21** | **Opieka długoterminowa i rehabilitacja** | 7 | nowy |
+| **A22** | **Dostępność i wykluczenie cyfrowe** | 5 | nowy |
+| **A23** | **Dostęp, tożsamość i podróż** | 7 | nowy |
+
+**Bilans:** obecne 16 modułów / 115 funkcji · nowe 7 / 54 · **razem aplikacja
+23 moduły / 169 funkcji**. Plus Digital Twin (15) + Station (21) + Capsule (23)
++ Matrix (11) → **239 funkcji w ekosystemie**.
+
+**A20 — najpilniejszy z siedmiu. Uzasadnienie luki:** w 185 funkcjach nie ma
+cyklu, płodności ani menopauzy (*„luka obejmuje połowę populacji przez połowę
+życia"*) · jest kalendarz szczepień dla zwierząt (A13), nie ma dla dziecka ·
+projekt 19 „Zdrowa Ciąża" nie ma na czym stanąć · brak wywiadu rodzinnego —
+*„model przyczynowy pracuje bez najsilniejszego predyktora"* · Faza 3 FERC
+wprowadza e-kartę ciąży i e-kartę zdrowia dziecka, więc państwo potwierdza
+potrzebę.
+**Dziesięć funkcji A20 w czterech poziomach dojrzałości (MVP → MLP → FINAL →
+SF):** A20.1 cykl menstruacyjny (ręczny zapis → predykcja z urządzeń →
+korelacja z HRV, snem, nastrojem → predykcja z biochemii) · A20.2 płodność
+(kalendarz + temperatura bazowa → testy → hormony z laboratorium → z implantu) ·
+A20.3 ciąża (kalendarz badań → waga, ciśnienie, obrzęki → integracja z e-kartą
+ciąży → ciągły monitoring płodu) · A20.4 połóg i karmienie (przypomnienia →
+nastrój, sen, waga → wykrywanie ryzyka depresji poporodowej) · A20.5 menopauza
+(dziennik objawów → korelacja z danymi → hormony i gęstość kości → terapia
+dostrajana) · A20.6 profil dziecka · A20.7 kalendarz szczepień dziecka
+(obowiązkowe → zalecane i przypomnienia → integracja z P1) · A20.8 siatki
+centylowe (wzrost, waga → obwód głowy, kamienie milowe → **odchylenia od własnej
+trajektorii** → predykcja wzrostu) · A20.9 wywiad rodzinny · A20.10 zdrowie
+rodziny jako całości (wspólny widok → wspólne czynniki ryzyka → bliźniak
+rodziny).
+
+**⚠️ A20.9 WYWIAD RODZINNY — najlepszy stosunek wartości do kosztu w całej
+Specyfikacji.** Koszt: jedno pole formularza, kilka tysięcy złotych. Daje:
+najsilniejszy pojedynczy predyktor w każdym modelu ryzyka sercowo-naczyniowego,
+onkologicznego i metabolicznego. Ma to: **nikt — ani IKP, ani Function, ani
+Superpower**. Bez niej model przyczynowy D2.2 pracuje bez najmocniejszej
+dostępnej zmiennej. Projekt 20 „Wykrywanie wad genetycznych" obiecuje za milion
+złotych to, co w dużej mierze daje **to jedno pytanie**.
+**Rekomendacja: A20.9 wchodzi do MVP przed wszystkimi pozostałymi funkcjami
+modułu.**
+
+**A20 — co widzi użytkownik / co widzimy my:** użytkownik — kalendarz cyklu
+przewidujący następny, ciąża prowadzona jako **jeden ciąg od planowania do pół
+roku po porodzie**, dziecko z siatką centylową pokazującą odchylenie od jego
+własnej trajektorii, nie od średniej; my — rytm hormonalny, korelacja z HRV i
+snem, wzorce rodzinne, rozwój dziecka w czasie, wywiad rodzinny jako zmienna
+w modelu. Ważność dla użytkownika 5 (dla połowy populacji), dla ekosystemu 5.
+**Monetyzacja:** freemium (cykl, szczepienia, siatki) · premium (predykcja,
+korelacje) · **pakiet ciążowy 999 zł/mies. × 15** · podprodukty: pakiet ciążowy,
+menopauzalny, rodzinny.
+**Koszt i termin A20:** MVP (A20.9, A20.1, A20.7, A20.8) 40–60k, 2027 Q1 ·
+MLP (A20.2, A20.3, A20.5, A20.6) 100–150k, 2027 Q4 · FINAL (A20.4, A20.10,
+integracja z e-kartami) 80–120k, 2029 → **razem 220–330k**. Jest to **warunek
+wstępny projektu 19 wycenionego na 500k**.
+
+**A17 Zgodność i nadzór nad wyrobem (12 funkcji, 150–200k, MLP 2027).**
+Instrukcja używania w aplikacji · etykieta elektroniczna z UDI · deklaracja
+przeznaczenia i ograniczeń · zgłaszanie incydentu · rejestr zdarzeń
+niepożądanych · panel nadzoru po wprowadzeniu · kontrolowana dystrybucja
+aktualizacji · **tryb degradacji przy awarii** · wykaz składników oprogramowania ·
+log dostępu widoczny dla użytkownika · granularne wycofanie zgody · realizacja
+usunięcia danych z potwierdzeniem. Ważność dla użytkownika 3 — **z wyjątkiem logu
+dostępu, który jest 5**; dla ekosystemu 5 (*„bez tego nie da się wydać wersji
+certyfikowanej"*). **Trzy ostatnie funkcje są jednocześnie wyróżnikami
+handlowymi, nie tylko wymogami** — konkurencja weterynaryjna jawnie deklaruje,
+że danych nie oddaje; tu można zadeklarować odwrotność w jednym zdaniu.
+
+**A18 Nadzór nad AI (7 funkcji, 70–110k, MLP 2027).** Oznaczanie treści
+generowanej · karta modelu widoczna dla użytkownika · wyjaśnienie decyzji ·
+nadzór człowieka nad rekomendacją wysokiej stawki · monitoring dryfu
+z automatycznym wstrzymaniem · rejestr zastosowań i logowanie zapytań · prawo
+zakwestionowania wyniku scoringu. Ważność dla ekosystemu 4 — **warunek scoringu
+B2B**.
+
+**A19 Bezpieczeństwo farmakoterapii (6 funkcji, 120–180k, MLP 2027).** Rejestr
+przyjmowanych leków · wykrywanie interakcji lekowych · alergie i
+przeciwwskazania · interakcje lek–suplement · farmakogenomika · monitoring
+przyczepności ze Station. *„Przyczepność mierzona, nie deklarowana —
+najsilniejszy predyktor skuteczności leczenia."* Warunek bezpieczeństwa Smart
+Dispensera. **⚠️ Wykrywanie interakcji to funkcja diagnostyczna, nie wellness —
+wyłącznie od MLP.**
+
+**A21 Opieka długoterminowa i rehabilitacja (7 funkcji, 180–260k, MLP 2028).**
+Wykrywanie upadku i braku aktywności · ocena czynności dnia codziennego ·
+**mapa i skale bólu** · plan rehabilitacji z kontrolą wykonania · oświadczenie
+woli i dyspozycje · panel dla opiekuna rozszerzony · tryb senioralny.
+*„Dziś jest panel opiekuna, ale nie ma czego na nim pokazać."*
+**⚠️ Ból jest najczęstszym powodem wizyty u lekarza i nie występuje w 185
+funkcjach w żadnej postaci.** Otwiera rynek instytucjonalny.
+
+**A22 Dostępność i wykluczenie cyfrowe (5 funkcji, 80–120k, MVP częściowo/MLP
+w pełni).** Zgodność ze standardem dostępności · tryb prostego języka · duży
+kontrast i skalowanie · obsługa głosowa · **kanał niecyfrowy dla osób bez
+smartfona**. Co widzimy my: *„kto odpada na którym etapie z powodu bariery, nie
+braku zainteresowania"*. **⚠️ Wymóg prawny w Unii dla aplikacji konsumenckich,
+a nie ma go w 185 funkcjach.**
+
+**A23 Dostęp, tożsamość i podróż (7 funkcji, 120–180k, MLP 2027).** Konto
+rodzinne wieloprofilowe · dostęp zastępczy do danych podopiecznego ·
+**automatyczne wygaszenie w osiemnaste urodziny** · czasowe udostępnienie
+lekarzowi · dostęp ratunkowy z pełnym logiem · tryb offline · karta zdrowia na
+wyjazd zagraniczny (zyskuje po marcu 2029 — transgraniczna wymiana kart
+pacjenta). *„Persona «opiekun rodzina» jest w Specyfikacji, ale nie ma
+mechanizmu dostępu."*
+
+**Zestawienie siedmiu nowych: 54 funkcje, 940 tys. – 1,38 mln zł.**
+**Kolejność wdrożenia (8 pozycji):** 1. A20.9 wywiad rodzinny (kilka tys.) →
+2. A22 dostępność, wersja podstawowa (40–60k) → 3. A20 MVP: cykl, szczepienia,
+siatki (40–60k) → 4. A17.10–A17.12: log, zgody, usunięcie (70–100k) → 5. A19
+farmakoterapia (120–180k) → 6. A23 dostęp rodzinny (120–180k) → 7. A18 nadzór
+nad AI (70–110k) → 8. A21 opieka długoterminowa (180–260k).
+**Pierwsze trzy pozycje kosztują razem 85–125 tys. i zamykają trzy największe
+luki w Specyfikacji.**
+
+## D061 — #51 REJESTR SCALONY (299 funkcji / 42 moduły) — rozstrzygnięcie rozbieżności liczb
+
+**⚠️ TO JEST DOKUMENT ROZSTRZYGAJĄCY.** Odpowiada wprost na polecenie
+*„dodaj z oryginału 265 + to, co jest w 239, a nie zostało zamieszczone w 265,
+następnie usuń duplikaty i to będzie wersja finalna"*. Zastępuje numerację z #39
+(gdzie A17 = Zgodność, A20 = Kobiety) — w wersji scalonej **A17 = Autonomia,
+A18 = Zgodność, A21 = Kobiety, A24 = Dostęp i podróż**.
+
+**Arytmetyka scalenia:**
+
+| Źródło | Nowych funkcji | Charakter |
+|---|---|---|
+| Wersja 265 | 80 | produktowe — atrakcyjność, nowe zdolności |
+| Wersja 239 | 54 | zgodnościowo-lukowe — braki formalne i demograficzne |
+| Razem zgłoszonych | 134 | |
+| Usunięte jako duplikaty | 21 | |
+| **Netto nowych** | **113** | |
+
+Specyfikacja Master 3.0: 30 modułów / 185 funkcji · dodane: 12 modułów /
+114 funkcji · **razem 42 moduły / 299 funkcji**.
+*(Uwaga na rozbieżność z wcześniejszym wariantem w korpusie mówiącym o 309
+funkcjach — App 186, Station 34, Capsule 41, Twin 27, Matrix 21. Wersja #51
+jest późniejsza i podaje pełne wyprowadzenie z usunięciem duplikatów, więc
+w dokumentach wyjściowych obowiązuje **299/42**.)*
+
+**Bilans po pionach:** aplikacja **185 funkcji / 24 moduły** · Station 21 + 10 =
+**31 / 6** · Capsule 23 + 17 = **40 / 5** · Digital Twin 15 + 9 = **24 / 4** ·
+Matrix 11 + 8 = **19 / 3**. Razem **299 / 42**.
+
+**Dwadzieścia jeden usuniętych duplikatów — 16 powielało istniejące 185 funkcji:**
+A17.2 rozpoznawanie stanu emocjonalnego = A8.2 · A17.13 organizacja
+zdecentralizowana = A16.6 Eternal Token · A17.16 skaner posiłków = A7.5 ·
+A17.18 kalendarz zdrowotny = A7.7 + A5.8 · S6.8 autonomiczny karmnik = A13.3
+Mini Station Pet · S6.9 dozownik napojów z suplementami = S3.2 · S6.11 dozownik
+wielu suplementów = S3.1 · S6.14 robot towarzyszący zwierzęciu = poz. 34 roboty
+humanoidalne · C5.7 autonomiczne dozowanie insuliny = C3.1 mikro-pompy MEMS ·
+D4.3 symulator efektu terapii = D2.4 · D4.6 interaktywne ciało 3D = D2.1 ·
+D4.9 kalkulator wpływu stylu życia = D2.4 · D4.11 testament cyfrowy = D3.1 ·
+D4.14 panel spadkobierców = D3.1 · D4.15 ciągłość po śmierci fizycznej = D3.3 ·
+X3.5 pełna immersja z dotykiem = X2.5 · X3.6 zwiedzanie własnego ciała w VR =
+X2.2 · X3.8 lekarz holograficzny = X2.4 Holonet · X3.9 miasto zdrowia
+w metawersum = X2.3.
+**Dwie przeniesione, nie usunięte:** A17.6 łącznik rodzinny → A21 · A17.17
+doradca zdrowia w podróży → A24.
+**Ustalenie diagnostyczne:** *„dziewiętnaście z dwudziestu jeden duplikatów
+powielało funkcje już istniejące w Master 3.0 — głównie w Digital Twin (6)
+i Matrix (4). To pokazuje, że wersja 265 była pisana bez pełnego przeglądu
+istniejących kart."*
+
+**A17 — AUTONOMIA, SPOŁECZNOŚĆ I INTEGRACJA (15, z wersji 265).**
+*Autonomia i inteligencja wyprzedzająca (5):* A17.1 autonomiczny opiekun zdrowia
+(ciągły nadzór nad wszystkimi danymi, wyprzedzanie problemów, FINAL) · A17.2
+architekt snu (optymalne godziny snu i drzemek, MLP) · A17.3 **lustro bliźniaka**
+(porównanie stanu obecnego z optymalnym dla wieku i płci, FINAL) · A17.4
+przypomnienia kontekstowe (*gdy warunki są optymalne, nie o stałej porze*,
+FINAL) · A17.5 wyprzedzające podpowiedzi (sugestia **przed** pojawieniem się
+problemu, FINAL).
+*Społeczność zaawansowana (4):* A17.6 wyzwania zdrowotne (MLP) · A17.7 transmisja
+danych na żywo (opcjonalna, FINAL) · A17.8 dobieranie mentorów (kojarzenie
+z osobami o podobnym doświadczeniu, MLP) · A17.9 zbiorczy wynik społeczności
+(współzawodnictwo miast i regionów, FINAL).
+*Integracja z życiem codziennym (3):* A17.10 interfejs głosowy (MLP) · A17.11
+integracja z domem inteligentnym — światło, temperatura, nawilżenie (FINAL) ·
+A17.12 analiza formy ćwiczeń z kamery, korekta w czasie rzeczywistym (MLP).
+*Analityka zaawansowana (3):* A17.13 wnioski z danych genetycznych (FINAL) ·
+A17.14 **zegar epigenetyczny** — wiek biologiczny z biomarkerów metylacji (SF) ·
+A17.15 optymalizator rytmu dobowego, dostrojenie doby do chronotypu (MLP).
+
+**A18 Zgodność i nadzór nad wyrobem (12)** — kody i etapy: A18.1 instrukcja
+używania wersjonowana MLP · A18.2 etykieta elektroniczna z UDI MLP ·
+**A18.3 deklaracja przeznaczenia i ograniczeń — co wyrób NIE robi, MVP** ·
+A18.4 zgłaszanie incydentu MLP · A18.5 rejestr zdarzeń niepożądanych MLP ·
+A18.6 panel nadzoru po wprowadzeniu MLP · A18.7 kontrolowana dystrybucja
+aktualizacji MLP · **A18.8 tryb degradacji przy niedostępności modelu lub
+chmury, MVP** · A18.9 wykaz składników oprogramowania i zgłaszanie podatności
+MLP · **A18.10 log dostępu widoczny dla użytkownika — kto oglądał moje dane
+i kiedy, MVP** · **A18.11 granularne wycofanie zgody per cel przetwarzania,
+MVP** · **A18.12 realizacja usunięcia danych z potwierdzeniem, odrębna od
+eksportu, MVP**.
+
+**A19 Nadzór nad AI (7):** A19.1 oznaczanie treści generowanej **MVP** · A19.2
+karta modelu widoczna dla użytkownika MLP · A19.3 wyjaśnienie decyzji — dlaczego
+taki wynik ryzyka MLP · A19.4 nadzór człowieka nad rekomendacją wysokiej stawki
+MLP · A19.5 monitoring dryfu z automatycznym wstrzymaniem FINAL · A19.6 rejestr
+zastosowań i logowanie zapytań MLP · A19.7 prawo zakwestionowania wyniku
+scoringu MLP.
+
+**A20 Bezpieczeństwo farmakoterapii (6):** A20.1 rejestr leków MVP · A20.2
+wykrywanie interakcji lekowych — **funkcja diagnostyczna**, MLP · A20.3 alergie
+i przeciwwskazania MVP · A20.4 interakcje lek–suplement MLP · A20.5
+farmakogenomika — dobór leku wg genotypu, FINAL · A20.6 monitoring przyczepności
+ze Station — czy dawka pobrana, MLP.
+
+**A21 Zdrowie kobiet, rodziny i dziecka (11)** — jak w #39 (A20.1–A20.10),
+przenumerowane na A21.1–A21.10, plus **A21.11 łącznik rodzinny** (dane rodziny
+w jednym widoku + uprawnienia). **A21.9 wywiad rodzinny — najlepszy stosunek
+wartości do kosztu w całym rejestrze.**
+
+**A22 Opieka długoterminowa (7):** A22.1 wykrywanie upadku MLP · A22.2 ocena
+czynności dnia codziennego MLP · **A22.3 mapa i skale bólu MVP** · A22.4 plan
+rehabilitacji z kontrolą wykonania MLP · A22.5 oświadczenie woli i dyspozycje
+medyczne FINAL · A22.6 panel dla opiekuna rozszerzony MLP · A22.7 tryb
+senioralny MVP.
+
+**A23 Dostępność (5):** A23.1 zgodność ze standardem dostępności MVP · A23.2 tryb
+prostego języka MVP · A23.3 duży kontrast i skalowanie MVP · A23.4 obsługa
+czytnikiem ekranu i głosem MLP · A23.5 kanał niecyfrowy dla osób bez smartfona
+FINAL.
+
+**A24 Dostęp, tożsamość i podróż (7):** A24.1 konto rodzinne wieloprofilowe MLP ·
+A24.2 dostęp zastępczy do danych podopiecznego MLP · A24.3 automatyczne
+wygaszenie w osiemnaste urodziny MLP · **A24.4 czasowe udostępnienie lekarzowi
+MVP** · A24.5 dostęp ratunkowy z pełnym logiem MLP · A24.6 tryb offline MLP ·
+A24.7 karta zdrowia na wyjazd zagraniczny MLP.
+
+**S6 — SENSING BEZKONTAKTOWY I DIAGNOSTYKA (10, Station):** S6.1 bezdotykowe EKG
+— pomiar przez ubranie, bez elektrod (FINAL) · S6.2 nieinwazyjny pomiar glukozy —
+spektroskopia zamiast igły (SF) · S6.3 monitorowanie oddechu — bezdech i jakość
+snu (MLP) · S6.4 analiza potu — elektrolity, nawodnienie, wysiłek (FINAL) ·
+S6.5 aplikator przezskórny — automatyczne podanie w odpowiedzi na pomiar (SF) ·
+S6.6 diagnostyka bezkrwawa — parametry z oddechu i potu (FINAL) · S6.7
+inteligentne opakowanie leków (MLP) · S6.8 autonomiczny oczyszczacz powietrza
+(FINAL) · S6.9 analiza aktywności zwierzęcia (MLP) · S6.10 inteligentna kuweta —
+analiza wydalin (FINAL).
+
+**C5 — MONITORING I TERAPIA ROZSZERZONA (17, Capsule).**
+*Monitoring (6):* C5.1 ciągły pomiar ciśnienia od wewnątrz FINAL · C5.2
+monitorowanie stanu zapalnego FINAL · C5.3 wykrywanie infekcji przed objawami SF ·
+C5.4 monitorowanie hormonów płodności FINAL · C5.5 wczesne wykrywanie zmian
+nowotworowych SF · C5.6 monitorowanie mikrobiomu SF.
+*Terapia (6):* C5.7 celowane dostarczanie leków SF · C5.8 wsparcie odporności SF ·
+C5.9 regulacja ciśnienia FINAL · C5.10 regulacja snu FINAL · C5.11 wsparcie
+trawienia SF · C5.12 terapia celowana nowotworów SF.
+*Właściwości urządzenia (5):* C5.13 ładowanie bezprzewodowe przez skórę FINAL ·
+C5.14 autonomiczna aktualizacja oprogramowania FINAL · C5.15 interfejs
+wielojęzyczny MLP · C5.16 samodiagnoza implantu FINAL · C5.17 implanty
+biodegradowalne SF.
+
+**D4 — PREDYKCJA I CIĄGŁOŚĆ ROZSZERZONA (9, Digital Twin):** D4.1 symulator
+przewidywanej długości życia FINAL · D4.2 predyktor postępu choroby przewlekłej
+FINAL · D4.3 trajektoria starzenia SF · D4.4 zbiorczy wskaźnik zdrowia
+z epigenetyką SF · D4.5 oś czasu zdrowia FINAL · D4.6 drzewo zdrowia rodziny
+MLP · D4.7 awatar przyszłego siebie FINAL · D4.8 archiwum wspomnień
+i doświadczeń SF · D4.9 wiadomości wideo dla bliskich FINAL.
+
+**X3 — SPOŁECZNOŚĆ I EDUKACJA ROZSZERZONA (8, Matrix):** X3.1 wioski zdrowotne
+w VR FINAL · X3.2 globalne wyzwania zdrowotne MLP · X3.3 platforma dla
+edukatorów MLP · X3.4 kręgi wsparcia MLP · X3.5 terapia w rzeczywistości
+wirtualnej FINAL · X3.6 edukacja zdrowotna w formie gry MLP · X3.7 szkolenie
+pierwszej pomocy w AR MLP · **X3.8 obalanie mitów zdrowotnych MVP**.
+
+**⚠️ TRZYNAŚCIE FUNKCJI OBOWIĄZKOWYCH W MVP (nie da się ich odłożyć):**
+A8.10 **redirect 116 123** (*jedyna funkcja bez ewolucji faz — dostępna na każdym
+etapie*) · A18.3 deklaracja przeznaczenia i ograniczeń · A18.8 tryb degradacji
+przy awarii · A18.10 log dostępu · A18.11 granularne wycofanie zgody · A18.12
+usunięcie danych z potwierdzeniem · A19.1 oznaczanie treści generowanej ·
+A20.1 rejestr leków · A20.3 alergie i przeciwwskazania · A21.9 wywiad rodzinny ·
+A22.3 mapa i skale bólu · A23.1–A23.3 dostępność podstawowa · A24.4 czasowe
+udostępnienie lekarzowi (*prostsze niż pełna integracja*).
+Trzy z nich — **log dostępu, granularne zgody, usunięcie danych** — są
+jednocześnie wymogami formalnymi i **najtańszymi wyróżnikami handlowymi w całym
+rejestrze**.
+
+## D061 — #54 (Pięć punktów, wersja druga)
+
+**TYLKO NOWE — siedem modułów M-A…M-G, osiem mechanizmów kontroli i podział
+deflacyjne/erozyjne są już w CZYT.md; poniżej to, czego tam nie ma.**
+
+**Co się zmieniło względem wersji pierwszej:** podstawa kosztowa **policzona od
+dołu** zamiast zakotwiczonej na cudzych projektach · punkt 4 zamiast ogólników
+o pozycjonowaniu — osiem mechanizmów kontroli technologii, której nie budujemy ·
+punkt 5 zamiast wariantów opisowych — konkretny zestaw z wyceną · punkt 2:
+te same pięć metod, ale przy realnych kwotach **wychodzi inny wniosek**.
+
+**Cztery projekty budżetowe (kondensacja poniżej modułów):** P-1 Rdzeń
+(M-A + M-B + M-G, właściciel Łukasz albo Janek) · P-2 Zwierzęta (M-C, właściciel
+osobny, oddany wyłącznie temu) · P-3 Sprzęt (M-D, Adrian, dopiero z zespołem) ·
+**P-4 Wnętrze (M-E) — właściciel nie istnieje**.
+
+**Pięć metod taniej realizacji moonshotów (redukcja / koszt zastosowania):**
+odłożenie w czasie — 30–50% rocznie / zero · kupowanie dowodu zamiast badań —
+rząd wielkości / licencja · wnoszenie danych zamiast kapitału — pełna / dostęp
+do zbioru · cykl zwierzęcy zamiast ludzkiego — rząd wielkości / infrastruktura
+M-C · warstwa zamiast urządzenia — **95%** / firmware i protokół.
+
+**⚠️ WNIOSEK ODWRACAJĄCY CAŁY WĄTEK.** Przy realnych kwotach moonshot w wariancie
+warstwowym to **250–900 tys. zł, nie dziesiątki milionów** — więc pytanie
+o potanianie traci ostrość. Odpis 20% z przychodu: przy 3 mln → 600 tys.
+(jeden moonshot warstwowy) · przy 5 mln → 1 mln (jeden plus rezerwa) · przy
+10 mln → 2 mln (**wszystkie trzy równolegle**). Trzy moonshoty warstwowe
+kosztują łącznie ok. 2 mln zł = roczny odpis przy przychodzie 10 mln.
+**Skutek dla priorytetów:** *„każda złotówka wydana na przyspieszenie moonshotu
+przed osiągnięciem przychodu jest wydana źle; każda wydana na przyspieszenie
+przychodu skraca drogę do wszystkich trzech naraz"*. Zastrzeżenie założyciela,
+że przy kontroli zasobów potanianie nie jest konieczne, **okazało się mocniejsze
+niż wszystkie pięć metod razem**.
+
+**⚠️ ODRZUCENIE MECHANIZMU — argument arytmetyczny.** Sterowanie decyzjami
+użytkowników bez ich wiedzy *„nie zadziała jako źródło zasobów na przedsięwzięcie
+dwudziestoletnie — z powodu arytmetycznego, nie tylko innego. Mechanizm taki
+przynosi zysk do momentu ujawnienia i zeruje w dniu ujawnienia jedyne aktywo,
+które rosło przez dekady: gotowość ludzi do powierzania zapisu. To zamiana
+aktywa trwałego na przychód jednorazowy."* (Kolejny niezależny zapis granicy
+wykluczenia — tym razem uzasadniony ekonomicznie, nie etycznie.)
+
+**Cztery źródła przychodu w kolejności dostępności:** usługi regulacyjne Hubu —
+**od kwartału 2**, 600 tys.–1,2 mln rocznie, warunek: kompetencja, którą i tak
+budujemy · oprogramowanie dla lecznic — rok 1, 1–3 mln, warunek: 15–50 klientów ·
+odczyt dokumentów dla placówek — rok 3, 2–5 mln, warunek: skuteczność powyżej
+ręcznego przepisywania · abonamenty i prowizje — rok 2–4, 3–10 mln, warunek:
+skala. *„Pierwsze źródło nie wymaga zbudowania żadnego produktu. To najkrótsza
+droga od zera do pierwszej faktury."*
+
+**Sześć form dźwigni niepieniężnej (co finansuje / kiedy dostępna):** własność
+wiedzy podstawowej → licencjonowanie do partnerów, 2029 · **depozyt danych** →
+wkład do konsorcjum zamiast kapitału, 2030 · wiarygodność naukowa → granty
+i konsorcja, 2029 · miejsce w standardzie → kontrakty publiczne, 2031 · efekt
+sieci → przychód abonamentowy, 2028 · neutralność → udział w wyniku partnerstw,
+2032.
+**Warunek najsilniejszej z nich** (dobrowolnie powierzony depozyt danych) jest
+pozornie ją osłabiający: **możliwość odejścia z pełnym zapisem bez
+konsekwencji**. *„Jeśli ludzie zostają, bo chcą, dźwignia jest prawdziwa. Jeśli
+zostają, bo nie mogą wyjść, jest policzona na kilka lat."*
+
+**Zestaw podstawowy — 400–540 tys. zł, 9–12 miesięcy:** agregator (warstwa nad
+cudzymi urządzeniami) 20–30 tys., 2 mies. · **ważenie pewności** (rozstrzyganie
+konfliktu odczytów) 40–60 tys., 2 mies. · odczyt dokumentów (parser polskich
+wyników) 100 tys., 6–9 mies. · Hub — usługi regulacyjne, **zero dodatkowego
+kosztu, od razu** · interfejsy (eksport danych, potem usługa dla placówek)
+40–50 tys., 2 mies. · rdzeń zapisu (warunek wszystkiego) 200–300 tys., 6 mies.
+*„Hub zaczyna płacić w kwartale drugim, zanim reszta zostanie skończona."*
+
+**Warianty afiliacyjne — 85–135 tys. zamiast 950 tys.:** laboratoria — katalog
+plus przekierowanie do sieci, wynik wprowadzany ręcznie, 10–15 tys. zamiast
+50 tys. · sprzęt noszony — agregacja cudzych urządzeń, 20–30 tys. zamiast 300
+tys. za własne ubranie mierzące · telemedycyna — integracja z istniejącym
+dostawcą, 30–50 tys. zamiast 200 tys. za własną platformę · Hub — rada plus
+regulamin funduszu, 5–10 tys. zamiast 200 tys. za platformę · rozpoznawanie
+mowy — model otwarty na własnej infrastrukturze, 20–30 tys.
+
+**⚠️ CZTERY ELEMENTY BEZ WARIANTU MINIMALNEGO:** warstwa kryzysowa
+(*„rozpoznanie, że komuś dzieje się źle, nie ma wersji uproszczonej"*) · model
+zapisu danych (*„skrót wymusza migrację całego zapisu za pięć lat"*) · prawo
+wyjścia z danymi (*„jest albo go nie ma"*) · **log dostępu**
+(*„musi istnieć od pierwszego dnia — wstecz się go nie odtworzy"*).
+
+**Skąd marża, skoro nie ze sprzętu (6 źródeł):** abonament nad cudzym sprzętem —
+miesięczny, marża programowa · **odczyt dokumentów dla placówek — za dokument,
+marża bardzo wysoka** · usługi regulacyjne Hubu — za projekt, wysoka ·
+**protokół licencjonowany producentom — od urządzenia, bardzo wysoka** ·
+prowizja od badań — od zlecenia, średnia · dane środowiskowe zagregowane —
+kontrakt, wysoka.
+*„Sprzęt jest nośnikiem, nie produktem. Marża 15–25% przy cyklu życia produktu
+dwa lata i konkurencji o cztery rzędy wielkości większej to najgorszy interes
+w całym zestawieniu."*
+
+**Zdanie zamykające #54:** *„Nie budujemy technologii, których nie stać nas
+zbudować — kupujemy nad nimi kontrolę wtedy, gdy jest najtańsza, czyli zanim
+ktokolwiek udowodni, że działają."*
+
+## D061 (koniec) — #65 MACIERZ SKONDENSOWANA v3: 20 projektów → 6 modułów produktowych
+
+Zastępuje Macierz 40 Projektów v2 w zakresie pozycji 1–20. Trzy kryteria
+kondensacji, wszystkie wyprowadzone z v2: **brak moatu = nie jest projektem**
+(poz. 3, 4, 5, 6 mają wpisane „Brak") · **koszt w cenie innej pozycji = nie jest
+projektem** (poz. 14–17: „w cenie platformy Nano") · **jedna ścieżka etapowa =
+jeden moduł** (poz. 11–18 to jedna sekwencja z bramkami).
+
+**Tablica przejścia — gdzie trafiła każda z 20 pozycji:** 1 Eternal App →
+**rozdzielony na M1 + M2** (Lite i Premium mają innego odbiorcę i inny model
+przychodu) · 2 Station Full → M4 · 3 Mini Station → M4 jako wariant entry-level ·
+4 Wearables → M1 jako **funkcja akwizycyjna** dla planu Lite · 5 Smart Clothes →
+M4, wariant odłożony · 6 Laboratoria → M2 jako kanał partnerski · 7 Ubezpieczenia
+→ M6 (zostaje jako produkt — moat: Scoring Engine) · 8 App Pet, 9 Mini Station
+Pet, 10 Implant Pet → M3 · 11 Implant Human → M5 etap 2–4 · 12 Mini Implant →
+M5 etap 1 · 13 Nanoboty platforma → M5 etap 7 · 14–17 Nano (skrzepy, tłuszcz,
+uzależnienia, psychika) → **wskazania M5, nie projekty** · 18 Edible Pills → M5
+jako wariant nośnika, ścieżka alternatywna do implantu · 19 Zdrowa Ciąża,
+20 Wady genetyczne → M6 jako pakiety wertykalne nadbudowane na M1+M2.
+
+**M1 — AGREGATOR (46 funkcji).** Odbiorca: każdy posiadacz jakiegokolwiek
+urządzenia lub wyników badań. Freemium — akwizycja, konwersja do M2. Start
+natychmiast. Zakres: A1 (10) + A2 (8) + A3 (9) + A4 (5) + A11 (5) + A14 (3) +
+**D1 EDM — rdzeń zapisu (6)**.
+*Moaty własne 250–290k:* Polish Medical Context Parser 100k · Universal Sync
+(Normalization Engine) 80k · Bio-Weather Intelligence 40–60k · Symulator Wieku
+Biologicznego 30–50k.
+*Wariant darmowy:* PostgreSQL + HAPI FHIR na Hetznerze 30 EUR/mies. · fork
+Gadgetbridge 0 · Terra API · Tesseract 0 · Airly + OpenWeather + GIOŚ 0 →
+**koszt uruchomienia wersji bezpłatnej ≈ 0**.
+*Etapy:* MVP Q4 2026 (Universal Sync 1 urządzenie, OCR 5/mies., Bio-Weather
+Basic) → MLP 2027 (multi-device, OCR bez limitu, Bio-Weather pełny, Wiek Bio) →
+FINAL 2028 (własny model OCR 99%, eksport API).
+*Zastrzeżenie licencyjne:* Gadgetbridge AGPL-3.0 — udostępnianie usługi sieciowej
+opartej na zmodyfikowanym kodzie pociąga obowiązek udostępnienia źródeł;
+**wymaga architektonicznego oddzielenia forka przed rozpoczęciem prac**.
+
+**M2 — OPIEKA (50 funkcji).** Odbiorca: prowadzący zdrowie świadomie lub chorobę
+przewlekłą. Abonament 49–99 zł/mies. → VIP Medical Concierge; prowizja 5–15% od
+badań. Start 2027. Zakres: A5 (9) + A6 (9) + A7 (9) + A8 (10) + A10 (8) + A12 (5).
+*Moaty 100–120k:* One-Click Rescue + AI Triaż 60–80k · Smart Pharma-Locator 40k.
+*Budowa:* BioMistral 7B + FAISS + PubMed 0 · telemedycyna MVP = link do Jitsi 0 ·
+telemedycyna MLP = Telemedi white label w cenie App Premium · Whisper 0 ·
+marketplace (Stripe + 5 aptek + ZnanyLekarz API) 100k · plany AI z bazą 200+
+ćwiczeń 70k · App Premium MVP 150k.
+*Funkcja obligatoryjna:* **A8.10 Redirect 116 123** — dostępna na każdym etapie,
+od MVP do SF; *„nie podlega spłaszczeniu, opóźnieniu ani przeniesieniu do
+wariantu płatnego"*.
+
+**M3 — PET (6 własnych + ~40 klonowanych).** Odbiorca: właściciel zwierzęcia,
+lecznica, hodowca. Freemium → 29 zł/mies. → VIP Home Vet; sprzedaż urządzeń
+marża 40%; subskrypcja karmy. Właściciel osobny, oddany wyłącznie temu modułowi.
+Start R&D Q4 2026.
+*Mapowanie warstw i co wycięte:* App = Vet AI + profil pupila + tele-weterynaria
+(bez BCI, AGI Pet, metawersum) · agregacja = Tractive, FitBark, Whistle, Petlibro
+(bez Smart Clothes Pet — niepraktyczne) · Mini Station = miska z wagą, analiza
+spożycia, monitoring picia (bez Care Pod Pet) · Full Station = dozownik karmy,
+suplementów, leków (bez Lab-on-a-chip Pet) · Bio-Tag = chip **ISO 11784/11785** +
+GPS + temperatura · Bio-Monitor = CGM dla psów z cukrzycą, mleczany dla koni ·
+Nanoboty = sterylizacja genowa zamiast operacji · Twin = twin rasy, predykcja
+chorób rasowych (bez Pet Ghost — *„etycznie wątpliwe"*) · Vet AI = toksyczne
+rośliny, pierwsza pomoc, dawkowanie (bez AGI Vet).
+*Moat 80–100k:* Vet AI fine-tuned PL (BioMistral + Merck Veterinary Manual)
+30–50k · App Pet jako klon Lite 50k.
+*Rola strategiczna (cytat z v2):* **„Pet Nanoboty (sterylizacja genowa) to NIE
+moonshot — to KLUCZOWA WALIDACJA przed ludzkim Swarm. Pozwala zaoszczędzić
+5–10 lat R&D na ludziach."** Jedyny moduł, którego uzasadnieniem nie jest
+przychód, tylko skrócenie ścieżki badawczej.
+*⚠️ Korekta do v2:* opis regulacji weterynaryjnych jako „łatwiejszych niż MDR"
+jest nieścisły — **reżim wyrobów medycznych dla ludzi nie obejmuje zastosowań
+weterynaryjnych w ogóle; to nie ścieżka łatwiejsza, tylko odrębna.** Wzmacnia
+argument, nie osłabia.
+
+**M4 — STACJA (21 funkcji).** Odbiorca: dom z osobą przewlekle chorą, senior,
+opiekun. Sprzedaż urządzeń marża 40–60% + subskrypcja wkładów. Właściciel Adrian
+— **dopiero z zespołem, nie sam**. Start R&D 2027, MVP Q1 2028. Zakres: S1 (5) +
+S2 (3) + S3 (5) + S4 (5) + S5 (3).
+*Warianty:* Mini Station (tylko diagnostyka) 800k · Full Station (+ Smart
+Dispenser) 2,5 mln · prototyp DIY (ESP32 + sensory, 50 szt.) 50k · Smart Clothes
+odłożony (brak moatu) 300k.
+*Komponenty OEM:* ESP32-S3 ~5 USD (firmware OSS) · **AD8232 EKG ~3 USD —
+producent Analog Devices, nie Texas Instruments (korekta do v2)** · MAX30102
+SpO₂ ~2 USD (Maxim, obecnie Analog Devices) · MLX90614 temp. IR ~5 USD
+(Melexis) · pompy Kamoer ~30 USD wobec 80 USD u Watson-Marlow · **BOM Shenzhen
+OEM ~500 PLN wobec 2 000 PLN samodzielnie**.
+*Gdzie jest przychód:* marża na urządzeniu jest jednorazowa, **subskrypcja
+wkładów jest powtarzalna** — *„im tańsze wejście, tym więcej wkładów"*.
+*⚠️ Pozycja nieujęta w v2:* **Custom Compounds** występuje w matrycy monetyzacji
+jako poziom VIP Station, ale nie ma własnej pozycji kosztowej. To działalność
+farmaceutyczno-logistyczna (compounding, prawo farmaceutyczne, magazyn, dostawa),
+nie funkcja sprzętu — **a cały przychód powtarzalny M4 od niej zależy**. Do
+wyceny i możliwego wydzielenia do osobnego podmiotu lub partnera aptecznego.
+
+**M5 — CAPSULE (23 funkcje).** Odbiorca: pacjent, szpital, klinika. Sprzedaż
+implantu 3 000–8 000 zł + Capsule Plan 200–500 zł/mies. + zabiegi B2B.
+**Właściciel nie istnieje w obecnym zespole.** Start uwarunkowany zamknięciem M3.
+Zakres: C1 (5) + C2 (7) + C3 The Hive (5) + C4 The Swarm (6).
+*Siedem bramek, razem 87–139 mln zł:* 1. MVP 2028 Mini Implant Pet (Bio-Tag)
+1,5 mln → 2. MLP 2029 Mini Implant Human 2–3 mln (50% R&D już zrobione na etapie
+1) → 3. 2029–2030 Implant: mleczany, sportowcy 3–5 mln (odpłata z etapu 2) →
+4. 2030 Implant: glukoza, CGM masowy 5–10 mln (rynek 500 tys. PL + 10 mln EU) →
+5. 2030 Implant: multi-marker 10–20 mln (wymaga inwestora B) → 6. FINAL 2031
+Closed Loop 15–50 mln (Class III, 1 000 pacjentów, 3 lata badań) → 7. SF 2032+
+Nanoboty + terapie celowane 50 mln+ przez 10–15 lat (konsorcjum Horizon Europe).
+*Cztery wskazania jako kolejka, nie projekty:* usuwanie skrzepów (B2B szpitale,
+100–300k/zabieg, 2032+) · redukcja tłuszczu (B2C estetyka, 10–30k, 2032+) ·
+eliminacja uzależnień (B2B kliniki / B2C VIP, 50–100k, 2033+) · leczenie
+psychiczne (B2C depresja lekooporna, 30–80k, 2033+). **Prowadzone kolejno, nie
+równolegle.**
+*⚠️ Dwie korekty regulacyjne do v2:*
+1. **Klasa wyrobu.** v2 podaje Mini Implant Human jako MDR Class I. Wyrób
+   inwazyjny chirurgicznie, przeznaczony do długotrwałego użytku i implantowany
+   **nie może być klasy I** — trafia do klasy wyższej. Zmienia to rząd wielkości
+   kosztu i czasu certyfikacji dla etapu 2.
+2. **Edycja genów.** C4.5 CRISPR in vivo **nie jest w Unii wyrobem medycznym,
+   lecz produktem leczniczym terapii zaawansowanej (ATMP)** — inna instytucja
+   oceniająca, inna ścieżka, inne dossier.
+*Ustalenie rozstrzygające:* M5 odpowiada za **87% kosztu wszystkich sześciu
+modułów i nie ma możliwego właściciela** (Wiktor, Karol, Łukasz, Janek, Adrian
+i Julia pokrywają M1–M4 i M6). *„Projekt bez możliwego właściciela nie jest
+projektem, tylko pytaniem badawczym."* **Rekomendacja: M5 pozostaje w rejestrze
+jako ścieżka warunkowa, uruchamiana wyłącznie po zamknięciu pełnego cyklu w M3
+i wyłącznie z partnerem.**
+
+## D062 — #65 (koniec): M6 Wertykały, bilans sześciu modułów, kolejność uruchomienia
+
+**M6 — WERTYKAŁY (10 funkcji).** Pochłania poz. 7, 19, 20. Odbiorca: segment
+(ciąża, genetyka) **oraz płatnik (ubezpieczyciel)**. Przychód: pakiet 999
+zł/mies., badanie 1 500–5 000 zł, prowizja 5–15 zł/user/mies. Właściciel Wiktor,
+start 2028. Zakres: D2 Predykcyjny Bliźniak / Causal AI (5) + D3 Eternal Legacy
+(4) + A16.7 dynamiczny scoring (1).
+*Moaty 250k:* Causal AI Twin 150k · **Eternal Scoring Engine 100k + 6 miesięcy
+negocjacji**.
+*Trzy pakiety:* scoring dla ubezpieczyciela — budowa 100k, przychód 5–15
+zł/user/mies., rynek PZU, Warta, AXA · **Zdrowa Ciąża — budowa 500k, 999 zł/mies.
+przez 15 miesięcy, rynek 350 tys. urodzeń rocznie** · wady genetyczne — budowa
+1 mln, 1 500–5 000 zł + abonament.
+*Luka blokująca:* w rejestrze 185 funkcji nie ma cyklu, płodności, menopauzy,
+profilu dziecka ani siatek centylowych — *„pakiet ciążowy nie ma na czym
+stanąć"*; wymaga wcześniejszego dodania 5–6 funkcji za 150–250k. (To samo
+ustalenie co A20/A21 w #39 i #51 — trzeci niezależny zapis.)
+*⚠️ Zastrzeżenie do scoringu:* **jedyny moduł, w którym wartość dla firmy rośnie,
+gdy dla części użytkowników wynik jest niekorzystny.** Wymaga trzech reguł
+zapisanych przed pierwszą umową. Model *„Pay-as-you-live −30% składki"* spełnia
+regułę trzecią **pod warunkiem, że pozostanie wyłącznie zniżką** (nigdy
+podwyżką).
+
+**Zestawienie sześciu modułów (funkcje / moaty własne / nakład do 2030 /
+właściciel):**
+
+| Moduł | Poz. v2 | Funkcje | Moaty własne | Nakład do 2030 | Właściciel |
+|---|---|---|---|---|---|
+| M1 Agregator | 1(Lite), 4 | 46 | 250–290k | | Łukasz/Janek |
+| M2 Opieka | 1(Premium), 6 | 50 | 100–120k | 250–320k | Wiktor + zespół |
+| M3 Pet | 8, 9, 10 | 46 | 80–100k | 2,2 mln | osobny |
+| M4 Stacja | 2, 3, 5 | 21 | — | 850k–3,3 mln | Adrian z zespołem |
+| M5 Capsule | 11–18 | 23 | 5 mln (2032+) | **87–139 mln** | **brak** |
+| M6 Wertykały | 7, 19, 20 | 10 | 250k | 1,75 mln | Wiktor |
+| **Razem** | 20 | **196** | **680–760k** | **92–147 mln** | |
+
+**Rozkład kosztu:** M5 Capsule **94%** · M3 Pet 2,4% · M6 Wertykały 1,9% ·
+M4 Stacja 1,5% · M1 + M2 **0,6%**.
+**Bez M5:** pięć modułów to **5,3–7,8 mln zł do 2030**; wszystkie moaty własne
+bez Nanotech Gateway **680–760k**; wersja bezpłatna ≈ 0; wersja z sekcji 9.2
+150k.
+
+**Kolejność uruchomienia kwartał po kwartale:** 2026 Q1 Fundacja Eternal, granty
+NCBR — 3k · 2026 Q2 M1 Lite App MVP na stosie OSS — 150k · 2026 Q3 M1 Wearables
+Integrator (fork Gadgetbridge) + Forge MVP — 60k · 2026 Q4 M1 launch, cel 1 000
+użytkowników · 2027 Q1 M2+M3 Premium MVP, App Pet MVP, Hub — 200k · 2027 Q2
+Premium launch 49 zł, Pet launch 29 zł · 2027 Q3 M2+M4 laboratoria (Synevo),
+prototyp Mini Station DIY 50 szt. — 100k · 2027 Q4 M6 scoring B2B, wniosek FENG
+2 mln — 100k · 2028 Q1 **seria Seed 2–5 mln EUR, EU Holding** · 2028 Q2 M4+M3
+Station MVP (Shenzhen, BOM 500 zł), Implant Pet R&D · 2028 Q3–Q4 Station MLP,
+Implant Pet launch · 2029 M5+M6 Mini Implant Human na bazie walidacji Pet,
+Zdrowa Ciąża · 2030 M5 CGM masowy, **seria A**.
+
+**Siedem zmian wobec v2 i ich skutki:** 20 pozycji → 6 modułów (sześć zespołów
+zamiast dwudziestu frontów) · poz. 3–6 przestają być projektami (cztery budżety
+i cztery harmonogramy mniej) · poz. 14–17 jako kolejka wskazań (**czterokrotna
+redukcja pozornego rozmiaru warstwy nano**) · poz. 1 rozdzielona na M1 i M2
+(rozdzielenie akwizycji od monetyzacji) · M5 oznaczony jako pozbawiony
+właściciela (**warunek uruchomienia zamiast terminu**) · Custom Compounds jako
+brakująca pozycja (ujawnienie, skąd faktycznie pochodzi przychód M4) · funkcje
+kobiece i dziecięce jako brakujące (ujawnienie blokady pakietu ciążowego).
+
+**Trzy korekty merytoryczne do v2 (zebrane):** AD8232 → Analog Devices, nie Texas
+Instruments · Mini Implant Human → klasa wyższa niż MDR I (wyrób implantowany
+długotrwale) · „łatwiejsze regulacje CVMP vs MDR" → **odrębny reżim, MDR nie
+obejmuje weterynarii w ogóle**.
+
+**Jedna liczba zamykająca #65:** *„Pięć modułów bez Capsule to 5,3–7,8 mln zł do
+2030, z czego wszystkie moaty własne — czyli wszystko, czego nie da się kupić
+ani wylicencjonować — to 680–760 tys. zł. Reszta to open source, licencje
+substytuowalne i komponenty OEM z Twojej własnej macierzy."*
+
+## D062 — #81 PIĘĆ ODPOWIEDZI (pytania 1–3)
+
+**TYLKO NOWE — dziesięć moatów, stos OSS, kondensacja do sześciu modułów i lejek
+retencji są już w CZYT.md; poniżej to, czego tam nie ma.**
+
+**⚠️ NOWE ZASTRZEŻENIE LICENCYJNE — Redis.** *„Redis zmienił licencję w 2024 na
+warunki niebędące licencją otwartą w rozumieniu OSI, a w 2025 przyjął AGPLv3.
+Otwartym odpowiednikiem na licencji BSD jest fork utrzymywany przez fundację
+branżową. Do rozstrzygnięcia przed wyborem warstwy cache."*
+To **druga** licencja AGPL w stosie obok Gadgetbridge — a Redis/BullMQ występuje
+w macierzy technologicznej jako warstwa kolejek MVP/MLP. Do zestawienia ryzyk
+licencyjnych.
+
+**⚠️ Korekta komponentowa (rozszerzona):** AD8232 → Analog Devices (nie Texas
+Instruments) · MAX30102 → Maxim, **obecnie część Analog Devices po przejęciu
+w 2021**. *„Przy zamawianiu prototypu ta pomyłka kosztuje kilka dni."*
+Pełna lista OEM z cenami: ESP32-S3 ~5 USD · AD8232 ~3 USD · MAX30102 ~2 USD ·
+MLX90614 ~5 USD · **NFC NTAG 213 ~0,3 USD** · **Nordic nRF52840 (BLE) ~15 USD** ·
+pompy Kamoer ~30 USD (wobec 80 USD Watson-Marlow) · BOM Station Shenzhen ~500 zł
+(wobec 2 000 zł samodzielnie).
+
+**Co stanieje samo do 2030 (tabela deflacyjna, 2026 → 2030):** koszt modelu za
+1 mln tokenów **~20 zł → ~2 zł** · CGM ~250 zł/mies. → **poniżej 50 zł/mies.** ·
+implanty BLE OEM → poniżej 30 USD/szt. · edge AI chips → poniżej 20 USD ·
+AR/VR mass-market ~2 500 zł → ~1 500 zł · polski dataset medyczny: własny,
+80 tys. anotacji → **gotowy OSS z uczelni** · dostęp do P1: certyfikat 5k/rok →
+**6 mies. darmowe API**. *(Uwaga: pozycja o certyfikacie 5k/rok jest sprostowana
+w innym miejscu korpusu — certyfikaty TLS/WSS do P1 są bezpłatne.)*
+**Co mimo to wymaga kapitału:** badania kliniczne implantów 2–3 mln · Closed Loop
+z tysiącem pacjentów · nanoboty 100 mln+ · mikrofluidyka Chip Lab · roboty
+humanoidalne · AGI z treningiem powyżej 10 mln USD rocznie na moc obliczeniową.
+
+**Substytuty licencji zewnętrznych:** Terra API → własny fork Gadgetbridge
+w FINAL, **oszczędność 2 000+ USD/mies. przy 1 000 użytkowników** · ZnanyLekarz
+API → własna baza specjalistów + Calendly w MVP · **PillCam → brak alternatywy,
+proprietary; tylko licencja albo R&D 5+ lat**.
+
+**⚠️ TRZY POZYCJE, KTÓRE W HORYZONCIE 2040+ PRZESTAJĄ BYĆ KOSZTEM, A STAJĄ SIĘ
+REDUKCJĄ KOSZTU:**
+- **poz. 24 Baterie diamentowe** (licencja NDB, 2033) — implant bez wymiany
+  baterii = brak powtórnej operacji. *„Zmiana kategorii produktu, nie
+  ulepszenie."*
+- poz. 25 Energy harvesting (R&D + partnerstwa, 2032) — zasilanie z ciała,
+  układy termogeneratorów **Seebecka**.
+- poz. 26 Zastępstwo serwerów krzemowych (fotonika, spintronika, 2035) — warunek
+  opłacalności ciągłego zapisu miliarda ludzi przez sto lat.
+**Pozycja 24 jest najważniejsza w całym zestawie moonshotów, bo od niej zależy
+sensowność M5.** *„Gdyby wolno było finansować cudze badania tylko w jednym
+miejscu, to w zasilaniu implantów."*
+
+**Rozstrzygnięcie sporu o moment startu (cytat z v2 sek. 10.5):** *„zacząć
+w 2026 z bootstrapem ~150k PLN → uruchomić App MVP → zbudować dataset i moaty →
+w 2028 Seria Seed → w 2030 być już na rynku, nie zaczynać. Start 2030 byłby
+łatwiejszy operacyjnie, ale straciłoby się 4 lata moatów (dataset, marka,
+społeczność, Pet validation)."*
+
+**Matryca monetyzacji — trzy poziomy dla każdego produktu:**
+Lite App: freemium (Universal Sync 1 urządzenie, OCR 5/mies., Bio-Weather Basic)
+→ premium (multi-device, OCR bez limitu, Wiek Bio) → VIP (eksport API, wsparcie
+priorytetowe) · App Premium: katalog lekarzy, artykuły, dane historyczne → AI
+Health Coach, telemedycyna, e-recepty → **Medical Concierge 24/7, dieta
+genomowa** · App Pet: profil pupila, kalendarz szczepień → Vet AI,
+tele-weterynaria, historia → **Home Vet, ubezpieczenie zwierzaka** · Station:
+pomiary na żądanie → Smart Dispenser, Auto-Refill → **Custom Compounds** ·
+Ubezpieczenia: — → Pay-as-you-live −30% składki → polisa Global Coverage.
+Cele z v2: **2026 Q4 — 1 000 użytkowników Free; 2030 Q3 — 5 000 użytkowników
+w 6 miesięcy.**
+
+**⚠️ SKALA PROBLEMU, KTÓRY SYSTEM ADRESUJE (dane systemowe, do biznesplanu):**
+wydatki publiczne na zdrowie 2026 — **247,8 mld zł, 6,81% PKB** · leczenie
+szpitalne 100,1 mld zł = 46,1% kosztów świadczeń · **luka finansowa 2026 —
+23 mld zł** · prognoza luki 2040 — **171 mld zł, 3,4% PKB** · hospitalizacje
+możliwe do uniknięcia **8–10 mld zł rocznie** · dublowanie badań diagnostycznych
+**6–8 mld zł rocznie** · wydatki na profilaktykę **21,6 EUR na mieszkańca wobec
+202 EUR średniej unijnej** (dziewięciokrotna różnica).
+*„Dwie środkowe pozycje — razem 14–18 mld rocznie — to problemy o charakterze
+informacyjnym, nie medycznym. Dokładnie te, które adresuje otwarty system
+agregujący dane."* To najmocniejszy argument rynkowy w całym korpusie.
+
+**⚠️ ARYTMETYKA ABONAMENTOWA — ile użytkowników potrzeba na 10 mln zł rocznie:**
+
+| Cena | Płacących | Zarejestrowanych przy 2% | przy 5% |
+|---|---|---|---|
+| 20 zł/mies. | 41 700 | 2,1 mln | 834 tys. |
+| **49 zł/mies.** | **17 000** | **850 tys.** | **340 tys.** |
+| 99 zł/mies. | 8 400 | 420 tys. | 168 tys. |
+
+Przy cenie 49 zł potrzeba **340–850 tys. zarejestrowanych, czyli 1–2% populacji
+Polski**. Cel z v2 na 2026 Q4 to **tysiąc** użytkowników — *„do celu
+abonamentowego brakuje trzech rzędów wielkości"*.
+
+**Co faktycznie działa w zmianie zachowań (skuteczność / obecność w Spec 3.0):**
+samo informowanie o wynikach — **niska** (A2.4, A3.1) · przypomnienia o stałej
+porze — **niska** (A14.2) · przypomnienia kontekstowe — średnia (A14.2 w wersji
+FINAL) · **widoczność postępu we własnych danych — wysoka** (A3.2, A7.6) ·
+**odpowiedzialność wobec innych ludzi — wysoka** (A9.2, A9.6, S4.5) ·
+**powiązanie z konsekwencją finansową — wysoka** (A16.7, poz. 7) · rywalizacja
+i odznaki — średnia, **krótkotrwała** (A9.3).
+Wniosek dla priorytetów: dwie funkcje o najniższej skuteczności są w MVP,
+a dwie o najwyższej — społecznościowa i finansowa — dopiero w MLP i dalej.
+Moduł A9 „Społeczność, edukacja i gamifikacja" ma 11 funkcji — **największy
+w całej Specyfikacji po A1**.
+
+**⚠️ ODPOWIEDŹ NA PYTANIE 3 — gdzie naprawdę leży zasób.** Nie w abonamentach.
+*„Zasobem jest skrócenie ścieżki badawczej o 5–10 lat — i to jest wartość
+liczona w milionach, nie w tysiącach."*
+Wycena: koszt etapu 2 **bez** walidacji Pet 4–6 mln · **z** walidacją Pet
+2–3 mln → **oszczędność bezpośrednia 2–3 mln zł**, skrócenie ścieżki o 5–10 lat,
+plus wartość 5 lat wcześniejszego wejścia na rynek CGM (500 tys. diabetyków
+w PL + 10 mln w UE). *„To jest zasób nieporównywalnie większy niż jakikolwiek
+przychód abonamentowy osiągalny w tym samym czasie."*
+
+**Trzy zasoby otwartego systemu wg dostępności (skala potrzebna / kiedy):**
+skrócenie ścieżki badawczej — kohorta zwierzęca kilku tysięcy, **2029** ·
+wiarygodność naukowa i granty — kohorta 1 000 osób z pełnym zapisem, **2029** ·
+pozycja negocjacyjna wobec płatnika — 10 tys. zaangażowanych, **2030** ·
+przychód abonamentowy — 340 tys. – 2,1 mln zarejestrowanych, **2033+**.
+Kolejność jest odwrotna do intuicyjnej: przychód abonamentowy jest **ostatnim**,
+nie pierwszym zasobem.
+
+## D062 (koniec) — #81 pytania 3–5: hipoteza poprawiona, strategia licencji, spłaszczenia
+
+**TYLKO NOWE — struktura fundacyjna, osiem mechanizmów kontroli, Hub bez
+notyfikacji, integracja_P1@cez.gov.pl i podział udziałów są już w CZYT.md.**
+
+**⚠️ POPRAWIONA HIPOTEZA O ZASOBACH — zmiana celu operacyjnego.**
+*„Otwarty system daje zasoby na moonshoty — ale nie przez liczbę płacących,
+tylko przez głębokość zapisu u nielicznych. Tysiąc osób z nieprzerwaną historią
+jest wkładem do konsorcjum wartym więcej niż sto tysięcy z fragmentami."*
+Cel przestaje brzmieć „jak najwięcej użytkowników", a zaczyna
+**„jak najwięcej użytkowników prowadzących zapis nieprzerwanie"**. To zmienia
+metrykę główną produktu z liczby rejestracji na **ciągłość zapisu**.
+
+**⚠️ GRANICA JAWNOŚCI — sformułowanie operacyjne.** Wpływ na zachowania
+w systemie otwartym, dobrowolnym i jawnym jest funkcją produktu — tak działa
+każde narzędzie zdrowotne i jedenaście funkcji modułu A9. *„Granica przebiega
+tam, gdzie wpływ przestaje być jawny. Powód jest praktyczny: ujawnienie ukrytego
+mechanizmu zeruje wszystkie trzy zasoby naraz — wiarygodność naukową, pozycję
+wobec płatnika i gotowość ludzi do prowadzenia zapisu. A to są jedyne zasoby,
+które ten system realnie generuje przed 2033."*
+Zaostrzenie w horyzoncie 2040+: ścieżka warstwy społecznościowej (X1.2 forum →
+moderacja AI → spotkania VR · X1.4 webinaria → VR → holograficzne · X1.5 grupy
+wsparcia → wirtualne · X1.3 gamifikacja → NFT → tokeny · X2.3 metawersum ·
+X2.5 pełna immersja R&D 2040+) prowadzi do momentu, w którym *„społeczność
+przestaje być forum, a staje się miejscem, w którym ludzie bywają. Wtedy wpływ
+na zachowanie przestaje być funkcją aplikacji, a staje się właściwością
+środowiska — i to jest moment, w którym pytanie o jawność mechanizmu staje się
+ostrzejsze niż dziś, nie łagodniejsze."*
+
+**Strategia dla ośmiu pozycji niebudowanych samodzielnie (partner wskazany):**
+poz. 22 komputery kwantowe — LICENCJA, dostęp chmurowy (IBM Quantum, Google
+Quantum AI) · poz. 23 materiały grafenowe — PARTNERSTWO (Graphenea, Versarien) ·
+poz. 24 baterie diamentowe — LICENCJA (Nano Diamond Battery) · poz. 18 Edible
+Pills — LICENCJA + rebranding (PillCam) · poz. 34 roboty humanoidalne —
+PARTNERSTWO, leasing (Figure, Tesla) · poz. 32 pełna immersja — R&D + licencja
+(Neuralink dla BCI, HaptX dla haptyki) · poz. 27 druk 3D — **SAMI**, konsorcjum
+z Politechniką Warszawską · poz. 20 sekwencjonowanie — PARTNERSTWO (Illumina, BGI).
+
+**Cennik usług regulacyjnych Hubu (wycena rynkowa / czas):** kwalifikacja
+i klasyfikacja 5–15 tys. / 2–4 tyg. · dokumentacja techniczna wyrobu prostszego
+30–80 tys. / 2–4 mies. · dokumentacja wyrobu złożonego 100–250 tys. /
+6–12 mies. · ocena kliniczna 20–60 tys. / 2–3 mies. · wdrożenie systemu jakości
+40–100 tys. / 4–8 mies.
+**Przy zespole trzech osób i dwunastu projektach rocznie: przychód 600 tys. –
+1,2 mln przy koszcie osobowym 400–500 tys.** *„To jest najwcześniejsze źródło
+przychodu w całym przedsięwzięciu — nie wymaga zbudowania żadnego produktu, bo
+kompetencja jest i tak potrzebna dla własnych wyrobów."*
+
+**⚠️ WARUNEK KONIECZNY DO MECHANIZMÓW KONTROLI:** *„fundusz badawczy zasilany
+automatycznie stałym odsetkiem przychodu, poza kontrolą zarządu. Zarząd
+rozliczany z wyników bieżących nie sfinansuje badań o horyzoncie
+dwudziestoletnim — nie ze złej woli, tylko dlatego, że jest rozliczany z czegoś
+innego."*
+
+**Trzy funkcje, które w horyzoncie 2040+ przechodzą z „kupujemy licencję" do
+„jesteśmy warstwą, bez której to nie działa":** **C4.6 raport z misji** —
+protokół komunikacji Swarm↔Hive↔App, *„nasze jedyne IP w warstwie nano"* ·
+**C3.4 łączność UWB** — nawigacja nanobotów w ciele · **X2.1 AR sterowane BCI** —
+interfejs bez ekranu. Cecha wspólna: *„to nie są urządzenia, tylko protokoły
+i warstwy interpretacji. Producent sprzętu chce sprzedawać sprzęt; nikt inny nie
+chce prowadzić zdrowia przez trzydzieści lat. To jest luka, która nie zamknie
+się sama."*
+
+**Dlaczego marża sprzętowa jest złym interesem (5 parametrów):** marża na
+sprzęcie noszonym 15–25%, przy naszym wolumenie **bliżej 15%** · cykl życia
+produktu 18–24 miesiące, potem projekt od nowa · minimalna partia to tysiące
+sztuk, kapitał zamrożony w magazynie · przewaga konkurencji **cztery rzędy
+wielkości wolumenu** · czas do przychodu 18–24 miesiące od decyzji.
+Wobec tego warstwa agregacji: **2–3 miesiące do działającej wersji, marża
+programowa, brak zamrożonego kapitału.**
+
+**Warianty afiliacyjne — pełne wyliczenie oszczędności:** laboratoria 10–15k
+zamiast 50k · wearables 20–30k zamiast **300k za Smart Clothes** · telemedycyna
+0–50k (Jitsi w MVP, Telemedi white label w MLP) zamiast 200k · Hub 0–10k
+(Notion + Tally + Discord) zamiast 200k · transkrypcja Whisper self-hosted
+20–30k zamiast budowy własnego modelu. **Razem 50–135k zamiast 950k —
+oszczędność 815 tys. zł, czyli 86%.**
+
+**Sześć źródeł przychodu zamiast marży sprzętowej (model / marża / kiedy):**
+usługi regulacyjne Hubu — za projekt, wysoka, **kwartał 2** · prowizja od badań
+5–15% — średnia, rok 1 · abonament nad cudzym sprzętem 49 zł/mies. —
+programowa, rok 2 · odczyt dokumentów dla placówek — za dokument, **bardzo
+wysoka**, rok 3 · prowizja Forge 10–20% — wysoka, rok 3 · **protokół
+licencjonowany producentom — od urządzenia, bardzo wysoka, rok 5+**.
+
+**⚠️ KONKURENCJA WETERYNARYJNA — korekta do pozycji 8 (rynek jest nasycony).**
+Dominujący gracz ma **ponad 5 600 placówek**, dwa rozwiązania są bezpłatne, ceny
+płatnych zaczynają się od **56–75 zł miesięcznie**, a migracja między systemami
+trwa kwadrans i jest bezpłatna. **Luka, której nikt nie zajmuje:** jeden
+z bezpłatnych dostawców na pytanie, czy klient po zakończeniu współpracy
+otrzyma zgromadzone dane, odpowiada wprost: **nie**. Przewaga polegająca na
+odwrotności — pełny eksport w formacie użytecznym gdzie indziej, bezpłatnie —
+kosztuje niewiele i *„da się ją powiedzieć jednym zdaniem"*.
+To wiąże się z A18.10–A18.12 jako wyróżnikami handlowymi (trzeci niezależny
+zapis tego samego wniosku w korpusie).
+
+**Czego nie wolno spłaszczyć (cztery pozycje, w tym jedna nowa względem #54):**
+A8.10 redirect 116 123 · model zapisu danych (D1.1) · **prawo wyjścia z danymi
+(D1.4, A2.6) — „jest albo go nie ma; to jednocześnie jedyny wyróżnik wobec
+darmowej konkurencji weterynaryjnej"** · log dostępu.
+
+**Trzy konsekwencje rozproszonej architektury P1** (placówka trzyma dokumentację
+u siebie, do P1 idzie wyłącznie **indeks**): w P1 są zdarzenia medyczne, indeksy
+dokumentów, recepty i skierowania; **nie ma** samych dokumentów, wyników badań,
+opisów ani wypisów → (1) *„państwo nie rozwiązało problemu agregacji i nie
+zamierza go rozwiązać"* · (2) **parser dokumentów zyskuje na znaczeniu** —
+odczyt dokumentu przyniesionego przez pacjenta pozostaje najkrótszą drogą do
+kompletnej historii · (3) założenie „P1 NFZ darmowe API w 2030" jest
+uproszczeniem — dostęp do środowiska integracyjnego jest **bezpłatny już dziś**
+(wniosek na integracja_P1@cez.gov.pl, środowisko isus.ezdrowie.gov.pl,
+standardy **HL7 CDA w polskiej implementacji krajowej i IHE XDS.b**).
+
+**Ścieżka odwrotna do spłaszczenia — afiliacja jest etapem, nie stanem
+docelowym** (dziś → FINAL → SF): agregacja A1.1 Terra API → własny silnik
+normalizacji → ciągła, predykcyjna · OCR A2.1 Google DocAI → własny model 99% →
+natychmiastowy · telemedycyna A5.1 link Jitsi → pełne, własne → hologram ·
+laboratoria A10.3 partnerstwo Synevo → **Chip Lab w Station** → pełne ·
+wearables A1.2 fork Gadgetbridge → pełne → predykcyjne · przechowywanie A1.10
+30 dni lokalnie → rozproszone + blockchain → kwantowe.
+**⚠️ Kryterium momentu przejęcia:** *„moment ten wyznacza nie ambicja, tylko
+chwila, w której własne rozwiązanie staje się tańsze od prowizji płaconej
+partnerowi."* To jedyna reguła decyzyjna dla całej warstwy afiliacyjnej.
+
+## D063 — #83: ROZWIĄZANIE ZAGADKI LICZB (23 moduły, 160 funkcji) i unieważnienie części dok. 028
+
+**⚠️ TO JEST DOKUMENT ROZSTRZYGAJĄCY ROZBIEŻNOŚĆ LICZB.** Bezpośrednia odpowiedź
+na pytanie założyciela *„w rozmowie «widz» określiłeś gdzieś 161 funkcji
+i 23 moduły"* oraz *„aplikacja miała ponad 140 funkcji, nie 105 czy 115"*.
+Data: 16 sierpnia 2026, Eternal Labs Sp. z o.o.
+
+**Skąd biorą się poszczególne liczby:**
+
+| Liczba | Co znaczy naprawdę |
+|---|---|
+| **185** | wszystkie funkcje Specyfikacji, pięć projektów |
+| **141** | **aplikacja tak, jak jej doświadcza użytkownik** — A + D + X (Digital Twin i Matrix są dostępne *przez* aplikację, nie osobno) |
+| **115** | sam moduł A |
+| **21** | modułów w ujęciu aplikacyjnym: A1–A16, D1–D3, X1–X2 |
+| **30** | modułów w całej Specyfikacji |
+| **23** | 21 modułów aplikacji **+ A17 + A18** |
+| **~160** | 141 + 12 funkcji A17 + 7 funkcji A18 |
+| 23 (drugie) | Capsule C1–C4 ma dokładnie 23 **funkcje** — stąd zbieżność liczby |
+
+**Rozstrzygnięcie:** *„«ponad 140» i «161» to ta sama rzecz na dwóch etapach:
+przed dodaniem modułów zgodnościowych i po."* Podwójne wystąpienie liczby 23
+(moduły aplikacji vs funkcje Capsule) było źródłem pomyłki.
+Struktura 23 modułów: A1–A16 (115) + D1–D3 (15) + X1–X2 (11) + **A17 Zgodność
+(12)** + **A18 Nadzór nad AI (7)** = **160**.
+
+**A17 — Zgodność i nadzór nad wyrobem.** *„Bez tych funkcji nie da się legalnie
+wydać MLP jako klasy IIa. To nie są procesy w dokumentacji — to funkcje widoczne
+w produkcie."* Kody i fazy jak w #51 (tam jako A18), z jednym doprecyzowaniem:
+A17.2 to etykieta elektroniczna **+ UDI-DI widoczne dla użytkownika**; A17.8 to
+tryb degradacji — **bezpieczne działanie przy niedostępności AI**; A17.9 to
+**SBOM i koordynowane ujawnianie podatności**.
+**⚠️ A17.12 to nie to samo co D1.4.** *„Eksport danych nie jest realizacją prawa
+do usunięcia. To dwie różne funkcje i druga dotąd nie istniała."*
+
+**A18 — Nadzór nad AI.** *„Specyfikacja nie zawierała ani jednej funkcji
+odnoszącej się do AI Act."*
+**⚠️ A18.7 przesądza o wykonalności Eternal Ubezpieczenia:** *„Scoring wpływający
+na wysokość składki to profilowanie o skutkach prawnych — RODO art. 22 plus
+AI Act. Bez funkcji odwołania ten produkt jest niewdrażalny."*
+
+**⚠️ KOREKTA UNIEWAŻNIAJĄCA CZĘŚĆ DOKUMENTU 028 — „porzucić, bo państwo to ma"
+było błędem.** Zasada zastępująca: *„Funkcja dostarczana przez IKP nie przestaje
+być potrzebna w Eternal. Przestaje być tylko wyróżnikiem. A jej brak jest luką,
+którą użytkownik odczuje."* Właściwy podział to **trzy kategorie**, nie dwie:
+1. **Pobierać z IKP, nie duplikować — 6 funkcji:** e-recepty · e-skierowania ·
+   e-zlecenia laboratoryjne · centralna rezerwacja · dokumenty EDM · historia
+   leczenia. *„Tu państwo ma monopol albo źródło. Duplikacja jest bezsensowna,
+   integracja obowiązkowa."*
+2. **Budować lepiej — 13 funkcji.** Wzorzec: *„Wersja państwowa działa na tym,
+   co placówka zaraportowała. Nasza na wszystkim."* Przykłady (IKP → Eternal):
+   krokomierz — kroki z telefonu → **wszystkie urządzenia** · przypomnienia
+   o lekach — tylko e-recepty → **suplementy, interakcje, sprawdzenie czy dawka
+   faktycznie pobrana ze Station** · interpretacja wyników — wynik, który jest
+   w systemie → **zdjęcie kartki sprzed pięciu lat w zestawieniu z ośmioma
+   poprzednimi** · symptom checker — porównanie z populacją → **porównanie
+   z twoim własnym wzorcem sprzed trzech tygodni** · e-karta ciąży — wizyty →
+   **plus ciśnienie, sen i waga mierzone codziennie**.
+   *„To jest gotowy materiał sprzedażowy — różnica w jednym zdaniu na funkcję."*
+3. **Dodać, bo to dobre funkcje** (rzeczy, które IKP ma, a których w 185 nie
+   było): **licznik wody** · **ankiety typu „Moje Zdrowie" prowadzone
+   cyklicznie** · **profil dziecka z siatkami centylowymi**.
+
+**Bilans po korekcie (przed → po):** moduły aplikacji 21 → **23** · funkcje
+aplikacji 141 → **160** · funkcje do wykreślenia ~20 → **~6** (reszta idzie do
+integracji lub przebudowy) · nowych funkcji zgodnościowych 0 → **19**.
+**Sześć funkcji MVP, których nie było w żadnej wcześniejszej wersji planu:**
+A17.3 deklaracja przeznaczenia · A17.8 tryb degradacji · A17.10 log dostępu ·
+A17.11 wycofanie zgody per cel · A17.12 realizacja usunięcia · A18.1 oznaczanie
+treści AI. **Wszystkie sześć to warstwa A — nie wymagają certyfikacji, a bez
+nich MVP jest nielegalne.**
+
+**Zdanie zamykające #83:** *„23 moduły to 21 aplikacyjnych plus dwa
+zgodnościowe, a 160 funkcji to 141 plus dziewiętnaście, które zgodność wymusza.
+Ale ważniejsze jest to, co przy okazji wyszło — «porzucić, bo państwo to ma»
+było błędem, a właściwa odpowiedź brzmi «pobrać, zbudować lepiej albo dodać»."*
+
+### ⚠️ ZESTAWIENIE WSZYSTKICH LICZB FUNKCJI W KORPUSIE — do rozstrzygnięcia w dokumentach wyjściowych
+
+| Liczba | Źródło | Co obejmuje | Status |
+|---|---|---|---|
+| 115 / 16 modułów | Master 3.0, moduł A | sama aplikacja, moduły A1–A16 | składnik |
+| 141 / 21 modułów | #83 | A + D + X — aplikacja jak jej doświadcza użytkownik | składnik |
+| **160 / 23 moduły** | **#83** | 141 + A17 (12) + A18 (7) | **rozstrzygnięcie „widza"** |
+| 169 / 23 moduły | #39 | 115 + 54 nowe, inna numeracja modułów | wersja pośrednia |
+| 185 / 30 modułów | Master 3.0 | pięć projektów razem | **baza** |
+| 196 | #65 | suma sześciu modułów produktowych M1–M6 | ujęcie produktowe |
+| 239 | #39 | 169 + Twin 15 + Station 21 + Capsule 23 + Matrix 11 | wersja pośrednia |
+| 265 | plik źródłowy | wersja produktowa przed scaleniem | składnik scalenia |
+| **299 / 42 moduły** | **#51 REJESTR SCALONY** | 185 + 114 netto po usunięciu 21 duplikatów | **WERSJA FINALNA** |
+| 309 / 42 moduły | wariant wcześniejszy | App 186 + Station 34 + Capsule 41 + Twin 27 + Matrix 21 | zastąpiony przez 299 |
+
+**Reguła dla dokumentów wyjściowych:** liczbą obowiązującą dla całego ekosystemu
+jest **299 funkcji w 42 modułach** (#51); dla samej aplikacji w ujęciu
+użytkownika — **160 funkcji w 23 modułach** (#83); baza historyczna to
+**185 funkcji w 30 modułach** (Master 3.0). Każda inna liczba w korpusie jest
+etapem pośrednim jednego z tych trzech ujęć i nie powinna pojawiać się bez
+wskazania, którego ujęcia dotyczy.
+
+## D063 — #90: SPECYFIKACJA MASTER 3.1 (196 funkcji, 6 modułów produktowych, 21.08.2026)
+
+**⚠️ TO JEST NAJNOWSZA WERSJA SPECYFIKACJI W KORPUSIE.** Aktualizuje Master 3.0
+i dokłada cztery warstwy, których w oryginale nie było **jako bytów**: warstwę
+orkiestracji, klasy komponentów z alternatywami, model ewolucji regulacyjnej
+i strukturę własnościową.
+Status dokumentu: *„Każde twierdzenie prawne ma podaną podstawę i poziom
+pewności. Pozycje oznaczone DO WERYFIKACJI nie były potwierdzone i nie należy na
+nich opierać budżetu ani decyzji regulacyjnych."*
+
+**Co zmienia się wobec Master 3.0 (7 obszarów):** klasyfikacja regulacyjna
+„105 niecertyfikowanych / 14 certyfikowanych" → **cztery statusy** · przeznaczenie
+funkcji: brak → **wymagane dla każdej funkcji przed napisaniem kodu** · warstwa
+kontrolna: cecha funkcji → **osiem modułów zarządzających z budżetem
+i właścicielem** · komponenty: wymienione przy funkcjach → **28 klas × 3
+alternatywy z progiem wyjścia** · licencje: nieuwzględnione → **pełna analiza,
+cztery pozycje blokujące** · ewolucja wellness → med: brak → **ścieżka dla 16
+funkcji granicznych** · struktura własnościowa: fundacja + spółka → **wzór Novo:
+obowiązek statutowy zamiast uprawnienia**.
+
+**⚠️ OSIEM KOREKT DO MASTER 3.0 — potwierdzonych źródłowo (zapis błędny →
+poprawny → podstawa):**
+1. A5.6 e-recepta „Class I (WSS)" → **nie jest wyrobem medycznym; WSS to
+   certyfikat systemu usługodawcy, nie klasa MDR** (MDR + ustawa o SIOZ).
+2. Koszt certyfikatu P1 ~5 000 zł/rok → **BEZPŁATNY; wniosek w RPWDL 2.0,
+   ważność 2 lata** (Centrum e-Zdrowia).
+3. ISO 13485 „wymagane dla Class IIa+" → **MDR wymaga systemu zarządzania
+   jakością; ISO 13485 jest drogą wykazania zgodności, nie obowiązkiem
+   ustawowym** (MDR art. 10 ust. 9).
+4. IOD „obowiązkowy dla danych zdrowotnych" → **obowiązkowy przy dużej skali
+   albo gdy przetwarzanie jest główną działalnością** (RODO art. 37 ust. 1).
+5. A1.2 Gadgetbridge „fork, koszt 0" → **AGPL-3.0 blokuje zamknięty model; fork
+   nie zmienia licencji**.
+6. AD8232 — Texas Instruments → **Analog Devices**.
+7. Mini Implant Human MDR Class I → **klasa wyższa, wyrób implantowany
+   długotrwale** (MDR zał. VIII).
+8. Eternal Pet „łatwiejsze regulacje CVMP vs MDR" → **MDR nie obejmuje
+   weterynarii w ogóle — to odrębny reżim** (MDR art. 1).
+
+**⚠️ CZTERY STATUSY REGULACYJNE ZAMIAST DWÓCH.** *„Podział na «certyfikowane
+i niecertyfikowane» jest źródłem błędów, bo sugeruje, że brak MDR oznacza brak
+regulacji."*
+
+| Status | Co obejmuje | Reżim | Funkcji App |
+|---|---|---|---|
+| 1. General software | konto, ID, marketplace, społeczność, Forge, Hub, kalendarz, płatności | RODO, prawo handlowe | ~30 |
+| 2. Health / wellness | sen, aktywność, cele, trening, wizualizacja, personalizacja stylu życia | RODO art. 9 | ~38 |
+| 3. Regulowane poza MDR | teleporada, dokumentacja, P1, profilowanie, marketplace leków i badań | ustawa o działalności leczniczej, prawo farmaceutyczne, IVDR, AI Act | ~17 |
+| 4. MDSW — wyrób medyczny | interpretacja, alerty progowe, triage, predykcja, closed loop | MDR reguła 11 zał. VIII | ~14 |
+| **GRANICZNE** | ta sama funkcja może być w statusie 2 albo 4 **zależnie od jednego zdania przeznaczenia** | — | **~16** |
+
+**⚠️ REGUŁA ROBOCZA GRANICY (najkrótsze i najostrzejsze sformułowanie w całym
+korpusie):** *„Fakt i porównanie do własnej historii są bezpieczne. Ocena, próg
+i zalecenie nie są. **Cztery słowa przekraczają granicę: «Twoje…», «w normie»,
+«powinieneś», «wskazuje na»**."*
+
+**⚠️ WARSTWA ORKIESTRACJI — OSIEM MODUŁÓW ZARZĄDZAJĄCYCH (K1–K8).** Uzasadnienie
+istnienia: *„W pełnym tekście oryginału słowa «rejestr», «silnik reguł»,
+«proweniencja» i «terminologia» nie występują ani razu. Rzeczy bez kodu nie mają
+właściciela, budżetu ani terminu."*
+
+| Kod | Moduł | Osobodni | Dlaczego krytyczny |
+|---|---|---|---|
+| K1 | Universal Sync (źródło → adapter → model Eternal → rdzeń) | 45 | obsługuje 7 funkcji naraz; wymiana dostawcy = wymiana pliku |
+| K2 | Model danych i Standard (kanoniczny model, jednostki **UCUM**, wersjonowanie) | 60 | **kto definiuje format, ten posiada ekosystem** |
+| K3 | Mapper CDA ↔ FHIR ↔ EEHRxF | 70 | twardy termin **26.03.2029**; produkt sprzedawalny |
+| K4 | Usługa terminologiczna (LOINC, ICD, ATC, SNOMED + mapowanie PL) | 40 | bez tego „glukoza" znaczy co innego w każdym źródle |
+| K5 | Zgody i kontrola dostępu (granularne, odwoływalne, z zakresem i czasem) | 70 | **WARUNEK PRAWNY całej reszty** |
+| K6 | Dziennik audytowy i proweniencja | 35 | dopisanie później = migracja wszystkich danych |
+| K7 | Rejestr zgodności (adaptery, wersje, partnerzy, urządzenia) | 30 | nośnik programu Eternal Kompatybilny |
+| K8 | Silnik reguł i granica wyrobu | 45 | **wymusza granicę wellness/MDR w kodzie, nie w regulaminie** |
+| | **RAZEM** | **395** | **316 000 zł** przy stawce 800 zł/osobodzień |
+
+**⚠️ KLASY KOMPONENTÓW — 196 funkcji to 28 decyzji.** *„Funkcje nie mają osobnych
+dostawców. Trzy alternatywy wybiera się raz na klasę, nie raz na funkcję. Zamiast
+588 kombinacji pozostaje 28 decyzji."* Jedenaście klas rozpisanych
+(open source / płatne / własne docelowe / **próg wyjścia**):
+wearables — HealthKit + Health Connect (0 zł) / **Terra ~399–499 USD/mies.** /
+adaptery Bluetooth SIG GATT / próg 3 000 zł/mies. · model danych — Medplum,
+HAPI FHIR / Aidbox od 1 000 USD/mies. / mapper PL / **nigdy** · storage —
+PostgreSQL + Hetzner UE / AWS RDS + S3 / schemat i retencja / nie dotyczy ·
+OCR — Tesseract, docTR, PaddleOCR / Document AI / parser kontekstu PL /
+2 000 zł/mies. · LLM — Llama, Mistral, BioMistral / Gemini Flash, GPT-4o-mini /
+**brak sensownej opcji własnej** / 2 500 zł/mies. · RAG — pgvector, Qdrant /
+Pinecone / korpus polski **od razu** · transkrypcja — Whisper /
+gpt-4o-mini-transcribe, Deepgram / słownik medyczny PL / 2 400 h/mies. ·
+wideo — Jitsi, mediasoup / LiveKit Cloud, Daily / **nie budować, nigdy** ·
+tożsamość — Keycloak, Ory / Auth0, Clerk / moduł zgód / **nigdy** · silnik
+reguł — Drools, OPA jako wzorzec / — / **ZAWSZE własne, nigdy** · firmware —
+ESP-IDF, Zephyr / moduły OEM / **ZAWSZE własne, nigdy**.
+Pozostałych 17 klas w załączniku komponentowym (wykresy, 3D, forum, dane
+środowiskowe, żywność, ćwiczenia, mapy, PDF, powiadomienia, płatności, P1,
+afiliacja, katalogi IP, TTS, rozpoznawanie obrazu, procesy Hub, moduł
+certyfikowany).
+
+**⚠️ BLOKADY LICENCYJNE — CZTERY POZYCJE + CZTERY ZMIANY LICENCJI PO 2021.**
+Blokujące: **Gadgetbridge AGPL-3.0** → profile Bluetooth SIG GATT · **wger
+AGPL-3.0** → ExerciseDB · **OpenPose — licencja niekomercyjna, 25 000 USD/rok,
+wyłączone zastosowania sportowe** → MediaPipe (Apache 2.0) · **Open Food Facts
+ODbL share-alike — baza pochodna musi być udostępniona** → trzymać w bazie
+odrębnej od własnych.
+Zmieniły licencje na restrykcyjne po 2021 i wymagają zamiany przy zamkniętym
+modelu usługowym: **MinIO (AGPL-3.0), Grafana i Loki (AGPL-3.0), Sentry (FSL),
+Redis (AGPL/SSPL)** → zamienniki: **SeaweedFS lub Garage, Prometheus
+z VictoriaMetrics, Valkey**.
+
+**⚠️ SZEŚĆ TERMINÓW REGULACYJNYCH WIĄŻĄCYCH DLA PROJEKTU (z podstawą prawną):**
+**28.05.2026** EUDAMED obowiązkowy — moduły Actors, UDI/Devices, Notified Bodies,
+Market Surveillance (Decyzja UE 2025/2371) · **03.10.2026** rejestracja
+w Wykazie KSC/NIS2, podmioty od progu średniego, mikroprzedsiębiorstwa co do
+zasady wyłączone (ustawa o KSC, Dz.U. 2026 poz. 252) · **02.08.2026** AI Act
+art. 50 — oznaczanie treści syntetycznych (Rozp. UE 2024/1689) · **26.03.2027**
+EHDS — ogólne stosowanie (Rozp. UE 2025/327) · **26.03.2029** EEHRxF kategoria 1:
+patient summary, e-recepta, e-dyspensacja · **26.03.2031** EEHRxF kategoria 2:
+obrazowanie, wyniki laboratoryjne, wypisy.
+*„Termin 26 marca 2029 jest jedyną zewnętrzną datą tworzącą rynek. Mapper
+CDA↔FHIR↔EEHRxF dla polskiego PIK nie istnieje jako produkt, a potrzebuje go
+każdy dostawca EDM w kraju."*
+
+**Sześć modułów produktowych — rozkład kosztu i status startu:** M1 Agregator
+46 funkcji / 250–290 tys. / 0,3% / Łukasz albo Janek / **START NATYCHMIAST** ·
+M2 Opieka 50 / 250–320 tys. / 0,3% / Wiktor + zespół / 2027 · M3 Pet 46 /
+2,2 mln / 2,4% / osobny / **2028 — tor walidacyjny** · M4 Stacja 21 /
+850 tys.–3,3 mln / 1,5% / Adrian z zespołem / 2028 · M5 Capsule 23 /
+87–139 mln / **94%** / **BRAK właściciela** / **warunek, nie termin** ·
+M6 Wertykały 10 / 1,75 mln / 1,9% / Wiktor / 2027 Q4.
+*„M1 i M2 razem to 0,6% budżetu i 96 funkcji — tam jest cały produkt
+konsumencki."*
+
+**⚠️ MODEL PRZYCHODU — TRZY WARSTWY.** Zasada wyjściowa: *„Przy darmowym B2C
+funkcja nie musi zarabiać. Musi produkować dane albo ruch."*
+- **Prowizja od ruchu** — laboratoria, apteki, catering; zostaje 10–30%;
+  od pierwszego miesiąca; **liniowa — każda złotówka wymaga transakcji**.
+- **Licencja B2B** — ubezpieczyciel, dostawca EDM; zostaje 100%; 2027–2029;
+  **zerowy koszt krańcowy**; scoring 5–15 zł/user/mies.
+- **Opłata za zgodność** — producenci urządzeń; zostaje 100%; 2028+;
+  **rośnie z adopcją standardu**.
+*„Orkiestrator nie zarabia na prowizji. Prowizja finansuje bieżące koszty.
+Wartość powstaje z tego, że jest jedynym miejscem, w którym dane z wielu źródeł
+są w komplecie — a to sprzedaje się licencyjnie, bez dzielenia się przychodem."*
+**⚠️ MODEL ODRZUCONY — sprzedaż danych użytkownika z prowizją.** Powód podwójny:
+*„Kategoria upadła rynkowo (**LunaDNA zamknięta 31 stycznia 2024, Nebula
+przekształcona w 2025**), a zgoda RODO nie może być kupiona ani stanowić warunku
+usługi (**art. 7 ust. 4**)."* To bezpośrednio unieważnia model 80/20 w wersji
+pieniężnej — zob. wcześniejszy pivot na świadczenie w naturze i wkład do
+konsorcjum.
+
+**Struktura własnościowa — dwa sprawdzone wzorce.** **Bosch** — rozdzielenie
+kapitału od głosu: fundacja ma udział kapitałowy, głosami steruje osobne ciało
+powiernicze; fundacja czerpie korzyść, ale nie kieruje. **Novo Nordisk** —
+fundacja trzyma głosy przez holding, akcje uprzywilejowane są nienotowane i poza
+obrotem.
+**⚠️ Element do skopiowania (najważniejsze zdanie sekcji):** *„Statut nie mówi,
+że fundacja MOŻE utrzymać kontrolę. Mówi, że jest ZOBOWIĄZANA ją utrzymać.
+Uprawnienie następca może nie wykonać. Obowiązek jest naruszeniem statutu."*
+**Pięć podmiotów (rola / reżim / kiedy zakładać):** Fundacja Eternal — standard,
+rejestr, znaki towarowe, **weto misyjne** / prawo o fundacjach / gdy jest IP do
+ochrony · Eternal Labs Sp. z o.o. — software, warstwa danych, mapper / prawo
+handlowe / **ISTNIEJE** · Eternal Devices — producent wyrobu (Station, Capsule) /
+MDR, PRRC, EUDAMED / gdy jest co produkować · **Eternal Care — podmiot leczniczy /
+RPWDL: 894 zł podmiot, 179 zł praktyka / przy teleporadzie własnej** ·
+Eternal Forge — marketplace, standard, rejestr / prawo handlowe / 2027–2028.
+
+**⚠️ KOLEJNOŚĆ WYKONANIA — 525 osobodni, 420 000 zł, ~2,4 roku pracy jednej
+osoby:** 1. afiliacja/sieci partnerskie 10 dni, 8 tys. → **przychód od pierwszego
+miesiąca** · 2. K2 model danych 60 dni, 48 tys. · 3. K5 zgody 70 dni, 56 tys. →
+**warunek prawny** · 4. K1 adaptery 45 dni, 36 tys. · 5. K6 proweniencja 35 dni,
+28 tys. · 6. K3 mapper EEHRxF 70 dni, 56 tys. → **licencja B2B 2027–2028** ·
+7. K4 terminologia PL 40 dni, 32 tys. → sprzedaje się z K3 · 8. K8 silnik reguł
+45 dni, 36 tys. · 9. M1 agregator/rdzeń App 120 dni, 96 tys. · 10. K7 rejestr
+zgodności 30 dni, 24 tys. → 2028+.
+Uwaga strukturalna: **osiem z dziesięciu pozycji to warstwa orkiestracji, nie
+funkcje produktu** — odwrotnie niż w Master 3.0.
+
+**⚠️ OSIEM POZYCJI DO WERYFIKACJI PRZED BUDŻETOWANIEM** (niepotwierdzone
+źródłowo, nie opierać na nich decyzji finansowych): stawki rynkowe w Polsce 2026
+(developer, ML engineer, konsultant regulacyjny, IOD) · koszt certyfikacji MDR
+klasy IIa (opłaty jednostki notyfikowanej, ISO 13485, ocena kliniczna, czas
+oczekiwania) · dostępność API u laboratoriów: Diagnostyka, ALAB, Synevo ·
+warunki programów afiliacyjnych: Dietly, Maczfit i pozostałe · aktualna
+funkcjonalność IKP i mojeIKP (czy pokazuje wyniki prywatne, czy przyjmuje dane
+z urządzeń) · istnienie gotowego narzędzia PIK → FHIR u dostawców krajowych ·
+warunki Apple HealthKit i Google Health Connect (dostęp serwerowy i ograniczenia
+regulaminowe) · warunki członkostwa Bluetooth SIG przy produkcji własnych
+urządzeń.
+
+**Zastrzeżenie zamykające:** dokument nie jest opinią prawną ani regulacyjną;
+klasyfikacja funkcji granicznych wymaga oceny jednostki notyfikowanej. Przed
+pierwszym wdrożeniem produkcyjnym należy: **napisać przeznaczenie dla każdej
+funkcji**, przeprowadzić udokumentowaną ocenę kwalifikacji wg **MDCG 2019-11
+rev.1 z 17 czerwca 2025**, oraz zweryfikować status pod **NIS2**.
+
+## D063 — #95: SPECYFIKACJA FUNKCJONALNA APP (115 funkcji × status regulacyjny × ścieżka ewolucji)
+
+**⚠️ NAJWAŻNIEJSZA TABELA OPERACYJNA W CAŁYM KORPUSIE.** Dla każdej ze 115
+funkcji podano nie tylko status, ale **ścieżkę ewolucji do wersji medycznej —
+czy jest możliwa, kiedy i za jaką cenę**. 21 sierpnia 2026, uzupełnienie
+Master 3.1.
+
+**Rozkład 115 funkcji:**
+
+| Status | Funkcji | Co znaczy | Kiedy budować |
+|---|---|---|---|
+| WELLNESS | **68** | bez certyfikacji; fakt i porównanie do własnej historii | od razu |
+| GRANICZNA (DUAL) | **16** | jedno zdanie przeznaczenia decyduje o reżimie | od razu w wersji wellness |
+| MEDYCZNA | **14** | wymaga dossier; z tego **5 da się oproxować** | 2029+ albo nigdy |
+| USŁUGA / PAŃSTWOWA | **10** | wymaga RPWDL albo integracji z P1 | przy podmiocie leczniczym |
+| ODRZUCONA | **7** | fikcja albo ryzyko bez korzyści | — |
+
+**⚠️ SZEŚCIOETAPOWY MODEL EWOLUCJI wellness → med.** *„Ewolucja nie polega na
+dodaniu kodu. Polega na zmianie jednego zdania w przeznaczeniu i poniesieniu
+kosztu dossier. Ta sama funkcja techniczna może mieć dwa reżimy."*
+1. **Wellness** — funkcja pokazuje fakt bez oceny; koszt 0 zł ponad budowę;
+   wymaga zdania przeznaczenia bez celu medycznego.
+2. **Decyzja** — rozstrzygnięcie, **czy wersja medyczna ma płatnika**; 0 zł;
+   analiza rynku.
+3. **Ocena kwalifikacji** — udokumentowana wg MDCG 2019-11 rev.1; kilka dni
+   pracy; konsultant regulacyjny.
+4. **Rozdzielenie** — moduł medyczny jako osobny wyrób z własnym release;
+   **40–80 osobodni**; walidowany interfejs do warstwy faktów.
+5. **Dossier** — dokumentacja techniczna, ocena kliniczna, QMS; **setki tys. –
+   mln zł**; PRRC, jednostka notyfikowana.
+6. **Utrzymanie** — nadzór po wprowadzeniu, PSUR, audyty; koszt cykliczny;
+   ciągłość zespołu.
+**Alternatywa dla etapów 4–6: proxy do cudzego wyrobu z CE.** Działa dla funkcji
+jednorodnych (jedno wejście, jeden wynik); **nie działa dla funkcji łączących
+dane z wielu źródeł**. ⚠️ *„Przy integracji przez API odpowiedzialność za
+certyfikację produktu końcowego pozostaje po stronie integratora."*
+
+**SZESNAŚCIE FUNKCJI GRANICZNYCH (DUAL) — wersja wellness → wersja medyczna,
+klasa, realny termin, alternatywa:**
+
+| ID | Funkcja | Wellness | Medyczna | Termin | Alternatywa |
+|---|---|---|---|---|---|
+| A2.4 | tłumaczenie wyników na język naturalny | słownik pojęć | interpretacja wyniku | IIa 2029+ | proxy do dostawcy z CE |
+| A3.3 | monitoring na żywo (streaming) | wyświetlanie wartości | ocena wzgl. progu | IIa 2030+ | **nie da się oproxować** |
+| A3.7 | Bio-Weather Intelligence | informacja o warunkach | komunikat pod chorobę | IIa 2031+ | odłożyć |
+| A3.8 | porównanie do grupy wiekowej | statystyka populacyjna | wartościowanie pozycji | IIa 2031+ | odłożyć |
+| A3.9 | Digital Twin 2D/3D | wizualizacja danych | model kliniczny | IIa 2032+ | zależy od deklaracji |
+| A6.1 | chatbot medyczny (RAG) | odpowiedź z bazy wiedzy | **odpowiedź na danych usera** | IIa 2030+ | separacja architektoniczna |
+| A6.4 | tłumaczenie wyników (opis) | słownik pojęć | interpretacja | IIa 2029+ | **duplikat A2.4** |
+| A6.7 | analiza korelacji pogoda↔samopoczucie | statystyka opisowa | **wniosek przyczynowy** | IIa 2031+ | nie da się oproxować |
+| A7.2 | plany dietetyczne (AI) | plan ogólny | plan dla przewlekle chorego | IIa 2030+ | **dietetyk-człowiek zamiast AI** |
+| A7.3 | plany suplementacyjne (AI) | informacja o składniku | zalecenie dawki | IIa 2031+ | odłożyć |
+| A7.4 | automatyczne sugestie suplementów | katalog produktów | sugestia z wyniku badania | IIa 2031+ | odłożyć |
+| A7.7 | przypomnienia o badaniach profilaktycznych | kalendarz wg wytycznych | uzasadnienie danymi pacjenta | IIa 2030+ | **wersja wellness wystarcza** |
+| A8.5 | AI Coach 24/7 | rozmowa bez oceny | wykrywanie pogorszenia | IIa 2031+ | **obszar najwyższej szkody** |
+| A8.10 | redirect 116 123 (OBLIGATORYJNY) | numer widoczny, wywołanie ręczne | automatyczne wykrycie kryzysu | IIa 2031+ | **wersja ręczna od dnia 1** |
+| A11.5 | dostosowanie rekomendacji do regionu | dostosowanie regionalne | zalecenie zdrowotne | IIa 2031+ | odłożyć |
+| A14.1 | eskalacja (rodzina, lekarz, 112) | eskalacja na żądanie | eskalacja z oceną stanu | IIa 2031+ | wersja ręczna wystarcza |
+
+**CZTERNAŚCIE FUNKCJI MEDYCZNYCH (MDR) — z terminem i możliwością proxy:**
+A3.5 trójkolorowe alerty (zmiana wzgl. własnej historii → alert progowy
+z eskalacją; IIa 2030+; **nie da się oproxować**) · A4.3 raport SBAR
+(zestawienie surowe → SBAR; IIa 2030+; nie da się oproxować) · A5.2 Medical
+Snapshot (user pokazuje dane sam → Medical Snapshot; IIa 2030+; nie da się
+oproxować) · A5.3 One-Click Rescue (telefon do bliskiej osoby → eskalacja z oceną
+stanu; IIa 2031+; **„112 nie ma API"**) · A5.5 ankiety/zdalny wywiad AI (ankieta
+o samopoczuciu → wywiad kliniczny AI; IIa 2029+; **proxy — dostawca klasy IIb**) ·
+**A5.9 zdalne monitorowanie Closed Loop (brak wersji wellness; IIb/III; 2036+;
+BRAK ALTERNATYWY)** · A6.5 diagnostyka wstępna/triage CDSS (brak → triage/CDSS;
+IIa 2029+; proxy — dostawca klasy IIb) · A6.6 spersonalizowane rekomendacje
+(rekomendacja niezdrowotna → sugestia działania zdrowotnego; IIa 2030+; nie da
+się oproxować) · A6.8 predykcja ryzyka chorób (brak → predykcja; IIa 2032+;
+**wymaga kohorty podłużnej**) · A8.2 wykrywanie nastroju z wearables (HRV i sen
+bez wniosku → ocena stanu psychicznego; IIa 2031+; częściowo, jeśli urządzenie
+oceni) · A8.7 wykrywanie EEG (brak → diagnostyka z EEG; IIa 2030+; proxy —
+certyfikowane urządzenie) · A8.8 stymulacja mózgu TMS (IIb; **„to sprzęt, nie
+funkcja App"**) · A12.4 zdalny wywiad przez AI (**duplikat A5.5**) ·
+**A16.7 Dynamiczny Scoring (brak wersji wellness; 2029+; ⚠️ NIE MDR: AI Act
+zał. III + KNF)**.
+
+**SIEDEM FUNKCJI ODRZUCONYCH:** A4.5 raport holograficzny · A6.9 AGI (uczenie
+się całożyciowe) · A7.9 plany pooperacyjne/nanotech · A8.9 BCI dla zdrowia
+psychicznego · A9.5 NFT — trofea zdrowotne · A13.6 Pet Nanoboty (sterylizacja
+genowa) · A16.6 Eternal Token — wewnętrzna waluta.
+
+**DZIESIĘĆ FUNKCJI USŁUGA/PAŃSTWOWA:** A2.8 integracja z P1 · A5.1
+wideokonsultacja (RPWDL) · A5.4 nagrywanie konsultacji · A5.6 e-recepty ·
+A5.7 e-skierowania · A8.3 czat z psychologiem · A8.4 wideokonsultacja
+z psychiatrą · A12.1 nagrywanie konsultacji · A12.2 transkrypcja nagrań ·
+A12.5 automatyczne tworzenie dokumentacji.
+
+**⚠️ WAGA MODUŁÓW — czterokolumnowa ocena (ekosystem / użytkownik / zachowanie
+państwa / konkurencja).** Wybrane rozstrzygnięcia:
+- **A1 KRYTYCZNA** — *„bez agregacji nie ma produktu"*; państwo: **IKP nie
+  przyjmuje danych z urządzeń**; konkurencja: Apple, Google, Terra — *„ale żaden
+  nie łączy z laboratoriami"*.
+- **A2 WYSOKA** — źródło danych klinicznych; IKP pokazuje tylko to, co
+  zaraportowano do P1; konkurencja: Labplus, portale laboratoriów — *„każdy
+  tylko swoje"*.
+- **A10 WYSOKA — jedyny przychód od dnia 1**; państwo nie prowadzi handlu.
+- **A12 WYSOKA — najkrótsza droga do B2B**; ⚠️ zapowiadana **transkrypcja
+  państwowa**; rynek **zatłoczony: 8+ graczy w PL**.
+- **A16 WYSOKA — aktywo rosnące w czasie**; *„państwo definiuje standard, nie
+  dostarcza narzędzi"*; **brak konkurencji w PL**.
+- A6 ŚREDNIA — *„połowa to wyrób"*; konkurencja: darmowe nakładki na modele
+  językowe. · A7 ŚREDNIA — rynek **przesycony, setki aplikacji**. ·
+  A8 ŚREDNIA — **„obszar najwyższej szkody"**. · A9 NISKA — koszt moderacji. ·
+  A11 NISKA. · A13 ŚREDNIA — **tor walidacyjny sprzętu**. · A15 ŚREDNIA —
+  aktywo Fundacji, *„niewidoczne dla pacjenta"*.
+
+**⚠️ CZTERY OBSZARY, W KTÓRYCH PAŃSTWO NIE WEJDZIE — z podstawą, nie z budżetu:**
+1. **Dane z urządzeń użytkownika** (zegarek, waga, CGM, implant) — *„to nie jest
+   dokumentacja medyczna, więc brak podstawy do gromadzenia"*.
+2. **Wyniki z prywatnych laboratoriów w komplecie** — IKP pokazuje to, co
+   zaraportowano do P1; laboratoria prywatne mają własne portale i własny interes.
+3. **Zlecanie badań i handel** — państwo nie prowadzi działalności handlowej.
+4. **Narzędzia zgodności dla dostawców EDM** — *„regulator definiuje standard
+   EEHRxF, ale nie dostarcza narzędzi do jego spełnienia"*.
+
+**Progi przejścia na własne rozwiązanie (uzupełnienie do #90):** wearables —
+**3 000 zł/mies. LUB 5 000 userów** · OCR 2 000 zł/mies. · LLM 2 500 zł/mies. ·
+RAG **od razu** (korpus polski) · transkrypcja 2 400 h/mies. · wideo **nigdy** ·
+tożsamość i zgody **nigdy — zawsze własne** · silnik reguł **zawsze własne**.
+
+**Warstwa „co widzi użytkownik / co widzimy my" (rozdzielenie widoków):**
+adaptery — użytkownik: lista podłączonych urządzeń i ostatnia synchronizacja;
+my: rejestr adapterów, kolejka zadań, **konflikty między źródłami**, wersja
+adaptera · model danych — użytkownik: **nic, warstwa niewidoczna**; my: wersja
+modelu, raport rozbieżności mapowania, pola nierozpoznane · OCR — użytkownik:
+zdjęcie i rozpoznane pola do potwierdzenia; my: **pewność rozpoznania per pole**,
+format laboratorium.
+
+## D063–D064 — #95 (koniec) i #108 ANEKS 3.1
+
+**TYLKO NOWE — EPP, dziewięć wad projektu, progi 11 API/14 licencji i korekta
+Terra są już w CZYT.md.**
+
+**#95 — sześć grup docelowych: co się zmienia w interfejsie i które funkcje są
+pierwszoplanowe:**
+- **Przewlekle chory** — kontekst jednostki chorobowej, porównanie z poprzednim
+  wynikiem → A2 dokumenty, A3 trendy, A7.7 kalendarz badań.
+- **Senior + opiekun** — **dwa konta na jednym ekranie**, większy font, **mniej
+  powiadomień** → A14 przypomnienia, A10 dostawa, A5 kontakt.
+- **Sportowiec** — dane surowe, kilka osi, eksport → A1 urządzenia, A3 wykresy,
+  A7 plany.
+- **Rodzic** — kalendarz szczepień, alerty środowiskowe → A7.7 profilaktyka,
+  A3.6 środowisko, A6.1 wiedza.
+- **Pracownik** — **grupa firmowa zamknięta**, raport zbiorczy → A8 nastrój,
+  A9 społeczność.
+- **Lekarz** — **źródło i wiarygodność każdego pomiaru, oryginał obok odczytu**
+  → A12 dokumentacja, A4 raporty.
+
+**#95 — panel operatora (druga kolumna widoku):** reguły — użytkownik widzi
+propozycję albo przypomnienie, my: **która reguła się wyzwoliła, wersja reguły,
+ile razy zignorowana** · zgody — ekran zgód / **kto ma dostęp do czego, historia
+zgód i odwołań, dziennik dostępów** · moduł medyczny — wynik z oznaczeniem
+producenta / **wersja wyrobu, log decyzji, zdarzenia niepożądane, dossier**.
+*„Panel operatora musi pokazywać drugą kolumnę. W Master 3.0 nie występuje ona
+w ogóle — a bez niej nie da się rozstrzygnąć konfliktu między źródłami ani
+obronić przed audytem."*
+
+**⚠️ #95 — CZTERY RZECZY DO ROZSTRZYGNIĘCIA PRZED BUDOWĄ:**
+1. **Napisanie przeznaczenia dla każdej ze 115 funkcji — jedno zdanie.**
+   *„To jedyny dokument, którego dziś nie ma, a który decyduje o klasie
+   regulacyjnej."*
+2. Rozstrzygnięcie licencji Gadgetbridge — **harmonogram Macierzy v3 przewiduje
+   fork w 2026 Q3, co jest sprzeczne z zastrzeżeniem licencyjnym w tej samej
+   macierzy** (wewnętrzna sprzeczność dokumentu źródłowego).
+3. Decyzja, czy Eternal **świadczy** teleporadę, czy tylko **pośredniczy** — to
+   determinuje strukturę spółek i status RPWDL.
+4. Wskazanie, które funkcje graniczne pójdą **kiedykolwiek** ścieżką medyczną —
+   *„reszta zostaje wellness na stałe i można je zbudować taniej"*.
+
+**#108 — ⚠️ POLSKIE E-ZDROWIE, TWARDE DATY (uzupełnienie do #33):**
+**1 lipca 2026 — NFZ płaci wyłącznie za wizyty umówione przez system
+państwowy** → kanał rejestracji przechodzi do państwa · 1 sierpnia 2026 —
+8 kolejnych specjalizacji w e-Rejestracji · **1 października 2026 — asystent
+głosowy AI potwierdza, odwołuje i przypomina o wizytach** → *„państwo wchodzi
+w warstwę kontaktu z pacjentem"* · 2027 — cel 40 specjalizacji w e-Rejestracji ·
+2027 — cel CeZ: **99% placówek raportujących zdarzenia do P1** · koniec 2029 —
+cała ambulatoryjna opieka specjalistyczna finansowana przez NFZ, **rejestracja
+zamknięta w systemie państwowym** · **26 marca 2031 — wyniki laboratoryjne
+i obrazowe wchodzą do EHDS; do tego czasu luka pozostaje otwarta**.
+**⚠️ Ustalenie planistyczne:** *„Poza rokiem 2027 nie ma polskiego planu. Jedyne
+twarde daty po 2027 pochodzą z prawa unijnego, nie z polskiej polityki. Kto
+planuje pod te daty, planuje pod jedyny stabilny element."*
+
+**⚠️ #108 — DLACZEGO LUKA NIE ZAMYKA SIĘ DO 2030 (jedno zdanie, do materiałów
+sprzedażowych):** *„Aktywność państwa jest populacyjna, nie indywidualna.
+Ankieta ta sama dla wszystkich, program profilaktyczny ten sam, przypomnienie
+identyczne. Państwo mówi, co się zdarzyło i kiedy masz przyjść. **Nie mówi, co
+to znaczy dla ciebie.** To jest cała dostępna luka i ona nie zamyka się do 2030."*
+Dowód empiryczny: **Portfel Aplikacji Zdrowotnych** ma warunek bezpłatności dla
+każdego użytkownika → efekt: **dwie aplikacje w portfelu i określenie „fiasko"
+w prasie branżowej**. *„Państwo próbowało wejść w rolę prywatnych aplikacji
+i mu się nie udało."*
+
+**⚠️ #108 — BCI I NANOTECH: CO JEST PRAWNIE NIEMOŻLIWE (cztery modele):**
+- **White label implantu klasy III — NIEMOŻLIWY.** *„MDR zlikwidował ten model
+  prawnie. Nic nie wskazuje na powrót."*
+- **OEM — możliwy, ale odwrotnie niż w elektronice.** *„Stajesz się producentem
+  prawnym z pełnym dossier — więcej kontroli za więcej pieniędzy."*
+- **Licencja z własnym firmware implantu — NIEMOŻLIWA NIGDY.** *„Firmware jest
+  częścią wyrobu. Zmiana = zmiana projektowa wymagająca oceny jednostki
+  notyfikowanej."*
+- **Warstwa dekodera, protokołu i aplikacji nad implantem — MOŻLIWA I TANIA.**
+  *„Jedyna warstwa, gdzie własny soft i własne aktualizacje są jednocześnie
+  możliwe. Właśnie jest standaryzowana."*
+To jest twarde uzasadnienie regulacyjne dla wcześniejszej tezy „kontrolujemy
+protokół, nie urządzenie" — i jednocześnie unieważnia wcześniejsze plany
+własnego firmware w implancie.
+
+**⚠️ #108 — MODEL DOJRZAŁOŚCI DLA OPROGRAMOWANIA: CZTERY OSIE ZAMIAST DRABINY.**
+*„Drabina afiliacja → agregacja → white label → OEM → produkcja własna ma jedną
+oś, bo w sprzęcie «kto wytwarza» i «kto posiada» to ta sama rzecz.
+W oprogramowaniu to się rozjeżdża: zawsze piszesz kod, nie ma «produkcji».
+Zmienia się co innego — **kto hostuje, kto posiada model danych, kto odpowiada
+regulacyjnie i kto kontroluje interfejs**."*
+Wniosek: dla warstwy software'owej nie stosować drabiny sprzętowej — cztery osie
+ocenia się niezależnie.
+
+**⚠️ #108 — KONKURENCJA EKOSYSTEMOWA: brak pełnego ekosystemu to selekcja, nie
+luka.** *„Nikt na świecie nie buduje wszystkich pięciu produktów Eternal pod
+jednym dachem. I to nie jest luka rynkowa — to wynik selekcji. Każda z pięciu
+warstw ma dobrze dokapitalizowanego okupanta."*
+Najbliżej pełnego ekosystemu: **M42 z Abu Zabi** oraz chińska trójka **Ping An,
+Alibaba Health, JD Health**. *„Żaden nie robi implantu ani metawersum, bo obie
+warstwy mają ujemną ekonomikę jednostkową, a wszyscy, którzy próbowali «kapsuły
+od razu», zbankrutowali."*
+
+**#108 — mechanizm zgody w P1 (szczegół wykonawczy):** P1 wystawia **osobną
+usługę obsługi zgód pacjenta**. Pacjent uwierzytelnia się przez **Węzeł
+Krajowy**, zostaje przekierowany do IKP i tam określa **czas oraz typy
+dokumentów**, których zgoda dotyczy. Zgoda jest **granularna i odwoływalna** —
+*„czyli dokładnie taka, jakiej wymaga zasada «dane pozostają własnością
+pacjenta»"*.
+Czego EPP **nie** udostępnia: wyniki badań laboratoryjnych strukturalnie ·
+badania obrazowe i wypisy (**oba wchodzą do EHDS dopiero 26.03.2031**) · dane
+z wearables i pomiary domowe (**„P1 ich nie przyjmuje i nie przyjmie"**).
+Co udostępnia za darmo i co oszczędza cały podprojekt: **słowniki ATC, ICD-10,
+ICD-9, ICF, ORPHANET** oraz **gotowy mechanizm powiadomień o istotnych
+zdarzeniach — „nie trzeba budować"**.
+**Pierwsze pytanie do rozstrzygnięcia:** czy EPP zwraca **pełne dokumenty EDM**,
+czy wyłącznie warstwę zdarzeń i indeksów — *„P1 gromadzi indeksy, a same
+dokumenty bywają w repozytoriach usługodawców. To rozstrzyga, ile realnej treści
+klinicznej dostaniesz. Odpowiedź jest w pliku specyfikacji YAML."*
+
+## D064 — #116: ROADMAPA WYKONAWCZA 2.0 (23.08.2026) — dokument nadrzędny dla roadmapy HTML
+
+**⚠️ ZASTĘPUJE roadmapy v2–v5 oraz etapy 7–11 z plików HTML.** To jest wersja
+obowiązująca dla `ETERNAL_ROADMAPA_SCALONA.html`.
+
+**Zasada roadmapy:** *„Nie budujemy produktu — budujemy dowód, że ktoś go kupi,
+i strukturę, która przetrwa pięćdziesiąt lat. Kod może poczekać kwartał. Statut
+Fundacji nie może, bo po 31.12.2026 negocjujesz zamiast decydować. Rejestracja
+NIS2 nie może, bo termin 3.10.2026 jest ustawowy. **Rejestr SOUP nie może, bo
+jest jedyną pozycją w projekcie nieodtwarzalną wstecz.**"*
+
+**Punkt wyjścia:** plan operacyjny ETL-019 uruchomiony 16 sierpnia 2026;
+dokument pisany 23 sierpnia — **tydzień drugi z trzynastu**.
+
+**PIĘĆ TORÓW × cel w 90 dni × właściciel:**
+- **A — Popyt:** pięć podpisanych zobowiązań (Maksymilian, wsparcie Julia)
+- **B — Fundacja i kaskada:** projekt statutu gotowy do podpisu (Karol +
+  kancelaria)
+- **C — Podmiot leczniczy i P1:** wniosek RPWDL złożony, dostęp do środowiska
+  integracyjnego (Karol, wsparcie Wiktor)
+- **D — Pierwszy produkt:** działa u pięciu użytkowników (Łukasz + Janek)
+- **E — Zgodność (NOWY):** NIS2 zarejestrowane, SOUP założony, IOD i PRRC
+  wskazani (Karol, wsparcie Janek)
+*„Tor E nie występował w planie 90-dniowym i jest jedynym torem z terminem
+ustawowym wewnątrz tego okna."* **Adrian (hardware) nadal nie ma pracy w torze
+głównym** — prowadzi wyłącznie rozpoznanie transponderów white-label pod Eternal
+Pet, **bez zamówień**.
+
+**KALENDARZ TWARDYCH DAT — z rozróżnieniem rodzaju i konsekwencji przekroczenia:**
+
+| Data | Co | Rodzaj | Konsekwencja przekroczenia |
+|---|---|---|---|
+| 28.05.2026 | EUDAMED obowiązkowy | ustawowa | dotyczy także **składających systemy i zestawy** |
+| 2.08.2026 | ujawnienie, że rozmówcą jest AI (AI Act art. 50) | ustawowa | **termin minął — zweryfikować stan wdrożenia** |
+| 15.09.2026 | dwadzieścia rozmów zamkniętych | brama wewnętrzna | **zatrzymaj tor D, zmień produkt** |
+| 3.10.2026 | samoidentyfikacja NIS2 + wpis do Wykazu KSC | ustawowa | **obowiązek własny — nikt nie wezwie** |
+| 1.10.2026 | państwowy asystent głosowy AI | zewnętrzna | państwo wchodzi w warstwę kontaktu z pacjentem |
+| **15.10.2026** | **pięć podpisanych zobowiązań** | **brama wewnętrzna** | **ZATRZYMAJ BUDOWĘ** |
+| 15.11.2026 | produkt u pięciu użytkowników, wniosek RPWDL złożony | brama wewnętrzna | opóźnienie, nie porażka |
+| 31.12.2026 | podpisany statut Fundacji | własna, **nieodwracalna** | po tej dacie piszesz go z pozycji negocjacyjnej |
+| 2027 | cel CeZ: 99% placówek raportujących do P1 | zewnętrzna | kompletność danych w P1 rośnie |
+| 26.03.2027 | akty wykonawcze EHDS, wyznaczenie HDAB | ustawowa | **początek okna przewagi** |
+| 26.03.2029 | EEHRxF kat. 1 — CE dla systemów EDM | ustawowa | **jedyna data tworząca rynek na mapper** |
+| koniec 2029 | cała AOS finansowana przez NFZ przez e-Rejestrację | zewnętrzna | kanał rejestracji zamknięty |
+| 26.03.2031 | EHDS kat. 2 — obrazowanie, wyniki lab, wypisy | ustawowa | do tego czasu luka pozostaje otwarta |
+
+**HORYZONT 0 — do 15 listopada 2026, zadania per tor i osoba.**
+*Tygodnie 1–2 (do 31 sierpnia):* A — lista **40 rozmówców: 20 gabinetów
+weterynaryjnych, 20 lekarzy lub menedżerów przychodni; imiona, telefony, kto
+poleca** (Maksymilian, Julia) · A — jednostronicowa oferta dla każdej grupy,
+**„jedna strona z ceną, nie prezentacja"** · B — wybór kancelarii
+z doświadczeniem w fundacjach kontrolujących spółki (Karol) · C — pobranie
+`epp-api-1-1-0.yaml`, rozstrzygnięcie czy EPP zwraca pełne dokumenty EDM
+(Łukasz) · C — mail na integracja_p1@cez.gov.pl (Karol) · D — **Pinecone →
+pgvector**, adapter na warstwie modeli językowych (Janek) · E — samoidentyfikacja
+NIS2: **podmiot kluczowy czy ważny** (Karol) · E — **założenie rejestru SOUP od
+pierwszej biblioteki** (Janek) · wszyscy — korekty w specyfikacji: klasa MDR IIb,
+**Unity nie jest open source**, cena Terra przy A1.1, Gadgetbridge AGPL-3.0.
+*Wrzesień:* A — **dwadzieścia rozmów przeprowadzonych: „rozmowa, nie ankieta;
+zawsze kończ pytaniem o pieniądze albo podpis"** · A — **makieta jednego ekranu,
+nie produkt** (Julia) · B — decyzja: **wariant Bosch (głosy poza fundacją) czy
+Novo (fundacja plus spółka wykonująca własność)**, rozstrzygnięcie kaskady ·
+B — inwentarz: co Fundacja faktycznie posiada dziś · C — kompletowanie warunków
+RPWDL: regulamin organizacyjny, **drzewo Przedsiębiorstwo → Zakład → Komórka**,
+lokal, opinia sanitarna, polisa OC · D — szkielet mappera CDA ↔ FHIR na danych
+testowych z P1 · E — wpis do Wykazu KSC · E — wyznaczenie IOD, ustalenie kto
+obejmie rolę PRRC.
+*Październik:* A — kolejne dwadzieścia rozmów, cel **pięć podpisanych zobowiązań
+(list intencyjny, przedpłata, cokolwiek wiążącego)** · B — pierwszy projekt
+statutu **z trzema zamkami: obowiązek zamiast uprawnienia, niezbywalność, zakaz
+rozwodnienia** + sukcesja rady i mechanizm przy paraliżu · C — złożenie wniosku
+do RPWDL 2.0 (894 zł) · C — wniosek o środowisko integracyjne P1 · D — pierwsza
+wersja produktu u trzech użytkowników testowych · E — **umówienie spotkania
+przedzgłoszeniowego z jednostką notyfikowaną**.
+**⚠️ BRAMA 15 PAŹDZIERNIKA: pięć podpisanych zobowiązań. „Bez niej dalsze
+budowanie jest spalaniem pieniędzy."**
+*Do 15 listopada:* konwersja zobowiązań w pierwsze płatności · **przegląd statutu
+przez drugą kancelarię** · certyfikat P1 i KS-BLOZ po uzyskaniu wpisu · produkt
+działa u pięciu płacących lub zobowiązanych użytkowników.
+
+**HORYZONT 1 — do 31 grudnia 2026 (sześć pozycji, w tym cztery opinie prawne):**
+podpisanie statutu Fundacji, rejestracja, **wykonanie licencji IP w dół kaskady**
+(*„IP mieszka nad spółkami i jest licencjonowane odwoływalnie — inaczej sprzedaż
+spółki zależnej sprzedaje technologię"*) · **opinia prawna: konflikt retencji
+20 lat z RODO — przed budową warstwy danych** · opinia farmaceutyczna: czy
+mechanika Auto-Refill z rabatem i program lojalnościowy są dopuszczalne po
+zmianie reżimu reklamy aptek (**wyrok TSUE C-200/24**) · opinia: czy
+**Underwriting AI to dystrybucja ubezpieczeń pod nadzorem KNF**, czy da się go
+sprowadzić do dostarczania danych ubezpieczycielowi · przepisanie przeznaczenia
+dla trzech funkcji granicznych: **trójkolorowe alerty, priorytetyzacja zaleceń,
+model starzenia biologicznego** · **klasyfikacja bezpieczeństwa IEC 62304 (A/B/C)**
+dla funkcji warstwy C.
+
+**HORYZONT 2 — 2027: dostęp do państwa i pierwszy przychód (z progami
+decyzyjnymi):** Q1 wpis do RPWDL, MUS, certyfikaty CeZ, kwalifikowane podpisy
+personelu → **brak wpisu do końca Q1 = przegląd całej strategii dostępu do
+danych** · Q2 działające raportowanie zdarzeń medycznych i indeksów EDM do P1 →
+brak = **stop i przegląd architektury integracji** · Q2 **zlecanie badań przez
+Eternal — wytwarzanie własnej EDM**: *„to jest moment, w którym pieniądze i dane
+zaczynają przychodzić tym samym kanałem"* · Q3 Eternal Pet: przychód
+powtarzalny; Eternal Scribe: pierwsze kliniki → **przychód pokrywający koszt
+zespołu do miesiąca 18** · Q4 **mapper CDA↔FHIR↔EEHRxF w wersji sprzedawalnej —
+dwa lata przed terminem 26.03.2029, „to jest cały margines"**.
+
+**HORYZONT 3 — 2028–2029: warstwa C i okno EHDS.** Dossier SaMD dla warstwy C
+(interpretacja, alerty z oceną, triage) — *„poprzedzone spotkaniem
+przedzgłoszeniowym, nie zastępowane analizą wewnętrzną"* · **walidacja
+prospektywna modeli predykcyjnych — bez niej Digital Twin pozostaje wizualizacją,
+nie wyrobem** · komponent EEHRxF gotowy i przetestowany przed 26.03.2029
+(**poślizg >6 miesięcy = repriorytetyzacja całego portfela**) · **Eternal
+Kompatybilny: poziomy Ready i Compatible; warunek startu — pierwszy podmiot
+spoza Eternal, który chce mieć znaczek** · **rejestr implantów: od 26.03.2029
+skrócona karta zdrowia pacjenta EHDS zawiera wszczepione urządzenia medyczne —
+rejestr przestaje być pomysłem i staje się elementem infrastruktury** · pierwsze
+umowy PMCF z producentami wyrobów — **„sprzedaż obowiązku, nie produktu"**.
+
+**⚠️ HORYZONT 4 — 2030+: co wraca i pod jakim warunkiem** (etap bez warunku
+wejścia nie jest planem): Bio-Tag weterynaryjny, produkcja własna — 2027–2028,
+warunek: przychód z Eternal Pet · Bio-Tag człowiek wellness NFC — 2030–2031,
+warunek: kompetencja produkcyjna z toru weterynaryjnego · **Bio-Tag człowiek
+klasy IIb — 2035–2037, warunek: partner z ISO 13485 ORAZ finansowanie deep-tech
+≥5 mln EUR** · Station S1 z gotowych komponentów, framing wellness — 2028,
+warunek: **art. 22 MDR (systemy i zestawy)** · Station jako wyrób medyczny —
+2032, warunek: dossier · Bio-Monitor (biosensor implantowalny) — **2040+, „nie
+własnymi siłami"** · Digital Twin jako wyrób (**ścieżka ASME V&V 40**) — 2031,
+warunek: walidacja prospektywna · **warstwa AR/VR (Matrix) — rekomendacja: nie
+robić** · The Hive — 2045+ · **The Swarm, kopia świadomości, teza „150 lat" —
+USUNIĘTE Z DOKUMENTACJI PRODUKTOWEJ**.
+
+**⚠️ OSIEM RZECZY, KTÓRYCH NIE ROBIMY (z uzasadnieniem):** żadnego hardware poza
+rozpoznaniem weterynaryjnym · żadnej nowej rodziny technologii (*„cztery przy
+zespole, który dopiero rośnie"*) · **żadnej pracy nad Unity, AR, Matrix —
+„33 funkcje zależności, warstwa nierentowna u wszystkich"** · żadnej pracy nad
+Capsule poza rozpoznaniem weterynaryjnym · żadnego zbierania pieniędzy do
+funduszu (*„najpierw wyniki operacyjne, potem klub, potem fundusz"*) · **żadnych
+nowych funkcji w specyfikacji — „masz 185; problem nie polega na tym, że masz za
+mało"** · żadnej kolejnej etykiety „dobra aplikacja zdrowotna" (**Label2Enable,
+xShare, Continua, QUANTUM — te miejsca są zajęte**) · **żadnej nowej analizy —
+„dwadzieścia osiem dokumentów wystarczy"**.
+
+**BUDŻET OKNA 90 DNI — 101 000 – 191 000 PLN:** kancelaria (statut Fundacji +
+opinia MDR) 30–60 tys. · przegląd przez drugą kancelarię 10–20 tys. · RPWDL
+894 zł · OC na spółkę, lokal, opinia sanitarna 20–40 tys. · certyfikat P1 +
+KS-BLOZ (rocznie) 15 tys. · podróże i spotkania na 40 rozmów 5–10 tys. ·
+**spotkanie przedzgłoszeniowe z jednostką notyfikowaną (NOWA POZYCJA)
+5–15 tys.** · **opinie prawne: retencja, farmaceutyczna, ubezpieczeniowa (NOWA
+POZYCJA) 15–30 tys.**
+*„Poza kosztem zespołu, który już jest ponoszony. To jest cały budżet przejścia
+od dwudziestu ośmiu dokumentów analizy do pierwszego przychodu i domkniętej
+struktury kontrolnej."*
+
+**⚠️ SIEDEM ZMIAN WOBEC POPRZEDNICH ROADMAP (poprzednio → teraz → powód):**
+jedenaście etapów i dwa scenariusze (2026/2030) → **pięć horyzontów, jeden
+scenariusz — ten, który biegnie** (*„Scenariusz B zakładał start w 2030 r. Jest
+sierpień 2026 i Scenariusz A trwa"*) · etapy 7–11 z moonshotami → **horyzont 4
+z warunkami reaktywacji** (*„etap bez warunku wejścia nie jest planem, tylko
+listą życzeń"*) · pierwszy produkt Eternal App MVP → **pierwsza fala: Eternal Pet
++ Eternal Scribe** (selekcja 7/7 i 5/7) · Fundacja Q3 2026 → spółka Q1 2027 →
+**spółka istnieje, Fundacja do 31.12.2026, licencja IP w dół** (*„kolejność
+w poprzednich dokumentach była odwrotna wobec stanu faktycznego"*) · brak toru
+zgodnościowego → **tor E z terminem ustawowym 3.10.2026** (NIS2, SOUP, IEC 62304,
+IOD i PRRC nie występowały w żadnej roadmapie) · MVP implantu Q2 2028 → **wyrób
+klasy IIb 2035–2037** (rozjazd **7–10 lat** wobec stanu techniki) · nanoboty jako
+etap z datą → **usunięte z roadmapy produktowej** · **KPI: MAU >1000, MRR
+>5000 PLN → trzy bramki: 5 zobowiązań / 5 płacących / przychód pokrywający
+zespół** (*„MAU nie rozstrzyga, czy ktoś zapłaci"*).
+
+Podstawa dokumentu: ETL-011, ETL-018, ETL-019, ETL-024, ETL-025, ETL-027,
+ETL-028 oraz zewnętrzna ocena wykonalności.
+
+## D064–D065 — #122: BIZNESPLAN 4.0 (23.08.2026) — dokument nadrzędny dla biznesplanu docx
+
+**⚠️ ZASTĘPUJE biznesplan rozszerzony 2.0 i wersję 3.0.** Układ inwestorski
+medtech/healthtech. Podstawa: **Specyfikacja Master 4.1 Część I i II** (nowsza
+niż Master 3.1!) oraz dokumenty ETL-001–033.
+
+**Streszczenie zarządcze — jedna teza:** *„Eternal buduje warstwę znaczenia nad
+polskim systemem e-zdrowia. Państwo dostarcza fakty — co się zdarzyło, kiedy
+przyjść, ile zapłacisz — za darmo, dwudziestu milionom ludzi. Nie dostarcza
+interpretacji **i nie może jej dostarczyć bez stania się producentem wyrobu
+medycznego**. Ta luka nie zamknie się do 2031 r."*
+
+| Wymiar | Ustalenie |
+|---|---|
+| Co sprzedajemy | dokumentację dla klinik, oprogramowanie weterynaryjne, interoperacyjność, certyfikację zgodności, dane wynikowe |
+| Kto płaci | podmiot leczniczy, integrator systemów EDM, producent wyrobu, sponsor badania. **Pacjent nie płaci** |
+| Pierwsza fala | Eternal Pet i Eternal Scribe, **poprzedzone społecznością** |
+| Fosa | **status podmiotu leczniczego — kto wytworzył dokumentację, ma do niej dostęp z mocy ustawy** |
+| Okno rynkowe | **26.03.2029 — obowiązek CE dla systemów EDM w reżimie EEHRxF** |
+| Czego potrzebujemy | **~200 tys. PLN na domknięcie struktury i pierwszy przychód. NIE rundy kapitałowej** |
+| Kiedy wiemy, że działa | 5 zobowiązań w 2 mies. · 5 płacących w 6 · pokrycie kosztu zespołu w 18 |
+
+**Sześć problemów z dowodem:** dokumentacja rozproszona (do platformy państwowej
+trafia wyłącznie indeks) · wynik badania nieczytelny dla pacjenta (**brak
+warstwy tłumaczącej w systemie publicznym**) · dane z urządzeń nie łączą się
+z dokumentacją (**platforma państwowa ich nie przyjmuje i nie przyjmie**) ·
+lekarz traci czas na dokumentację (*„powód istnienia całej kategorii
+produktów"*) · systemy gabinetowe nie są gotowe na wymóg interoperacyjności
+(termin 26.03.2029) · **weterynaria nie ma żadnej infrastruktury cyfrowej —
+„zero obecności państwa"**.
+**⚠️ Problem, którego NIE rozwiązujemy:** *„dostępu do lekarza, kolejek
+i finansowania świadczeń. To są problemy systemowe, których żadna firma nie
+rozwiąże, a obiecywanie tego podważa wiarygodność wszystkiego pozostałego."*
+
+**Pięć zdolności i ich reżim:** „dane zdrowotne" (adaptery, import, odczyt,
+normalizacja) — **poza reżimem wyrobu** · „dokumentacja" (transkrypcja wizyty,
+strukturyzacja notatki, wypełnianie pól) — poza reżimem, **przeznaczenie brzmi
+„dokumentacja"** · „interoperacyjność" (mapowanie PL ↔ format europejski) —
+komponent · „zwierzęta" — **poza MDR, inne prawo** · „interpretacja" (ocena
+wyniku, alert progowy, predykcja) — **wyrób klasy IIa, nie w pierwszej fali**.
+**Reguła produktowa sterująca całym projektem:** *„Fakt i porównanie do własnej
+historii są bezpieczne regulacyjnie. Ocena, próg i zalecenie nie są. Ta sama
+funkcja po jednej stronie granicy jest darmowa, po drugiej kosztuje dossier."*
+
+**⚠️ „DLACZEGO TERAZ" — okno jest wąskie i zamknie się samo:** *„Kto zbuduje
+mapper przed 2029 r., sprzedaje go każdemu dostawcy systemu gabinetowego
+w Polsce. Kto zacznie w 2029, sprzedaje go nikomu. To jedyna zewnętrzna data
+w całym planie, która tworzy popyt niezależnie od naszych działań."*
+
+**Siedem segmentów rynku (wielkość / nasza dostępna część / uwaga):** podmioty
+lecznicze — dziesiątki tysięcy / gabinety i małe placówki bez działu IT /
+**„płatnik decyzyjny to jedna osoba, nie komisja"** · dostawcy systemów
+gabinetowych i szpitalnych — kilkudziesięciu / **wszyscy, każdy musi spełnić
+wymóg do 2029** / rynek zamknięty liczbowo, ale każdy klient duży · lecznice
+weterynaryjne — tysiące / wszystkie / **zero obecności państwa** · właściciele
+zwierząt — miliony gospodarstw / **jedyny segment konsumencki, w który
+wchodzimy** · producenci wyrobów — setki w regionie / ci, którzy potrzebują
+danych nadzoru porynkowego / **„sprzedaż obowiązku, nie produktu"** · sponsorzy
+badań klinicznych — dziesiątki / badania zdecentralizowane / **najwyższa marża,
+płatnik instytucjonalny** · pacjenci — 20+ mln kont / **nie jest naszym
+płatnikiem — kanał dystrybucji i rekrutacji**.
+**⚠️ Zasada prezentacji rynku:** *„CELOWO NIE PODAJEMY GLOBALNYCH LICZB RYNKU.
+Materiały z poprzedniej wersji operowały wartościami rzędu bilionów dolarów przy
+strategii ograniczonej do Polski. Taka rozbieżność między wielkością rynku
+a zasięgiem działania jest w rozmowie z inwestorem **sygnałem ostrzegawczym, nie
+atutem**."* — wiążące dla pitch decków.
+
+**⚠️ Bilans wobec systemu publicznego (185 funkcji):** zajęte przez państwo ~18
+(nie konkurujemy) · zajęte częściowo ~26 (integrujemy się) · **puste ~105 — to
+jest pole gry** · poza zakresem systemu publicznego ~36 (weterynaria, wellness,
+badania).
+*„Państwo zajęło funkcje najtańsze do zbudowania i o najwyższym wolumenie —
+czyli te, od których startup normalnie zaczyna. Zostawiło drogie i trudne. To
+odwrotność sekwencji, którą chce się mieć, i to jest właściwy problem, a nie
+sama konkurencja."*
+
+**Portfel z oceną wg kryteriów własnych:** społeczność i baza wiedzy — **przed
+produktem konsumenckim** · **Eternal Pet z ramieniem sprzętowym 7/7 — teraz** ·
+**Eternal Scribe 5/7 — teraz** · mapper interoperacyjności 4/7 — 2027 ·
+translator wyników 4/7 — 2027 · marketplace 3/7 — po pierwszym przychodzie ·
+Station z gotowych komponentów 2/7 — 2028 · telemedycyna 1/7 — **rynek nasycony**.
+**⚠️ ETAP ZEROWY TO DWANAŚCIE FUNKCJI, NIE STO OSIEMDZIESIĄT PIĘĆ:** konto ·
+profil zdrowia · integracja urządzenia · import dokumentów z mapowaniem ·
+dashboard · asystent · rekomendacje w warstwie wellness · cele · historia ·
+osobisty model zdrowia · podstawowy bliźniak · marketplace.
+**Parkujemy (finansowanie osobne):** transponder u człowieka (warunek:
+kompetencja produkcyjna z toru weterynaryjnego) · biosensor wszczepialny (**nie
+własnymi siłami**) · warstwa immersyjna (**rekomendacja: nie robić**).
+**⚠️ POZYCJE USUNIĘTE Z PLANU I Z KAŻDEGO MATERIAŁU ZEWNĘTRZNEGO:** roje
+terapeutyczne · kopia świadomości · teza o wydłużeniu życia do konkretnej liczby
+lat · konsumencki panel biochemiczny · mieszanie preparatów przez model · ogniwa
+biopaliwowe · pozycjonowanie w kategorii długowieczności. *„Każda z nich kończy
+rozmowę z inwestorem medtech w pierwszej minucie."*
+
+**Dziewięć kanałów przychodu (kto płaci / za co / model):** Eternal Scribe —
+klinika / dokumentacja wizyty / **licencja per lekarz miesięcznie** · Eternal
+Pet — właściciel i lecznica / subskrypcja + transponder / freemium →
+subskrypcja → sprzęt · mapper — dostawcy systemów, placówki / interoperacyjność
+z terminem 2029 / licencja per placówka + wdrożenie · świadczenia własne —
+pacjent albo płatnik / teleporada, zlecone badania / za świadczenie ·
+marketplace — apteka, laboratorium, dostawca / **transakcja z kontekstem** /
+prowizja · certyfikacja zgodności — producent urządzenia / wpis do rejestru,
+testy / opłata roczna + test · nadzór porynkowy — producent wyrobu / dane PMS /
+kontrakt roczny · badania zdecentralizowane — sponsor / infrastruktura zbierania
+danych / kontrakt na badanie · wersje konsumenckie — użytkownik / rozszerzona
+funkcjonalność / **„finansowanie pomostowe lat 1–2, nie oś przychodu"**.
+**Ranking typów przychodu:** abonament instytucjonalny — **najlepszy** ·
+materiał zużywalny — bardzo dobry (**„sprzęt jest nośnikiem, nie towarem"**) ·
+kontrakt badawczy — bardzo dobry (**„płaci za ciągłość, której nikt nie ma"**) ·
+licencja na zdolność — dobry po udowodnieniu skuteczności · prowizja — dobry
+jako uzupełnienie, **zły jako źródło główne** · abonament konsumencki —
+**najsłabszy** · marża sprzętowa — **nigdy jako źródło główne** · **NIGDY
+PŁATNE: eksport danych, warstwa kryzysowa, format zapisu**.
+**⚠️** *„Najwyżej marżowe produkty nie są skierowane do pacjenta. Parser dla
+laboratoriów, dokumentacja dla klinik, kohorta, protokół, dane nadzoru.
+Wszystkie powstają **jako produkt uboczny czegoś, co i tak budujemy**. Aplikacja
+konsumencka jest kanałem dystrybucji i rekrutacji, nie produktem."*
+
+**⚠️ TRZY RZECZY NAZYWANE „CERTYFIKATEM" I MYLONE ZE SOBĄ:** (1) klasa wyrobu
+wydawana przez jednostkę notyfikowaną · (2) certyfikat integracji z platformą
+państwową wydawany przez CeZ — **BEZPŁATNY, przez rejestr elektroniczny,
+ważność dwa lata** · (3) reżim nadzoru finansowego przy scoringu
+ubezpieczeniowym. **Klasa I nie jest „tania i prosta"** — wymaga dokumentacji
+technicznej, systemu jakości, identyfikatora wyrobu, rejestracji i nadzoru
+porynkowego.
+**Realne wąskie gardło:** *„nie koszt, tylko KOLEJKA DO JEDNOSTKI NOTYFIKOWANEJ —
+czas oczekiwania na wejście w proces bywa dłuższy niż zakładany czas całej
+certyfikacji. Dlatego spotkanie przedzgłoszeniowe umawia się **przed pierwszą
+linijką kodu**, a nie po zbudowaniu produktu."*
+
+**⚠️ STRATEGIA DANYCH — GŁĘBIA ZAMIAST SZEROKOŚCI:** *„Zbiory publiczne to
+przekroje — pojedyncze zdarzenia rozrzucone w czasie. Nikt nie ma ciągłości. Do
+wnioskowania przyczynowego potrzeba **tej samej osoby przed i po,
+wielokrotnie**. Milion przekrojów tego nie da; tysiąc ciągłych historii — da."*
+Stąd kohorta rzędu **tysiąca osób, instrumentowana maksymalnie, za darmo,
+z pełną świadomością obu stron, że to współpraca badawcza**.
+Pięć etapów dowodu: kohorta zwierzęca (dane podłużne bez reżimu MDR, kontrakty
+badawcze; 2027–2028) → kohorta ludzka z ciągłością (publikacje i wnioski
+grantowe; 2028+) → **walidacja prospektywna modeli — „warunek, żeby bliźniak był
+wyrobem, a nie wykresem"; 2029–2031** → ocena kliniczna (2029) → nadzór po
+wprowadzeniu (**obowiązek stały, jednocześnie produkt**).
+**Zasada nienaruszalna:** *„Dane należą do ludzi, którzy je wytworzyli. Surowe
+dane zostają jak najbliżej człowieka, na zewnątrz idą wyniki i wielkości
+zbiorcze, każde wykorzystanie poza bezpośrednią usługą wymaga osobnej zgody
+odwoływalnej natychmiast. **Oznaczamy dane, nie ludzi** — każdy wpis dostaje
+wagę pewności, model uczy się z wpisów ważonych."*
+
+**⚠️ FIZYKA MARKETINGU W TEJ KATEGORII (odwrotna niż w większości branż):**
+*„Im głośniej się mówi, tym mniej jest się wiarygodnym. Prosimy człowieka nie
+o zakup, tylko o **powierzenie zapisu własnego ciała na dwadzieścia lat**.
+Decyzja o powierzeniu zapada wolno, reaguje na dowód zamiast na obietnicę
+i karze rozmach."*
+Kanały wg fazy: przed produktem — **społeczność prowadzona przez rozpoznawalną
+osobę o wiarygodności medycznej, wokół konkretnej sprawy** · mies. 1–2 —
+40 rozmów (20 lecznic, 20 gabinetów) → 5 zobowiązań · mies. 3–6 — konwersja
+w płatności i polecenia → 5 płacących · rok 1–2 — sprzedaż bezpośrednia +
+kanał przez dostawców systemów → przychód powtarzalny · rok 2–3 — mapper przez
+dostawców → 3 płacące placówki · **rok 3+ — rejestr i certyfikacja: „producenci
+przychodzą sami"**.
+
+**Siedem kategorii konkurencji i nasza pozycja:** system publiczny — **nie
+konkurujemy, integrujemy się** · systemy gabinetowe — **„stajemy się ich
+dostawcą komponentu, nie konkurentem"** · dokumentacja automatyczna
+(międzynarodowa) — nasza przewaga: **język polski, integracja z polską
+dokumentacją, cena** · aplikacje konsumenckie (setki) — **nie wchodzimy w tę
+kategorię** · agregatory danych — **„stają się jednym z trzech dostawców, nie
+jedynym"** · weterynaria — **pole czyste** · globalne firmy prewencyjne
+(kapitał rzędu miliarda) — **„nie wchodzą do Polski, bo wymaga to statusu
+podmiotu leczniczego"**.
+**⚠️ Kalibracja skali ryzyka:** *„W tej kategorii spalono kapitał rzędu
+miliardów przy produktach, które **uzyskały dopuszczenie regulacyjne i mimo to
+upadły z powodów rynkowych**. Dopuszczenie nie chroni przed brakiem popytu. To
+jest argument za tym, żeby najpierw mieć pięciu płacących klientów, a dopiero
+potem dossier."*
+
+**⚠️ SZEŚĆ ELEMENTÓW FOSY — z odpowiedzią „kto może powtórzyć":**
+1. **Status podmiotu leczniczego** — żadna aplikacja konsumencka; dla niej to
+   absurdalny koszt za dostęp do danych.
+2. **Wytwarzanie własnej dokumentacji** — *„kto wytworzył dokument, ma dostęp
+   z mocy ustawy; zlecanie badań daje jednocześnie przychód i dane"*; powtórzyć
+   może tylko inny podmiot leczniczy — **a te nie budują oprogramowania**.
+3. Model danych i mapper — **„każdy, kto zacznie teraz — to wyścig, nie fosa
+   trwała"**.
+4. Rejestr i dane wynikowe — *„producent wie, że urządzenie działa. Nie wie, czy
+   pacjentowi jest lepiej"*; nikt bez dostępu do pacjentów wielu producentów.
+5. **Ciągłość zapisu** — *„ósma kartka po trzech latach jest bezcenna, bo nikt
+   inny nie ma siedmiu poprzednich. **Nikt — czasu nie da się kupić**."*
+6. Kompetencja regulacyjna — wąska, rzadka, już zbudowana; **„kosztuje czas, nie
+   pieniądze"**.
+
+**Technologia: kontrola własna dziś 39%.** Zawsze własne: model danych,
+protokół, rejestr, mapper, oprogramowanie układowe, dziennik audytowy. Nigdy
+własne: wytwórnia półprzewodników, chemia farmaceutyczna, produkcja masowa,
+transport wideo, baza danych. **Do rozstrzygnięcia: wskazanie 3–5 komponentów,
+które muszą być własne w ponad 80%, i podniesienie ich kosztem pozostałych.**
+
+**⚠️ ZESPÓŁ — jedna rola nieobsadzona i to najpilniejsza:** obsadzone —
+założyciel (strategia, produkt, sprzedaż), prawo i zgodność, architektura
+i integracje, inżynieria, infrastruktura i integracja z P1, sprzedaż i wsparcie;
+sprzęt — **rozpoznanie, bez zamówień**; **NASTĘPCA OPERACYJNY — NIEOBSADZONA,
+najpilniejsza rekrutacja, wymaga 2–3 lat wspólnej pracy przed przekazaniem**;
+osoba odpowiedzialna za zgodność regulacyjną — do wskazania w Q4 2026.
+**Zapis statutowy decydujący o trwałości:** statut mówi, że Fundacja jest
+**ZOBOWIĄZANA** utrzymać kontrolę, nie że **MOŻE**; wymienia obowiązki zarządu:
+**udaremniać każde podwyższenie kapitału, przez które Fundacja utraciłaby
+większość głosów**. *„Kontrola ma pięć niezależnych źródeł: kapitał, głosy,
+własność intelektualną, infrastrukturę i ludzi."*
+
+**⚠️ STRUKTURA KOSZTÓW — wynagrodzenia 70–90%** (*„pozycja nieobecna
+w poprzednich modelach kosztowych"*) · infrastruktura i usługi zewnętrzne
+5–15% · zgodność i prawo 5–10% (**rośnie skokowo przy wejściu w warstwę C**) ·
+sprzedaż i pozyskanie 5–15% · **sprzęt 0% do 2028**.
+**⚠️ SPROSTOWANIE POPRZEDNICH MODELI KOSZTOWYCH — SIEDEM SPRAWDZALNYCH BŁĘDÓW:**
+pominięty mnożnik trzydziestu dni przy usłudze agregacyjnej (**30×**) · zaniżona
+liczba tokenów przy modelu językowym (**75×**) · stawka podstawowa zamiast
+parsowania formularza (**10–20×**) · anotacja medyczna po 0,80 PLN/dokument przy
+stawce rynkowej 5–50 PLN (**10–50×**) · podwójne liczenie tych samych funkcji ·
+rozjazd sum **2–3×** w obrębie jednej tabeli · koszt certyfikacji zaniżony
+o rząd wielkości. **Najpoważniejszy: brak wynagrodzeń.**
+
+**Założenia przychodowe bez prognozy liczbowej:** 2027 — pierwsze licencje
+dokumentacyjne i subskrypcje weterynaryjne (kilkudziesięciu klientów, przychód
+powtarzalny) · 2028 — rozszerzenie kanału, świadczenia własne, pierwsze
+kontrakty badawcze (**pokrycie kosztu zespołu**) · 2029 — mapper, okno
+regulacyjne (**skokowy wzrost przy trafieniu w termin**) · 2030+ — rejestr,
+certyfikacja, nadzór porynkowy, badania zdecentralizowane (**przychód niezależny
+od liczby użytkowników**).
+**⚠️** *„Świadomie nie podajemy prognozy liczbowej pięcioletniej. Poprzednia
+wersja zawierała taką prognozę zbudowaną na modelu kosztowym bez wynagrodzeń
+i na konwersji konsumenckiej, która nie jest naszą osią przychodu. Prognoza
+zostanie zbudowana po pierwszych sześciu miesiącach sprzedaży, na danych, a nie
+na założeniach."*
+
+**⚠️ FINANSOWANIE — kolejność źródeł, kapitał wysokiego ryzyka na końcu:**
+1. przepływ z działalności powtarzalnej (oprogramowanie weterynaryjne,
+   dokumentacja) · 2. środki bezzwrotne — granty i konsorcja (**„nie rozwadniają,
+   dają wiarygodność"**) · 3. kapitał cierpliwy (biura rodzinne, fundacje,
+   partnerzy strategiczni) · 4. przychód konsumencki (dopiero przy zbudowanej
+   społeczności) · **NIE — kapitał wysokiego ryzyka do spółki-matki: „czas życia
+   funduszu jest krótszy niż horyzont przedsięwzięcia. Wyłącznie do spółek
+   celowych pod konkretne produkty sprzętowe."**
+*„Nie prowadzimy rundy kapitałowej. Potrzebujemy około dwustu tysięcy złotych…
+To jest kwota, którą pokrywa działalność usługowa albo pojedynczy grant."*
+
+**Osiem ryzyk z prawdopodobieństwem i mitygacją:** brak popytu na pierwszą falę
+(średnie — bramka dwumiesięczna) · wpis do rejestru nieuzyskany (**niskie — Pet
+i Scribe go nie wymagają, dlatego są pierwsze**) · konkurent zajmuje mapper
+(średnie — przychód z Pet i Scribe niezależny) · jednostka notyfikowana
+klasyfikuje wyżej (średnie — **„różnica jest w jednym zdaniu przeznaczenia"**) ·
+odcięcie kluczowego dostawcy (średnie — **reguła 33%, adapter, wariant zapasowy,
+przez który płynie ruch**) · termin cyberbezpieczeństwa (niskie po podjęciu
+działania) · **rozproszenie uwagi na zbyt wiele frontów — WYSOKIE**, mitygacja:
+zasada dwóch–trzech projektów, katalog odrzuceń zapisany · **odejście założyciela
+z operacji bez następcy — WYSOKIE**, mitygacja: rekrutacja następcy jako pozycja
+priorytetowa, dokumentacja jako obowiązek instytucjonalny.
+
+**⚠️ SZEŚĆ RZECZY, KTÓRYCH TEN PLAN NIE OBIECUJE** (sekcja do przeniesienia do
+docx bez zmian): nie obiecuje wygranej z systemem publicznym na jego polu —
+*„obiecuje pozycję na polu, na które on nie wejdzie"* · nie obiecuje ekspansji
+globalnej · nie obiecuje implantu w horyzoncie planu — *„program sprzętowy jest
+finansowany osobno albo wcale"* · nie obiecuje, że klasyfikacja regulacyjna
+wypadnie po naszej myśli — *„jak konkretna jednostka notyfikowana odczyta
+konkretne zdanie o przeznaczeniu — tego nie wie nikt poza nią"* · nie obiecuje
+rentowności modelu konsumenckiego — *„przetrwały modele infrastrukturalne
+i instytucjonalne, nie czysty rynek konsumencki"* · nie podaje prognozy
+pięcioletniej przed pierwszymi sześcioma miesiącami sprzedaży.
+
+**Aparat źródłowy (do przeniesienia do docx):** prawo UE — Rozp. 2017/745 (MDR,
+zał. I, II, III, VIII, XIV), 2017/746 (IVDR), **2025/327 (EHDS)**, 2024/1689
+(AI Act, zał. I i III, art. 50), **Dyrektywa 2024/2853 o odpowiedzialności za
+produkty wadliwe**, Rozp. 1924/2006 o oświadczeniach zdrowotnych, RODO,
+NIS2 · wytyczne MDCG: 2019-11 rev.1, **2025-4 (udostępnianie na platformach)**,
+2023-4, 2020-1, 2019-16 rev.1, 2018-5 · organy: URPL, baza NANDO, EUDAMED ·
+prawo polskie: ustawa o wyrobach medycznych z 7.04.2022 (Dz.U. 2022 poz. 974),
+o działalności leczniczej, o SIOZ, o KSC, **o medycznej diagnostyce
+laboratoryjnej**, prawo farmaceutyczne (reklama aptek), **ustawa o działalności
+lobbingowej**, **ustawa o funduszach inwestycyjnych — reżim ASI** ·
+infrastruktura: RPWDL, CeZ, polska implementacja krajowa CDA, specyfikacja EPP,
+**profile IHE (wymiana dokumentów, dziennik audytowy)**, profile Bluetooth SIG
+dla urządzeń zdrowotnych, normy PKN/IEC/ISO, PubMed ·
+**dokumenty własne: Specyfikacja Master 4.1 Część I i II · Specyfikacja App 4.1 ·
+Roadmapa Wykonawcza 2.0 · ETL-001–033** (pełne przypisanie zakresów do numerów
+ETL zapisane w §20.5).
+Zastrzeżenie końcowe: *„Wszystkie liczby oznaczone jako szacunkowe wymagają
+weryfikacji u źródła przed użyciem zewnętrznym. Poziomy pewności dla twierdzeń
+merytorycznych znajdują się w Specyfikacji Master 4.1, Część I sekcja 18."*
+
+## D065–D067 — #129: KARTY FUNKCJI Digital Twin (D1–D3) i Matrix (X1–X2), 26 kart
+
+**⚠️ DOKUMENT W 90% SZABLONOWY — logika deduplikacji.** Karty mają dziewięć
+identycznych sekcji (przeznaczenie, działanie, komponenty, interfejs, grupa
+docelowa, etap, kontrola technologii, korzyści, ryzyka), a większość pól jest
+generowana z nazwy funkcji (*„Brak dedykowanego rozwiązania dla <nazwa>
+w jednym ekosystemie zdrowotnym"*, *„Realizacja funkcji <nazwa> z minimum
+wysiłku użytkownika"*, *„Standard interakcji App: tap, swipe, głos; maksymalnie
+3 kliknięcia do celu"*). **Do dokumentów wyjściowych przechodzą wyłącznie pola
+o wartości nieszablonowej — poniżej ich pełne zestawienie.**
+
+**Trzy poziomy kosztu R&D (jedyne trzy wartości w całym zestawie 26 kart):**
+- **40–70 tys. PLN** (rozwój + testy) — 16 funkcji: D1.1–D1.4, D1.6, D2.3–D2.5,
+  D3.1, D3.2, X1.2, X1.4, X2.1, X2.2, X2.3, X2.6
+- **80–150 tys. PLN** (model + training + dataset) — 6 funkcji: D1.5, D2.1, D2.2,
+  X1.1, X1.3, X1.5
+- **250 tys. – 2 mln PLN** (R&D wieloletni) — 3 funkcje: **D3.3 pełna kopia
+  świadomości, X2.4 Holonet, X2.5 pełna immersja sensoryczna**
+Koszt jednostkowy: **0,10–0,50 PLN/user/mies.** (0,30–1,00 przy funkcjach
+z API AI); utrzymanie **8–15 tys. PLN/rok**.
+
+**Rozkład kontroli własnej (własne / OSS / licencja):** dominująca wartość
+**42% / 33% / 25%** (18 funkcji) · **30% / 40% / 30%** przy funkcjach opartych na
+HAPI FHIR i AR (D1.1, D1.4, X2.1) · **33%** (D2.1, X1.4) · **39% / 0% / 61%** —
+**najniższa kontrola w całym zestawie**, funkcje blockchainowe D1.5 i X1.3
+(jedyna licencja zewnętrzna: **Hedera Hashgraph, 0,0001 USD/transakcja**) ·
+**50%** — X2.6 integracja z Digital Twin, najwyższa w zestawie.
+
+**⚠️ Trzy reżimy zgodności w kartach — w tym jeden sprzeczny sam ze sobą:**
+- HL7 FHIR R4 + certyfikat P1 NFZ (WSS) + zgodność z EHDS — D1.1, D1.4, D1.6.
+- RODO art. 9 + „MDR jeżeli software medyczny" — pozostałe 21 kart (formuła
+  warunkowa, **nierozstrzygająca** — to jest dokładnie ta luka, którą zamyka
+  #95, przypisując każdej funkcji twardy status).
+- **MiCA (Rozp. UE 2024 o rynkach kryptoaktywów) + AML/KYC dla tokenów + ⚠️
+  RODO art. 17 „prawo do bycia zapomnianym vs niezmienność blockchaina"** —
+  D1.5 i X1.3. To jest **wewnętrzna sprzeczność prawna zapisana wprost w karcie**
+  i niezależne uzasadnienie dla późniejszego odrzucenia Eternal Token (A16.6)
+  oraz NFT (A9.5) w #95.
+
+**Wartości merytoryczne, których nie ma w szablonie:**
+- **D1.2 historia badań:** *„Historia danych z lat = absolutny lock-in.
+  Użytkownik nie zmieni aplikacji tracąc historyczne dane."* (jedyna karta
+  z własnym opisem wpływu na retencję).
+- **D1.4 eksport:** udostępnianie linkiem **z TTL 24 h**; *„wzrost zaufania
+  lekarzy → referencje → akwizycja nowych użytkowników"*.
+- **D1.5 / funkcje AI:** Free 5 zapytań/dzień, Premium bez limitu; **konwersja
+  Free → Premium po 10 zapytaniach: 40%**.
+- **Personalizacja jako moat:** *„im dłużej użytkownik, tym lepsza AI dla niego.
+  Niemożliwe do replikacji od zera."*
+- **Timeline wspólny dla całego Twin/Matrix:** MVP Q4 2026 (EDM) · MLP Q3 2027
+  (Predykcyjny Twin) · FINAL 2029–2030 (Eternal Legacy) · SCI-FI 2040+ (kopia
+  świadomości).
+- **Ryzyko powtarzane w kartach:** *„certyfikacja MDR/IVDR może trwać
+  12–24 mies.; wczesna komunikacja z jednostką notyfikowaną (np. TÜV SÜD
+  Polska)"* — zaniżone wobec ustalenia z #90/#122 (**18–36 miesięcy**, a wąskim
+  gardłem jest kolejka, nie proces).
+- **Reguła redirectu 116 123 w kartach:** *„funkcja nie wymaga redirectu
+  kryzysowego, ale jeżeli AI wykryje sygnały kryzysu (np. w analizie tekstu),
+  automatyczne przekierowanie aktywuje się"* — ⚠️ to jest **automatyczne
+  wykrywanie kryzysu**, czyli wersja MDR klasy IIa wg #95 (A8.10), a nie wersja
+  ręczna dopuszczalna w MVP. Sprzeczność do usunięcia w dokumentach wyjściowych.
+
+## D067 — #134: SZESNAŚCIE MODUŁÓW TECHNICZNYCH — rozwiązanie agregowane / własne IP / koszt
+
+**⚠️ Najczystsze w korpusie zastosowanie zasady „kupuj funkcję, kontroluj
+interfejs" — dla każdego modułu podano co bierzemy z zewnątrz, co zostaje nasze
+i ile to kosztuje.** Dziewięć z szesnastu modułów ma koszt licencji **0 zł**.
+
+| # | Moduł | Rozwiązanie agregowane | Własne IP | Koszt |
+|---|---|---|---|---|
+| 1 | **Eternal Data Vault** (backend FHIR) | **Medplum** — otwarty serwer FHIR, certyfikowalny, zgodny z RODO i EHDS | definicja rozszerzeń schematu FHIR + precyzyjne polityki dostępu | **0 zł** self-hosted |
+| 2 | **Eternal Bridge** (wearables) | Terra API na wczesnym etapie → **przejście na własny fork Gadgetbridge** (surowe dane) | warstwa normalizująca do FHIR — *„bez tej transformacji dane z wielu źródeł pozostają niespójne"* | niski, zależny od liczby użytkowników w Terra |
+| 3 | **Eternal OCR Gateway** | **DocTR lub LayoutLMv3** (OSS), ewentualnie Google Vision API | **Medical Context Parser** — słownik synonimów, jednostek miar, reguły mapowania na FHIR | **0 zł** przy OSS |
+| 4 | **Eternal RAG** | LangChain + Pinecone (lub OSS) + **darmowe API PubMed i Cochrane** | **selekcja i nadzór nad bazą zweryfikowanych publikacji — „określa ramy wiedzy, którą system uznaje za poprawną medycznie"** | niski |
+| 5 | **Eternal Orchestrator** | LangChain lub **Flowise** | **algorytm priorytetyzacji rekomendacji — nadrzędność zaleceń kardiologicznych nad dietetycznymi; „rdzeń decyzyjny zapobiegający konfliktom agentów"** | **0 zł** |
+| 6 | **Eternal Translator** (Human-Insight) | **BioMistral-7B** lub Llama-3 na własnej budżetowej instancji GPU | prompty systemowe + reguły przekładu żargonu medycznego | niski (wynajem GPU) |
+| 7 | **Eternal ID** | **Solid Pods (Inrupt)** — zdecentralizowane przechowywanie u użytkownika, ułatwia obowiązki RODO | **zarządzanie kluczami szyfrującymi w standardzie post-quantum** + autoryzacja profilu | **0 zł** |
+| 8 | **Eternal Underwriting AI** (Shield B2B) | Stripe Connect + API ubezpieczycieli (**MGA**) | **algorytm Eternal Score — „podstawa monetyzacji w segmencie biznesowym"** | niski, prowizyjny |
+| 9 | **Eternal Agent Manager** | Flowise lub **LangFlow** | **definicje system promptów dla ról: kardiolog, dietetyk, pulmonolog — „ramy kompetencyjne modułów AI"** | **0 zł** |
+| 10 | **Eternal Digital Twin** (3D) | **Three.js + TensorFlow.js w przeglądarce — „eliminuje renderowanie po stronie serwera"** | **model predykcyjny starzenia biologicznego** trenowany na pozyskanych danych | **0 zł** |
+| 11 | **Eternal Audit Trail** | **Hyperledger Fabric** (OSS) lub publiczny testnet | struktura zapisu logów + weryfikacja podpisów — **niezaprzeczalny zapis decyzji AI** | **0 zł** |
+| 12 | **Eternal Notification Hub** | Firebase Cloud Messaging (darmowe limity) + Twilio (SMS) | **reguły dystrybucji i priorytetyzacji zapobiegające nadmiarowym komunikatom** | niski, zależny od wolumenu SMS |
+| 13 | **Eternal Analytics Dashboard** (B2B) | **Grafana + Metabase** ⚠️ *(uwaga: Grafana przeszła na AGPL-3.0 — zob. blokady licencyjne #90)* | szablony raportów zdrowotnych i analiz kohortowych dla partnerów | **0 zł** |
+| 14 | **Eternal Subscription Engine** | Stripe Billing | logika poziomów **Lite / Premium / Elite**, okresy próbne, kontrola uprawnień | niski, prowizja Stripe |
+| 15 | **Eternal Bio-Firewall** (API) | **WireGuard + OpenSSL** | system autoryzacji i dystrybucji kluczy dla podmiotów zewnętrznych | — |
+| 16 | **Eternal Mapping Engine** (jednostki, normy) | biblioteka **Pint** + standardowe słowniki norm | **Fuzzy Matcher — korekta błędów OCR, np. „Clukosa" → „Glukoza"** | — |
+
+**⚠️ DZIEWIĘĆ MODUŁÓW MVP z uproszczeniem wykonawczym (co konkretnie robimy
+w wersji pierwszej):**
+1. **Eternal Bridge** — TAK: **darmowy Apple HealthKit API + ręczne dodawanie
+   danych** (bez Terra na starcie).
+2. **Eternal Data Vault** — natychmiastowe wdrożenie gotowego Medplum.
+3. **Eternal Mapping Engine (OCR + FHIR)** — DocTR albo Google Vision +
+   **podstawowy autorski słownik synonimów**.
+4. **Eternal RAG** — LangChain + BioMistral + PubMed API.
+5. **Eternal Orchestrator** — ⚠️ **uproszczona logika: JEDEN agent (Internista)**,
+   nie zespół specjalistów.
+6. **Eternal Translator** — przełożenie wyników na prosty polski, *„kluczowy
+   element doświadczenia użytkownika"*.
+7. **Eternal ID** — Solid Pods **albo klasyczne logowanie e-mail + hasło dla
+   uproszczenia rejestracji**.
+8. **Eternal Score Engine** — TAK w wersji podstawowej: **proste reguły i progi
+   na standardowych normach laboratoryjnych, bez modelu predykcyjnego**.
+9. **Eternal Audit Trail** — **prosty mechanizm logowania w bazie danych**, bez
+   blockchaina.
+**Wzorzec MVP:** każdy moduł wchodzi w wersji najtańszej możliwej, a warstwa
+zaawansowana (Terra, model predykcyjny, wielu agentów, Hyperledger, Solid Pods)
+jest odłożona — zgodnie z zasadą deflacyjną z #54/#81.
+
+## D067–D070 — #147: ETERNAL ROADMAP v2 (realny) — 11 etapów, 276 epików, 1038 tasków, 3891 subtasków
+
+**TYLKO NOWE — struktura 66 bloków etap×sekcja i podział etapów 1–6 realne /
+7–11 [FIKCJA] są już w CZYT.md przy #133 i #145; poniżej to, czego tam nie ma.**
+
+**Hierarchia dokumentu:** Etap → Produkt @ etap dojrzałości → Sekcja (6) → Epik →
+Task → Subtask. Sześć sekcji stałych: **A Technologiczny · B Marketing ·
+C Finanse · D Prawno-biznesowe · E Operacyjny/HR · F Ekspansja modelu**.
+Skala: **66 bloków, 276 epików, 1038 tasków, 3891 subtasków** (dokument #133
+podawał inną skalę dla Master WBS: 133 epiki + 20 MS, 811 tasków — to dwa różne
+artefakty, nie rozbieżność).
+
+**⚠️ SZEŚĆ ETAPÓW REALNYCH — cel, produkty, rok, zespół, budżet:**
+
+| Etap | Cel | Produkty @ etap | Rok | Zespół | Budżet |
+|---|---|---|---|---|---|
+| **1. Planowanie MVP** | fundament: specyfikacja, architektura, walidacja koncepcji **PRZED napisaniem kodu produkcyjnego** | App @ MVP, Fundacja/Hub @ MVP | 2026 Q1–Q2 | **1–2 osoby: founder-technik + kontraktor godzinowy (UX/researcher). ZERO ETATÓW** | **0–500 USD/mies.** (Figma Free, GitHub Free); Lite MVP docelowo 150–200k PLN + 5k/mies. OPEX |
+| **2. Budowa Firmy MVP** | założyć spółkę, wypuścić App Lite MVP + satelity (Wearables Integrator, App Pet R&D). **Cel 1000 użytkowników Free** | App @ MVP, Pet @ MVP, Fundacja/Hub @ MLP | 2026 Q2–Q4 | 2–4 osoby (2 fullstack + founder/PM), **sprint tygodniowy, code review na PR** | — |
+| **3. Rozwój Firmy MLP** | App MLP (telemedycyna, e-Recepty, Smart Pharma-Locator) + R&D Station + App Pet MVP + Laboratoria | App @ MLP, Station @ MVP, Pet @ MLP | 2027 | 5–10 osób w 2–3 zespołach funkcjonalnych, **sprinty 2-tygodniowe, CI/CD, code review obowiązkowy** | **Premium MVP: 300–450k PLN** |
+| **4. Ekspansja MLP** | Station MVP→MLP, Smart Clothes, Ubezpieczenia, kilka rynków równocześnie | App @ MLP, Station @ MLP, Pet @ FINAL | 2027–2028 | 10–25 osób + lokalni partnerzy/kontraktorzy | Station MVP(Q1)→MLP(Q3) launch, **Shenzhen OEM** |
+| **5. Lobbing FINAL** | certyfikacje (**MDR IIa dla App, CVMP dla Mini Implant Pet**), lobbing u ubezpieczycieli/NFZ/regulatorów, przygotowanie Serii Seed | App @ FINAL, Capsule @ MVP, Twin @ MVP | 2028–2029 | **25–60 osób** + zewnętrzne kancelarie i firmy PR/lobbingowe na kontraktach | **Seria Seed 2–5 mln** |
+| **6. Rozwój Technologiczny FINAL** | Implant Human (**mleczany → glukoza CGM → multi-marker → Closed Loop**), Twin FINAL, start R&D AGI Medyczna i Nanoboty | App/Capsule/Twin/Station @ FINAL | 2029–2031 | **60–150 osób**, dedykowane zespoły R&D/hardware/data science | — |
+
+**Sekcje D/E/F per etap (konkret, którego nie ma w innych roadmapach):**
+- **1.D.LEG** — rejestracja Fundacji Eternal (Q1 2026, ~3 000 PLN), szablony
+  ToS/PP (Termly), zgłoszenie do PUODO. **Decyzja: wellness bez MDR — 9 funkcji
+  MDSW WYŁĄCZONYCH z MVP wg analizy MDCG 2019-11.**
+- **1.E.OPS** — narzędzia: Figma Free, GitHub Free, Notion Free, Google
+  Workspace. **1.F.EXP — „Brak ekspansji: jeden produkt (App Lite), jeden rynek
+  (Polska). Walidacja przed jakimkolwiek skalowaniem."**
+- **2.D.LEG** — zgody RODO (checkbox + timestamp + audit log), **pierwszy DPA
+  z Anthropic/Supabase**, Sp. z o.o.: Fundacja 51% + Założyciele 39% + ESOP 10%.
+  **2.E.OPS** — Hetzner VPS, Terra API sandbox, no-code gdzie możliwe.
+  **2.F.EXP** — App Pet R&D start Q4 2026 jako klon Lite: *„pierwszy dowód modelu
+  «kopiuj ekosystem na inny segment»"*.
+- **3.D.LEG** — jednostka notyfikowana MDR (TÜV SÜD/BSI), proces Class IIa
+  rozpoczęty (**⚠️ 50–150k PLN, 6–12 mies. — wartość zaniżona o rząd wielkości
+  wobec #90/#122**), ISO 13485 QMS. **3.E.OPS** — reserved instances (30–50%
+  taniej), automatyzacja QA, negocjacje stawek B2B. **3.F.EXP** — Laboratoria
+  (marketplace Synevo/uPacjenta, prowizja 5–15%), **Ubezpieczenia Scoring B2B
+  (PZU/Warta/AXA) — pierwsze rozmowy**.
+- **4.D.LEG** — **ISO 27001 (30–50k PLN)**, kontynuacja MDR IIa, zgłoszenia
+  UODO w kolejnych krajach UE. **4.E.OPS** — outsourcing lokalizacji i wsparcia,
+  cloud multi-region. **4.F.EXP** — Ubezpieczenia (pay-as-you-live), Mini Station
+  Pet launch, **rezerwacja pojemności multi-region**.
+- **5.D.LEG** — **9 funkcji MDSW pozostaje WYŁĄCZONYCH** (system trójkolorowy,
+  klasyfikacja norma/choroba, e-skierowanie, integracja EHR/EMR — wg MDCG
+  2019-11); **DPA ze wszystkimi procesorami (Anthropic, Voyage…)**.
+  **5.E.OPS — „compliance-as-a-service, partnerstwa badawcze z uczelniami zamiast
+  własnego R&D"**. **5.F.EXP — Eternal Holding GmbH (DE/EE): centralizacja IP
+  europejskiego**; Mini Implant Pet R&D→launch jako **walidacja przed człowiekiem**.
+
+**Stack per moduł MVP (etap 1, sekcja A — konkret wykonawczy):**
+- **1.A.M1 Onboarding & Bezpieczeństwo:** F1.1 rejestracja e-mail/Apple/Google
+  (OAuth 2.0) · F1.2 logowanie biometryczne · F1.3 zgody RODO (checkbox +
+  timestamp + log audytowy) · **F1.4 recovery codes — 10 jednorazowych,
+  AES-256-GCM, KDF Argon2id** · F1.5 PIN 6-cyfrowy fallback · F1.6 profil
+  podstawowy. Stack: **Firebase Auth** — *„najszybszy time-to-market, Google for
+  Startups credits"*.
+- **1.A.M2 Universal Sync:** F2.1 Apple HealthKit native (iOS) · F2.2 Google Fit
+  Health Connect (Android) · F2.3 **Terra API (Garmin, Oura, Fitbit, Whoop,
+  Polar)** · F2.4 mapowanie do **FHIR R4 Observation** · **F2.5 conflict
+  resolution — gdy dwa urządzenia mierzą to samo** · **F2.6 auto-sync co 15 min
+  w tle**. ⚠️ Wycena w dokumencie: *„Terra API $0,002/sync, do 100 users
+  $300/mies."* — **sprostowane w #108: Terra to plany od 399 USD/mies.**
+- **1.A.M3 OCR Badań (Polish Medical Context Parser):** F3.1 skan z aparatu
+  (UX jak CamScanner) · F3.2 upload PDF z Google Drive/Files · **F3.3 Tesseract 5
+  + polski model trenowany** · **F3.4 parser polskich wyników lab: Synevo,
+  Diagnostyka, ALAB** · **F3.5 mapowanie do kodów LOINC** · F3.6 alert gdy
+  parametr poza normą (⚠️ to jest funkcja graniczna wg #95 — A3.5).
+
+**⚠️ ETAPY 7–11 — JAWNIE OZNACZONE [FIKCJA], z ramką narracyjną, nie planem.**
+Każdy element ma prefiks `[FIKCJA]`, zespoły opisane jako *„postaci fabularne,
+nie realne stanowiska"*, a budżety jako *„punkt odniesienia z Macierzy, tu jako
+element fabuły"*. Zawartość: **Etap 9 Cyfrowa Nieśmiertelność (2045+)** —
+przeniesienie świadomości, R&D 100M+ PLN przez 20 lat, Eternal Vault Premium
+(*„wieczna kopia danych + awatar jako fabularny produkt kulminacyjny"*), dylemat
+**„czy kopia to nadal ty"**, tło: Human Brain Project EU · **Etap 10 Utworzenie
+Wielkiego Społeczeństwa (2040+)** — Holonet, wejście w wygenerowany świat
+(2042–2045, pełna immersja BCI + haptyka), **Interfejsy Materii (myśl → materia,
+2045+)**, kolektywna świadomość; stack [FIKCJA] Neuralink/HaptX; motyw
+**ostrzegawczy: „pytanie o granice technologii i wolność jednostki w świecie
+pełnej immersji"** · **Etap 11 Władza Absolutna (2050+)** — teleportacja,
+replikator, konwerter energia-materia, pełna gospodarka tokenowa.
+**⚠️ Kluczowe dla dokumentów wyjściowych: sam korpus określa etap 11 jako
+przestrogę, nie cel.** Marketing etapu 11: *„brak — etap istnieje wyłącznie jako
+przestroga narracyjna"*; sekcja prawna: *„finalny dylemat etyczny fabuły:
+koncentracja technologii = koncentracja władzy. **Etap zamykający z morałem, nie
+z rekomendacją**"*; ekspansja: *„kulminacja — wszystkie wątki technologiczne
+fabuły zbiegają się w pytaniu o odpowiedzialność"*.
+Realne punkty odniesienia wplecione w fikcję (do zachowania jako dane, nie jako
+plan): metawersum 1–3 mln PLN (zespół Unity) · prototypy Matrix 500k–2 mln PLN ·
+nanoboty platforma 50 mln+ PLN · komputery kwantowe/neuromorficzne (IBM Quantum,
+Google Quantum AI — licencja, dostęp chmurowy, drug discovery dla Big Pharma) ·
+fotonika/spintronika 2035 · biodruk organów 2035.
+
+## D070–D071 — #149, #150, #153, #155: warianty roadmapy v3 i v5
+
+**#149** — plik-skorupa (spis treści etapów 7–11, sekcja „9. Źródła"), bez treści
+merytorycznej.
+
+**#150 — dodatek z epikami strategicznymi SF dla etapów 7–11.**
+⚠️ **POZOSTAJE POZA ZAKRESEM OPRACOWANIA.** Zawiera epiki: 7.A.POL (partia,
+infrastruktura polityczna i propagandowa), 7.A.AI (centralny system kontroli AI),
+8.A.GOV i 8.A.GOV2 (globalny system zarządzania AI, gubernatorzy), 9.A.CON
+(transfer świadomości), 9.A.AND (androidy), 10.A.MAT, 10.A.SOC, 11.A.FIN
+(globalny system finansowy bez pieniędzy), 11.A.SPACE, **11.A.DIG (cyfrowa
+tożsamość i globalny system kontroli)**.
+Sam dokument opatruje je zastrzeżeniem: *„Tryb SF / worldbuilding: elementy
+takie jak kontrola AI, propaganda, globalne zarządzanie i cyfrowa tożsamość są
+opisane jako **motywy dystopijne, konflikty fabularne i ostrzeżenia**. To nie są
+realne instrukcje wdrożeniowe, polityczne, propagandowe, medyczne ani
+operacyjne."* oraz *„Funkcja: konkretne sceny, konflikty, symbole i konsekwencje
+świata przedstawionego. Nie jest to plan realnego wdrożenia."*
+**Konsekwencja dla dokumentów wyjściowych: ta warstwa nie jest przenoszona ani
+przeredagowywana — zostaje usunięta,** zgodnie z instrukcją zapisaną w samym
+korpusie. Struktura dodatku jest odwracalna (*„po usunięciu tej sekcji wraca
+dokładnie oryginał"*), więc usunięcie nie narusza pozostałej treści.
+
+**#153 — Roadmap v3: ta sama struktura co v2, ale task dostaje siedem pól.**
+`Task (Kto / Kiedy / Czas trwania / Koszt / Redukcja / Use case / Compliance)`.
+To jest jedyna wersja roadmapy z **przypisaniem ról** i jedyna z **jawnym polem
+zgodności per task** (*„weryfikacja względem Katalogu Compliance —
+RODO/MDR/ISO/HIPAA/FDA/EHDS"*).
+**Pięć ról wykonawczych w sekcjach B–F:** Analityk Finansowy (sekcja C) ·
+Marketing Specialist / Growth (B) · Radca Prawny / Compliance Officer (D) ·
+People Ops Manager (E) · Business Development Manager (F).
+**Czasy trwania per typ zadania:** kampania marketingowa 1–2 tyg. (3–4 tyg.
+w etapach późnych) · negocjacja kosztów 3–5 dni (2 tyg. w etapach późnych) ·
+dokumentacja prawna 1 tydz. (**do 6+ tyg. przy certyfikacji**) · zadanie HR
+1 tydz. (1 mies. przy zespole 60–150 osób) · ekspansja 2 tyg. (1–2 mies. przy
+wejściu na rynek US).
+
+**⚠️ Budżet etapu 6 (2029–2031) — najkonkretniejsze widełki warstwy Capsule
+w całym korpusie:** Mini Implant Human MVP **2–3 mln PLN** → Implant Glukoza CGM
+**5–10 mln** → Multi-marker **10–20 mln** → **Closed Loop Final 15–50 mln PLN
+(partnerstwo Big Pharma: Medtronic, Abbott)** → AGI Medyczna R&D **50 mln+ PLN**.
+Redukcja kosztów w tym etapie: **współdzielona infrastruktura GPU, granty
+badawcze (Horizon Europe), open-source rdzeń dla kontrybutorów**.
+**Zgodność etapu 6:** *„MDR Class III + 1000 pacjentów + 3 lata badań klinicznych
+dla Closed Loop. Biodegradowalność wymagana. HIPAA-ready (USA expansion).
+**SOC 2 Type II (50–100k USD, wymagany przez US enterprise)**."*
+**Ekspansja etapu 6:** US Corp (Delaware C-Corp) przygotowanie do założenia
+(2030+), **Seria A 15–30 mln USD (a16z, Founders Fund, Khosla)**.
+**Budżet etapu 2 (uszczegółowiony):** Eternal Labs Sp. z o.o. założona
+(~6 000 PLN + 10 000 PLN/rok obsługa) · Lite MVP 150–200k PLN + 5k/mies. OPEX ·
+**Eternal Wearables Integrator 20 tys. PLN (licencje API)**.
+**Kanały marketingowe etapu 2:** *„pierwsze kampanie testowe (organiczny
+Instagram/TikTok), lista mailingowa, community seed (Discord)"*; wzorzec kanałów
+dla wszystkich etapów: **organiczne → płatne → B2B/PR**.
+
+**#155 — Roadmap v5-SHORT: wyłącznie etapy 1–6.**
+⚠️ **To jest wersja, którą należy przyjąć za wzorzec dla roadmapy HTML** —
+*„Etapy 7–11 (fikcja/worldbuilding SCI-FI) zostały celowo pominięte w tym
+pliku"*. Potwierdza, że rozdzielenie warstwy realnej od fabularnej zostało już
+w korpusie wykonane i istnieje gotowy plik bez warstwy wykluczonej.
+Dwie cechy dodatkowe v5: **dwa harmonogramy** (podstawowy oraz alternatywny
+start 2030 wg Macierzy sek. 10) · **alternatywne ścieżki technologiczne Tor A /
+Tor B z porównaniem koszt / kontrola / szybkość / dokładność** dla kluczowych
+potrzeb ekosystemu.
+Tabela etapów v5: 1 Planowanie @ MVP · 2 Budowa Firmy @ MVP · 3 Rozwój Firmy
+@ MLP · 4 Ekspansja @ MLP · 5 Lobbing @ FINAL · 6 Rozwój Technologiczny @ FINAL —
+wszystkie oznaczone **„realny"**.
+
+## D071–D076 — #148 (Master 3.0, 183 karty) i #KARTY (klasy komponentów K01–K28)
+
+### #148 — kompletna specyfikacja funkcjonalno-techniczna, 183 karty
+
+**⚠️ USTALENIE O JAKOŚCI ŹRÓDŁA.** Po deduplikacji z 183 kart zostaje niewiele
+treści unikalnej: pola **„Własne IP / Moaty" i „Persona wiodąca" są puste we
+wszystkich kartach**, „Cel (1 zdanie)" wypełniony w ok. 10, „Problem" w ok. 25,
+a pole „Software / AI" ma **tylko 12 różnych wartości na 183 karty** (173 karty
+mają je puste). To znaczy, że deklaracja „185 funkcji rozpisanych w 9 sekcjach"
+opisuje **strukturę, nie zawartość** — i uzasadnia wniosek z #116: *„masz 185;
+problem nie polega na tym, że masz za mało"*.
+
+**⚠️ POTWIERDZENIE BŁĘDU MIESZANIA KART (zgłoszonego wcześniej w korpusie).**
+Karta **A1.1 „Synchronizacja Terra API"** ma wpisane: Software/AI = *„Unity
+(OSS), ARKit/ARCore, własny backend metawersum"*, a „Co widzi klient" = *„w AR:
+nakładki na otoczenie z parametrami zdrowia"* i interakcja = *„gesty
+w przestrzeni 3D"*. To treść karty X2.1/X2.3, nie funkcji pobierania danych
+z API. **Defekt jest w pliku źródłowym — do usunięcia, nie do przeniesienia.**
+
+**Dwanaście rzeczywistych stacków w całym katalogu:** HAPI FHIR (Apache 2.0)
++ własny mapper · **Google DocAI (MVP) / Tesseract fine-tuned (MLP) / własny CNN
+(FINAL)** — trójstopniowa ścieżka OCR · BioMistral 7B fine-tuned na polskim
+korpusie medycznym · Three.js (MIT) + własny model Causal AI · LiveKit WebRTC
+(Apache 2.0) + własny backend telemedyczny · OpenAI Whisper (MIT) + własny
+pipeline transkrypcji · Discourse (GPL-2.0) + własna moderacja AI ·
+**ESP-IDF (Apache 2.0) + własny firmware Station** · Hedera Hashgraph SDK
++ własny smart kontrakt · własny model ML (TensorFlow/PyTorch) fine-tuned na
+polskich danych · własny stack Node.js/Python + PostgreSQL + Redis · Unity +
+ARKit/ARCore (karta wadliwa, zob. wyżej).
+
+**Ceny licencji w kartach (do zestawienia z korektami z #90/#108):**
+Terra 0,002 USD/sync ⚠️ *(sprostowane: 399–499 USD/mies.)* · **Pinecone
+70 USD/mies. starter** · LLM 0,0005 USD/1k tokenów · **Google DocAI 1,5 USD/1k
+stron** · Hedera 0,0001 USD/transakcja · LiveKit 15 USD/mies.
+**Koszt utrzymania rocznego — trzy poziomy:** **15 000 PLN/rok** (37 funkcji,
+dominujący) · **20 000 PLN/rok** (16 funkcji) · 30 000 i 100 000 PLN/rok
+(pojedyncze, warstwa sprzętowa/certyfikowana) · 2 000–10 000 PLN/rok (funkcje
+proste).
+
+**⚠️ GRAF ZALEŻNOŚCI MIĘDZY FUNKCJAMI (pole „Zasila / Czerpie z") — to jest
+najcenniejsza warstwa #148, bo nie występuje w żadnym innym pliku.** Wybrane
+krawędzie:
+- **OCR/dokumenty → FHIR A1.5, EDM D1.1, Twin D2.2, Scoring A16.7** ← aparat,
+  DocAI, PubMed.
+- **Station S1–S2 (pomiary) → telemedycyna A5.1, eskalacja A14.1**;
+  **EKG → Dashboard A3.1, EDM D1.1, Twin D2.2** ← sensory OEM (AD8232, MAX30102).
+- **Capsule Bio-Monitor C2.x + pompy MEMS → zamknięta pętla terapeutyczna ze
+  Station** (to jest jedyne miejsce, w którym Closed Loop jest opisany jako
+  krawędź grafu, a nie jako produkt).
+- **Twin D2.x + hardware AR/VR → pełna immersja Matrix**.
+- **EDM D1.1 + Capsule + Station + App → rekomendacje A6.6 i awatar Matrix X2.6.**
+- **Pełna historia życia użytkownika → spadkobiercy (Legacy) i awatar po
+  śmierci.**
+- **Katalog IP + sieć partnerów → monetyzacja ekosystemu i partnerstwa B2B**
+  (Forge).
+- **Zgłoszenia zewnętrznych innowatorów → rozwój IP ekosystemu i pipeline R&D**
+  (Hub).
+- **Wearables + dziennik + EEG → telemedycyna A5.x i Crisis redirect 116 123.**
+- **DNA + OCR badań + Causal AI → Marketplace auto-order i Station Auto-Refill
+  S3.4** (to jest krawędź, która czyni z suplementacji funkcję graniczną).
+- Powiadomienia A14 opisane jako *„zasila wszystkie moduły — warstwa
+  notyfikacji"*.
+**Wniosek:** dwa węzły mają najwyższy stopień wejścia — **EDM D1.1** i **Digital
+Twin D2.2**; każda ścieżka danych kończy się w jednym z nich. To potwierdza
+ustalenie z innego pliku: *„D1 to nie jest moduł Twin, to FUNDAMENT; Twin jest
+jednym z konsumentów, nie właścicielem"*.
+
+**Zastrzeżenie SCI-FI powtarzane w kartach:** *„Faza SCI-FI wymaga R&D 10–20 lat.
+Partnerstwa naukowe z uczelniami i instytutami badawczymi. Granty NCBR / Horizon
+Europe."*
+
+### #KARTY — klasy komponentów K01–K28: wariant A/B/C, próg wyjścia, mechanizm kontroli
+
+**⚠️ To jest najbardziej operacyjna wersja tabeli 28 klas — z rekomendacją „co
+robimy w dniu 1" dla każdej klasy.** W korpusie obecne 25 z 28 klas
+(**brakuje K10, K19, K24** — wg listy z #90 to tożsamość/zgody, płatności i TTS;
+do uzupełnienia).
+
+**Klasy, z których NIGDY nie wychodzimy (wariant własny od początku):**
+**K02 model danych i mapowanie FHIR** — *„mapowanie zawsze własne; serwer
+wymienialny, mapper nie"*; kontrola: wersjonowanie semantyczne, pola
+zarezerwowane, **jedna osoba z prawem weta na zmiany** · **K22 firmware
+i BLE** — *„nigdy nie wychodzimy z własnego firmware"*; start: moduł OEM +
+własny firmware, **zacząć od Pet Bio-Tag (brak ściany MDR)** · **K23 silnik
+reguł** — *„własny silnik reguł: prosty, jawny, wersjonowany"* · K03 storage —
+*„nie wychodzimy, zmieniamy hostingodawcę, nie technologię"*; **rezydencja UE
+obowiązkowa, backup w drugiej lokalizacji UE, klucze u nas, nie u dostawcy**.
+
+**Klasy z liczbowym progiem wyjścia:** K01 wearables — **3 000 zł/mies. LUB
+5 000 aktywnych userów, co nastąpi pierwsze** · K04 OCR — **2 000 zł/mies. LUB
+moment wejścia funkcji do dossier wyrobu** · K05 LLM — 2 500 zł/mies. ·
+K07 transkrypcja — **2 400–3 000 godzin nagrań miesięcznie** · K17 mapy —
+800 zł/mies. · K25 rozpoznawanie obrazu — 2 000 zł/mies.
+
+**Rekomendacje „na dzień 1" (najkrótsza lista decyzji wykonawczych w korpusie):**
+- **K01:** HealthKit + Health Connect od dnia 1; **Terra dopiero gdy klient B2B
+  zażąda Garmina/Oura**. Warianty B z cenami: Terra ~399–499 USD/mies. (~100 tys.
+  kredytów, ~200 kredytów/usera/mies.) · **Rook 399 USD/mies. do 750 userów** ·
+  **Junction/Vital 0,50 USD/user/mies., min. 300 USD**. Wariant C: własne
+  adaptery na **profilach Bluetooth SIG GATT (Heart Rate, Weight Scale, Glucose,
+  Blood Pressure, CGM) — protokoły publiczne, bez opłat**.
+  Mechanizm kontroli: *„rdzeń nigdy nie woła API dostawcy — zawsze przez adapter;
+  dwa źródła równoległe dla tego samego parametru"*.
+- **K02:** Medplum self-host + własny mapper. (B: **Aidbox od ~1 000 USD/mies.**,
+  Firely Server, Google Cloud Healthcare API per call.)
+- **K03:** Hetzner UE od dnia 1; **AWS dopiero gdy klient B2B zażąda tego
+  w umowie** (AWS/GCP/Azure **3–6× drożej przy tej skali**).
+- **K04:** **Document AI (procesor formularzowy) + własny parser od dnia 1**
+  (~1,5 USD/1000 stron OCR podstawowy, **~30 USD/1000 procesor formularzowy**).
+- **K05:** Gemini Flash lub GPT-4o-mini; self-host dopiero przy dużym ruchu.
+  Wariant C: **„brak sensownej opcji własnej — trening modelu językowego to setki
+  tysięcy"**.
+- **K06:** **pgvector w istniejącym PostgreSQL — „zero nowych zależności"**.
+- **K07:** gpt-4o-mini-transcribe + własny słownik — **„najtańszy start w całym
+  projekcie"**.
+- **K08:** Jitsi self-host. **K09:** FCM + SendGrid. **K11:** Recharts.
+  **K13:** Discourse self-host. **K18:** WeasyPrint. Wszystkie: zero kosztu.
+- **K12 grafika 3D/AR:** Three.js; **„nie wchodzimy w Unity bez wyraźnej
+  potrzeby — to jedyna zależność bez substytutu w stacku"**; odłożyć do czasu,
+  gdy Twin ma sens biznesowy.
+- **K14:** IMGW + GIOŚ — darmowe i publiczne. **K15:** USDA (public domain)
+  + własna baza PL budowana przez userów; **ODbL wymaga ostrożności**.
+  **K16:** MediaPipe — **„omijać OpenPose i wger"**. **K17:** OSM + Leaflet
+  + własna baza punktów. **K26:** Espacenet + GitHub API.
+- **K20 integracja P1:** *„nie wychodzimy — nie ma dokąd"*; **odłożyć do momentu,
+  gdy jest podmiot leczniczy**.
+- **K21 marketplace i afiliacja:** *„nie dotyczy — to przychód, nie koszt"*;
+  **Dietly przez Circlewise OD ZARAZ (darmowe dla wydawcy, model CPS) — „zero
+  negocjacji, przychód od pierwszego miesiąca"**; Maczfit przez MyLead
+  **3,20% CPS**; suplementy **~30% prowizji**; docelowo własny marketplace
+  w Forge.
+- **K27:** Notion/Airtable na start, własne dopiero przy skali.
+- **K28 moduł certyfikowany:** wariant A **nie istnieje** — *„moduł certyfikowany
+  nie może być złożony z przypadkowych komponentów OSS"*; B: **proxy do cudzego
+  wyrobu z CE przez API — Labplus, ma API i partnerstwa z Diagnostyką i Synevo**;
+  C: własny wyrób (dossier, ISO 13485, PRRC, UDI, EUDAMED, ocena kliniczna).
+  Próg: *„nie dotyczy — to decyzja strategiczna, nie kosztowa"*.
+  **Rekomendacja: proxy na start, własny wyrób dopiero przy przychodzie B2B.**
+
+### ⚠️ D074–D076 — KATALOG GRANICY MDR PER FUNKCJA (183 karty scalone, format Master 3.1)
+
+**To jest najważniejszy artefakt operacyjny w całym korpusie i nie występuje
+w żadnym innym pliku.** Każda ze 183 funkcji dostaje cztery pola rozstrzygające:
+`Dlaczego nie jest MDR` · `Kiedy staje się MDR` · `Bezpieczne sformułowanie` ·
+`Wersja wellness / Wersja medyczna / Klasa docelowa / Realny termin`, plus
+przypisanie do klasy komponentu K01–K28. Przykład kompletny:
+
+> **A3.5 — Trójkolorowe alerty** [komponent: **K28 moduł certyfikowany**]
+> Status: **4. MDSW — wyrób medyczny (MDR)** · Dlaczego nie jest MDR: **„BRAK
+> wersji bezpiecznej w tej formie"** · Kiedy staje się MDR: **„ZAWSZE — próg
+> fizjologiczny z eskalacją = reguła 11"** · Bezpieczne sformułowanie: *wellness:
+> „zmiana o 30% względem Twoich ostatnich 10 pomiarów"* · wersja wellness:
+> zmiana wzgl. własnej historii → wersja medyczna: alert progowy z eskalacją ·
+> klasa **IIa** · realny termin **2030+**.
+
+**⚠️ CZTERDZIEŚCI PIĘĆ REGUŁ „KIEDY FUNKCJA STAJE SIĘ WYROBEM" — pełna lista
+deduplikowana** (to jest lista kontrolna do każdego przeglądu przeznaczenia):
+gdy **dodasz ocenę** · gdy **wartościujesz („gorszy niż")** · gdy oceniasz
+względem **progu fizjologicznego** · gdy nanosisz **zakres normy z własną oceną** ·
+gdy **walidujesz wpis względem normy klinicznej** · gdy „walidacja" oznacza
+sprawdzenie względem normy · gdy dashboard **sam sygnalizuje nieprawidłowość** ·
+gdy **OCR dodaje interpretację** odczytanej wartości · gdy przy imporcie
+**oceniasz zawartość** · gdy **mapowanie zmienia znaczenie kliniczne** · gdy
+w trakcie mapowania **interpretujesz znaczenie** · gdy system **sam rozstrzyga,
+która wartość jest prawdziwa** · gdy **rozstrzygasz konflikt medyczny między
+źródłami** · gdy **chatbot ma dostęp do danych użytkownika** · gdy odnosisz się
+do **WYNIKU tego pacjenta** · gdy odnosi się do **konkretnego pacjenta** · gdy
+**uzasadniasz danymi pacjenta** · gdy **formułujesz wniosek przyczynowy** · gdy
+**raport zawiera wnioski** · gdy **ankieta prowadzi do wniosku diagnostycznego** ·
+gdy **deklarujesz cel diagnostyczny** · gdy **cel jest kliniczny** · gdy
+**deklarujesz dokładność pomiarową** · gdy urządzenie **mierzy parametr życiowy
+z oceną** · gdy **analizujesz treść / nagranie klinicznie** · gdy **tłumaczysz
+treść kliniczną bez weryfikacji** · gdy **treść komunikatu jest oceną stanu** ·
+gdy **komunikat odnosi się do stanu zdrowia usera** · gdy **reaguje na dane
+zdrowotne** · gdy **plan jest dla osoby przewlekle chorej** · gdy **dostosowany
+do jednostki chorobowej** · gdy **personalizujesz pod jednostkę chorobową** · gdy
+**dostosowujesz zalecenie zdrowotne** · gdy **zalecasz dawkę pod stan zdrowia** ·
+gdy **sugestia wynika z wyniku badania** · gdy **analizujesz interakcje leków** ·
+gdy **system ocenia stan psychiczny** · gdy **wykrywa pogorszenie i eskaluje** ·
+gdy **system SAM wykrywa kryzys** · gdy eskalacja jest **automatyczna na
+podstawie oceny stanu** · gdy **gamifikujesz parametry kliniczne** · gdy **TY
+tworzysz dokumentację** (a nie dostarczasz narzędzia klinice).
+Osobno: **„Nie dotyczy. Inny reżim: wymaga wpisu do RPWDL"** (funkcje usługowe).
+
+**⚠️ PIĘĆDZIESIĄT DWA „BEZPIECZNE SFORMUŁOWANIA" — gotowe zdania do interfejsu**
+(dokładnie ta warstwa, której brakowało w Master 3.0; do przeniesienia do
+specyfikacji bez zmian):
+- **Pomiary:** *„Tętno: 78"* TAK / *„Tętno w normie"* NIE · *„Zapisano wartość
+  5,4 mmol/l"* · *„Twoje 10 ostatnich pomiarów"* — **bez linii normy** ·
+  *„Twoje pomiary z 7 dni"* — tabela, **bez podsumowania oceniającego** ·
+  *„Wizualizacja Twoich pomiarów"* — bez deklaracji klinicznej.
+- **Wyniki i OCR:** *„CRP to białko ostrej fazy"* TAK / *„Twoje CRP jest
+  podwyższone"* NIE · *„Odczytano: CRP 12 mg/l. Sprawdź poprawność"* ·
+  *„Odczytano: metformina 500 mg 2× dz."* · *„Czy odczyt jest poprawny?"* —
+  pytanie do użytkownika, nie ocena · *„Poprawiono wpis. Poprzednia wartość
+  zachowana w historii"* · **konflikt źródeł:** *„Dwa wyniki z 12.03, różne
+  metody — pokazujemy oba"* (nie rozstrzygamy).
+- **Środowisko:** *„Dziś PM10: 85 µg/m³"* TAK / *„Źle dla Twojej astmy"* NIE ·
+  *„Spadek ciśnienia atmosferycznego o 12 hPa"* · **korelacja bez przyczynowości:**
+  *„W dni o niższym ciśnieniu spałeś średnio 40 min krócej"*.
+- **Porównania populacyjne:** *„Średnia dla grupy 40–49: 5,2"* — **bez oceny
+  Twojej pozycji**.
+- **Plany:** *„Dieta śródziemnomorska"* TAK / *„Dieta dla cukrzycy"* NIE ·
+  *„Plan dla początkujących"* bez odniesienia do chorób · *„Witamina D3 —
+  informacje"* bez zalecenia dawki · *„Szacunkowo ok. 450 kcal — zweryfikuj"* ·
+  ⚠️ **„twarde limity ze względu na zaburzenia odżywiania"**.
+- **Profilaktyka:** *„Wg wytycznych dla Twojego wieku badanie co 3 lata.
+  Ostatnie: 2023"*.
+- **Zdrowie psychiczne:** *„Zapisano nastrój: 3/5"* · wellness: **pokazanie HRV
+  i snu bez wniosku** · wellness: ankieta o samopoczuciu **bez wniosków** ·
+  wellness: przycisk **„zadzwoń do bliskiej osoby" bez oceny** · **116 123:
+  numer zawsze dostępny + wywołanie przez użytkownika; „twarde reguły
+  przekierowania, bez detekcji stanu"**.
+- **Eskalacja:** ⚠️ **„112 NIE MA API — tylko rodzina i lekarz"**.
+- **AI:** **„separacja architektoniczna kontekstu, nie prompt"** · *„wsparcie
+  decyzji człowieka z prawem do wyjaśnienia"*.
+- **Proxy zamiast własnego wyrobu:** **PROXY do Infermedica (ma CE)** dla
+  triage/symptom checkera · **PROXY do certyfikowanego urządzenia EEG** ·
+  partnerstwo sprzedażowe z producentem.
+- **Marketplace i handel:** *„rezerwacja w aptece + OTC"* · **„płatna widoczność
+  zamiast prowizji per wizyta"** · katalog **bez powiązania z danymi
+  zdrowotnymi** · **„sprzedajesz narzędzie, nie usługę dokumentacyjną"**.
+- **Gamifikacja:** **„nie gamifikować wartości medycznych"**.
+- **Bez wersji bezpiecznej (trzy przypadki):** *„Brak. Albo budujesz, albo nie
+  ma"* · *„Brak. Wymaga kohorty podłużnej"* (predykcja ryzyka) · *„BRAK wersji
+  bezpiecznej w tej formie"* (trójkolorowe alerty).
+
+**Pięćdziesiąt kilka uzasadnień „dlaczego to nie jest wyrób" — wzorzec:**
+wszystkie sprowadzają się do jednego z sześciu typów czynności: **transport
+i zapis** (magazyn danych, archiwizacja, eksport/import pliku, zapis rozmowy,
+nagrywanie — *„zapis, nie analiza"*, transkrypcja — *„zamiana mowy na tekst"*,
+transport wideo — *„decyduje lekarz"*) · **prezentacja** (wykres wartości
+w czasie, zestawienie danych, wyświetlanie na żywo, wizualizacja danych, które
+user już ma) · **czynność techniczna** (konwersja jednostek, wykrywanie
+duplikatów **technicznych**, poprawa błędów rozpoznawania znaków, korekta **na
+żądanie użytkownika**) · **informacja ogólna** (dane publiczne o pogodzie
+i powietrzu, treści edukacyjne, kalendarz wg publicznych wytycznych, informacja
+o składniku, katalog produktów) · **pośrednictwo** (pośrednictwo handlowe,
+program partnerski, platforma, usługa lokalizacyjna, narzędzie dla kliniki —
+**„ona jest wytwórcą EDM"**) · **treść użytkownika** (forum, grupa dyskusyjna,
+zapis samooceny, użytkownik wpisuje własne dane, rozmowa wspierająca bez oceny).
+Osobno: **weterynaria — poza MDR** (i **ISO 11784/11785** dla transpondera).
+
+**Pola scalone z kart (do specyfikacji):** każda karta ma teraz `Status
+regulacyjny (Master 3.1)` z czterostopniowej skali, `komponent: K01–K28`,
+`% Kontroli`, `Koszt/user/mies` i `Timeline`. **Wskazane w kartach duplikaty do
+scalenia:** *„Duplikat A2.4 — połączyć"* (A6.4) · *„X1 duplikuje A9 — scalić"*.
+Odrzucenia z uzasadnieniem: **„Odrzucone — MiCA"** (token/NFT) ·
+**„Odrzucone — R&D"** (funkcje poza horyzontem).
+
+**⚠️ Reguła proxy (K28, mechanizm kontroli) — warunek, pod którym cała strategia
+„proxy zamiast dossier" działa:** *„Proxy działa tylko gdy **NIE modyfikujesz
+wyniku** i **wskazujesz producenta**. Modyfikacja = jesteś producentem."*
+To jest najkrótsze sformułowanie granicy między integratorem a wytwórcą i wiąże
+się bezpośrednio z ustaleniem z #108 (przy integracji przez API odpowiedzialność
+za certyfikację produktu końcowego pozostaje po stronie integratora).
+
+**Konwersja z karty A1.1 (jedyna liczba konwersji w kartach):** *„driver
+konwersji Free → Premium; konwersja po pierwszym użyciu OCR/agregacji: **25–35%**
+wg analogów rynkowych (Health2Sync, Vivante)"*. ⚠️ Zestawić ze sprostowaniem
+z wcześniejszej części korpusu: **konwersja freemium w healthtech ≈ 3,9%** —
+25–35% dotyczy konwersji **po użyciu funkcji**, nie konwersji z całej bazy.
+
+---
+
+# ODCZYT KORPUSU ZAKOŃCZONY
+
+**Przeczytano D001–D076 — cały zdeduplikowany strumień odczytu (159 plików,
+28 618 387 znaków surowo → 13 020 154 po deduplikacji).** Dziennik ustaleń liczy
+ponad 12 900 linii i zawiera wyłącznie treść nową względem wcześniejszych
+fragmentów; powtórzenia zostały odfiltrowane zgodnie z poleceniem *„cała treść
+z każdego pliku, następnie usuń duplikaty i powtarzającą się 1:1 treść"*.
+
+## Dokumenty obowiązujące (hierarchia dla materiałów wyjściowych)
+
+| Zakres | Dokument obowiązujący | Zastępuje |
+|---|---|---|
+| Specyfikacja | **#90 Master 3.1** (+ odniesienia do Master 4.1 w #122) | Master 3.0 (#148) |
+| Funkcje aplikacji ze statusem | **#95 Specyfikacja funkcjonalna App** + katalog granicy MDR (D074–D076) | karty #129, #148 |
+| Rejestr funkcji ekosystemu | **#51 Rejestr scalony — 299 funkcji / 42 moduły** | wersje 265, 239, 309 |
+| Liczby aplikacji | **#83 — 160 funkcji / 23 moduły** | „141", „161", „115", „169" |
+| Biznesplan | **#122 Biznesplan 4.0** | biznesplan 2.0 i 3.0 |
+| Roadmapa | **#116 Roadmapa Wykonawcza 2.0**; dla HTML wzorzec zakresu: **#155 v5-SHORT (etapy 1–6)** | roadmapy v2–v5, etapy 7–11 |
+| Klasy komponentów | **#KARTY K01–K28** (A/B/C, próg wyjścia, mechanizm kontroli) | tabele komponentowe w #90 i #81 |
+| Moduły techniczne | **#134 — 16 modułów, rozwiązanie agregowane / własne IP / koszt** | — |
+
+## Materiał wykluczony z opracowania
+
+Warstwa sterowania zachowaniem ludzi, wpływu na decyzje wyborcze, oddziaływania
+podprogowego, chipa behawioralnego i niejawnego podawania nanotechnologii
+pozostaje poza zakresem. Pliki **#141, #142, #143** oraz części **#137** i **#130**
+odnotowano wyłącznie jako notę wykluczeniową. Epiki z **#150**: 7.A.CHIP, 7.A.POL,
+7.B.PROP, 7.A.AI, 7.F.EXP, 8.A.GOV, 8.A.GOV2, 8.D.LEG, 9.A.CON, 11.A.DIG,
+11.A.FIN. Sam korpus opisuje tę warstwę jako *„motywy dystopijne, konflikty
+fabularne i ostrzeżenia… nie są to realne instrukcje wdrożeniowe"* (#150) oraz
+argumentuje przeciw niej ekonomicznie (#54: *„zeruje w dniu ujawnienia jedyne
+aktywo, które rosło przez dekady"*). Struktura #150 jest odwracalna — usunięcie
+tej sekcji przywraca oryginał bez naruszenia pozostałej treści.
+
+## Następny krok
+
+Przebudowa materiałów wyjściowych na podstawie tego dziennika, z zachowaniem
+reguły formatów: **specyfikacja i biznesplan → docx · roadmapa → html · pitch
+decki → pptx**, plus indeks.

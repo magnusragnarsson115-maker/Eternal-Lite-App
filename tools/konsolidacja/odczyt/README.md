@@ -11,9 +11,20 @@ surowo → 13 020 154 po deduplikacji) prowadzonego zgodnie z poleceniem:
 
 ## Stan odczytu
 
-Przeczytane i zalogowane: **D001–D059** oraz początek **D060** (pliki #33, #39).
-Pozostaje: reszta **D060** i **D061–D076** (pliki #51, #54, #65, #81, #83, #90,
-#95, #108, #109, #116, #122, #129, #134, #147–#150, #153, #155 i kontynuacje).
+**ZAKOŃCZONY.** Przeczytano i zalogowano cały strumień **D001–D076**.
+
+### Dokumenty obowiązujące dla materiałów wyjściowych
+
+| Zakres | Dokument obowiązujący | Zastępuje |
+|---|---|---|
+| Specyfikacja | #90 Master 3.1 (odniesienia do Master 4.1 w #122) | Master 3.0 (#148) |
+| Funkcje App ze statusem | #95 + katalog granicy MDR (D074–D076) | karty #129, #148 |
+| Rejestr funkcji ekosystemu | #51 — 299 funkcji / 42 moduły | wersje 265, 239, 309 |
+| Liczby aplikacji | #83 — 160 funkcji / 23 moduły | „141", „161", „115", „169" |
+| Biznesplan | #122 Biznesplan 4.0 | biznesplan 2.0 i 3.0 |
+| Roadmapa | #116 Roadmapa Wykonawcza 2.0; zakres HTML wg #155 v5-SHORT | roadmapy v2–v5, etapy 7–11 |
+| Klasy komponentów | #KARTY K01–K28 | tabele w #90 i #81 |
+| Moduły techniczne | #134 — 16 modułów | — |
 
 ## Wykluczenie
 
