@@ -19,6 +19,17 @@ NOTA=[
  "(FINAL przed UNIKAT, UNIKAT przed SUROWIEC), dlatego brzmienie pochodzi z wersji najnowszej.",
  "Znaczniki luk pozostawione w treści źródłowej (np. [BRAK]) nie są usuwane — luka widoczna jest tańsza "
  "niż luka zamaskowana.",
+ "CZĘŚĆ 0C powstała inaczej niż reszta dokumentu. Nie jest przeniesieniem bloków, tylko wynikiem odczytu "
+ "całej treści wszystkich 159 plików korpusu — 28 618 387 znaków surowo, 13 020 154 po usunięciu duplikatów "
+ "i treści powtarzającej się jeden do jednego. Zawiera wyłącznie ustalenia, których nie ma w żadnym "
+ "pojedynczym pliku: rozstrzygnięcia sprzeczności między wersjami, korekty do treści źródłowej oraz "
+ "zestawienia powstałe z porównania wielu plików. Tam, gdzie część 0C prostuje treść źródłową, "
+ "obowiązuje część 0C — ale brzmienie źródłowe pozostaje w częściach I–X i musi być czytane razem z korektą.",
+ "Rozstrzygnięcie hierarchii wersji zostało zweryfikowane metrykami plików, nie deklaracjami w treści. "
+ "Master 5.4 FINAL ma 1 072 132 znaki i datę 30.08.2026; Master 3.1 ma 13 706 znaków i jest skrótem, "
+ "mimo że sam siebie opisuje jako aktualizację. Rejestr FINALNY 309 zastępuje rejestr scalony 299, "
+ "ale nazwy osiemdziesięciu funkcji dodanych w wersji 265 występują wyłącznie w rejestrze 299 — "
+ "dlatego oba pozostają w obiegu, każdy w swojej roli.",
 ]
 WERSJE=[["Wersja","Plik","Znaków","Status"],
  ["Master 3.0","Eternal_Specyfikacja_Master_3.0_KOMPLETNA","744 973","zastąpiona przez 5.4"],

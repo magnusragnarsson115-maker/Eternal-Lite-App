@@ -11491,15 +11491,22 @@ było błędem, a właściwa odpowiedź brzmi «pobrać, zbudować lepiej albo d
 | 196 | #65 | suma sześciu modułów produktowych M1–M6 | ujęcie produktowe |
 | 239 | #39 | 169 + Twin 15 + Station 21 + Capsule 23 + Matrix 11 | wersja pośrednia |
 | 265 | plik źródłowy | wersja produktowa przed scaleniem | składnik scalenia |
-| **299 / 42 moduły** | **#51 REJESTR SCALONY** | 185 + 114 netto po usunięciu 21 duplikatów | **WERSJA FINALNA** |
-| 309 / 42 moduły | wariant wcześniejszy | App 186 + Station 34 + Capsule 41 + Twin 27 + Matrix 21 | zastąpiony przez 299 |
+| 299 / 42 moduły | #51 Rejestr scalony (30.08.2026, 15 205 zn.) | 185 + 114 netto po usunięciu 21 duplikatów | **zastąpiony przez 309** |
+| **309 / 42 moduły** | **#32 Rejestr FINALNY 309** (30.08.2026, 10 518 zn.) | App 186 + Station 34 + Capsule 41 + Twin 27 + Matrix 21 | **OBOWIĄZUJĄCY** |
 
-**Reguła dla dokumentów wyjściowych:** liczbą obowiązującą dla całego ekosystemu
-jest **299 funkcji w 42 modułach** (#51); dla samej aplikacji w ujęciu
-użytkownika — **160 funkcji w 23 modułach** (#83); baza historyczna to
-**185 funkcji w 30 modułach** (Master 3.0). Każda inna liczba w korpusie jest
-etapem pośrednim jednego z tych trzech ujęć i nie powinna pojawiać się bez
-wskazania, którego ujęcia dotyczy.
+**⚠️ REGUŁA DLA DOKUMENTÓW WYJŚCIOWYCH — po weryfikacji dat i rozmiarów plików:**
+liczbą obowiązującą dla całego ekosystemu jest **309 funkcji w 42 modułach**
+(#32 Rejestr FINALNY, przywoływany także przez Master 5.4); rejestr 299 (#51)
+jest jego bezpośrednim poprzednikiem i został zastąpiony — ale **nazwy 80 funkcji
+dodanych w wersji 265 występują wyłącznie w #51**, więc pozostaje on źródłem
+nazewnictwa. Dla samej aplikacji w ujęciu użytkownika obowiązuje **160 funkcji
+w 23 modułach** (#83); baza historyczna to **185 funkcji w 30 modułach**
+(Master 3.0). Każda inna liczba w korpusie jest etapem pośrednim jednego z tych
+ujęć i nie powinna pojawiać się bez wskazania, którego ujęcia dotyczy.
+**Uwaga o dwóch różnych „309":** #145 sek. 6.1 zawiera katalog 16 modułów × 4
+poziomy = 309 funkcji numerowanych F1.1–F16.x. To **inna numeracja** niż rejestr
+309 z Master 5.4 (kody A-/S-/C-/D-/X-). Zbieżność liczby jest przypadkowa;
+dokumenty wyjściowe używają kodów A-/S-/C-/D-/X-.
 
 ## D063 — #90: SPECYFIKACJA MASTER 3.1 (196 funkcji, 6 modułów produktowych, 21.08.2026)
 
@@ -12947,14 +12954,26 @@ z każdego pliku, następnie usuń duplikaty i powtarzającą się 1:1 treść"*
 
 | Zakres | Dokument obowiązujący | Zastępuje |
 |---|---|---|
-| Specyfikacja | **#90 Master 3.1** (+ odniesienia do Master 4.1 w #122) | Master 3.0 (#148) |
-| Funkcje aplikacji ze statusem | **#95 Specyfikacja funkcjonalna App** + katalog granicy MDR (D074–D076) | karty #129, #148 |
-| Rejestr funkcji ekosystemu | **#51 Rejestr scalony — 299 funkcji / 42 moduły** | wersje 265, 239, 309 |
+| **Specyfikacja — KANON** | **#126 ETERNAL_Specyfikacja_Master_5_4_FINAL** (1 072 132 zn., 30.08.2026) | Master 3.0 (#129/#148), Master 3.1 (#90) |
+| Specyfikacja aplikacji | **#125 App Specyfikacja 5.4 FINAL** (752 667 zn.) — **89% treści zawarte w Master 5.4**, do dokumentu wchodzą tylko bloki własne | App 3.1, App funkcjonalna (#95) |
+| Rejestr funkcji ekosystemu | **#32 Rejestr FINALNY 309** (10 518 zn.) | #51 Rejestr 299, wersje 265 i 239 |
+| Nazwy 80 funkcji dodanych | **#51 Rejestr scalony 299** — jedyne źródło nazewnictwa tych pozycji | — |
+| Granica MDR per funkcja | **katalog kart z #126** (183 karty: „dlaczego nie jest MDR / kiedy staje się MDR / bezpieczne sformułowanie") | pola „MDR jeżeli software medyczny" z kart #129 |
 | Liczby aplikacji | **#83 — 160 funkcji / 23 moduły** | „141", „161", „115", „169" |
+| Cztery statusy regulacyjne, warstwa K1–K8 | **#90 Master 3.1 (skrót, 13 706 zn.)** — ustalenia przejęte przez 5.4, wartość jako zwięzły wykład | — |
 | Biznesplan | **#122 Biznesplan 4.0** | biznesplan 2.0 i 3.0 |
 | Roadmapa | **#116 Roadmapa Wykonawcza 2.0**; dla HTML wzorzec zakresu: **#155 v5-SHORT (etapy 1–6)** | roadmapy v2–v5, etapy 7–11 |
-| Klasy komponentów | **#KARTY K01–K28** (A/B/C, próg wyjścia, mechanizm kontroli) | tabele komponentowe w #90 i #81 |
+| Klasy komponentów | **K01–K28 z #126** (A/B/C, próg wyjścia, mechanizm kontroli) | tabele komponentowe w #90 i #81 |
 | Moduły techniczne | **#134 — 16 modułów, rozwiązanie agregowane / własne IP / koszt** | — |
+
+**⚠️ SPROSTOWANIE WŁASNE.** We wcześniejszym fragmencie tego dziennika przyjąłem
+#90 Master 3.1 za dokument obowiązujący dla specyfikacji, a rejestr 299 za
+finalny. Weryfikacja metryk plików to wyklucza: #90 ma **13 706 znaków** i jest
+skrótem, a **#126 Master 5.4 FINAL (1 072 132 znaki, 30.08.2026)** jest wersją
+najnowszą i najpełniejszą; rejestr 309 (#32) jest z tej samej daty co 299 (#51)
+i jest przez Master 5.4 przywoływany jako obowiązujący. Powyższa tabela
+obowiązuje; wcześniejsze zdania o „Master 3.1 jako specyfikacji obowiązującej"
+są nieaktualne.
 
 ## Materiał wykluczony z opracowania
 
