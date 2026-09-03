@@ -7,3 +7,4 @@ out/*.docx
 out/*.html
 out/*.xlsx
 out/*.pptx
+tools/konsolidacja/build/

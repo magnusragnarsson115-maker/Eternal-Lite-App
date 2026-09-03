@@ -6,6 +6,8 @@ from docx import Document
 from dane_ustalenia import U, KAT
 from dane_pliki import P as UPL
 import dane_odczyt as OD
+import wyklucz
+import dane_odczyt_bp as OB
 
 
 def _ustalenia(doc, sec):
@@ -173,8 +175,162 @@ def _odczyt(doc, sec):
     doc.add_page_break()
 
 
+
+def _wykluczenie(doc, stat):
+    """Nota o warstwie wylaczonej — w kazdym dokumencie, ktory jej dotyka."""
+    if not stat['pliki'] and not stat['bloki']:
+        return
+    doc.add_heading('Warstwa wyłączona z dokumentacji', 2)
+    doc.add_paragraph(
+        'Specyfikacja Master 5.4 w sekcji 38 wyłącza z dokumentacji warstwę sterowania '
+        'zachowaniem ludzi, wpływu na decyzje wyborcze, oddziaływania podprogowego, masowej '
+        'implantacji i niejawnego podawania nanotechnologii. Ta sama granica jest zapisana '
+        'niezależnie w trzech innych miejscach korpusu: etapy 7–11 roadmapy są oznaczone '
+        '[FIKCJA]; dodatek z epikami strategicznymi opisuje je jako „motywy dystopijne, '
+        'konflikty fabularne i ostrzeżenia — to nie są realne instrukcje wdrożeniowe”; '
+        'a Plan PWNŚ świadomie ich nie zoperacjonalizował, uzasadniając to zdaniem: '
+        '„nie da się zbudować dla nich budżetu, listy partnerów i harmonogramu, bo to nie '
+        'jest plan firmy”.')
+    doc.add_paragraph(
+        'Ten dokument tej warstwy nie rozwija. Usunięto %d bloków treści%s. Zachowano '
+        'natomiast każdy zapis, który tę warstwę NAZYWA i wyklucza — rejestry epików, '
+        'listy skreśleń, argumenty odrzucające — ponieważ to jest zapis granicy i musi '
+        'pozostać widoczny. Zachowano też całą treść weterynaryjną dotyczącą transponderów '
+        'w standardzie ISO 11784/11785, która z tą warstwą nie ma związku.'
+        % (stat['bloki'],
+           ' oraz %d plików w całości poświęconych tej warstwie' % len(stat['pliki'])
+           if stat['pliki'] else ''))
+    if stat['pliki']:
+        rows = [['#', 'Plik pominięty w całości', 'Czym jest']]
+        for i in sorted(stat['pliki']):
+            rows.append([str(i), INV[i]['name'].replace('.txt', '')[:56], wyklucz.PLIKI[i]])
+        add_table(doc, rows)
+    doc.add_paragraph('Epiki wyłączone — nazwane, żeby nie wróciły przez pomyłkę:')
+    add_table(doc, [['Kod epiku', 'Czego dotyczy']] + [[k, o] for k, o in wyklucz.EPIKI])
+    doc.add_paragraph(
+        'Korpus wskazuje dla nich legalne odpowiedniki i to one są przyjęte '
+        'w dokumentacji:')
+    add_table(doc, wyklucz.ODPOWIEDNIKI)
+
+
+
+def _odczyt_bp(doc, sec):
+    """Czesc 0C dla sekcji BIZNESPLAN — ustalenia z pelnego odczytu korpusu."""
+    if sec != 'B':
+        return
+    H = doc.add_heading
+    H('CZĘŚĆ 0C — USTALENIA Z PEŁNEGO ODCZYTU KORPUSU', 1)
+    doc.add_paragraph(
+        'Ta część powstała z odczytu całej treści 159 plików korpusu — 28 618 387 znaków '
+        'surowo, 13 020 154 po usunięciu duplikatów i treści powtarzającej się jeden do '
+        'jednego. Nie powiela bloków źródłowych z części I–XIII: zawiera wyłącznie '
+        'ustalenia, które powstały z zestawienia wielu plików albo prostują treść '
+        'źródłową. Dziennik odczytu: tools/konsolidacja/odczyt/USTALENIA_ODCZYT.md.')
+
+    H('0C.1  Hierarchia dokumentów biznesowych', 2)
+    add_table(doc, OB.HIERARCHIA)
+
+    H('0C.2  Streszczenie zarządcze w siedmiu wymiarach', 2)
+    add_table(doc, OB.STRESZCZENIE)
+
+    H('0C.3  Skala problemu — liczby systemowe', 2)
+    add_table(doc, OB.PROBLEM_SKALA)
+    doc.add_paragraph(OB.PROBLEM_TEZA)
+    doc.add_paragraph(OB.LUKA)
+
+    H('0C.4  Bilans wobec systemu publicznego', 2)
+    add_table(doc, OB.BILANS_PANSTWO)
+    doc.add_paragraph(OB.BILANS_WZORZEC)
+
+    H('0C.5  Segmenty rynku i zasada prezentacji rynku', 2)
+    add_table(doc, OB.SEGMENTY)
+    p = doc.add_paragraph(); r = p.add_run(OB.ZASADA_RYNKU); r.bold = True
+
+    H('0C.6  Portfel pierwszej fali i etap zerowy', 2)
+    add_table(doc, OB.PORTFEL)
+    doc.add_paragraph(OB.ETAP_ZEROWY)
+    doc.add_paragraph(OB.USUNIETE)
+
+    H('0C.7  Kanały przychodu i ich ranking', 2)
+    add_table(doc, OB.KANALY)
+    add_table(doc, OB.RANKING_PRZYCHODU)
+    doc.add_paragraph(OB.MARZA_TEZA)
+    p = doc.add_paragraph(); r = p.add_run(OB.MODEL_ODRZUCONY); r.bold = True
+
+    H('0C.8  Dlaczego marża sprzętowa nie może być źródłem głównym', 2)
+    add_table(doc, OB.MARZA_SPRZET)
+
+    H('0C.9  Arytmetyka abonamentu konsumenckiego', 2)
+    add_table(doc, OB.ARYTMETYKA_ABO)
+    doc.add_paragraph(OB.ARYTMETYKA_WNIOSEK)
+
+    H('0C.10  Gdzie naprawdę leży zasób', 2)
+    add_table(doc, OB.ZASOBY)
+    doc.add_paragraph(OB.ZASOB_GLOWNY)
+    doc.add_paragraph(OB.GLEBIA)
+
+    H('0C.11  Finansowanie: kolejność źródeł i wczesny przychód', 2)
+    add_table(doc, OB.ZRODLA_FINANSOWANIA)
+    add_table(doc, OB.WCZESNY_PRZYCHOD)
+    add_table(doc, OB.CENNIK_HUB)
+    doc.add_paragraph(OB.CENNIK_HUB_WNIOSEK)
+
+    H('0C.12  Dźwignia niepieniężna', 2)
+    add_table(doc, OB.DZWIGNIA)
+    doc.add_paragraph(OB.DZWIGNIA_WARUNEK)
+
+    H('0C.13  Kontrola technologii, której nie budujemy', 2)
+    add_table(doc, OB.KONTROLA8)
+    add_table(doc, OB.KONTROLA_PLAN)
+    p = doc.add_paragraph(); r = p.add_run(OB.KONTROLA_WARUNEK); r.bold = True
+    doc.add_paragraph(OB.MOONSHOT_ARYTMETYKA)
+
+    H('0C.14  Warianty tanie i zestaw podstawowy', 2)
+    add_table(doc, OB.WARIANTY_TANIE)
+    add_table(doc, OB.ZESTAW_PODSTAWOWY)
+    add_table(doc, OB.BEZ_WARIANTU)
+
+    H('0C.15  Budżet okna dziewięćdziesięciu dni', 2)
+    add_table(doc, OB.BUDZET90)
+
+    H('0C.16  Struktura kosztów i błędy poprzednich modeli', 2)
+    add_table(doc, OB.KOSZTY_STRUKTURA)
+    add_table(doc, OB.BLEDY_KOSZTOWE)
+
+    H('0C.17  Korekty liczb biznesowych', 2)
+    add_table(doc, OB.KOREKTY)
+
+    H('0C.18  Fosa i konkurencja', 2)
+    add_table(doc, OB.FOSA)
+    add_table(doc, OB.KONKURENCJA)
+    doc.add_paragraph(OB.KONKURENCJA_KALIBRACJA)
+    doc.add_paragraph(OB.LUKA_WETERYNARYJNA)
+
+    H('0C.19  Wejście na rynek i bramki decyzyjne', 2)
+    doc.add_paragraph(OB.FIZYKA_MARKETINGU)
+    add_table(doc, OB.WEJSCIE)
+    add_table(doc, OB.BRAMKI)
+
+    H('0C.20  Zespół i struktura podmiotów', 2)
+    add_table(doc, OB.ZESPOL)
+    add_table(doc, OB.STRUKTURA)
+    p = doc.add_paragraph(); r = p.add_run(OB.STATUT); r.bold = True
+
+    H('0C.21  Ekonomika warstwy sprzętowej', 2)
+    add_table(doc, OB.STACJA_EKONOMIKA)
+    doc.add_paragraph(OB.STACJA_WNIOSEK)
+    doc.add_paragraph(OB.SEGMENTY_B2B_STACJA)
+
+    H('0C.22  Czego ten plan nie obiecuje', 2)
+    for t in OB.NIE_OBIECUJEMY:
+        doc.add_paragraph(t, style='List Bullet')
+
+    doc.add_page_break()
+
+
 def build(sec, tytul, podtytul, podstawa, nota, wersje, kanon, klastry, reszta_tytul, out):
     PARTS={x[0]:(x[1],x[2],x[3]) for x in json.load(open('build/PARTS_%s.json'%sec))}
+    PARTS, WSTAT = wyklucz.filtruj(PARTS)
     doc=Document(); setup(doc)
     for t,sz,b in [("ETERNAL ECOSYSTEM",26,True),(tytul,16,True),(podtytul,12,False)]:
         p=doc.add_paragraph(); p.alignment=WD_ALIGN_PARAGRAPH.CENTER
@@ -187,9 +343,11 @@ def build(sec, tytul, podtytul, podstawa, nota, wersje, kanon, klastry, reszta_t
     for t in nota: doc.add_paragraph(t)
     if wersje:
         doc.add_heading("Łańcuch wersji i pliki zastąpione",2); add_table(doc,wersje)
+    _wykluczenie(doc, WSTAT)
     doc.add_page_break(); doc.add_heading("Spis treści",1); toc(doc); doc.add_page_break()
     _ustalenia(doc, sec)
     _odczyt(doc, sec)
+    _odczyt_bp(doc, sec)
 
     uzyte=set()
     for i,(ktyt,kopis) in kanon:
