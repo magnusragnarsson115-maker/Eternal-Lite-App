@@ -24,7 +24,7 @@ IDX = "out/indeks_zrodel.json"
 AUTH = ".work/autorytet.json"
 RAPORT = ".work/dedup_raport.json"
 KOTWICE = ".work/kotwice_spec.json"
-WYJSCIE = "out/ETERNAL_Specyfikacja_Techniczna.docx"
+WYJSCIE = "out/ETAP4_ETERNAL_Specyfikacja_Techniczna.docx"
 
 GRUPY_SPEC = ("G1", "G2")
 

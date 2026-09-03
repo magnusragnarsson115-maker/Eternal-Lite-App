@@ -29,10 +29,10 @@ przez krok 04 — stąd kolejność.
 | Krok | Wejście | Wyjście | Rola |
 |---|---|---|---|
 | 01 | `.work/src/*.md` | `out/zrodla/`, `out/indeks_zrodel.json` | Rozcina paczki na pojedyncze dokumenty (granica: nagłówek `## nazwa.ext`) i przypisuje każdy do jednej z 9 grup |
-| 02 | `out/zrodla/` | `out/00_MASTER_ZRODLOWY.md`, `.work/bloki.jsonl`, `.work/autorytet.json` | Scala całość w jeden plik, tnie na bloki, wylicza autorytet dokumentów |
-| 03 | bloki + autorytet | `out/01_DEDUP_ZWYKLA.md`, `out/02_DEDUP_ZAAWANSOWANA.md`, `.work/kanon.jsonl` | Obie deduplikacje |
-| 04 | bloki kanoniczne | `out/ETERNAL_Specyfikacja_Techniczna.docx`, `.work/kotwice_spec.json` | Specyfikacja + zakładki do linkowania |
-| 05 | bloki + zakładki | `out/ETERNAL_Biznesplan.docx` | Biznesplan z indeksem, źródłami i odsyłaczami |
+| 02 | `out/zrodla/` | `out/ETAP1_PLIK_SCALONY.md`, `.work/bloki.jsonl`, `.work/autorytet.json` | Scala całość w jeden plik, tnie na bloki, wylicza autorytet dokumentów |
+| 03 | bloki + autorytet | `out/ETAP2_DEDUPLIKACJA_1do1.md`, `out/ETAP3_DEDUPLIKACJA_ZAAWANSOWANA.md`, `.work/kanon.jsonl` | Obie deduplikacje |
+| 04 | bloki kanoniczne | `out/ETAP4_ETERNAL_Specyfikacja_Techniczna.docx`, `.work/kotwice_spec.json` | Specyfikacja + zakładki do linkowania |
+| 05 | bloki + zakładki | `out/ETAP5_ETERNAL_Biznesplan.docx` | Biznesplan z indeksem, źródłami i odsyłaczami |
 
 ## Autorytet dokumentu (krok 02)
 

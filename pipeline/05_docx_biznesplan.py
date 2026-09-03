@@ -27,8 +27,8 @@ IDX = "out/indeks_zrodel.json"
 AUTH = ".work/autorytet.json"
 RAPORT = ".work/dedup_raport.json"
 KOTWICE = ".work/kotwice_spec.json"
-WYJSCIE = "out/ETERNAL_Biznesplan.docx"
-PLIK_SPEC = "ETERNAL_Specyfikacja_Techniczna.docx"
+WYJSCIE = "out/ETAP5_ETERNAL_Biznesplan.docx"
+PLIK_SPEC = "ETAP4_ETERNAL_Specyfikacja_Techniczna.docx"
 
 GRUPY_BIZNES = ("G3", "G5", "G6", "G8", "G4")
 

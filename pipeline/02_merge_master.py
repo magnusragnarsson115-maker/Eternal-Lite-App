@@ -3,7 +3,7 @@
 oraz segmentacja na bloki z ocena autorytetu dokumentu.
 
 Wyjscie:
-  out/00_MASTER_ZRODLOWY.md   — cala tresc zrodlowa w jednym pliku
+  out/ETAP1_PLIK_SCALONY.md   — cala tresc zrodlowa w jednym pliku
   .work/bloki.jsonl           — bloki tresci do deduplikacji
   .work/autorytet.json        — ocena autorytetu (aktualnosc/kompletnosc) dokumentow
 """
@@ -15,7 +15,7 @@ from datetime import date
 
 IDX = "out/indeks_zrodel.json"
 DST = "out/zrodla"
-MASTER = "out/00_MASTER_ZRODLOWY.md"
+MASTER = "out/ETAP1_PLIK_SCALONY.md"
 BLOCKS = ".work/bloki.jsonl"
 AUTH = ".work/autorytet.json"
 

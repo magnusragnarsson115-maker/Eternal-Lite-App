@@ -16,8 +16,8 @@ ZAAWANSOWANA  — grupuje bloki o tym samym znaczeniu, wybiera wariant
                 a sam Jaccard by go nie zlapal.
 
 Wyjscie:
-  out/01_DEDUP_ZWYKLA.md
-  out/02_DEDUP_ZAAWANSOWANA.md
+  out/ETAP2_DEDUPLIKACJA_1do1.md
+  out/ETAP3_DEDUPLIKACJA_ZAAWANSOWANA.md
   .work/dedup_raport.json
   .work/kanon.jsonl              — bloki kanoniczne (wejscie dla DOCX)
 """
@@ -30,8 +30,8 @@ from collections import defaultdict
 BLOCKS = ".work/bloki.jsonl"
 AUTH = ".work/autorytet.json"
 IDX = "out/indeks_zrodel.json"
-OUT_ZW = "out/01_DEDUP_ZWYKLA.md"
-OUT_ZA = "out/02_DEDUP_ZAAWANSOWANA.md"
+OUT_ZW = "out/ETAP2_DEDUPLIKACJA_1do1.md"
+OUT_ZA = "out/ETAP3_DEDUPLIKACJA_ZAAWANSOWANA.md"
 RAPORT = ".work/dedup_raport.json"
 KANON = ".work/kanon.jsonl"
 
