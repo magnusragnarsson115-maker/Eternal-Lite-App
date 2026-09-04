@@ -14,6 +14,11 @@ jako część 0C, przed treścią przenoszoną dosłownie:
 |---|---|---|
 | `dane_odczyt.py` | specyfikacja (DOCX) | 16 podsekcji: hierarchia wersji, rozstrzygnięcie dziesięciu liczb funkcji, cztery statusy regulacyjne, 45 reguł granicy MDR, 34 pary bezpiecznych sformułowań, K1–K8, K01–K28, licencje, terminy, korekty |
 | `dane_odczyt_bp.py` | biznesplan (DOCX) | 22 podsekcje: skala problemu, bilans wobec państwa, segmenty, kanały przychodu, arytmetyka abonamentu, finansowanie, dźwignia, kontrola technologii, koszty, fosa, bramki |
+| `dane_ceo.py` | dokument CEO (DOCX) | 26 sekcji zarządczych: streszczenie, cele, problem, grupy, model biznesowy, ekosystem, produkty, moduły, funkcje, priorytety, regulacje, IP, dane, AI, cyberbezpieczeństwo, integracje, hardware, partnerstwa, model operacyjny, finanse, KPI, ryzyka, decyzje, roadmapa 1–3–5–10, załączniki |
+| `dane_produkty.py` | dokument CEO, XLSX | sześć produktów po 5–6 funkcji z korelacji rejestru, kryteria „moduł czy produkt", jedenaście nisz i branż z tego samego rdzenia, monetyzacja, dobór pod klienta, build/buy z progami |
+| `dane_modele.py` | dokument CEO | struktura badawczo-biznesowa (sześć podmiotów, pięć źródeł kontroli, fundusz badawczy) i sześć modeli wykonania ekosystemu z warunkiem wejścia i wyjścia |
+| `rejestr.py` | wszystko powyżej | jedno źródło prawdy: 337 funkcji ze scalenia macierzy, komponentów i rejestru — kod, warstwa A/B/C, klasa MDR, kanał, klasa komponentu, wariant build/buy, próg wyjścia |
+| `karty.py` | karty funkcji (DOCX) | generator 337 kart w szablonie osiemnastopolowym plus warstwa rozszerzona; treść rdzeniowych 30 funkcji pisana osobno |
 | `dane_odczyt_rm.py` | roadmapa (HTML) | Roadmapa Wykonawcza 2.0: pięć torów, kalendarz twardych dat, horyzonty 0–4, czego nie robimy, budżet 90 dni, zmiany wobec poprzednich roadmap |
 
 `wyklucz.py` filtruje warstwę wyłączoną przez Specyfikację Master 5.4 sekcja 38 — sterowanie
@@ -47,6 +52,11 @@ python3 build_master_docx.py         # dokument nadrzędny 26 sekcji    → DOCX
 python3 build_architektura_docx.py   # A1 wzorcowy, adapter/brama/mapper → DOCX
 python3 build_rynek_xlsx.py          # odpowiedniki rynkowe            → XLSX
 python3 build_ustalenia_docx.py      # 81 ustaleń korpusu               → DOCX
+python3 rejestr.py                   # kontrola: 337 funkcji, jedno źródło prawdy
+python3 karty.py                     # kontrola: 337 kart, rozkład priorytetów
+python3 build_ceo_docx.py            # dokument zarządczy 26 sekcji     → DOCX
+python3 build_karty_docx.py          # karty 337 funkcji                → DOCX
+python3 build_rejestr_xlsx.py        # rejestr + produkty + branże      → XLSX
 python3 paczka.py 1 10               # zrzut paczki plików do odczytu (1..159)
 python3 build_pliki_docx.py          # ustalenie per plik, 159 pozycji   → DOCX
 python3 inject_ustalenia_html.py     # wstrzyknięcie ustaleń do roadmap  → HTML
