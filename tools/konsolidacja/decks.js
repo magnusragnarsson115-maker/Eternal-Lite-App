@@ -13,8 +13,8 @@ const TEL = '+48 784 407 991';
 
 // ---- Zrodla zewnetrzne (research, nie indeks archiwum) ----
 const Z = {
-  gvr: 'Grand View Research — Digital Health Market Report (946 mld USD w 2030, CAGR 22,2%)',
-  mnm: 'MarketsandMarkets — Digital Health Market 2025-2030 (573,5 mld USD w 2030)',
+  gvr: 'Grand View Research — Digital Health Market Report (raport branżowy; liczby globalne nie są podstawą naszej wyceny rynku)',
+  mnm: 'MarketsandMarkets — Digital Health Market 2025-2030 (raport branżowy)',
   prec: 'Precedence Research — Digital Health Market do 2035',
   diga: 'BfArM — Digital Health Applications (DiGA): wymogi wpisu i refundacji',
   mdr: 'Rozporządzenie MDR (UE) 2017/745 — wyroby medyczne',
@@ -29,6 +29,10 @@ const Z = {
   p1: 'Centrum e-Zdrowia — Platforma P1 i Internetowe Konto Pacjenta',
   itaka: 'Centrum Wsparcia 116 123 — Fundacja ITAKA',
   nis2: 'Dyrektywa NIS2 (UE) 2022/2555 i ustawa o KSC',
+  nfz: 'Wydatki publiczne na zdrowie 2026: 247,8 mld zł (6,81% PKB); luka finansowa 23 mld zł, prognoza 2040 — 171 mld zł',
+  prof: 'Wydatki na profilaktykę w Polsce: 21,6 EUR na mieszkańca wobec 202 EUR średniej unijnej',
+  eehrxf: 'EEHRxF — obowiązek CE dla systemów dokumentacji medycznej od 26.03.2029, kategoria druga od 26.03.2031',
+  bp41: 'Biznesplan 4.0 i Plan Korporacyjny 5.1 — ustalenia po pełnym odczycie korpusu (159 plików, 28,6 mln znaków)',
 };
 
 function mk(title) {
@@ -226,8 +230,10 @@ function deckApp() {
   cards(s, [['Filar 1 — import uniwersalny', 'Skan dowolnego dokumentu medycznego i konwersja na dane strukturalne w standardzie FHIR.'],
             ['Filar 2 — synchronizacja', 'Jedno API do wszystkich wiodących wearables: Apple, Garmin, Oura, Whoop, Fitbit.'],
             ['Filar 3 — logika medyczna', 'Korelacja twardych wyników badań z miękkimi danymi behawioralnymi.']], 2.3, 3);
-  kpis(s, [['16', 'modułów A1–A16'], ['337', 'funkcji w macierzy'], ['201', 'funkcji aplikacji'], ['Q3 2026', 'start MVP']], 4.3);
-  src(s, ['terra', 'fhir']);
+  kpis(s, [['160', 'funkcji aplikacji w 23 modułach'], ['309', 'funkcji ekosystemu w 42 modułach'], ['12', 'funkcji etapu zerowego'], ['Q3 2026', 'start MVP']], 4.3);
+  s.addText('Liczby po scaleniu rejestrów i usunięciu duplikatów: 160 funkcji w 23 modułach dla aplikacji w ujęciu użytkownika, 309 w 42 modułach dla całego ekosystemu. Etap zerowy to jednak dwanaście funkcji tworzących jeden produkt, nie sto sześćdziesiąt.',
+    { x: 0.55, y: 5.5, w: 12.2, h: 0.5, fontSize: 10, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['terra', 'fhir', 'bp41']);
 
   s = slide(p); head(s, 'Moduły', 'Co aplikacja faktycznie robi', 'moduł → zakres → etap dojrzałości');
   table(s, ['Moduły', 'Zakres', 'Etap'], [
@@ -263,14 +269,14 @@ function deckApp() {
 
   s = slide(p); head(s, 'Grupy docelowe', 'Trzy segmenty, trzy różne powody', 'segment → potrzeba → wielkość rynku → CAC → LTV');
   table(s, ['Segment', 'Potrzeba', 'Wielkość PL/UE', 'CAC', 'LTV'], [
-    ['Biohackerzy 30–50 lat', 'Mają 3+ urządzenia, dane w 5 aplikacjach. Szukają korelacji.', '200 tys. / 2 mln', '80 PLN', '1 200 PLN'],
-    ['Pacjenci metaboliczni', 'Stosy PDF-ów i chaos w lekach. Potrzebują cyfrowego archiwum.', '500 tys. / 5 mln+', '100 PLN', '1 500 PLN'],
-    ['Opiekunowie 40–60 lat', 'Martwią się o rodziców. Zdalny monitoring i interpretacja wyników.', '800 tys. / 8 mln+', '120 PLN', '2 000 PLN'],
+    ['Biohackerzy 30–50 lat', 'Mają 3+ urządzenia, dane w 5 aplikacjach. Szukają korelacji.', '200 tys. / 2 mln', '250–600 PLN', 'do przeliczenia'],
+    ['Pacjenci metaboliczni', 'Stosy PDF-ów i chaos w lekach. Potrzebują cyfrowego archiwum.', '500 tys. / 5 mln+', '250–600 PLN', 'do przeliczenia'],
+    ['Opiekunowie 40–60 lat', 'Martwią się o rodziców. Zdalny monitoring i interpretacja wyników.', '800 tys. / 8 mln+', '250–600 PLN', 'do przeliczenia'],
   ], 2.3, [2.5, 5.0, 2.0, 1.2, 1.5]);
   s.addText('Warianty produktu wskazane w źródłach: tryb fitness, panel dla lekarza, tryb dla przewlekle chorych.',
     { x: 0.55, y: 4.35, w: 12.2, h: 0.35, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-  warn(s, 'LTV liczone było dla płatnej subskrypcji. Po przyjęciu modelu darmowego trzeba je przeliczyć od zera — z marży kanałów K3–K11 przypadającej na użytkownika, a nie z abonamentu.', 4.8);
-  src(s, ['gvr']);
+  warn(s, 'Dwie korekty do wcześniejszych wersji tego slajdu. CAC: wartości 80–120 PLN były nierealne dla nowej marki medtech — scenariusz bazowy B2C to 250–600 PLN, dobry viral 100–250, premium health 500–1000+; w B2B 2–10 tys. na klienta, ale klient kupuje 10–1000 urządzeń, więc B2B jest wielokrotnie efektywniejsze. LTV: liczone było dla płatnej subskrypcji, a aplikacja jest darmowa — trzeba je przeliczyć od zera z marży kanałów K3–K11 przypadającej na użytkownika. Konwersja: 25–35% dotyczy konwersji PO UŻYCIU funkcji, nie z całej bazy; konwersja freemium w healthtech to około 3,9%.', 4.65);
+  src(s, ['bp41']);
 
   s = slide(p); head(s, 'Granica regulacyjna', 'Wellness teraz, wyrób medyczny później', 'warstwa przeznaczenia → zakres funkcji → wymóg certyfikacji');
   cards(s, [['Warstwa A — poza MDR', 'Agregacja, przechowywanie i pokazywanie własnych danych, eksport. Zakres MVP.'],
@@ -289,8 +295,8 @@ function deckApp() {
     ['Pre-Seed', '110 tys. PLN', 'Q2 2026', '5–8%', 'MVP aplikacji: agregacja, OCR, dashboard'],
     ['Seed', '6,0–6,7 mln PLN', 'Q4 2026', '12–15%', 'Premium, telemedycyna, runway 18–24 mies.'],
   ], 2.3, [1.6, 2.3, 1.6, 1.4, 5.3]);
-  warn(s, 'Budżet MVP 110 tys. PLN nie pokrywa opisanego zakresu. Master 5.4 wycenia go na 160–190 tys. przy orkiestracji i zaznacza, że wcześniejsze wyceny całkowicie pomijały wynagrodzenia. Do rozstrzygnięcia: albo zawęzić zakres, albo podnieść kwotę.', 4.1);
-  src(s, ['gvr']);
+  warn(s, 'Budżet MVP 110 tys. PLN nie pokrywa opisanego zakresu. Master 5.4 wycenia go na 160–190 tys. przy orkiestracji i zaznacza, że wcześniejsze wyceny całkowicie pomijały wynagrodzenia — a wynagrodzenia to 70–90% struktury kosztów. Alternatywa wynikająca z pełnego odczytu korpusu: około 200 tys. zł domyka strukturę prawną, status podmiotu leczniczego i doprowadza do pierwszego przychodu bez rundy kapitałowej. Kolejność źródeł: przepływ z działalności powtarzalnej, potem granty, potem kapitał cierpliwy — kapitał wysokiego ryzyka wyłącznie do spółek celowych pod sprzęt.', 3.95);
+  src(s, ['bp41']);
 
   s = slide(p, true); head(s, 'Kontakt', 'Porozmawiajmy', null, true); kontakt(s);
 
@@ -335,14 +341,18 @@ function deckEko() {
             ['Dostępność', 'Zdalna opieka i diagnostyka w domu przez całą dobę, dla każdego pacjenta.']], 2.3, 4);
   src(s, ['ehds']);
 
-  s = slide(p); head(s, 'Rynek', 'Analiza rynku i segmentacja', 'TAM → SAM → SOM · segmenty B2C i B2B · ekspansja');
-  kpis(s, [['946 mld USD', 'rynek zdrowia cyfrowego w 2030'], ['22,2%', 'CAGR 2025–2030'],
-           ['280 mld USD', 'SAM — rynki OECD'], ['~600 mln USD', 'SOM w roku piątym']], 2.3);
-  cards(s, [['B2C — rynek konsumencki', 'Biohackerzy, opiekunowie pokolenia sandwich, pacjenci przewlekli.'],
-            ['B2B — partnerzy instytucjonalni', 'Kliniki, ubezpieczyciele, pracodawcy i programy corporate wellness.'],
-            ['Ekspansja geograficzna', 'Polska jako sandbox, następnie UE i DACH, potem USA dla skali.']], 3.6, 3);
-  warn(s, 'Oficjalny deck podaje TAM 1,39 bln USD. Prognozy na 2030 mieszczą się w przedziale 573–946 mld USD; poziom 1,39 bln pojawia się dopiero w prognozach na lata 2032–2033. Slajd używa liczby zweryfikowanej wraz z rokiem, którego dotyczy.', 5.5);
-  src(s, ['gvr', 'mnm', 'prec']);
+  s = slide(p); head(s, 'Rynek', 'Problem policzony w złotówkach, nie w bilionach dolarów', 'skala problemu → segmenty, do których realnie docieramy');
+  kpis(s, [['8–10 mld zł', 'hospitalizacje możliwe do uniknięcia, rocznie'],
+           ['6–8 mld zł', 'dublowane badania diagnostyczne, rocznie'],
+           ['23 mld zł', 'luka finansowa systemu w 2026'],
+           ['9×', 'różnica w wydatkach na profilaktykę wobec UE']], 2.3);
+  s.addText('Dwie pierwsze pozycje — razem 14–18 mld zł rocznie — to problemy o charakterze informacyjnym, nie medycznym. Dokładnie te, które adresuje warstwa agregująca dane.',
+    { x: 0.55, y: 3.5, w: 12.2, h: 0.4, fontSize: 11.5, bold: true, color: GRANAT, fontFace: BF, margin: 0, isTextBox: true });
+  cards(s, [['Płatnicy instytucjonalni', 'Podmioty lecznicze — dziesiątki tysięcy; dostawcy systemów gabinetowych — kilkudziesięciu, ale każdy musi spełnić wymóg do 2029.'],
+            ['Rynek weterynaryjny', 'Tysiące lecznic i miliony gospodarstw domowych. Zero obecności państwa — jedyny segment konsumencki, w który wchodzimy.'],
+            ['Producenci i sponsorzy', 'Setki producentów wyrobów potrzebujących danych nadzoru; dziesiątki sponsorów badań zdecentralizowanych — najwyższa marża.']], 4.0, 3);
+  warn(s, 'CELOWO NIE PODAJEMY GLOBALNYCH LICZB RYNKU. Wcześniejsze materiały operowały wartościami 946 mld USD i 1,39 bln USD przy strategii ograniczonej do Polski. Taka rozbieżność między wielkością rynku a zasięgiem działania jest w rozmowie z inwestorem sygnałem ostrzegawczym, nie atutem. Podajemy segmenty, do których realnie docieramy, i problem policzony w walucie, w której będziemy fakturować.', 5.9);
+  src(s, ['nfz', 'prof', 'eehrxf', 'bp41']);
 
   s = slide(p); head(s, 'Trendy rynkowe', 'Cztery siły kształtujące przyszłość medycyny', 'trend → mechanizm → wskaźnik');
   cards(s, [['Normalizacja telemedycyny', 'Pacjenci oczekują dostępu do specjalisty bez wychodzenia z domu. To standard, nie nowinka.'],
@@ -485,8 +495,8 @@ function deckEko() {
     ['2030', '6,50 mln PLN', '−0,85 mln PLN', '−8,11 mln PLN'],
     ['2031', '18,50 mln PLN', '+1,56 mln PLN', 'próg rentowności'],
   ], 2.3, [1.3, 2.9, 3.0, 5.0]);
-  warn(s, 'Suma strat przed progiem rentowności to −8,11 mln PLN, a kapitał do rundy A to 6,11–6,81 mln PLN. Brakuje 1,3–2,0 mln PLN, a runda A nie ma w decku daty. Wycena 200 mln USD przy przychodzie 18,5 mln PLN to mnożnik około 45×, przy rynkowych 3–10× dla digital health.', 5.15);
-  src(s, ['gvr']);
+  warn(s, 'Suma strat przed progiem rentowności to −8,11 mln PLN, a kapitał do rundy A to 6,11–6,81 mln PLN. Brakuje 1,3–2,0 mln PLN, a runda A nie ma w decku daty. Wycena 200 mln USD przy przychodzie 18,5 mln PLN to mnożnik około 45×, przy rynkowych 3–10× dla digital health. Osobno: prognoza pięcioletnia była budowana na modelu kosztowym bez wynagrodzeń i na konwersji konsumenckiej, która nie jest osią przychodu — do przeliczenia po pierwszych sześciu miesiącach sprzedaży, na danych.', 5.0);
+  src(s, ['bp41']);
 
   s = slide(p); head(s, 'Finansowanie', 'Struktura finansowania', 'etap → kwota → termin → equity → cel');
   table(s, ['Etap', 'Kwota', 'Termin', 'Equity', 'Cel'], [

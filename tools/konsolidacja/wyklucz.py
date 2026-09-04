@@ -67,7 +67,7 @@ _NAZYWA_I_WYKLUCZA = re.compile(
     r'|\[FIKCJA\]|fikcj|worldbuilding|przestrog|ostrze[żz]|motyw\w*\s+dystopij'
     r'|poza\s+zakres|nie\s+jest\s+planem|nie\s+s[aą]\s+realne|sekcj[ai]\s+38|§\s*38'
     r'|granic\w*|=====|Dobrowolno[śs][ćc]|Mechanizm|Rozbie[żz]no[śs]|Sprzeczno[śs]'
-    r'|weterynar|ISO\s*11784|CVMP|ps[oó]w|zwierz|w\s+napi[eę]ciu|rozstrzyga|arytmetyk|wykonaln|MOONSHOT|SCI-FI|STRATEGICZNY|DS-A|DS-B|DS-C|PWNS|E7-11|w\s+nawiasie|wa[żz]niejsz|powie[śs]ci|literack|ruch\s+ideow', re.I)
+    r'|weterynar|ISO\s*11784|CVMP|ps[oó]w|zwierz|w\s+napi[eę]ciu|rozstrzyga|arytmetyk|wykonaln|SCI-FI|STRATEGICZNY|DS-A|DS-B|DS-C|PWNS|E7-11|w\s+nawiasie|wa[żz]niejsz|powie[śs]ci|literack|ruch\s+ideow', re.I)
 
 
 def blok_wypada(txt):

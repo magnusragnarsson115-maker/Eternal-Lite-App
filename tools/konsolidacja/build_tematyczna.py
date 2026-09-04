@@ -8,7 +8,18 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from mkdocx import (Document, setup, toc, add_table, emit, Pt, RGBColor,
                     WD_ALIGN_PARAGRAPH, INV, M, TODAY)  # noqa: E402
 
+import wyklucz  # noqa: E402
+
 T = json.load(open('build/TEMATY.json'))
+_usun = 0
+for _t in T:
+    _keep = [b for b in _t['bloki']
+             if b[0] not in wyklucz.PLIKI and not wyklucz.blok_wypada(b[2][2])]
+    _usun += len(_t['bloki']) - len(_keep)
+    _t['bloki'] = _keep
+    _t['n'] = len(_keep)
+    _t['zrodla'] = [z for z in _t['zrodla'] if z[0] not in wyklucz.PLIKI]
+print('filtr warstwy wykluczonej: usunieto %d blokow' % _usun)
 
 OPIS = {
  "T01": "Warstwa nadzoru nad funkcjami: co system blokuje, co eskaluje i co wylacza. "

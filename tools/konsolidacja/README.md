@@ -4,6 +4,25 @@ Pipeline, który z 159 unikalnych plików korpusu (28,6 mln znaków) buduje osie
 dokumentów wynikowych. Skrypty są tu po to, żeby wynik dało się odtworzyć — same
 dokumenty nie są wersjonowane (patrz `.gitignore`).
 
+## Warstwy dokładane po pełnym odczycie korpusu
+
+Trzy moduły danych niosą ustalenia, których nie ma w żadnym pojedynczym pliku źródłowym —
+powstały z zestawienia wielu plików albo prostują treść źródłową. Wchodzą do dokumentów
+jako część 0C, przed treścią przenoszoną dosłownie:
+
+| Moduł | Trafia do | Zawartość |
+|---|---|---|
+| `dane_odczyt.py` | specyfikacja (DOCX) | 16 podsekcji: hierarchia wersji, rozstrzygnięcie dziesięciu liczb funkcji, cztery statusy regulacyjne, 45 reguł granicy MDR, 34 pary bezpiecznych sformułowań, K1–K8, K01–K28, licencje, terminy, korekty |
+| `dane_odczyt_bp.py` | biznesplan (DOCX) | 22 podsekcje: skala problemu, bilans wobec państwa, segmenty, kanały przychodu, arytmetyka abonamentu, finansowanie, dźwignia, kontrola technologii, koszty, fosa, bramki |
+| `dane_odczyt_rm.py` | roadmapa (HTML) | Roadmapa Wykonawcza 2.0: pięć torów, kalendarz twardych dat, horyzonty 0–4, czego nie robimy, budżet 90 dni, zmiany wobec poprzednich roadmap |
+
+`wyklucz.py` filtruje warstwę wyłączoną przez Specyfikację Master 5.4 sekcja 38 — sterowanie
+zachowaniem, propagandę polityczną i masową implantację. Pomija dwa pliki w całości jej
+poświęcone (#141, #142) oraz pojedyncze bloki w pozostałych, zachowując każdy zapis, który tę
+warstwę nazywa i wyklucza. Każdy dokument dostaje notę z listą epików wyłączonych i legalnych
+odpowiedników wskazanych przez sam korpus. Filtr jest wpięty w `builder.py`, `build_roadmap.py`,
+`build_app_html.py` i `build_tematyczna.py`.
+
 ## Kolejność uruchamiania
 
 ```bash
@@ -34,6 +53,7 @@ python3 inject_ustalenia_html.py     # wstrzyknięcie ustaleń do roadmap  → H
 python3 inject_pliki_html.py         # wstrzyknięcie rejestru per plik   → HTML
 python3 build_roadmap.py             # roadmapa całości                → HTML
 python3 build_app_html.py            # roadmapa aplikacji              → HTML
+npm install pptxgenjs                # zależność decków
 node    decks.js                     # pitch aplikacja + ekosystem     → PPTX
 python3 finish.py                    # macierz XLSX + wstrzyknięcie rozstrzygnięć
 ```

@@ -37,7 +37,11 @@ ETAPY = [("1", "Planowanie", "MVP", "2026"), ("2", "Budowa firmy", "MVP", "2026-
          ("3", "Rozwoj firmy", "MLP", "2027"), ("4", "Ekspansja", "MLP", "2027-28"),
          ("5", "Lobbing", "FINAL", "2028-29"), ("6", "Rozwoj technologiczny", "FINAL", "2029-31")]
 
+import wyklucz  # noqa: E402
+
 P = json.load(open('build/PARTS_R.json'))
+_Q, WSTAT = wyklucz.filtruj({x[0]: (x[1], x[2], x[3]) for x in P})
+P = [[i, v[0], v[1], v[2]] for i, v in sorted(_Q.items())]
 
 
 def txt(b):
