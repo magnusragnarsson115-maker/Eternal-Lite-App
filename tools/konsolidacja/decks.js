@@ -1,12 +1,15 @@
 const pptxgen = require('pptxgenjs');
 
 // ---- Paleta z logo Eternal Life: rdzawa pomarancz + granat ----
-const RDZA = 'B8431F', RDZA_J = 'D46A3E';
-const GRANAT = '1B3A6B', GRANAT_C = '122845';
-const ATRAMENT = '16233F', SZARY = '5D6B8A';
+const RDZA = 'A1370E', RDZA_J = 'C9552A';   // rdza z logo
+const GRANAT = '003071', GRANAT_C = '00224F';  // granat z logo
+const ATRAMENT = '0E1B33', SZARY = '5A6B87';
 const BIALY = 'FFFFFF', KOSC = 'FAF8F5', LINIA = 'E6E2DC';
 const BURSZTYN = 'B07419';
 const HF = 'Cambria', BF = 'Calibri';
+const path = require('path');
+const LOGO = path.join(__dirname, 'assets', 'eternal_logo.png');
+const LOGO_D = path.join(__dirname, 'assets', 'eternal_logo_dark.png');
 const WWW = 'eternallife24.pages.dev';
 const MAIL = 'office.eternal.life@gmail.com';
 const TEL = '+48 784 407 991';
@@ -33,6 +36,21 @@ const Z = {
   prof: 'Wydatki na profilaktykę w Polsce: 21,6 EUR na mieszkańca wobec 202 EUR średniej unijnej',
   eehrxf: 'EEHRxF — obowiązek CE dla systemów dokumentacji medycznej od 26.03.2029, kategoria druga od 26.03.2031',
   bp41: 'Biznesplan 4.0 i Plan Korporacyjny 5.1 — ustalenia po pełnym odczycie korpusu (159 plików, 28,6 mln znaków)',
+  rej:  'Rejestr funkcji Eternal — 337 pozycji ze scalenia macierzy monetyzacji, komponentów i rejestru funkcji (ETERNAL_REJESTR_FUNKCJI.xlsx)',
+  spec: 'Specyfikacja Master 5.4 FINAL — kanon techniczny, katalog granicy MDR na 183 kartach funkcji',
+  kart: 'Karty funkcji Eternal — 337 kart w szablonie osiemnastopolowym (ETERNAL_KARTY_FUNKCJI.docx)',
+  road: 'Roadmapa Wykonawcza 2.0 — pięć torów, kalendarz twardych dat, horyzonty 0–4',
+  prod: 'Analiza produktowa Eternal — sześć produktów po 5–6 funkcji z korelacji rejestru',
+  komp: 'Katalog klas komponentów K01–K28 — wariant A/B/C, próg wyjścia, mechanizm kontroli',
+  cez:  'Centrum e-Zdrowia — e-Profil Pacjenta, RPWDL 2.0, certyfikat integracji (bezpłatny, ważność 2 lata)',
+  pcbc: 'PCBC — cennik oceny dokumentacji technicznej MDR; Komisja Europejska — koszt oceny klinicznej',
+  gus:  'Wydatki publiczne na zdrowie 2026: 247,8 mld zł (6,81% PKB); luka 23 mld zł, prognoza 2040 — 171 mld zł',
+  hosp: 'Hospitalizacje możliwe do uniknięcia 8–10 mld zł rocznie; dublowanie badań 6–8 mld zł rocznie',
+  neko: 'Neko Health — benchmark produktowy: skan ok. 60 min, £299, ponad 350 tys. osób na liście oczekujących',
+  forw: 'Forward Health — 657 mln USD kapitału, zamknięcie działalności 13 listopada 2024',
+  luna: 'LunaDNA (zamknięta 31.01.2024) i Nebula (przekształcona w 2025) — upadek kategorii sprzedaży danych',
+  m42:  'M42 (Abu Zabi) oraz Ping An, Alibaba Health i JD Health — najbliżej pełnego ekosystemu',
+  pwns: 'Warstwa operacyjna planu — 188 punktów z narzędziami, czasem, odpowiedzialnością, partnerami i kosztami w cenach rynkowych PL 2026',
 };
 
 function mk(title) {
@@ -44,13 +62,7 @@ function mk(title) {
   p.defineSlideMaster({
     title: 'JASNY', background: { color: KOSC },
     objects: [
-      // logo: blok E + wordmark
-      { rect: { x: 0.55, y: 0.3, w: 0.30, h: 0.085, fill: { color: RDZA }, line: { color: RDZA } } },
-      { rect: { x: 0.55, y: 0.3, w: 0.085, h: 0.34, fill: { color: RDZA }, line: { color: RDZA } } },
-      { rect: { x: 0.55, y: 0.555, w: 0.30, h: 0.085, fill: { color: RDZA }, line: { color: RDZA } } },
-      { rect: { x: 0.55, y: 0.428, w: 0.20, h: 0.075, fill: { color: RDZA }, line: { color: RDZA } } },
-      { text: { text: 'TERNAL LIFE', options: { x: 0.90, y: 0.29, w: 2.6, h: 0.36, valign: 'middle',
-        fontSize: 15, bold: true, color: GRANAT, fontFace: HF, charSpacing: 1, margin: 0, isTextBox: true } } },
+      { image: { path: LOGO, x: 0.55, y: 0.24, w: 1.62, h: 1.03 * 0.62 } },
       { text: { text: WWW, options: { x: 9.9, y: 0.29, w: 2.85, h: 0.36, align: 'right', valign: 'middle',
         fontSize: 9.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true } } },
     ],
@@ -58,12 +70,7 @@ function mk(title) {
   p.defineSlideMaster({
     title: 'CIEMNY', background: { color: GRANAT },
     objects: [
-      { rect: { x: 0.55, y: 0.3, w: 0.30, h: 0.085, fill: { color: RDZA_J }, line: { color: RDZA_J } } },
-      { rect: { x: 0.55, y: 0.3, w: 0.085, h: 0.34, fill: { color: RDZA_J }, line: { color: RDZA_J } } },
-      { rect: { x: 0.55, y: 0.555, w: 0.30, h: 0.085, fill: { color: RDZA_J }, line: { color: RDZA_J } } },
-      { rect: { x: 0.55, y: 0.428, w: 0.20, h: 0.075, fill: { color: RDZA_J }, line: { color: RDZA_J } } },
-      { text: { text: 'TERNAL LIFE', options: { x: 0.90, y: 0.29, w: 2.6, h: 0.36, valign: 'middle',
-        fontSize: 15, bold: true, color: BIALY, fontFace: HF, charSpacing: 1, margin: 0, isTextBox: true } } },
+      { image: { path: LOGO_D, x: 0.55, y: 0.24, w: 1.62, h: 1.03 * 0.62 } },
       { text: { text: WWW, options: { x: 9.9, y: 0.29, w: 2.85, h: 0.36, align: 'right', valign: 'middle',
         fontSize: 9.5, color: '9FB2D8', fontFace: BF, margin: 0, isTextBox: true } } },
     ],
@@ -208,319 +215,558 @@ const MONET = [
   ['K11', 'Choroby przewlekłe', 'Pakiety dla diabetyków, kardiologii i zdrowia psychicznego.'],
 ];
 
-// ============ DECK APLIKACJI (12 slajdow) ============
+// ============ DECK APLIKACJI — 14 slajdow wg nazw z oryginalnego decku ============
 function deckApp() {
-  NUM = 0; TOT = 12;
+  NUM = 0; TOT = 14;
   const p = mk('Eternal App — pitch aplikacji');
   let s;
 
-  cover(p, 'Pre-Seed · aplikacja', 'Eternal App', 'Zintegrowana platforma danych zdrowotnych',
-    'Aplikacja zbiera rozproszoną historię medyczną w jedno miejsce i zamienia ją w dane, na których da się działać. Rozwiązujemy problem ostatniej mili w analizie zdrowia.');
+  // 1 ETERNAL — tytul
+  cover(p, 'Pre-Seed · aplikacja Eternal', 'Eternal',
+    'Zintegrowana platforma danych zdrowotnych',
+    'Aplikacja zbiera rozproszoną historię medyczną w jedno miejsce i zamienia ją w dane, na których da się działać. Rozwiązujemy barierę ostatniej mili w analizie zdrowia — bez oceny, progu i zalecenia, czyli bez wchodzenia w reżim wyrobu medycznego na starcie.');
 
-  s = slide(p); head(s, 'Problem', '80% historii medycznej jest niewidoczne dla algorytmów', 'trzy bariery → skutek dla predykcji');
-  cards(s, [['Martwe dane', 'Wyniki badań siedzą w PDF-ach, zdjęciach i skanach. Standardowe algorytmy ich nie widzą.'],
-            ['Brak kontekstu', 'Smartwatch widzi słaby sen, ale nie widzi niskiej ferrytyny ukrytej w PDF.'],
-            ['Brak działania', 'Bez standardu FHIR nie ma wymiany danych. Pacjent dostaje informację, nie możliwość działania.']], 2.3, 3);
-  s.addText('„Obecny system jest zaprojektowany do leczenia chorób, a nie utrzymania zdrowia."',
-    { x: 0.55, y: 4.25, w: 12.2, h: 0.4, fontSize: 13, italic: true, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-  src(s, ['fhir', 'ehds']);
-  s.addNotes('Problem ostatniej mili: dane istnieją, ale są nieczytelne dla maszyn i pozbawione kontekstu klinicznego.');
+  // 2 OBECNE WYZWANIA — bariera ostatniej mili
+  s = slide(p); head(s, 'Obecne wyzwania', 'Bariera ostatniej mili', 'bariera → mechanizm → skutek dla pacjenta');
+  cards(s, [
+    ['Martwe dane', 'Wyniki badań leżą w PDF-ach, skanach i zdjęciach. Dla algorytmu to obraz, nie dane. Bez struktury nie ma korelacji.'],
+    ['Brak kontekstu', 'Opaska widzi słaby sen, ale nie widzi niskiej ferrytyny ukrytej w PDF sprzed ośmiu miesięcy. Dwa sygnały nigdy się nie spotykają.'],
+    ['Brak działania', 'Pacjent dostaje informację, nie możliwość działania. Nie ma jednej osi czasu, nie ma raportu, z którym idzie się do lekarza.'],
+  ], 2.3, 3);
+  kpis(s, [
+    ['247,8 mld zł', 'wydatki publiczne na zdrowie 2026 (6,81% PKB)'],
+    ['23 mld zł', 'luka finansowa systemu, prognoza 2040 — 171 mld'],
+    ['21,6 EUR', 'na profilaktykę na mieszkańca wobec 202 EUR w UE'],
+    ['8–10 mld zł', 'hospitalizacje możliwe do uniknięcia rocznie'],
+  ], 4.3);
+  s.addText('System jest zaprojektowany do leczenia chorób, a nie do utrzymania zdrowia. Pieniądze idą na skutek, nie na przyczynę — a dane, które pozwoliłyby zawrócić, są rozproszone i nieczytelne dla maszyn.',
+    { x: 0.55, y: 5.5, w: 12.2, h: 0.5, fontSize: 11, italic: true, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['gus', 'prof', 'hosp']);
+  s.addNotes('Bariera ostatniej mili: dane istnieją, ale są nieczytelne dla maszyn i pozbawione kontekstu klinicznego.');
 
-  s = slide(p); head(s, 'Rozwiązanie', 'Eternal Core Intelligence', 'filar → technologia → zakres integracji');
-  cards(s, [['Filar 1 — import uniwersalny', 'Skan dowolnego dokumentu medycznego i konwersja na dane strukturalne w standardzie FHIR.'],
-            ['Filar 2 — synchronizacja', 'Jedno API do wszystkich wiodących wearables: Apple, Garmin, Oura, Whoop, Fitbit.'],
-            ['Filar 3 — logika medyczna', 'Korelacja twardych wyników badań z miękkimi danymi behawioralnymi.']], 2.3, 3);
-  kpis(s, [['160', 'funkcji aplikacji w 23 modułach'], ['309', 'funkcji ekosystemu w 42 modułach'], ['12', 'funkcji etapu zerowego'], ['Q3 2026', 'start MVP']], 4.3);
-  s.addText('Liczby po scaleniu rejestrów i usunięciu duplikatów: 160 funkcji w 23 modułach dla aplikacji w ujęciu użytkownika, 309 w 42 modułach dla całego ekosystemu. Etap zerowy to jednak dwanaście funkcji tworzących jeden produkt, nie sto sześćdziesiąt.',
+  // 3 NASZE ROZWIAZANIE — Eternal Core Intelligence
+  s = slide(p); head(s, 'Nasze rozwiązanie', 'Eternal Core Intelligence', 'filar → co robi → reżim regulacyjny');
+  cards(s, [
+    ['Filar 1 — import uniwersalny', 'Skan dowolnego dokumentu medycznego i konwersja na dane strukturalne w standardzie FHIR R4B. Poza reżimem wyrobu.'],
+    ['Filar 2 — synchronizacja', 'Jedno wejście do wiodących urządzeń noszonych: Apple, Garmin, Oura, Whoop, Fitbit. Poza reżimem wyrobu.'],
+    ['Filar 3 — logika medyczna', 'Korelacja twardych wyników badań z miękkimi danymi behawioralnymi. Fakt i porównanie do własnej historii — nie ocena.'],
+  ], 2.3, 3);
+  kpis(s, [
+    ['337', 'pozycji w rejestrze funkcji ekosystemu'],
+    ['243 / 31 / 63', 'funkcji w warstwie A / B / C'],
+    ['67', 'funkcji o priorytecie P0'],
+    ['13', 'funkcji obowiązkowych w MVP'],
+  ], 4.3);
+  s.addText('Rejestr powstał ze scalenia macierzy monetyzacji, katalogu komponentów i rejestru funkcji po pełnym odczycie korpusu i usunięciu duplikatów. Warstwa A działa poza reżimem wyrobu medycznego, warstwa C wymaga certyfikacji — i dlatego jest odroczona, a nie pominięta.',
     { x: 0.55, y: 5.5, w: 12.2, h: 0.5, fontSize: 10, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-  src(s, ['terra', 'fhir', 'bp41']);
+  src(s, ['rej', 'spec', 'terra']);
 
-  s = slide(p); head(s, 'Moduły', 'Co aplikacja faktycznie robi', 'moduł → zakres → etap dojrzałości');
-  table(s, ['Moduły', 'Zakres', 'Etap'], [
-    ['A1–A2', 'Agregacja danych z wearables i OCR dokumentów medycznych', 'MVP'],
-    ['A3–A4', 'Dashboard, alerty, Bio-Weather, raporty i eksport', 'MVP'],
-    ['A5–A6', 'Telemedycyna oraz AI/RAG z guardrails i cytowaniem źródeł', 'MLP'],
-    ['A7–A8', 'Planowanie, rekomendacje, zdrowie psychiczne z Crisis Redirect 116 123', 'MLP'],
-    ['A9–A12', 'Społeczność, marketplace, regionalizacja, automatyczna dokumentacja', 'MLP–FINAL'],
-    ['A13–A16', 'Pet, powiadomienia i eskalacja, Fundacja/Hub, Eternal Forge', 'FINAL'],
-  ], 2.3, [1.5, 8.5, 2.2]);
-  src(s, ['itaka']);
+  // 4 ARCHITEKTURA — pipeline danych
+  s = slide(p); head(s, 'Architektura', 'Pipeline danych', 'warstwa → zakres techniczny → zasada');
+  table(s, ['Warstwa', 'Zakres techniczny', 'Zasada'], [
+    ['01 Ingestion', 'agregacja urządzeń noszonych · OCR dokumentów medycznych · import z e-Profilu Pacjenta', 'trzech dostawców, nie jeden'],
+    ['02 Structuring', 'FHIR R4B · mapowanie SNOMED CT i LOINC · normalizacja jednostek', 'standard przed logiką'],
+    ['03 Intelligence', 'RAG z guardrails i cytowaniem źródła · detekcja anomalii · Bio-Correlation', 'brak oceny i progu'],
+    ['04 Presentation', 'oś czasu zdrowia · raport SBAR dla lekarza · eksport i usunięcie danych', 'wyjście zawsze możliwe'],
+    ['05 Governance', 'log dostępu widoczny dla użytkownika · zgoda granularna per cel · tryb degradacji', 'wymóg i wyróżnik handlowy'],
+  ], 2.3, [1.9, 7.6, 2.7]);
+  s.addText('Decyzje zamknięte: Flutter i FastAPI, FHIR R4B, wektory na pgvector (odejście od Pinecone), modele językowe za adapterem, dane surowe pozostają na urządzeniu, hosting w Unii Europejskiej. Każda klasa komponentu K01–K28 ma wariant A, B i C oraz próg wyjścia — dostawca startowy nie jest zobowiązaniem na zawsze.',
+    { x: 0.55, y: 4.85, w: 12.2, h: 0.7, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['fhir', 'komp', 'rodo']);
 
-  s = slide(p); head(s, 'Architektura', 'Od sygnału do wniosku klinicznego', 'warstwa → zakres techniczny');
-  table(s, ['Warstwa', 'Zakres'], [
-    ['01 Ingestion', 'Terra API dla urządzeń noszonych · OCR dokumentów medycznych'],
-    ['02 Structuring', 'FHIR R4B · mapowanie SNOMED CT i LOINC'],
-    ['03 Intelligence', 'RAG z guardrails · scoring i detekcja anomalii · Bio-Correlation'],
-    ['04 Presentation', 'Dashboardy · oś czasu zdrowia · raport SBAR dla lekarza'],
-  ], 2.3, [2.4, 9.8]);
-  s.addText('Decyzje oznaczone w źródłach jako zamknięte: Flutter + FastAPI + FHIR R4B, RAG na Qdrant, BioMistral 7B i PubMedBERT, dane surowe pozostają na urządzeniu, hosting w Unii Europejskiej.',
-    { x: 0.55, y: 4.5, w: 12.2, h: 0.55, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-  src(s, ['fhir', 'rodo']);
+  // 5 CORE INTELLIGENCE — kluczowe funkcjonalnosci
+  s = slide(p); head(s, 'Core Intelligence', 'Kluczowe funkcjonalności', 'funkcja → co daje → dlaczego obowiązkowa');
+  table(s, ['Funkcja', 'Co daje użytkownikowi', 'Status'], [
+    ['Agregacja i OCR', 'jedna oś czasu z opasek, PDF-ów i skanów — bez przepisywania ręcznego', 'P0 · warstwa A'],
+    ['Rejestr leków, alergii, wywiad rodzinny', 'fundament farmakoterapii i najsilniejszy predyktor ryzyka za koszt jednego pola', 'P0 · warstwa A'],
+    ['Mapa i skale bólu', 'najczęstszy powód wizyty u lekarza — nie występował w żadnym wcześniejszym rejestrze', 'P0 · warstwa A'],
+    ['Raport SBAR i czasowe udostępnienie lekarzowi', 'lekarz widzi historię w trzy minuty zamiast w trzy wizyty', 'P0 · warstwa A'],
+    ['Log dostępu, zgoda per cel, usunięcie danych', 'użytkownik widzi, kto czytał i może wycofać zgodę punktowo', 'P0 · wymóg RODO'],
+    ['Oznaczanie treści generowanej przez model', 'jasność, co napisał człowiek, a co system', 'P0 · AI Act art. 50'],
+    ['Redirect 116 123', 'jedyna funkcja bez ewolucji faz — dostępna na każdym etapie produktu', 'P0 · bezwarunkowa'],
+  ], 2.3, [3.4, 6.4, 2.4]);
+  warn(s, 'Reguła granicy obowiązuje w każdej z tych funkcji: fakt i porównanie do własnej historii są bezpieczne; ocena, próg i zalecenie nie są. Cztery sformułowania przekraczają granicę wyrobu medycznego: „Twoje…", „w normie", „powinieneś", „wskazuje na". Katalog liczy 45 reguł kwalifikacji i 52 bezpieczne sformułowania interfejsu.', 5.15);
+  src(s, ['spec', 'kart', 'mdcg']);
 
-  s = slide(p); head(s, 'Monetyzacja', 'Aplikacja pacjenta jest darmowa', 'kanał → nazwa → istota i stawka');
-  table(s, ['Kanał', 'Nazwa', 'Istota'], MONET.slice(0, 6), 2.3, [1.0, 3.5, 7.7]);
-  warn(s, 'Paradoks przychodowy: 95–105 funkcji niecertyfikowanych jest tanich i ma najsłabszą skłonność do płacenia, a 14–35 certyfikowanych jest drogich i to jedyne, za które ktoś zapłaci. Dojście do 10 mln zł z samego abonamentu wymaga 1–5% populacji Polski. Darmowa aplikacja nie wygrywa z IKP i nie ma wygrywać — ceny zera nie da się podciąć, a IKP ma mandat ustawowy i 20 mln kont. To decyzja dystrybucyjna, nie konkurencyjna. Wygrywamy tym, czego państwo zrobić nie może: zlecić badanie, leczyć, zinterpretować. Cennik rozjechany w korpusie (29,99/49,99, 49, 19–29 PLN) — obowiązuje Master 5.4: darmowa w całości.', 4.75);
-  src(s, ['rodo']);
-
-  s = slide(p); head(s, 'Monetyzacja', 'Kanały K6–K11 — tam, gdzie są pieniądze', 'kanał → nazwa → istota i stawka');
-  table(s, ['Kanał', 'Nazwa', 'Istota'], MONET.slice(6), 2.3, [1.0, 3.5, 7.7]);
-  warn(s, 'Kanał K6 jest najbardziej ryzykowny prawnie: różnicowanie składki na podstawie danych zdrowotnych to profilowanie z art. 22 RODO w połączeniu z art. 9. Wymaga osobnej, w pełni opcjonalnej zgody i ścieżki odwoławczej do człowieka.', 4.9);
-  src(s, ['rodo', 'ehds']);
-
-  s = slide(p); head(s, 'Grupy docelowe', 'Trzy segmenty, trzy różne powody', 'segment → potrzeba → wielkość rynku → CAC → LTV');
-  table(s, ['Segment', 'Potrzeba', 'Wielkość PL/UE', 'CAC', 'LTV'], [
-    ['Biohackerzy 30–50 lat', 'Mają 3+ urządzenia, dane w 5 aplikacjach. Szukają korelacji.', '200 tys. / 2 mln', '250–600 PLN', 'do przeliczenia'],
-    ['Pacjenci metaboliczni', 'Stosy PDF-ów i chaos w lekach. Potrzebują cyfrowego archiwum.', '500 tys. / 5 mln+', '250–600 PLN', 'do przeliczenia'],
-    ['Opiekunowie 40–60 lat', 'Martwią się o rodziców. Zdalny monitoring i interpretacja wyników.', '800 tys. / 8 mln+', '250–600 PLN', 'do przeliczenia'],
-  ], 2.3, [2.5, 5.0, 2.0, 1.2, 1.5]);
-  s.addText('Warianty produktu wskazane w źródłach: tryb fitness, panel dla lekarza, tryb dla przewlekle chorych.',
-    { x: 0.55, y: 4.35, w: 12.2, h: 0.35, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-  warn(s, 'Dwie korekty do wcześniejszych wersji tego slajdu. CAC: wartości 80–120 PLN były nierealne dla nowej marki medtech — scenariusz bazowy B2C to 250–600 PLN, dobry viral 100–250, premium health 500–1000+; w B2B 2–10 tys. na klienta, ale klient kupuje 10–1000 urządzeń, więc B2B jest wielokrotnie efektywniejsze. LTV: liczone było dla płatnej subskrypcji, a aplikacja jest darmowa — trzeba je przeliczyć od zera z marży kanałów K3–K11 przypadającej na użytkownika. Konwersja: 25–35% dotyczy konwersji PO UŻYCIU funkcji, nie z całej bazy; konwersja freemium w healthtech to około 3,9%.', 4.65);
+  // 6 RYNEK I SEGMENTY — grupy docelowe
+  s = slide(p); head(s, 'Rynek i segmenty', 'Grupy docelowe', 'segment → potrzeba → kto decyduje → CAC');
+  table(s, ['Segment', 'Potrzeba', 'Kto decyduje', 'CAC'], [
+    ['Pacjenci metaboliczni i przewlekli', 'stosy PDF-ów i chaos w lekach — potrzebują archiwum, które rozumie treść', 'sam pacjent', '250–600 zł'],
+    ['Opiekunowie 40–60 lat', 'martwią się o rodziców; chcą wglądu i interpretacji bez dzwonienia po wynikach', 'opiekun, nie pacjent', '250–600 zł'],
+    ['Biohackerzy 30–50 lat', 'trzy urządzenia, dane w pięciu aplikacjach — szukają korelacji, nie kolejnego wykresu', 'sam użytkownik', '100–250 zł'],
+    ['Gabinety bez działu IT', 'dokumentacja zjada czas wizyty; płatnik decyzyjny to jedna osoba, nie komisja', 'właściciel gabinetu', '2–10 tys. zł'],
+  ], 2.3, [3.0, 5.6, 2.2, 1.4]);
+  warn(s, 'Dwie korekty wobec wcześniejszych wersji tego slajdu. CAC 80–120 zł było nierealne dla nowej marki medtech — scenariusz bazowy B2C to 250–600 zł, premium health 500–1000+, w B2B 2–10 tys. na klienta, ale klient kupuje 10–1000 stanowisk, więc B2B jest wielokrotnie efektywniejszy. LTV liczono dla płatnej subskrypcji, a aplikacja pacjenta jest darmowa — trzeba je przeliczyć od zera z marży kanałów K3–K11. Konwersja 25–35% dotyczyła użycia funkcji, nie całej bazy; konwersja freemium w healthtech to około 3,9%.', 5.15);
   src(s, ['bp41']);
 
-  s = slide(p); head(s, 'Granica regulacyjna', 'Wellness teraz, wyrób medyczny później', 'warstwa przeznaczenia → zakres funkcji → wymóg certyfikacji');
-  cards(s, [['Warstwa A — poza MDR', 'Agregacja, przechowywanie i pokazywanie własnych danych, eksport. Zakres MVP.'],
-            ['Warstwa B — poza MDR', 'Transkrypcja, dokumentacja, umawianie wizyt, prezentacja danych. Zakres MLP.'],
-            ['Warstwa C — klasa IIa+', 'Interpretacja z oceną, alerty progowe z oceną kliniczną. Po certyfikacji.']], 2.3, 3);
-  warn(s, 'Dziedziczenie klasy: komponent obsługujący jednocześnie funkcję wellness i funkcję klasy IIa dziedziczy klasę wyższą dla całości — dzielenie komponentów oszczędza pieniądze i podnosi klasę. Reguła produktowa: fakt i porównanie do własnej historii są bezpieczne; ocena, próg i zalecenie nie są. Zbiera, normalizuje, łączy — bezpieczne. Automatyzuje, personalizuje — granica. Jedna warstwa decyzyjna to wyrób. Agregacja nie omija certyfikacji, tylko ją odracza. Osobno obowiązuje AI Act — załącznik III.', 4.3);
-  src(s, ['mdcg', 'mdr', 'aiact']);
+  // 7 CASE STUDY — podroz uzytkownika: Piotr
+  s = slide(p); head(s, 'Case study', 'Podróż użytkownika: Piotr', 'krok → co widzi Piotr → co widzi system');
+  table(s, ['Krok', 'Co widzi Piotr', 'Co widzi system'], [
+    ['1. Wejście', 'skanuje osiem wyników badań z trzech lat i podłącza opaskę — pięć minut, bez przepisywania', 'OCR → FHIR R4B, mapowanie LOINC, normalizacja jednostek'],
+    ['2. Oś czasu', 'pierwszy raz widzi ferrytynę, sen i tętno spoczynkowe na jednej osi', 'korelacja twardych wyników z danymi behawioralnymi'],
+    ['3. Sygnał', '„Twoja ferrytyna z marca była niższa niż w dwóch poprzednich badaniach" — fakt i porównanie, bez oceny', 'detekcja odchylenia od własnej historii; brak progu i zalecenia'],
+    ['4. Wizyta', 'generuje raport SBAR i udostępnia go lekarzowi na 48 godzin', 'czasowy token dostępu, log widoczny dla Piotra'],
+    ['5. Kontrola', 'wycofuje zgodę na jeden cel, resztę zostawia; eksportuje albo usuwa całość', 'zgoda granularna per cel, usunięcie odrębne od eksportu'],
+  ], 2.3, [1.5, 6.0, 4.7]);
+  s.addText('W żadnym kroku system nie mówi Piotrowi, że coś jest „w normie", ani czego „powinien" — to byłaby ocena kliniczna i wyrób medyczny klasy IIa. Mówi, co się zmierzyło i jak to wygląda wobec jego własnej historii. Rozstrzyga lekarz, z raportem, którego wcześniej nie miał.',
+    { x: 0.55, y: 5.15, w: 12.2, h: 0.7, fontSize: 11, color: ATRAMENT, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['spec', 'mdcg', 'rodo']);
 
-  s = slide(p); head(s, 'Zespół', 'Kto to buduje', 'osoba → rola → zakres odpowiedzialności');
-  team(s, 2.3);
-  s.addText('Model operacyjny lean: zespół core plus wyspecjalizowane software house\'y, hardware przez partnerów OEM, konsultanci medyczni rozliczani projektowo.',
-    { x: 0.55, y: 4.65, w: 12.2, h: 0.5, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
+  // 8 MONETYZACJA — model biznesowy
+  s = slide(p); head(s, 'Monetyzacja', 'Model biznesowy', 'kanał → nazwa → istota i stawka');
+  table(s, ['Kanał', 'Nazwa', 'Istota'], [
+    MONET[0], MONET[7], MONET[6], MONET[5], MONET[2], MONET[8], MONET[3],
+  ], 2.3, [1.0, 3.5, 7.7]);
+  warn(s, 'Paradoks przychodowy rozstrzygnięty: funkcje niecertyfikowane są tanie i mają najsłabszą skłonność do płacenia, certyfikowane są drogie i to za nie ktoś płaci. Dojście do 10 mln zł z samego abonamentu konsumenckiego wymagałoby 1–5% populacji Polski — dlatego aplikacja pacjenta jest darmowa w całości, a przychód idzie z gabinetów, płatników, marketplace i grantów. Darmowa aplikacja nie konkuruje z systemem państwowym i nie ma konkurować: ceny zera nie da się podciąć.', 5.35);
+  src(s, ['rej', 'bp41']);
 
-  s = slide(p); head(s, 'Finansowanie', 'Czego szukamy', 'etap → kwota → termin → equity → cel');
-  table(s, ['Etap', 'Kwota', 'Termin', 'Equity', 'Cel'], [
-    ['Pre-Seed', '110 tys. PLN', 'Q2 2026', '5–8%', 'MVP aplikacji: agregacja, OCR, dashboard'],
-    ['Seed', '6,0–6,7 mln PLN', 'Q4 2026', '12–15%', 'Premium, telemedycyna, runway 18–24 mies.'],
-  ], 2.3, [1.6, 2.3, 1.6, 1.4, 5.3]);
-  warn(s, 'Budżet MVP 110 tys. PLN nie pokrywa opisanego zakresu. Master 5.4 wycenia go na 160–190 tys. przy orkiestracji i zaznacza, że wcześniejsze wyceny całkowicie pomijały wynagrodzenia — a wynagrodzenia to 70–90% struktury kosztów. Alternatywa wynikająca z pełnego odczytu korpusu: około 200 tys. zł domyka strukturę prawną, status podmiotu leczniczego i doprowadza do pierwszego przychodu bez rundy kapitałowej. Kolejność źródeł: przepływ z działalności powtarzalnej, potem granty, potem kapitał cierpliwy — kapitał wysokiego ryzyka wyłącznie do spółek celowych pod sprzęt.', 3.95);
-  src(s, ['bp41']);
+  // 9 OKAZJA RYNKOWA — rynek i dlaczego teraz
+  s = slide(p); head(s, 'Okazja rynkowa', 'Dlaczego teraz', 'data → co obowiązuje → skutek dla nas');
+  table(s, ['Data', 'Co obowiązuje', 'Skutek dla nas'], [
+    ['28.05.2026', 'EUDAMED obowiązkowy — także dla składających systemy i zestawy', 'obowiązek rejestracyjny po naszej stronie'],
+    ['03.10.2026', 'samoidentyfikacja NIS2 i wpis do Wykazu KSC', 'obowiązek własny — nikt nie wezwie'],
+    ['26.03.2027', 'akty wykonawcze EHDS, organy dostępu do danych', 'początek okna przewagi'],
+    ['26.03.2029', 'EEHRxF kategoria 1 — CE dla systemów dokumentacji medycznej', 'jedyna data tworząca rynek na mapper'],
+    ['26.03.2031', 'EEHRxF kategoria 2 — obrazowanie, wyniki, wypisy', 'do tego czasu luka pozostaje otwarta'],
+  ], 2.3, [1.9, 5.9, 4.4]);
+  s.addText('Kto zbuduje mapper przed 2029, sprzedaje go każdemu dostawcy systemu gabinetowego w Polsce. Kto zacznie w 2029 — nikomu. To jedyna zewnętrzna data w całym planie, która tworzy popyt niezależnie od naszych działań.',
+    { x: 0.55, y: 4.85, w: 12.2, h: 0.6, fontSize: 12, bold: true, color: RDZA, fontFace: BF, margin: 0, isTextBox: true });
+  s.addText('Celowo nie podajemy globalnych wartości rynku. Wcześniejsze materiały operowały liczbami rzędu bilionów dolarów przy strategii ograniczonej do Polski — taka rozbieżność jest w rozmowie z inwestorem sygnałem ostrzegawczym, nie atutem.',
+    { x: 0.55, y: 5.5, w: 12.2, h: 0.5, fontSize: 10, italic: true, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['eehrxf', 'ehds', 'nis2']);
 
+  // 10 KRAJOBRAZ RYNKU — konkurencja
+  s = slide(p); head(s, 'Krajobraz rynku', 'Konkurencja', 'kategoria → ich przewaga → nasza pozycja');
+  table(s, ['Kategoria', 'Ich przewaga', 'Nasza pozycja'], [
+    ['System publiczny (IKP, P1)', 'darmowe, 20 mln kont, mandat ustawowy', 'nie konkurujemy — integrujemy się przez e-Profil Pacjenta'],
+    ['Systemy gabinetowe', 'zainstalowana baza, relacje z placówkami', 'stajemy się ich dostawcą komponentu przed 2029'],
+    ['Dokumentacja automatyczna (scribe)', 'kapitał, dojrzałość produktu', 'język polski, integracja lokalna, cena'],
+    ['Aplikacje konsumenckie', 'budżety marketingowe', 'nie wchodzimy w tę kategorię'],
+    ['Agregatory danych', 'zasięg integracji', 'stają się jednym z trzech dostawców, nie jedynym'],
+    ['Globalne firmy prewencyjne', 'kapitał rzędu miliarda', 'nie wchodzą do Polski — wymaga statusu podmiotu leczniczego'],
+  ], 2.3, [3.0, 3.9, 5.3]);
+  s.addText('Dwa ostrzeżenia z rynku: firma prewencyjna z 657 mln USD kapitału zamknęła działalność w listopadzie 2024, a obie platformy monetyzujące sprzedaż danych genetycznych zniknęły do 2025. Kategoria „sprzedamy dane" jest martwa — nasz kanał danych to wyłącznie zbiory zagregowane i zanonimizowane.',
+    { x: 0.55, y: 5.15, w: 12.2, h: 0.7, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['forw', 'luna', 'neko', 'm42']);
+
+  // 11 TRACTION I ROADMAPA
+  s = slide(p); head(s, 'Traction i roadmapa', 'Start 2026', 'termin → kamień milowy → co znaczy niepowodzenie');
+  table(s, ['Termin', 'Kamień milowy', 'Co znaczy niepowodzenie'], [
+    ['15.09.2026', 'dwadzieścia rozmów zamkniętych — rozmowa, nie ankieta', 'zatrzymaj budowę, zmień produkt'],
+    ['15.10.2026', 'PIĘĆ PODPISANYCH ZOBOWIĄZAŃ — list, przedpłata, cokolwiek wiążącego', 'ZATRZYMAJ BUDOWĘ — dalsze budowanie jest spalaniem pieniędzy'],
+    ['15.11.2026', 'produkt u pięciu użytkowników, wniosek do rejestru podmiotów leczniczych złożony', 'opóźnienie, nie porażka'],
+    ['31.12.2026', 'podpisany statut Fundacji z trzema zamkami', 'po tej dacie piszesz go z gorszej pozycji negocjacyjnej'],
+    ['2027', 'pierwsze licencje dokumentacyjne i subskrypcje weterynaryjne', 'brak przychodu powtarzalnego — rewizja kanału'],
+    ['2029', 'mapper w oknie regulacyjnym EEHRxF', 'okno zamknięte, produkt bez rynku'],
+  ], 2.3, [1.6, 6.6, 4.0]);
+  s.addText('Roadmapa prowadzona jest pięcioma równoległymi torami: sprzedaż, struktura prawna, integracja państwowa, produkt i zgodność. Bramki są wiążące — przekroczenie bramki bez wyniku zatrzymuje tor produktowy, a nie przesuwa termin.',
+    { x: 0.55, y: 5.5, w: 12.2, h: 0.5, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['road', 'pwns']);
+
+  // 12 STRUKTURA ORGANIZACYJNA
+  s = slide(p); head(s, 'Struktura organizacyjna', 'Kluczowy zespół i partnerzy', 'osoba → rola → zakres odpowiedzialności');
+  team(s, 2.25);
+  table(s, ['Partner / dostawca', 'Rola w modelu operacyjnym'], [
+    ['Software house wyspecjalizowany', 'wykonanie modułów poza rdzeniem; zespół core trzyma architekturę i dane'],
+    ['Partner OEM sprzętowy', 'hardware bez własnej linii produkcyjnej — wariant „kupić zamiast budować"'],
+    ['Kancelaria i druga kancelaria przeglądowa', 'statut Fundacji, opinie regulacyjne, przegląd niezależny'],
+    ['Konsultanci medyczni i jednostka notyfikowana', 'wiarygodność kliniczna, spotkanie przedzgłoszeniowe przed ścieżką CE'],
+  ], 4.6, [4.4, 7.8]);
+  src(s, ['bp41', 'komp']);
+
+  // 13 BUDZET I EKONOMIA
+  s = slide(p); head(s, 'Budżet i ekonomia', 'Finanse — budżet MVP', 'pozycja → kwota → charakter');
+  table(s, ['Pozycja', 'Kwota', 'Charakter'], [
+    ['Kancelaria — statut Fundacji i opinia regulacyjna', '30–60 tys. zł', 'jednorazowo, nieodwracalne'],
+    ['Przegląd przez drugą kancelarię', '10–20 tys. zł', 'jednorazowo'],
+    ['Opinie prawne: retencja, farmaceutyczna, ubezpieczeniowa', '15–30 tys. zł', 'jednorazowo'],
+    ['Wpis do rejestru podmiotów leczniczych', '894 zł', 'warunek wejścia'],
+    ['OC, lokal, opinia sanitarna', '20–40 tys. zł', 'warunek wejścia'],
+    ['Bazy słownikowe i licencje branżowe', '~15 tys. zł rocznie', 'powtarzalne'],
+    ['Spotkanie przedzgłoszeniowe z jednostką notyfikowaną', '5–15 tys. zł', 'jednorazowo'],
+    ['RAZEM, poza kosztem zespołu', '101–191 tys. zł', 'certyfikat integracji z platformą państwową — bezpłatny'],
+  ], 2.3, [6.0, 2.6, 3.6]);
+  warn(s, 'Budżet MVP na poziomie 110 tys. zł nie pokrywał opisanego zakresu — wcześniejsze wyceny całkowicie pomijały wynagrodzenia, a wynagrodzenia to 70–90% struktury kosztów. Alternatywa wynikająca z pełnego odczytu korpusu: około 200 tys. zł domyka strukturę prawną, status podmiotu leczniczego i doprowadza do pierwszego przychodu bez rundy kapitałowej. Kolejność źródeł: przepływ z działalności powtarzalnej, potem granty, potem kapitał cierpliwy — kapitał wysokiego ryzyka wyłącznie do spółek celowych pod sprzęt.', 5.35);
+  src(s, ['cez', 'pcbc', 'bp41']);
+
+  // 14 KONTAKT
   s = slide(p, true); head(s, 'Kontakt', 'Porozmawiajmy', null, true); kontakt(s);
 
   return p.writeFile({ fileName: '/home/user/Eternal-Lite-App/out/ETERNAL_PITCH_APLIKACJA.pptx' });
 }
 
-// ============ DECK EKOSYSTEMU (24 slajdy, struktura wg oficjalnego decku) ============
+// ============ DECK EKOSYSTEMU — 32 slajdy wg nazw z oryginalnego decku ============
 function deckEko() {
-  NUM = 0; TOT = 26;
-  const p = mk('Eternal Life — pitch ekosystemu');
+  NUM = 0; TOT = 32;
+  const p = mk('Eternal Life Ecosystem — pitch deck');
   let s;
 
-  cover(p, 'Pre-Seed · faza koncepcyjna', 'Rewolucja w prewencji zdrowotnej',
-    'Pierwszy na świecie zintegrowany Health OS',
-    'Ekosystem łączący aplikację mobilną, diagnostykę domową i nanotechnologię, aby przekształcić medycynę prewencyjną z reaktywnej w proaktywną.');
+  // 1
+  cover(p, 'Pre-Seed · ekosystem', 'Eternal Life',
+    'Warstwa znaczenia nad polskim systemem e-zdrowia',
+    'Państwo dostarcza fakty dwudziestu milionom ludzi za darmo. Nie dostarcza interpretacji i nie może jej dostarczyć bez stania się producentem wyrobu medycznego. Ta luka nie zamknie się do 2031 roku.');
 
-  s = slide(p); head(s, 'Problem I', 'Współczesna medycyna jest fragmentaryczna i opóźniona', 'trzy osie problemu → konsekwencja systemowa');
-  cards(s, [['Rosnące obciążenie chorobami', 'Seniorzy i grupy ryzyka wymagają stałego monitoringu, a systemy opierają się na rzadkich wizytach.'],
-            ['Późne diagnozy i brak prewencji', 'Diagnozy stawiane zbyt późno, gdy leczenie jest kosztowne i mniej skuteczne. Brak ostrzegania 24/7.'],
-            ['Chaos informacyjny', 'Dane rozproszone w wielu systemach uniemożliwiają spójną analizę i ciągłość opieki.']], 2.3, 3);
-  src(s, ['ehds']);
+  // 2 Problem I
+  s = slide(p); head(s, 'Problem I', 'Współczesna medycyna jest fragmentaryczna i opóźniona', 'gdzie leżą dane → dlaczego nie da się na nich działać');
+  cards(s, [['Dokumentacja jest rozproszona', 'Placówka trzyma dokument u siebie. Do platformy państwowej trafia wyłącznie indeks — nie treść.'],
+            ['Wynik jest nieczytelny', 'Pacjent dostaje liczbę bez odniesienia do własnej historii. Brak warstwy tłumaczącej w systemie publicznym.'],
+            ['Reakcja zamiast prewencji', 'System jest zaprojektowany do leczenia chorób, nie do utrzymania zdrowia. Wydatki na profilaktykę: 21,6 EUR wobec 202 EUR średniej unijnej.']], 2.3, 3);
+  kpis(s, [['247,8 mld zł', 'wydatki publiczne na zdrowie 2026'], ['23 mld zł', 'luka finansowa 2026'],
+           ['171 mld zł', 'prognoza luki 2040'], ['9×', 'różnica w profilaktyce wobec UE']], 4.35);
+  src(s, ['gus', 'prof']);
+  s.addNotes('Problem jest policzony w złotówkach i w polskim systemie, nie w globalnych prognozach rynku.');
 
-  s = slide(p); head(s, 'Problem II', 'Bariera ostatniej mili w analizie zdrowia', 'udział danych nieustrukturyzowanych → skutek dla predykcji');
-  kpis(s, [['~80%', 'historii medycznej w PDF i skanach'], ['0', 'wspólnego kontekstu klinicznego'],
-           ['5+', 'aplikacji na użytkownika'], ['brak', 'standardu wymiany danych']], 2.3);
-  cards(s, [['Martwe dane', 'Nieczytelne dla algorytmów analitycznych, niewidoczne dla predykcji.'],
-            ['Brak kontekstu klinicznego', 'Błędne predykcje i fałszywe alarmy, ignorujące przyczyny biomedyczne.'],
-            ['Brak standaryzacji', 'Bez FHIR nie ma wymiany. Pacjent zostaje z informacją, bez możliwości działania.']], 3.6, 3);
-  src(s, ['fhir', 'ehds']);
-
-  s = slide(p); head(s, 'Rozwiązanie', 'Eternal Core Intelligence', 'filar → technologia → zakres integracji');
-  cards(s, [['Import uniwersalny', 'OCR dowolnych dokumentów medycznych i konwersja na dane strukturalne.'],
-            ['Synchronizacja niezależna', 'Jedno API integrujące dane ze wszystkich wiodących urządzeń noszonych.'],
-            ['Logika medyczna', 'Korelacja wyników badań z danymi behawioralnymi — pełny kontekst kliniczny.']], 2.3, 3);
-  warn(s, 'Źródła nowsze zamykają stos inaczej niż oficjalny deck: Flutter + FastAPI + FHIR R4B oraz Qdrant, BioMistral 7B i PubMedBERT, hosting w UE. Terra API wyceniona od 399 USD/mies., a nie jako koszt pomijalny.', 4.3);
-  src(s, ['terra', 'fhir']);
-
-  s = slide(p); head(s, 'Propozycja wartości', 'Od monitoringu do predykcji', 'wymiar wartości → co daje użytkownikowi');
-  cards(s, [['Kompleksowość', 'Wszystkie narzędzia zdrowotne w jednym ekosystemie — od prewencji, przez diagnostykę, po terapię.'],
-            ['Personalizacja', 'Algorytmy analizują unikalne dane biometryczne i dostarczają dopasowane rekomendacje.'],
-            ['Prewencja', 'Przejście z reaktywnego leczenia na proaktywne zapobieganie, zanim wystąpią objawy.'],
-            ['Dostępność', 'Zdalna opieka i diagnostyka w domu przez całą dobę, dla każdego pacjenta.']], 2.3, 4);
-  src(s, ['ehds']);
-
-  s = slide(p); head(s, 'Rynek', 'Problem policzony w złotówkach, nie w bilionach dolarów', 'skala problemu → segmenty, do których realnie docieramy');
+  // 3 Problem II
+  s = slide(p); head(s, 'Problem II', 'Bariera ostatniej mili w analizie zdrowia', 'trzy bariery → skutek dla predykcji');
+  cards(s, [['Martwe dane', 'Wyniki siedzą w plikach PDF, zdjęciach i skanach. Algorytmy ich nie widzą.'],
+            ['Brak kontekstu', 'Zegarek widzi słaby sen, ale nie widzi niskiej ferrytyny ukrytej w wyniku sprzed pół roku.'],
+            ['Brak rozstrzygnięcia', 'Dwa urządzenia mierzą to samo i pokazują co innego. Nikt tego nie rozstrzyga — a system, który wybiera po cichu, kłamie.']], 2.3, 3);
   kpis(s, [['8–10 mld zł', 'hospitalizacje możliwe do uniknięcia, rocznie'],
            ['6–8 mld zł', 'dublowane badania diagnostyczne, rocznie'],
-           ['23 mld zł', 'luka finansowa systemu w 2026'],
-           ['9×', 'różnica w wydatkach na profilaktykę wobec UE']], 2.3);
-  s.addText('Dwie pierwsze pozycje — razem 14–18 mld zł rocznie — to problemy o charakterze informacyjnym, nie medycznym. Dokładnie te, które adresuje warstwa agregująca dane.',
-    { x: 0.55, y: 3.5, w: 12.2, h: 0.4, fontSize: 11.5, bold: true, color: GRANAT, fontFace: BF, margin: 0, isTextBox: true });
-  cards(s, [['Płatnicy instytucjonalni', 'Podmioty lecznicze — dziesiątki tysięcy; dostawcy systemów gabinetowych — kilkudziesięciu, ale każdy musi spełnić wymóg do 2029.'],
-            ['Rynek weterynaryjny', 'Tysiące lecznic i miliony gospodarstw domowych. Zero obecności państwa — jedyny segment konsumencki, w który wchodzimy.'],
-            ['Producenci i sponsorzy', 'Setki producentów wyrobów potrzebujących danych nadzoru; dziesiątki sponsorów badań zdecentralizowanych — najwyższa marża.']], 4.0, 3);
-  warn(s, 'CELOWO NIE PODAJEMY GLOBALNYCH LICZB RYNKU. Wcześniejsze materiały operowały wartościami 946 mld USD i 1,39 bln USD przy strategii ograniczonej do Polski. Taka rozbieżność między wielkością rynku a zasięgiem działania jest w rozmowie z inwestorem sygnałem ostrzegawczym, nie atutem. Podajemy segmenty, do których realnie docieramy, i problem policzony w walucie, w której będziemy fakturować.', 5.9);
-  src(s, ['nfz', 'prof', 'eehrxf', 'bp41']);
+           ['14–18 mld zł', 'razem — problem informacyjny, nie medyczny']], 4.35);
+  src(s, ['hosp', 'gus']);
 
-  s = slide(p); head(s, 'Trendy rynkowe', 'Cztery siły kształtujące przyszłość medycyny', 'trend → mechanizm → wskaźnik');
-  cards(s, [['Normalizacja telemedycyny', 'Pacjenci oczekują dostępu do specjalisty bez wychodzenia z domu. To standard, nie nowinka.'],
-            ['AI w diagnostyce', 'Algorytmy analizują miliony punktów danych, wykrywając anomalie przed objawami.'],
-            ['Wszechobecność IoT', 'Wearables przechodzą od gadżetów fitness do certyfikowanych narzędzi medycznych.'],
-            ['Medycyna precyzyjna', 'Koniec podejścia jednego rozmiaru dla wszystkich — opieka oparta na danych.']], 2.3, 4);
-  src(s, ['gvr', 'prec']);
+  // 4 Rozwiązanie
+  s = slide(p); head(s, 'Rozwiązanie', 'Eternal Core Intelligence', 'zdolność → co robi → reżim regulacyjny');
+  table(s, ['Zdolność', 'Co robi', 'Reżim'], [
+    ['Dane zdrowotne', 'adaptery urządzeń, import dokumentów, normalizacja do jednego modelu', 'poza wyrobem'],
+    ['Dokumentacja', 'transkrypcja wizyty, strukturyzacja notatki, kodowanie', 'poza wyrobem'],
+    ['Interoperacyjność', 'mapowanie standardu krajowego na europejski', 'komponent'],
+    ['Zwierzęta', 'dokumentacja, przypomnienia, transponder', 'poza MDR — odrębny reżim'],
+    ['Interpretacja', 'ocena wyniku, alert progowy, predykcja', 'wyrób klasy IIa — nie w pierwszej fali'],
+  ], 2.3, [2.4, 7.4, 2.4]);
+  s.addText('Reguła produktowa, która sterowała całym projektem: fakt i porównanie do własnej historii są bezpieczne. Ocena, próg i zalecenie nie są. Cztery słowa przekraczają granicę: „Twoje…”, „w normie”, „powinieneś”, „wskazuje na”.',
+    { x: 0.55, y: 4.6, w: 12.2, h: 0.6, fontSize: 11.5, bold: true, color: GRANAT, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['spec', 'mdcg']);
 
-  s = slide(p); head(s, 'Produkt', 'Cztery fazy do Health OS', 'faza → produkt → istota → model przychodu');
-  table(s, ['Faza', 'Produkt', 'Istota', 'Model przychodu'], [
-    ['1', 'Eternal Lite App', 'Portfel danych — OCR i integracja wearables', 'Darmowa; przychód z K3 i K7'],
-    ['2', 'Eternal Premium', 'Kieszonkowa klinika — Bio-Physics, telemedycyna', 'K5 prowizje, K7 B2B'],
-    ['3', 'Eternal Station', 'Domowe laboratorium i system dozowania', 'K2 hardware i wkłady'],
-    ['4', 'Nanotech', 'Implanty i nanoboty — terapia celowana', 'K2 implant, K1 subskrypcja'],
-  ], 2.3, [0.9, 2.8, 5.3, 3.2]);
-  s.addText('Każda faza podnosi ARPU, barierę wejścia i unikalność danych. Wspólnym mianownikiem jest zintegrowana platforma AI.',
-    { x: 0.55, y: 4.35, w: 12.2, h: 0.4, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
+  // 5 Propozycja wartości
+  s = slide(p); head(s, 'Propozycja wartości', 'Od zapisu do rozstrzygnięcia', 'co dostaje użytkownik → czego nie ma nigdzie indziej');
+  cards(s, [['Komplet', 'Dane z urządzeń, z laboratoriów i z dokumentów papierowych w jednym szeregu czasowym.'],
+            ['Rozstrzygnięcie', 'Konflikt między źródłami pokazany z wagą pewności i metodą pomiaru — nie ukryty.'],
+            ['Ciągłość', 'Ósma kartka po trzech latach jest bezcenna, bo nikt inny nie ma siedmiu poprzednich.'],
+            ['Prawo wyjścia', 'Pełny eksport w formacie użytecznym gdzie indziej, bezpłatnie i zawsze.']], 2.3, 4);
+  s.addText('Prosimy człowieka nie o zakup, tylko o powierzenie zapisu własnego ciała na dwadzieścia lat. Dlatego prawo wyjścia jest częścią produktu, nie ustępstwem.',
+    { x: 0.55, y: 4.5, w: 12.2, h: 0.5, fontSize: 12, italic: true, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['prod', 'bp41']);
 
-  s = slide(p); head(s, 'Faza 1–2', 'Eternal Lite App i Premium', 'produkt → funkcje kluczowe → ekonomia');
-  cards(s, [['Lite — portfel danych', 'Inteligentny parser OCR, uniwersalna synchronizacja, oś czasu zdrowia.'],
-            ['Premium — centrum dowodzenia', 'Silnik Bio-Physics, telemedycyna, e-recepty przez P1, pulpit lekarza.'],
-            ['Model', 'Aplikacja pacjenta darmowa; przychód z kanałów wokół niej.']], 2.3, 3);
-  warn(s, 'Aplikacja jest kanałem dystrybucji, nie produktem — najwyżej marżowe pozycje (parser dla laboratoriów, dokumentacja dla klinik, kohorta, dane nadzoru) nie są skierowane do pacjenta. Zlecając badanie wytwarzamy EDM i mamy do niej dostęp z mocy ustawy: ten sam ruch daje przychód i dane. Budżet MVP: deck 110 tys. PLN, specyfikacja 160–190 tys. przy orkiestracji.', 4.3);
-  src(s, ['p1', 'mdcg']);
-
-  s = slide(p); head(s, 'Faza 3', 'Eternal Station — domowe laboratorium', 'model sprzedaży → cena → koszt → marża');
-  table(s, ['Model', 'Cena', 'Koszt', 'Marża'], [
-    ['Zakup urządzenia', '1 499 PLN', 'BOM i montaż ~1 100 PLN', '20–30%'],
-    ['Wkłady (subskrypcja)', '149 PLN/mies', 'odczynniki ~50 PLN', '60–70%'],
-    ['HaaS — wynajem 24 mies.', '249 PLN/mies', 'opłata startowa 1 PLN', 'stały MRR'],
-  ], 2.3, [3.3, 2.9, 3.7, 2.3]);
-  s.addText('NXP i.MX 8M Plus z Edge AI · sensory EKG, SpO2, temperatura, ciśnienie · laboratorium mikrofluidyczne i spektrofotometria · prototyp Q2 2027, produkcja masowa Q1 2028.',
-    { x: 0.55, y: 4.15, w: 12.2, h: 0.55, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-  warn(s, 'Wariant ostrożny w Master 5.4 to certyfikacja cudzych urządzeń zamiast własnej produkcji. Producentem układu AD8232 jest Analog Devices, a nie Texas Instruments.', 4.8);
-  src(s, ['mdr']);
-
-  s = slide(p); head(s, 'Faza 3 — wykonanie', 'OEM, ODM czy produkcja własna', 'ścieżka → koszt → kontrola → szybkość');
-  table(s, ['Ścieżka', 'Koszt', 'Kontrola', 'Szybkość'], [
-    ['OEM / white-label (Shenzhen)', 'niższy CAPEX, BOM ~1 100 PLN', 'niska — zależna od dostawcy', 'najszybsza'],
-    ['ODM — własny firmware i design', 'R&D 4 mln PLN, formy 1,8 mln PLN', 'wysoka', 'średnia'],
-    ['Produkcja własna', 'najwyższy CAPEX, hard tooling', 'pełna nad jakością i łańcuchem', 'najwolniejsza'],
-    ['Certyfikacja cudzych urządzeń', 'najniższy', 'średnia', 'najszybsza'],
-  ], 2.3, [3.7, 3.6, 3.3, 1.6]);
-  src(s, ['mdr']);
-
-  s = slide(p); head(s, 'Faza 4', 'Nanotech i implanty', 'produkt → funkcja → zabezpieczenie → klasa MDR');
-  cards(s, [['Bio-Tag / Bio-Monitor', 'Implanty podskórne: CGM glukozy i kortyzolu, NFC dla temperatury i HRV.'],
-            ['Nanoboty (R&D)', 'Wczesna detekcja patogenów i terapia celowana z biodegradacją.'],
-            ['Bezpieczeństwo', 'Bioglass 8625 wg ISO 10993, kill-switch sprzętowy, szyfrowanie transmisji.']], 2.3, 3);
-  warn(s, 'Master 5.4 podnosi klasy: Bio-Tag z IIa na IIb, implant z I na IIb/III, pętla zamknięta z IIb na III. Ścieżka MDR klasy III to 3–8 mln PLN i certyfikacja realistycznie po 2033 — cztery lata później niż pilotaż deklarowany w decku. Zasada: wyłącznie odczyt, bez zdalnego sterowania funkcjami ciała.', 4.3);
-  src(s, ['mdr', 'iso']);
-
-  s = slide(p); head(s, 'Moonshoty', 'Projekty przełomowe — ocena wykonalności', 'projekt → TRL → koszt → alternatywa strategiczna');
-  table(s, ['Projekt', 'TRL', 'Koszt', 'Alternatywa strategiczna'], [
-    ['Implant Human (Closed Loop)', 'wysoki', '15 mln+ PLN', 'brak — źródło moatu, wymaga partnera Big Pharma'],
-    ['Nanoboty (platforma)', 'bardzo wysoki', '50 mln+ PLN', 'poczekać, aż technologia dojrzeje, i licencjonować'],
-    ['AGI Medyczna', 'ekstremalny', '50 mln+ PLN', 'fine-tuning modeli gigantów zamiast budowy od zera'],
-    ['Przeniesienie świadomości', 'sci-fi', '100 mln+ przez 20 lat', 'konsorcja naukowe; poza horyzontem planu'],
-  ], 2.3, [3.5, 1.7, 2.5, 4.5]);
-  s.addText('Walidacja na linii zwierzęcej w reżimie CVMP zamiast MDR skraca drogę o 5–10 lat i jest traktowana jako obowiązkowy etap pośredni przed człowiekiem.',
-    { x: 0.55, y: 4.65, w: 12.2, h: 0.5, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-  src(s, ['mdr']);
-
-  s = slide(p); head(s, 'Architektura', 'Od sygnałów do insightów klinicznych', 'warstwa → zakres techniczny');
-  table(s, ['Warstwa', 'Zakres'], [
-    ['01 Ingestion', 'Terra API dla urządzeń noszonych · OCR dokumentów medycznych'],
-    ['02 Structuring', 'FHIR R4B · mapowanie SNOMED CT i LOINC'],
-    ['03 Intelligence', 'RAG z guardrails · scoring i detekcja anomalii · Bio-Correlation'],
-    ['04 Presentation', 'Dashboardy · oś czasu · insighty i plany działania'],
-  ], 2.3, [2.4, 9.8]);
-  s.addText('Moduły kontrolne K1–K14 nadzorują funkcje ryzykowne. Bez K5 panel lekarza jest nielegalny i nie pobierzesz danych z P1; bez K10 nie ma dossier technicznego.',
-    { x: 0.55, y: 4.5, w: 12.2, h: 0.55, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-  src(s, ['fhir', 'p1']);
-
-  s = slide(p); head(s, 'Zaufanie', 'Bezpieczeństwo i zgodność regulacyjna', 'obszar → mechanizm → reżim prawny');
-  cards(s, [['Szyfrowanie E2E', 'AES-256 i TLS 1.3, dane surowe pozostają na urządzeniu użytkownika.'],
-            ['Integralność zapisu', 'Na łańcuchu wyłącznie hasze i znaczniki czasu — nigdy dane osobowe.'],
-            ['Nadzór nad AI', 'Zarządzanie ryzykiem, dokumentacja, nadzór człowieka, rejestr zdarzeń.'],
-            ['Zgodność wyrobu', 'MDR, IVDR, ISO 13485 i 14971, odpowiedzialność za produkt.']], 2.3, 4);
-  warn(s, 'Deklaracja niezmienności dokumentacji w rejestrze rozproszonym kłóci się z prawem do usunięcia danych (RODO art. 17). Rozwiązanie: na łańcuchu wyłącznie hasze. Do listy zgodności dochodzą pozycje nieobecne w decku: IVDR, dyrektywa 2024/2853, AI Act oraz NIS2 z karami do 10 mln EUR.', 4.3);
-  src(s, ['rodo', 'aiact', 'mdr', 'nis2']);
-
-  s = slide(p); head(s, 'Model biznesowy', 'Jedenaście kanałów wokół darmowej aplikacji', 'kanał → nazwa → istota i stawka');
-  table(s, ['Kanał', 'Nazwa', 'Istota'], MONET.slice(0, 6), 2.3, [1.0, 3.5, 7.7]);
-  s.addText('Pacjent nie płaci. Płacą ci, którzy na jego zdrowiu zarabiają lub oszczędzają: płatnicy, przychodnie, partnerzy marketplace.',
-    { x: 0.55, y: 4.75, w: 12.2, h: 0.4, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-  src(s, ['rodo']);
-
-  s = slide(p); head(s, 'Model biznesowy', 'Kanały K6–K11 — płatnicy, przychodnie, fitness, choroby przewlekłe', 'kanał → nazwa → istota i stawka');
-  table(s, ['Kanał', 'Nazwa', 'Istota'], MONET.slice(6), 2.3, [1.0, 3.5, 7.7]);
-  warn(s, 'Kanał K6 to profilowanie z art. 22 RODO w połączeniu z art. 9: wymaga wyraźnej, odrębnej i w pełni opcjonalnej zgody, prawa do interwencji człowieka i oceny skutków. Zgoda warunkująca dostęp do funkcji może zostać uznana za nieswobodną.', 4.9);
-  src(s, ['rodo', 'ehds']);
-
-  s = slide(p); head(s, 'Macierz funkcji', 'Co zarabia, co jest potrzebne, co się dubluje', 'funkcja → kanał → potrzeba → duplikacja w efekcie');
-  kpis(s, [['337', 'funkcji w macierzy'], ['314', 'z przypisanym kanałem'],
-           ['23', 'funkcje fundamentowe'], ['31', 'objętych duplikacją']], 2.3);
-  table(s, ['Grupa duplikacji w efekcie końcowym', 'Funkcje', 'Na czym polega'], [
-    ['Pomiar glukozy', 'S1.5, C2.1', 'Station mierzy punktowo, Capsule ciągle — ten sam wynik dla pacjenta'],
-    ['Telemedycyna', 'A5.1, S4.1', 'Ta sama konsultacja z aplikacji i ze stacji'],
-    ['Alert ratunkowy', 'A5.3, A14.1, S4.2', 'Trzy drogi do tego samego: wezwanie pomocy'],
-    ['Wywiad przez AI', 'A5.5, A12.3, A12.4', 'Trzy kody funkcji, jeden efekt: zebranie wywiadu'],
-  ], 3.6, [3.5, 2.7, 6.0]);
-
-  s = slide(p); head(s, 'Go-to-market', 'Ekspansja geograficzna i kanały sprzedaży', 'faza → rynek → kanał → cel');
-  table(s, ['Faza', 'Rynek', 'Kanały', 'Cel'], [
-    ['1 · 2026', 'Polska — sandbox i walidacja', 'Sklepy aplikacji, content marketing, SEO medyczne', '10 tys. użytkowników'],
-    ['2 · 2027', 'DACH — wysokie ARPU', 'Prywatne kliniki, ubezpieczyciele, ścieżka DiGA', '100 tys. użytkowników'],
-    ['3 · 2028–29', 'UE szeroko — B2B2C', 'Ubezpieczyciele, programy wellness, apteki', '1 mln użytkowników'],
-    ['4 · 2030+', 'USA i Azja', 'Po zatwierdzeniu FDA, partnerstwa globalne', 'skala globalna'],
-  ], 2.3, [1.6, 3.4, 4.9, 2.3]);
-  warn(s, 'Wpis do rejestru DiGA wymaga oznakowania CE jako wyrobu medycznego i dowodu pozytywnego efektu zdrowotnego; przy wpisie warunkowym producent ma rok, wyjątkowo dwa, na dostarczenie badania. To projekt na 18–30 miesięcy z własnym budżetem, a nie konsekwencja ekspansji.', 4.5);
-  src(s, ['diga', 'ehds']);
-
-  s = slide(p); head(s, 'Konkurencja', 'Fragmentacja kontra integracja', 'obszar → gracze → luka wobec Eternal');
-  table(s, ['Obszar', 'Gracze', 'Luka wobec Eternal'], [
-    ['Aplikacja i dane', '1upHealth, Redox, Human API', 'brak interfejsu pacjenta, tylko middleware B2B, brak analityki AI'],
-    ['Diagnostyka domowa', 'Cue Health, Everlywell, Labcorp Pixel', 'wąski zakres testów, wolny proces wysyłkowy, brak integracji stylu życia'],
-    ['Nanotechnologia', 'Nanovis, Axoft, OncoRevive', 'skupienie na ortopedii, tylko neuro-tech, wąskie zastosowanie onkologiczne'],
-  ], 2.3, [2.5, 3.9, 5.8]);
-  s.addText('Konkurencja działa w silosach. Eternal łączy dane w standardzie FHIR, diagnostykę domową i interwencję w jeden zamknięty ekosystem opieki.',
-    { x: 0.55, y: 4.5, w: 12.2, h: 0.45, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-
-  s = slide(p); head(s, 'Przewagi', 'Dlaczego wygrywamy', 'przewaga → na czym polega');
-  cards(s, [['Zintegrowany ekosystem', 'Software, hardware i wetware w jednej spójnej całości — bez żonglowania narzędziami.'],
-            ['Closed-Loop Care', 'Zmierz, zdiagnozuj, interweniuj. Nie tylko wykrywamy problem, ale wdrażamy interwencję.'],
-            ['Fosa danych', 'Unikalne korelacje behawioralno-kliniczne. Silnik uczy się z każdym użytkownikiem.'],
-            ['Regulatory-by-Design', 'System projektowany od podstaw pod CE MDR i FDA, co buduje zaufanie partnerów B2B.']], 2.3, 4);
-  s.addText('Pozycjonowanie: strategia błękitnego oceanu — nowa kategoria Health OS na przecięciu osi zintegrowany i proaktywny.',
-    { x: 0.55, y: 4.35, w: 12.2, h: 0.4, fontSize: 10.5, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
-
-  s = slide(p); head(s, 'Zespół', 'Zespół założycielski', 'osoba → rola → zakres odpowiedzialności');
-  team(s, 2.3);
-  warn(s, 'Plan operacyjny opisuje skład inaczej: Janek jako CTO, Adrian jako CTO Hardware, Wiktor jako CMO/Medical Director, Karol jako CAO. Deck lokuje siedzibę w Warszawie, plan operacyjny w Poznaniu. Do uzgodnienia przed wysyłką do inwestora.', 4.7);
-
-  s = slide(p); head(s, 'Finanse', 'Prognozy pięcioletnie i luka w finansowaniu', 'rok → przychody → EBITDA → skumulowana strata');
-  table(s, ['Rok', 'Przychody', 'EBITDA', 'Skumulowana strata'], [
-    ['2027', '85 tys. PLN', '−1,62 mln PLN', '−1,62 mln PLN'],
-    ['2028', '513 tys. PLN', '−2,45 mln PLN', '−4,07 mln PLN'],
-    ['2029', '1,97 mln PLN', '−3,19 mln PLN', '−7,26 mln PLN'],
-    ['2030', '6,50 mln PLN', '−0,85 mln PLN', '−8,11 mln PLN'],
-    ['2031', '18,50 mln PLN', '+1,56 mln PLN', 'próg rentowności'],
-  ], 2.3, [1.3, 2.9, 3.0, 5.0]);
-  warn(s, 'Suma strat przed progiem rentowności to −8,11 mln PLN, a kapitał do rundy A to 6,11–6,81 mln PLN. Brakuje 1,3–2,0 mln PLN, a runda A nie ma w decku daty. Wycena 200 mln USD przy przychodzie 18,5 mln PLN to mnożnik około 45×, przy rynkowych 3–10× dla digital health. Osobno: prognoza pięcioletnia była budowana na modelu kosztowym bez wynagrodzeń i na konwersji konsumenckiej, która nie jest osią przychodu — do przeliczenia po pierwszych sześciu miesiącach sprzedaży, na danych.', 5.0);
+  // 6 Rynek i segmentacja
+  s = slide(p); head(s, 'Rynek', 'Segmenty, do których realnie docieramy', 'segment → wielkość → kto decyduje');
+  table(s, ['Segment', 'Wielkość', 'Nasza część', 'Uwaga'], [
+    ['Podmioty lecznicze', 'dziesiątki tysięcy', 'gabinety bez działu IT', 'płatnik decyzyjny to jedna osoba, nie komisja'],
+    ['Dostawcy systemów EDM', 'kilkudziesięciu', 'wszyscy', 'każdy musi spełnić wymóg do 2029'],
+    ['Lecznice weterynaryjne', 'tysiące', 'wszystkie', 'zero obecności państwa'],
+    ['Właściciele zwierząt', 'miliony gospodarstw', 'segment konsumencki', 'jedyny, w który wchodzimy'],
+    ['Producenci wyrobów', 'setki w regionie', 'potrzebujący danych nadzoru', 'sprzedaż obowiązku, nie produktu'],
+    ['Sponsorzy badań', 'dziesiątki w Polsce', 'badania zdecentralizowane', 'najwyższa marża'],
+  ], 2.3, [2.6, 2.3, 3.2, 4.1]);
+  warn(s, 'CELOWO NIE PODAJEMY GLOBALNYCH LICZB RYNKU. Wcześniejsze materiały operowały wartościami 946 mld USD i 1,39 bln USD przy strategii ograniczonej do Polski. Taka rozbieżność między wielkością rynku a zasięgiem działania jest w rozmowie z inwestorem sygnałem ostrzegawczym, nie atutem.', 5.15);
   src(s, ['bp41']);
 
-  s = slide(p); head(s, 'Finansowanie', 'Struktura finansowania', 'etap → kwota → termin → equity → cel');
-  table(s, ['Etap', 'Kwota', 'Termin', 'Equity', 'Cel'], [
-    ['Pre-Seed', '110 tys. PLN', 'Q2 2026', '5–8%', 'MVP software; frontend 50k, backend 40k, UX 10k, prawne 10k'],
-    ['Seed', '6,0–6,7 mln PLN', 'Q4 2026', '12–15%', 'Ekosystem; runway 18–24 mies.; dev 40%, marketing 25%, hardware 20%'],
-    ['Runda A', '20 mln PLN', 'wymagana 2029', 'do ustalenia', 'Ekspansja DACH, pełny AI Coach, oferta B2B'],
-    ['Runda B', '50 mln+ PLN', 'do ustalenia', 'do ustalenia', 'USA i Azja, własne wearables, R&D nanoboty'],
-  ], 2.3, [1.5, 2.1, 1.7, 1.5, 5.4]);
-  warn(s, 'Pre-seed implikuje wycenę post-money 1,4–2,2 mln PLN, seed 40–56 mln PLN — skok 20–40× w dwa kwartały przy jednym kamieniu milowym. Trudne do obrony przed inwestorem seed.', 4.75);
+  // 7 Trendy
+  s = slide(p); head(s, 'Dlaczego teraz', 'Cztery daty, które tworzą rynek', 'data → co obowiązuje → skutek');
+  table(s, ['Data', 'Co obowiązuje', 'Skutek dla nas'], [
+    ['03.10.2026', 'rejestracja w Wykazie KSC (NIS2)', 'obowiązek własny — nikt nie wezwie'],
+    ['26.03.2027', 'akty wykonawcze EHDS, organy dostępu do danych', 'początek okna przewagi'],
+    ['26.03.2029', 'EEHRxF kategoria 1 — CE dla systemów dokumentacji', 'jedyna data tworząca rynek na mapper'],
+    ['26.03.2031', 'EEHRxF kategoria 2 — obrazowanie, wyniki, wypisy', 'do tego czasu luka pozostaje otwarta'],
+  ], 2.3, [1.9, 5.6, 4.7]);
+  s.addText('Kto zbuduje mapper przed 2029, sprzedaje go każdemu dostawcy systemu gabinetowego w Polsce. Kto zacznie w 2029 — nikomu. To jedyna zewnętrzna data w całym planie, która tworzy popyt niezależnie od naszych działań.',
+    { x: 0.55, y: 4.35, w: 12.2, h: 0.6, fontSize: 12, bold: true, color: RDZA, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['ehds', 'nis2', 'eehrxf']);
 
-  s = slide(p); head(s, 'Ryzyko', 'Analiza ryzyk i strategia mitygacji', 'ryzyko → poziom → zagrożenie → mitygacja');
-  table(s, ['Ryzyko', 'Poziom', 'Zagrożenie', 'Mitygacja'], [
-    ['Regulacyjne', 'WYSOKIE', 'Opóźnienia CE MDR i FDA; AI Act jako osobny reżim', 'Etapowo wellness → medical, wcześni eksperci RA'],
-    ['Prawne — dane', 'WYSOKIE', 'Scoring dla ubezpieczycieli to profilowanie z art. 22', 'Osobna, opcjonalna zgoda i ścieżka odwoławcza'],
-    ['Licencyjne', 'WYSOKIE', 'Gadgetbridge na AGPL-3.0 blokuje model komercyjny', 'Własny adapter zamiast forka; audyt licencji'],
-    ['Technologiczne', 'WYSOKIE', 'Złożoność hardware i niepewność B+R nanotechnologii', 'Modułowa roadmapa, outsourcing OEM'],
-    ['Adopcja rynkowa', 'ŚREDNIE', 'Wolniejsza adopcja, opór przed zaufaniem do AI', 'Darmowa aplikacja obniża barierę wejścia'],
-  ], 2.3, [1.9, 1.2, 4.6, 4.5]);
-  src(s, ['rodo', 'aiact', 'agpl']);
+  // 8 Ekosystem
+  s = slide(p); head(s, 'Ekosystem', 'Sześć produktów z korelacji funkcji', 'produkt → skład → kto płaci');
+  table(s, ['Produkt', 'Funkcje', 'Kto płaci'], [
+    ['P1 Sync — agregacja i rozstrzyganie', 'A1.1 A1.2 A1.8 A1.7 A1.5 A1.10', 'licencja API, B2B'],
+    ['P2 Parser — odczyt dokumentów', 'A2.1 A2.3 A2.7 A11.4 A1.5 A2.6', 'placówka, za dokument'],
+    ['P3 Scribe — dokumentacja wizyty', 'A12.1 A12.2 A12.5 A12.6 A12.7 A2.2', 'klinika, per lekarz'],
+    ['P4 Pet — linia weterynaryjna', 'A13.1 A13.2 A13.4 A13.5 A13.3 A2.6', 'właściciel i lecznica'],
+    ['P5 Mapper — interoperacyjność', 'D1.6 A1.5 A2.2 D1.4 A11.4 A2.8', 'dostawca systemu'],
+    ['P6 Report — raport dla lekarza', 'A4.1 A4.2 A4.4 A2.5 D1.2 A2.6', 'wersja surowa bezpłatna'],
+  ], 2.3, [4.3, 4.6, 3.3]);
+  s.addText('Produkt to pięć albo sześć funkcji z rejestru, dobranych tak, że razem robią jedną rzecz, której żadna z nich nie robi osobno. Żaden z sześciu nie wprowadza funkcji spoza rejestru.',
+    { x: 0.55, y: 5.05, w: 12.2, h: 0.5, fontSize: 11.5, bold: true, color: GRANAT, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['prod', 'rej']);
 
+  // 9 P1 Sync
+  s = slide(p); head(s, 'Produkt', 'P1 Eternal Sync', 'funkcje → co robi → dlaczego niezastępowalny');
+  cards(s, [['Sześć funkcji', 'A1.1 Terra · A1.2 open wearables · A1.8 HealthKit i Health Connect · A1.7 deduplikacja · A1.5 normalizacja · A1.10 przechowywanie'],
+            ['Automatyzm', 'Synchronizacja w tle co 15 minut. Po jednorazowym podłączeniu użytkownik nie robi nic.'],
+            ['Rdzeń przewagi', 'Apple, Google i Terra pobierają dane. Żaden nie rozstrzyga konfliktu odczytów między źródłami — to funkcja A1.7 i nie ma jej nikt inny.']], 2.3, 3);
+  kpis(s, [['0 zł', 'HealthKit i Health Connect od dnia 1'], ['399–499 USD/mies.', 'Terra — dopiero na żądanie klienta B2B'],
+           ['3 000 zł/mies.', 'próg wyjścia na własne adaptery'], ['5 000', 'albo tylu aktywnych użytkowników']], 4.35);
+  src(s, ['rej', 'komp', 'terra']);
+
+  // 10 P2 Parser
+  s = slide(p); head(s, 'Produkt', 'P2 Eternal Parser', 'funkcje → co robi → dlaczego niezastępowalny');
+  cards(s, [['Sześć funkcji', 'A2.1 OCR wyników · A2.3 walidacja · A2.7 OCR recept · A11.4 jednostki · A1.5 normalizacja · A2.6 eksport'],
+            ['Rdzeń przewagi', 'Silnik rozpoznawania jest towarem. Własny jest parser polskiego kontekstu: ponad trzy tysiące nazw laboratoryjnych, słownik synonimów, formaty Synevo, Diagnostyki i ALAB-u.'],
+            ['Rozwój', 'Każda korekta użytkownika wraca do słownika. Próg docelowy: ponad 90% pól bez korekty po tysiącu dokumentów.']], 2.3, 3);
+  s.addText('Bezpieczne sformułowanie: „Odczytano: CRP 12 mg/l. Sprawdź poprawność”. Nigdy: „Twoje CRP jest podwyższone” — to druga strona granicy i kosztuje dossier.',
+    { x: 0.55, y: 4.4, w: 12.2, h: 0.5, fontSize: 11.5, bold: true, color: RDZA, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['rej', 'spec', 'kart']);
+
+  // 11 P3 Scribe
+  s = slide(p); head(s, 'Produkt', 'P3 Eternal Scribe — pierwsza fala', 'funkcje → model → dlaczego pierwszy');
+  cards(s, [['Sześć funkcji', 'A12.1 nagrywanie · A12.2 transkrypcja · A12.5 auto-dokumentacja · A12.6 kodowanie ICD · A12.7 integracja z systemem gabinetowym · A2.2 parsowanie'],
+            ['Dlaczego pierwszy', 'Ocena 5/7 wg kryteriów własnych. Nie wymaga statusu podmiotu leczniczego, nie wymaga urządzeń, nie wymaga danych z platformy państwowej.'],
+            ['Bariera wejścia', 'Język polski medyczny i integracja z polską dokumentacją. Gracz amerykański liczy około 199–250 USD za lekarza miesięcznie i nie wchodzi do Polski.']], 2.3, 3);
+  s.addText('Granica: sprzedajesz narzędzie, nie usługę dokumentacyjną. W momencie, w którym to Eternal tworzy dokumentację, a nie klinika, zmienia się reżim.',
+    { x: 0.55, y: 4.45, w: 12.2, h: 0.45, fontSize: 11.5, bold: true, color: GRANAT, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['prod', 'rej', 'bp41']);
+
+  // 12 P4 Pet
+  s = slide(p); head(s, 'Produkt', 'P4 Eternal Pet — jedyna ocena 7/7', 'funkcje → rynek → luka konkurencji');
+  cards(s, [['Sześć funkcji', 'A13.1 profil · A13.2 obroża GPS · A13.4 Vet AI · A13.5 transponder Bio-Tag · A13.3 Mini Station · A2.6 eksport'],
+            ['Rynek nasycony', 'Dominujący gracz ma ponad 5 600 placówek, dwa rozwiązania są bezpłatne, migracja trwa kwadrans.'],
+            ['Luka, której nikt nie zajmuje', 'Bezpłatny dostawca na pytanie, czy klient po zakończeniu współpracy otrzyma dane, odpowiada wprost: nie. Pełny eksport kosztuje niewiele i da się go powiedzieć jednym zdaniem.']], 2.3, 3);
+  kpis(s, [['poza MDR', 'odrębny reżim, nie łatwiejsza ścieżka'], ['ISO 11784/11785', 'normy identyfikacji zwierząt'],
+           ['~29 zł/mies.', 'subskrypcja po freemium'], ['tor walidacyjny', 'dla całej warstwy sprzętowej']], 4.5);
+  src(s, ['rej', 'prod', 'bp41']);
+
+  // 13 P5 i P6
+  s = slide(p); head(s, 'Produkt', 'P5 Mapper i P6 Report', 'okno regulacyjne → produkt adopcyjny');
+  cards(s, [['P5 Mapper — okno 2029', 'Mapper między standardem krajowym a europejskim nie istnieje jako produkt, a od 26.03.2029 potrzebuje go każdy dostawca systemu gabinetowego. Licencja per placówka plus wdrożenie, zerowy koszt krańcowy. To wyścig, nie fosa trwała.'],
+            ['P6 Report — komplet dla lekarza', 'Raport łączący dane z urządzeń, z laboratoriów prywatnych i z dokumentów papierowych. Nie powstaje nigdzie indziej, bo nikt inny nie ma wszystkich trzech źródeł. Wersja surowa bezpłatna na zawsze.']], 2.3, 2);
+  s.addText('Siódma pozycja świadomie nie jest produktem: karta ratunkowa działa bez sieci, z zablokowanego ekranu, bez konta po stronie ratownika. Każdy odczyt zostawia nieusuwalny ślad, pacjent dostaje powiadomienie po fakcie. Najmocniejszy argument adopcyjny w portfelu — i nie monetyzujemy jej nigdy.',
+    { x: 0.55, y: 4.4, w: 12.2, h: 0.7, fontSize: 11.5, bold: true, color: RDZA, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['prod', 'eehrxf']);
+
+  // 14 Architektura
+  s = slide(p); head(s, 'Architektura', 'Od sygnału do wniosku', 'warstwa → zakres → zasada');
+  table(s, ['Warstwa', 'Zakres', 'Zasada'], [
+    ['Adaptery', 'urządzenia, dokumenty, laboratoria, platforma państwowa', 'rdzeń nigdy nie woła API dostawcy — zawsze przez adapter'],
+    ['Model danych', 'kanoniczny model, jednostki UCUM, wersjonowanie', 'kto definiuje format, ten posiada ekosystem'],
+    ['Proweniencja', 'źródło, metoda, czas, waga pewności każdego pomiaru', 'dopisanie później to migracja wszystkich danych'],
+    ['Zgody', 'granularne per cel, odwoływalne natychmiast', 'warunek prawny całej reszty'],
+    ['Silnik reguł', 'reguły jawne i wersjonowane', 'wymusza granicę wellness–wyrób w kodzie, nie w regulaminie'],
+  ], 2.3, [2.2, 5.0, 5.0]);
+  kpis(s, [['8 modułów', 'warstwa orkiestracji K1–K8'], ['395', 'osobodni'],
+           ['316 tys. zł', 'przy stawce 800 zł/osobodzień'], ['28', 'klas komponentów zamiast 588 kombinacji']], 4.95);
+  src(s, ['spec', 'komp']);
+
+  // 15 Bezpieczeństwo
+  s = slide(p); head(s, 'Bezpieczeństwo', 'Zaufanie jest warunkiem produktu, nie dodatkiem', 'zasada → wykonanie');
+  table(s, ['Zasada', 'Wykonanie'], [
+    ['Dane należą do tego, kto je wytworzył', 'pełny eksport bezpłatny i zawsze dostępny — prawo wyjścia jest albo go nie ma'],
+    ['Surowe dane blisko człowieka', 'na zewnątrz idą wyniki i wielkości zbiorcze, nie zapis źródłowy'],
+    ['Każdy odczyt zostawia ślad', 'dziennik audytowy od pierwszego dnia — wstecz się go nie odtworzy'],
+    ['Zgoda granularna i odwoływalna', 'per cel przetwarzania, cofnięcie działa natychmiast'],
+    ['Rezydencja i klucze', 'dane w Unii, klucze po naszej stronie, nie u dostawcy'],
+    ['Cztery tryby dostępu', 'własny, czasowy link wygasający, opiekuńczy z wygaszeniem w 18. urodziny, ratunkowy z pełnym logiem'],
+  ], 2.3, [3.7, 8.5]);
+  src(s, ['rodo', 'nis2', 'spec']);
+
+  // 16 Zgodność
+  s = slide(p); head(s, 'Zgodność', 'Cztery statusy regulacyjne zamiast dwóch', 'status → funkcji → reżim');
+  table(s, ['Status', 'Funkcji', 'Reżim'], [
+    ['1. General software', '~30', 'RODO, prawo handlowe'],
+    ['2. Health / wellness', '~38', 'RODO art. 9'],
+    ['3. Regulowane poza MDR', '~17', 'działalność lecznicza, prawo farmaceutyczne, IVDR, AI Act'],
+    ['4. MDSW — wyrób medyczny', '~14', 'MDR reguła 11 załącznik VIII'],
+    ['GRANICZNE', '~16', 'status 2 albo 4 zależnie od jednego zdania przeznaczenia'],
+  ], 2.3, [3.4, 1.6, 7.2]);
+  kpis(s, [['243', 'funkcje warstwy A — poza wyrobem'], ['31', 'warstwa B — inny reżim'],
+           ['63', 'warstwa C — wyrób medyczny'], ['18–36 mies.', 'realny czas dossier klasy IIa']], 4.85);
+  warn(s, 'Wąskim gardłem nie jest koszt, tylko kolejka do jednostki notyfikowanej — bywa dłuższa niż zakładany czas całej certyfikacji. Dlatego spotkanie przedzgłoszeniowe umawia się przed pierwszą linią kodu, a nie po zbudowaniu produktu.', 6.0);
+  src(s, ['mdr', 'mdcg', 'pcbc', 'rej']);
+
+  // 17 Roadmapa
+  s = slide(p); head(s, 'Roadmapa', 'Pięć horyzontów, jeden scenariusz', 'horyzont → co gotowe → warunek przejścia');
+  table(s, ['Horyzont', 'Co ma być gotowe', 'Warunek przejścia dalej'], [
+    ['Do 15.11.2026', 'pięć podpisanych zobowiązań, wniosek RPWDL, produkt u pięciu użytkowników', 'brak zobowiązań = zatrzymaj budowę'],
+    ['Do 31.12.2026', 'statut Fundacji, licencja IP w dół kaskady, cztery opinie prawne', 'po tej dacie negocjujesz zamiast decydować'],
+    ['2027', 'wpis do RPWDL, raportowanie do platformy, Pet i Scribe z przychodem', 'przychód pokrywający koszt zespołu w miesiącu 18'],
+    ['2028–2029', 'mapper sprzedawalny, kohorta tysiąca osób, dossier warstwy oceny', 'wejście w okno przed 26.03.2029'],
+    ['2030+', 'warstwa oceny dopuszczona, rejestr implantów, drugi rynek unijny', 'walidacja prospektywna modeli'],
+  ], 2.3, [2.3, 6.4, 3.5]);
+  src(s, ['road', 'pwns']);
+
+  // 18 Roadmapa 2030+
+  s = slide(p); head(s, 'Horyzont 4', 'Co wraca i pod jakim warunkiem', 'pozycja → data → warunek reaktywacji');
+  table(s, ['Pozycja', 'Realna data', 'Warunek reaktywacji'], [
+    ['Transponder weterynaryjny — produkcja własna', '2027–2028', 'przychód z linii weterynaryjnej'],
+    ['Transponder u człowieka, wellness NFC', '2030–2031', 'kompetencja produkcyjna z toru weterynaryjnego'],
+    ['Transponder jako wyrób klasy IIb', '2035–2037', 'partner z ISO 13485 oraz finansowanie ≥5 mln EUR'],
+    ['Station jako wyrób medyczny', '2032', 'dossier'],
+    ['Digital Twin jako wyrób', '2031', 'walidacja prospektywna, ścieżka ASME V&V 40'],
+    ['Warstwa immersyjna', '—', 'rekomendacja: nie robić'],
+  ], 2.3, [4.6, 2.4, 5.2]);
+  warn(s, 'Etap bez warunku wejścia nie jest planem, tylko listą życzeń. Pozycje usunięte z dokumentacji produktowej: roje terapeutyczne, kopia świadomości, teza o wydłużeniu życia do konkretnej liczby lat, konsumencki panel biochemiczny, mieszanie preparatów przez model, ogniwa biopaliwowe i pozycjonowanie w kategorii długowieczności.', 5.4);
+  src(s, ['road', 'bp41']);
+
+  // 19 Model biznesowy
+  s = slide(p); head(s, 'Model biznesowy', 'Trzy warstwy przychodu', 'warstwa → kto płaci → charakterystyka');
+  table(s, ['Warstwa', 'Kto płaci', 'Ile zostaje', 'Kiedy', 'Charakterystyka'], [
+    ['Prowizja od ruchu', 'laboratoria, apteki, catering', '10–30%', 'pierwszy miesiąc', 'liniowa — każda złotówka wymaga transakcji'],
+    ['Licencja B2B', 'ubezpieczyciel, dostawca EDM, klinika', '100%', '2027–2029', 'zerowy koszt krańcowy'],
+    ['Opłata za zgodność', 'producenci urządzeń', '100%', '2028+', 'rośnie z adopcją standardu'],
+  ], 2.3, [2.3, 3.4, 1.5, 1.9, 3.1]);
+  s.addText('Orkiestrator nie zarabia na prowizji — prowizja finansuje koszty bieżące. Wartość powstaje z tego, że jesteśmy jedynym miejscem, w którym dane z wielu źródeł są w komplecie, a to sprzedaje się licencyjnie.',
+    { x: 0.55, y: 4.15, w: 12.2, h: 0.55, fontSize: 11.5, bold: true, color: GRANAT, fontFace: BF, margin: 0, isTextBox: true });
+  warn(s, 'MODEL ODRZUCONY: sprzedaż danych użytkownika z prowizją. Powód podwójny. Rynkowy: kategoria upadła — LunaDNA zamknięta 31 stycznia 2024, Nebula przekształcona w 2025. Prawny: zgoda w rozumieniu RODO nie może być kupiona ani stanowić warunku usługi (art. 7 ust. 4).', 4.85);
+  src(s, ['luna', 'rodo', 'bp41']);
+
+  // 20 Strumienie przychodów
+  s = slide(p); head(s, 'Przychody', 'Dziewięć kanałów i ich ranking', 'kanał → model → marża');
+  table(s, ['Kanał', 'Model', 'Kiedy pierwszy przychód', 'Marża'], [
+    ['Usługi regulacyjne', 'za projekt', 'kwartał 2', 'wysoka — nie wymaga żadnego produktu'],
+    ['Eternal Scribe', 'licencja per lekarz miesięcznie', 'kwartał 3', 'abonament instytucjonalny — najlepszy typ'],
+    ['Eternal Pet', 'freemium → subskrypcja → sprzęt', 'kwartał 3', 'software wysoka, sprzęt 40%'],
+    ['Odczyt dokumentów', 'za dokument', 'rok 3', 'bardzo wysoka'],
+    ['Mapper interoperacyjności', 'licencja per placówka plus wdrożenie', 'rok 2–3', 'bardzo wysoka'],
+    ['Nadzór porynkowy', 'kontrakt roczny', '2028+', 'wysoka — sprzedaż obowiązku'],
+    ['Badania zdecentralizowane', 'kontrakt na badanie', '2029', 'najwyższa'],
+    ['Prowizja marketplace', 'od transakcji', 'rok 1', 'średnia — dobra jako uzupełnienie'],
+    ['Eksport, warstwa kryzysowa, format zapisu', 'nigdy płatne', '—', 'kupują zaufanie, na którym stoi reszta'],
+  ], 2.3, [3.3, 3.5, 2.6, 2.8]);
+  src(s, ['bp41', 'prod']);
+
+  // 21 GTM
+  s = slide(p); head(s, 'Go-to-market', 'Fizyka marketingu jest tu odwrotna', 'faza → kanał → co mierzymy');
+  table(s, ['Faza', 'Kanał', 'Co mierzymy'], [
+    ['Przed produktem', 'społeczność prowadzona przez osobę o wiarygodności medycznej, wokół konkretnej sprawy', 'wielkość i zaangażowanie'],
+    ['Miesiące 1–2', 'czterdzieści rozmów: dwadzieścia lecznic, dwadzieścia gabinetów', 'pięć podpisanych zobowiązań'],
+    ['Miesiące 3–6', 'konwersja zobowiązań w płatności, polecenia', 'pięciu płacących'],
+    ['Rok 1–2', 'sprzedaż bezpośrednia plus kanał przez dostawców systemów', 'przychód powtarzalny'],
+    ['Rok 2–3', 'mapper przez dostawców systemów gabinetowych', 'trzy płacące placówki'],
+    ['Rok 3+', 'rejestr i certyfikacja — producenci przychodzą sami', 'wpisy zewnętrzne'],
+  ], 2.3, [2.0, 7.0, 3.2]);
+  s.addText('Im głośniej się mówi, tym mniej jest się wiarygodnym. Decyzja o powierzeniu zapisu zapada wolno, reaguje na dowód zamiast na obietnicę i karze rozmach.',
+    { x: 0.55, y: 5.15, w: 12.2, h: 0.45, fontSize: 12, italic: true, color: SZARY, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['bp41']);
+
+  // 22 Konkurencja
+  s = slide(p); head(s, 'Konkurencja', 'Siedem kategorii i nasza pozycja', 'kto → ich przewaga → nasza pozycja');
+  table(s, ['Kategoria', 'Ich przewaga', 'Nasza pozycja'], [
+    ['System publiczny', 'darmowe, 20 mln kont, obowiązek po stronie placówek', 'nie konkurujemy — integrujemy się'],
+    ['Systemy gabinetowe', 'zainstalowana baza, relacje', 'stajemy się ich dostawcą komponentu'],
+    ['Dokumentacja automatyczna', 'kapitał, dojrzałość produktu', 'język polski, integracja, cena'],
+    ['Aplikacje konsumenckie', 'marketing', 'nie wchodzimy w tę kategorię'],
+    ['Agregatory danych', 'zasięg integracji', 'stają się jednym z trzech dostawców, nie jedynym'],
+    ['Weterynaria', 'brak', 'pole czyste, ale rynek nasycony'],
+    ['Globalne firmy prewencyjne', 'kapitał rzędu miliarda', 'nie wchodzą do Polski — wymaga statusu podmiotu leczniczego'],
+  ], 2.3, [3.0, 4.2, 5.0]);
+  src(s, ['m42', 'neko', 'bp41']);
+
+  // 23 Przewagi
+  s = slide(p); head(s, 'Przewagi', 'Sześć elementów fosy', 'element → na czym polega → kto może powtórzyć');
+  table(s, ['Element', 'Na czym polega', 'Kto może powtórzyć'], [
+    ['Status podmiotu leczniczego', 'kto wytworzył dokument, ma dostęp z mocy ustawy', 'żadna aplikacja konsumencka'],
+    ['Wytwarzanie własnej dokumentacji', 'zlecanie badań daje jednocześnie przychód i dane', 'tylko inny podmiot leczniczy — a te nie budują oprogramowania'],
+    ['Model danych i mapper', 'Polska stoi na innym standardzie niż europejski', 'każdy, kto zacznie teraz — to wyścig, nie fosa'],
+    ['Rejestr i dane wynikowe', 'producent wie, że urządzenie działa; nie wie, czy pacjentowi jest lepiej', 'nikt bez dostępu do pacjentów wielu producentów'],
+    ['Ciągłość zapisu', 'ósma kartka po trzech latach', 'nikt — czasu nie da się kupić'],
+    ['Kompetencja regulacyjna', 'wąska, rzadka, już zbudowana', 'kosztuje czas, nie pieniądze'],
+  ], 2.3, [3.0, 5.0, 4.2]);
+  src(s, ['bp41', 'spec']);
+
+  // 24 Blue ocean
+  s = slide(p); head(s, 'Pozycjonowanie', 'Cztery obszary, w które państwo nie wejdzie', 'obszar → dlaczego nie wejdzie');
+  cards(s, [['Dane z urządzeń', 'To nie jest dokumentacja medyczna, więc nie ma podstawy prawnej do gromadzenia.'],
+            ['Wyniki prywatnych laboratoriów w komplecie', 'Platforma pokazuje to, co zaraportowano. Laboratoria mają własne portale i własny interes.'],
+            ['Zlecanie badań i handel', 'Państwo nie prowadzi działalności handlowej.'],
+            ['Narzędzia zgodności dla dostawców EDM', 'Regulator definiuje standard, ale nie dostarcza narzędzi do jego spełnienia.']], 2.3, 4);
+  s.addText('To nie są luki wynikające z budżetu, tylko z podstawy prawnej działania systemu publicznego. Państwo mówi, co się zdarzyło i kiedy masz przyjść. Nie mówi, co to znaczy dla ciebie.',
+    { x: 0.55, y: 4.5, w: 12.2, h: 0.55, fontSize: 12, bold: true, color: RDZA, fontFace: BF, margin: 0, isTextBox: true });
+  warn(s, 'Dowód empiryczny: Portfel Aplikacji Zdrowotnych ma warunek bezpłatności dla każdego użytkownika. Efekt — dwie aplikacje w portfelu i określenie „fiasko" w prasie branżowej. Państwo próbowało wejść w rolę prywatnych aplikacji i mu się nie udało.', 5.2);
+  src(s, ['spec', 'bp41']);
+
+  // 25 Zespół
+  s = slide(p); head(s, 'Zespół', 'Kto to buduje', 'osoba → rola → zakres');
+  team(s, 2.3);
+  warn(s, 'Jedna rola pozostaje nieobsadzona i jest najpilniejszą rekrutacją: następca operacyjny. Wymaga dwóch do trzech lat wspólnej pracy przed przekazaniem, więc rekrutacja zaczyna się teraz, a nie wtedy, gdy będzie potrzebny.', 4.7);
+  src(s, ['pwns', 'bp41']);
+
+  // 26 Model operacyjny
+  s = slide(p); head(s, 'Model operacyjny', 'Sześć modeli wykonania, włączanych w kolejności', 'model → kiedy → warunek');
+  table(s, ['Model', 'Kiedy włączamy', 'Koszt i kontrola'], [
+    ['Orkiestrator', 'DOMYŚLNY — od dziś', '400–540 tys. zł, 9–12 mies.; kontrola rosnąca z progami wyjścia'],
+    ['Integrator systemów', 'równolegle — dzieli komponenty', '110 osobodni; wysoka nad formatem'],
+    ['Podmiot leczniczy', 'po pierwszym przychodzie', '894 zł plus lokal, personel, OC — realnie druga firma'],
+    ['Konsorcjum badawcze', 'gdy istnieje kohorta', 'zero pieniędzy; udział 5–15% za wkład danych'],
+    ['Platforma dla twórców', 'gdy istnieje API i klienci', '40–60 tys. zł na wersję pierwszą'],
+    ['Wytwórca wyrobu', 'NA KOŃCU — gdy pięciu klientów płaci za to samo', 'setki tys. do kilku mln zł, 18–36 mies.'],
+  ], 2.3, [2.8, 3.6, 5.8]);
+  s.addText('Najczęstszy błąd w tej kategorii to wejście w model wytwórcy przed modelem orkiestratora: dossier przed dowodem popytu. Dopuszczenie regulacyjne nie chroni przed brakiem popytu — spalono na tym miliardy.',
+    { x: 0.55, y: 5.15, w: 12.2, h: 0.5, fontSize: 11.5, bold: true, color: RDZA, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['prod', 'forw']);
+
+  // 27 Prognozy
+  s = slide(p); head(s, 'Finanse', 'Założenia przychodowe bez prognozy liczbowej', 'rok → źródło → charakter');
+  table(s, ['Rok', 'Źródło przychodu', 'Charakter'], [
+    ['2027', 'pierwsze licencje dokumentacyjne i subskrypcje weterynaryjne', 'kilkudziesięciu klientów, przychód powtarzalny'],
+    ['2028', 'rozszerzenie kanału, świadczenia własne, pierwsze kontrakty badawcze', 'pokrycie kosztu zespołu'],
+    ['2029', 'mapper — okno regulacyjne', 'skokowy wzrost przy trafieniu w termin'],
+    ['2030+', 'rejestr, certyfikacja, nadzór porynkowy, badania', 'przychód niezależny od liczby użytkowników'],
+  ], 2.3, [1.4, 6.0, 4.8]);
+  warn(s, 'Świadomie nie podajemy prognozy pięcioletniej. Poprzednia była zbudowana na modelu kosztowym bez wynagrodzeń i na konwersji konsumenckiej, która nie jest osią przychodu. Wynagrodzenia to 70–90% struktury kosztów — ich pominięcie było najpoważniejszym z siedmiu błędów tamtych wycen. Prognoza powstanie po pierwszych sześciu miesiącach sprzedaży, na danych.', 4.45);
+  src(s, ['bp41']);
+
+  // 28 Struktura finansowania
+  s = slide(p); head(s, 'Finansowanie', 'Około 200 tys. zł, bez rundy kapitałowej', 'pozycja → kwota');
+  table(s, ['Pozycja', 'Kwota'], [
+    ['Kancelaria — statut Fundacji i opinia regulacyjna', '30–60 tys. zł'],
+    ['Przegląd przez drugą kancelarię', '10–20 tys. zł'],
+    ['Opinie prawne: retencja, farmaceutyczna, ubezpieczeniowa', '15–30 tys. zł'],
+    ['Wpis do rejestru podmiotów leczniczych', '894 zł'],
+    ['OC, lokal, opinia sanitarna', '20–40 tys. zł'],
+    ['Certyfikat integracji z platformą państwową', 'bezpłatny'],
+    ['Bazy słownikowe i licencje branżowe', '~15 tys. zł rocznie'],
+    ['Spotkanie przedzgłoszeniowe z jednostką notyfikowaną', '5–15 tys. zł'],
+    ['Podróże i spotkania — czterdzieści rozmów', '5–10 tys. zł'],
+    ['RAZEM, poza kosztem zespołu', '101–191 tys. zł'],
+  ], 2.3, [8.6, 3.6]);
+  src(s, ['cez', 'pcbc', 'bp41']);
+
+  // 29 Alokacja
+  s = slide(p); head(s, 'Alokacja kapitału', 'Kolejność źródeł finansowania', 'źródło → uwaga');
+  table(s, ['Kolejność', 'Źródło', 'Uwaga'], [
+    ['1', 'przepływ z działalności powtarzalnej — Scribe i Pet', 'dostępne od pierwszego roku'],
+    ['2', 'środki bezzwrotne — granty i konsorcja', 'nie rozwadniają, dają wiarygodność'],
+    ['3', 'kapitał cierpliwy — biura rodzinne, fundacje, partnerzy strategiczni', ''],
+    ['4', 'przychód konsumencki', 'dopiero przy zbudowanej społeczności'],
+    ['NIE', 'kapitał wysokiego ryzyka do spółki-matki', 'czas życia funduszu jest krótszy niż horyzont przedsięwzięcia; wyłącznie do spółek celowych pod sprzęt'],
+  ], 2.3, [1.4, 5.4, 5.4]);
+  s.addText('Warunek konieczny dla warstwy badawczej: fundusz zasilany automatycznie stałym odsetkiem przychodu, poza kontrolą zarządu. Zarząd rozliczany z wyników bieżących nie sfinansuje badań o horyzoncie dwudziestoletnim — nie ze złej woli, tylko dlatego, że jest rozliczany z czegoś innego.',
+    { x: 0.55, y: 4.65, w: 12.2, h: 0.6, fontSize: 11.5, bold: true, color: GRANAT, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['bp41', 'prod']);
+
+  // 30 Ryzyka
+  s = slide(p); head(s, 'Ryzyka', 'Osiem pozycji z prawdopodobieństwem', 'ryzyko → prawdopodobieństwo → mitygacja');
+  table(s, ['Ryzyko', 'Prawd.', 'Mitygacja'], [
+    ['Rozproszenie uwagi na zbyt wiele frontów', 'WYSOKIE', 'zasada dwóch–trzech projektów; katalog odrzuceń zapisany'],
+    ['Odejście założyciela z operacji bez następcy', 'WYSOKIE', 'rekrutacja następcy jako pozycja priorytetowa'],
+    ['Brak popytu na pierwszą falę', 'średnie', 'bramka: pięć zobowiązań przed budową'],
+    ['Konkurent zajmuje mapper przed nami', 'średnie', 'przychód ze Scribe i Pet niezależny'],
+    ['Jednostka notyfikowana klasyfikuje wyżej', 'średnie', 'spotkanie przedzgłoszeniowe przed kodem'],
+    ['Odcięcie kluczowego dostawcy', 'średnie', 'reguła jednej trzeciej, adapter, wariant zapasowy z realnym ruchem'],
+    ['Termin cyberbezpieczeństwa niedotrzymany', 'niskie', 'koszt bliski zeru dziś'],
+    ['Wpis do rejestru nieuzyskany', 'niskie', 'Scribe i Pet go nie wymagają — dlatego są pierwsze'],
+  ], 2.3, [4.4, 1.5, 6.3]);
+  src(s, ['bp41']);
+
+  // 31 Grupy docelowe i bramki
+  s = slide(p); head(s, 'Bramki decyzyjne', 'Kiedy wiemy, że to działa — i kiedy przestajemy', 'termin → kamień → co znaczy niepowodzenie');
+  table(s, ['Termin', 'Kamień milowy', 'Co znaczy niepowodzenie'], [
+    ['15.09.2026', 'dwadzieścia rozmów zamkniętych', 'zatrzymać budowę, zmienić produkt'],
+    ['15.10.2026', 'pięć podpisanych zobowiązań', 'nie ma popytu'],
+    ['31.12.2026', 'statut Fundacji podpisany', 'negocjujesz zamiast decydować'],
+    ['Q1 2027', 'wpis do rejestru podmiotów leczniczych', 'przegląd strategii dostępu do danych'],
+    ['Miesiąc 6', 'pięciu płacących, aktywnych klientów', 'nie umiemy sprzedać'],
+    ['Miesiąc 18', 'przychód pokrywający koszt zespołu', 'zwiń do jednego produktu'],
+    ['Przed 26.03.2029', 'mapper gotowy i przetestowany', 'okno zamknięte'],
+  ], 2.3, [2.2, 5.4, 4.6]);
+  s.addText('MAU nie rozstrzyga, czy ktoś zapłaci. Dlatego wskaźnikami są zobowiązania, płacący klienci i pokrycie kosztu zespołu — nie liczba rejestracji.',
+    { x: 0.55, y: 5.3, w: 12.2, h: 0.45, fontSize: 11.5, bold: true, color: GRANAT, fontFace: BF, margin: 0, isTextBox: true });
+  src(s, ['road', 'bp41']);
+
+  // 32 Kontakt
   s = slide(p, true); head(s, 'Kontakt', 'Porozmawiajmy', null, true); kontakt(s);
 
   return p.writeFile({ fileName: '/home/user/Eternal-Lite-App/out/ETERNAL_PITCH_EKOSYSTEM.pptx' });
 }
+
 
 deckApp().then(f => { console.log('OK', f); return deckEko(); })
   .then(f => console.log('OK', f))
