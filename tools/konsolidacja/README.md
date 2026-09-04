@@ -177,3 +177,22 @@ Wyjątkiem są rozstrzygnięcia wpisane wprost w `finish.py` i `decks.js`
 | `finish.py` | macierz XLSX i wstrzyknięcie rozstrzygnięć do roadmap |
 | `INVENTORY.json` | mapa numeru pliku na ścieżkę oryginału |
 | `PACZKI.txt`, `READ_QUEUE.txt` | grupowanie korpusu użyte przy pełnym odczycie |
+
+## Wersje finalne, skrócone (wrzesień 2026)
+
+Dokumentacja dowodowa (ponad 9 000 stron na dokument) pozostaje w archiwum:
+`build_spec2.py` i `build_bp.py` przenoszą treść korpusu blok po bloku.
+Do obiegu wchodzą wersje skrócone, pisane raz i bez powtórzeń:
+
+| Generator | Dane | Wynik | Objętość |
+|---|---|---|---|
+| `build_spec_final.py` | `dane_spec_final.py` + rejestr, karty, komponenty, roadmapa | `ETERNAL_SPECYFIKACJA_FINALNA.docx` — SPEC-00..21 + Aneks A | ~210 stron |
+| `build_bp_final.py` | `dane_bp_final.py` + `dane_odczyt_bp`, rynek, analiza, moduły | `ETERNAL_BIZNESPLAN_FINALNY.docx` — sekcje 1..21 + załączniki A–C | ~97 stron |
+| `decks.js` | rejestr, produkty, odczyt korpusu | `ETERNAL_PITCH_EKOSYSTEM.pptx` (32 slajdy), `ETERNAL_PITCH_APLIKACJA.pptx` (14 slajdów) | — |
+
+Aneks A specyfikacji zawiera pełny rejestr 337 pozycji, pełne karty 67 funkcji P0
+i karty skrócone 108 funkcji P1. Pełne karty wszystkich 337 pozycji pozostają
+w `ETERNAL_KARTY_FUNKCJI.docx`.
+
+Każdy slajd obu decków ma blok ŹRÓDŁA ze wskazaniem pochodzenia danych.
+Paleta i logo pochodzą z identyfikacji wizualnej: rdza `#A1370E`, granat `#003071`.

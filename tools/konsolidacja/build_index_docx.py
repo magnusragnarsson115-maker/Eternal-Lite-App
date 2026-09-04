@@ -25,9 +25,11 @@ INV = {r['idx']: r for r in json.load(open('INVENTORY.json'))}
 TODAY = datetime.date.today().strftime('%d.%m.%Y')
 OUT = '/home/user/Eternal-Lite-App/out/ETERNAL_INDEKS_ZRODEL.docx'
 
-SEK = [('B', 'BIZNESPLAN', 'ETERNAL_BIZNESPLAN_SCALONY.docx'),
+SEK = [('B', 'BIZNESPLAN', 'ETERNAL_BIZNESPLAN_FINALNY.docx (wersja obowiązująca) '
+        '+ ETERNAL_BIZNESPLAN_SCALONY.docx (archiwum dowodowe)'),
        ('R', 'ROADMAPA', 'ETERNAL_ROADMAPA_SCALONA.html + ETERNAL_ROADMAPA_APLIKACJA.html'),
-       ('S', 'SPECYFIKACJA', 'ETERNAL_SPECYFIKACJA_SCALONA.docx + ETERNAL_SPECYFIKACJA_TEMATYCZNA.docx'),
+       ('S', 'SPECYFIKACJA', 'ETERNAL_SPECYFIKACJA_FINALNA.docx (wersja obowiązująca) '
+        '+ ETERNAL_SPECYFIKACJA_SCALONA.docx i ETERNAL_SPECYFIKACJA_TEMATYCZNA.docx (archiwum)'),
        ('P', 'PITCH DECK', 'ETERNAL_PITCH_APLIKACJA.pptx + ETERNAL_PITCH_EKOSYSTEM.pptx')]
 
 PARTS = {}
