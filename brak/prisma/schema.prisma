@@ -1,0 +1,133 @@
+// Schemat BRAK — rejestr utraconej sprzedaży.
+// Provider dev: sqlite (plik lokalny). Do produkcji zmień na "postgresql"
+// i ustaw DATABASE_URL na connection string Postgresa — reszta schematu
+// nie wymaga zmian (celowo unikamy natywnych enumów, żeby był przenośny).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Firma korzystająca z aplikacji (najemca — multi-tenant root).
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  industry  String? // np. "hurtownia elektryczna" — do analogii branżowej
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users        User[]
+  locations    Location[]
+  categories   Category[]
+  reports      LostSaleReport[]
+  subscription Subscription?
+}
+
+/// Punkt sprzedaży / lokalizacja firmy (magazyn, sklep, oddział).
+model Location {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  address        String?
+  createdAt      DateTime @default(now())
+
+  users   User[]
+  reports LostSaleReport[]
+
+  @@index([organizationId])
+}
+
+/// Konto logowania — właściciel albo pracownik przypisany do stanowiska.
+/// role: "OWNER" | "STAFF"
+model User {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  locationId     String?
+  location       Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  email          String   @unique
+  passwordHash   String
+  name           String
+  role           String   @default("STAFF")
+  createdAt      DateTime @default(now())
+
+  sessions Session[]
+  reports  LostSaleReport[] @relation("ReportedBy")
+
+  @@index([organizationId])
+}
+
+/// Sesja logowania — token trzymany w ciasteczku httpOnly, referencja w DB.
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// Subskrypcja firmy — jeden wiersz na organizację.
+/// plan: "FREE" | "SOLO" | "TEAM" | "MULTI"
+/// status: "ACTIVE" | "PAST_DUE" | "CANCELED"
+model Subscription {
+  id                   String   @id @default(cuid())
+  organizationId       String   @unique
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan                 String   @default("FREE")
+  status               String   @default("ACTIVE")
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+/// Kategoria produktowa — tworzona automatycznie przy parsowaniu zgłoszeń
+/// (np. "elektronarzędzia"), osobna per organizacja.
+model Category {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  createdAt      DateTime @default(now())
+
+  reports LostSaleReport[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+/// Zgłoszenie utraconej sprzedaży — sedno aplikacji.
+/// reason: "BRAK_NA_STANIE" | "WYCOFANY_Z_OFERTY" | "ZA_DROGO" | "INNY"
+model LostSaleReport {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  locationId     String
+  location       Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  reportedById   String
+  reportedBy     User     @relation("ReportedBy", fields: [reportedById], references: [id], onDelete: Cascade)
+
+  rawText     String // dosłowna wypowiedź pracownika, np. "wiertarka Makita DDF484"
+  productName String // znormalizowana nazwa produktu wskazana przez AI
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  quantity    Int      @default(1)
+  acceptedPrice Float? // cena, jaką klient zaakceptował (opcjonalnie)
+  reason        String?
+  customerContact String? // opcjonalny kontakt, tylko za zgodą klienta
+
+  createdAt DateTime @default(now())
+
+  @@index([organizationId, createdAt])
+  @@index([locationId])
+  @@index([categoryId])
+}
