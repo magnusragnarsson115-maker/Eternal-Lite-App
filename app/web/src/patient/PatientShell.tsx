@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Activity, Bell, CalendarDays, FileText, Home, LogOut, Menu, MessageSquare, Pill, Search, Shield, User } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
-import { get } from '../api';
+import { get, msSinceOwnMutation } from '../api';
 import { useI18n } from '../i18n';
 import { useRealtime, type LiveEvent } from '../realtime';
 import { useSession } from '../session';
@@ -43,7 +43,7 @@ export function PatientShell() {
   });
   useRealtime(authed, (e: LiveEvent) => {
     const msg = LIVE_MESSAGES[e.type];
-    if (msg && document.visibilityState === 'visible') toast(t(msg));
+    if (msg && document.visibilityState === 'visible' && msSinceOwnMutation() > 5000) toast(t(msg));
   });
 
   if (loading) return <Spinner />;

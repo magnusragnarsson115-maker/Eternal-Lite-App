@@ -1,5 +1,11 @@
 let csrfToken = '';
 let onAuthLost: (() => void) | undefined;
+let lastMutation = 0;
+
+/** Czas ostatniej zmiany wykonanej przez tego użytkownika — do wyciszania komunikatów o własnych akcjach. */
+export function msSinceOwnMutation(): number {
+  return Date.now() - lastMutation;
+}
 
 export function setCsrfToken(token: string | undefined): void {
   csrfToken = token ?? '';
@@ -30,7 +36,10 @@ interface Options {
 export async function api<T = unknown>(path: string, opts: Options = {}): Promise<T> {
   const method = opts.method ?? (opts.body !== undefined || opts.form ? 'POST' : 'GET');
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (method !== 'GET') headers['X-CSRF-Token'] = csrfToken;
+  if (method !== 'GET') {
+    headers['X-CSRF-Token'] = csrfToken;
+    lastMutation = Date.now();
+  }
   if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
   let res: Response;
   try {

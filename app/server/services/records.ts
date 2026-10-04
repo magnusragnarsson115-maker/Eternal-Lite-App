@@ -396,10 +396,11 @@ export async function patientCanViewRecords(patientRef: string): Promise<{ allow
 }
 
 /** Potwierdzenie odczytu; pierwszy odczyt powiadamia personel (status „odczytano” w karcie pacjenta). */
-export function markRead(userId: string, ref: string, patientRef?: string): boolean {
+export function markRead(userId: string, ref: string): boolean {
   const res = getDb().prepare('INSERT OR IGNORE INTO record_read (user_id, resource_ref, read_at) VALUES (?, ?, ?)').run(userId, ref, nowIso());
   const first = res.changes > 0;
-  if (first) bus.publish({ type: ref.startsWith('DiagnosticReport/') ? 'report.changed' : 'document.changed', patientRef, resourceRef: ref });
+  // tylko do personelu — pacjent nie dostaje komunikatu o własnej czynności
+  if (first) bus.publish({ type: ref.startsWith('DiagnosticReport/') ? 'report.changed' : 'document.changed', resourceRef: ref, staff: true });
   return first;
 }
 

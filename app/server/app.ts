@@ -51,7 +51,7 @@ function securityHeaders(reply: FastifyReply): void {
   reply.header('Referrer-Policy', 'no-referrer');
   reply.header('X-Frame-Options', 'DENY');
   reply.header('Cross-Origin-Opener-Policy', 'same-origin');
-  reply.header('Permissions-Policy', `bluetooth=(self), camera=(self "${jitsi}"), microphone=(self "${jitsi}"), display-capture=(self "${jitsi}"), geolocation=(), payment=()`);
+  reply.header('Permissions-Policy', `camera=(self "${jitsi}"), microphone=(self "${jitsi}"), display-capture=(self "${jitsi}"), geolocation=(), payment=()`);
   if (config.isProduction) reply.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 }
 
@@ -139,9 +139,19 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
 
   const dist = webDistDir();
   if (dist) {
-    await app.register(fastifyStatic, { root: dist, prefix: '/', wildcard: false, index: false });
+    // wildcard: pliki sprawdzane przy każdym żądaniu — nowy build nie wymaga restartu; hashowane zasoby cache'owane długo
+    await app.register(fastifyStatic, {
+      root: dist,
+      prefix: '/',
+      wildcard: true,
+      index: ['index.html'],
+      setHeaders: (res, filePath) => {
+        if (filePath.includes(`${path.sep}assets${path.sep}`)) res.header('Cache-Control', 'public, max-age=31536000, immutable');
+        else res.header('Cache-Control', 'no-cache');
+      },
+    });
     app.setNotFoundHandler((req, reply) => {
-      if (req.url.startsWith('/api/') || req.url.startsWith('/fhir/') || !['GET', 'HEAD'].includes(req.method)) {
+      if (req.url.startsWith('/api/') || req.url.startsWith('/fhir/') || req.url.startsWith('/assets/') || !['GET', 'HEAD'].includes(req.method)) {
         return reply.status(404).send({ error: 'not_found' });
       }
       return reply.type('text/html').send(fs.readFileSync(path.join(dist, 'index.html')));
