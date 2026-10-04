@@ -424,8 +424,8 @@ export function NotificationsPage({ staff }: { staff?: boolean }) {
                 <Link to={n.link ? (staff || !n.link.startsWith('/panel') ? n.link : '/') : '#'} className="list-item" onClick={() => void post('/api/notifications/read', { ids: [n.id] }).then(() => qc.invalidateQueries({ queryKey: ['badges'] }))}>
                   {!n.read_at && <span className="unread-dot" aria-label={t('nieprzeczytane')} />}
                   <span className="grow">
-                    <span className="list-title" style={{ display: 'block' }}>{n.title}</span>
-                    <span className="list-sub" style={{ display: 'block' }}>{n.body}</span>
+                    <span className="list-title" style={{ display: 'block' }}>{t(n.title)}</span>
+                    <span className="list-sub" style={{ display: 'block' }}>{t(n.body)}</span>
                     <span className="small muted">{fmt.dateTime(n.created_at)}</span>
                   </span>
                 </Link>

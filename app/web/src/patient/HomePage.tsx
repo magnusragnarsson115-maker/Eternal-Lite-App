@@ -116,8 +116,8 @@ export function HomePage() {
                     <Link to={n.link ?? '/powiadomienia'} className="list-item">
                       {!n.read_at && <span className="unread-dot" aria-label={t('nieprzeczytane')} />}
                       <span className="grow">
-                        <span className="list-title" style={{ display: 'block' }}>{n.title}</span>
-                        <span className="list-sub" style={{ display: 'block' }}>{n.body}</span>
+                        <span className="list-title" style={{ display: 'block' }}>{t(n.title)}</span>
+                        <span className="list-sub" style={{ display: 'block' }}>{t(n.body)}</span>
                         <span className="small muted">{fmt.relative(n.created_at)}</span>
                       </span>
                     </Link>

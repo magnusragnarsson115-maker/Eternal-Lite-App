@@ -395,8 +395,12 @@ export async function patientCanViewRecords(patientRef: string): Promise<{ allow
   return { allowed: true };
 }
 
-export function markRead(userId: string, ref: string): void {
-  getDb().prepare('INSERT OR IGNORE INTO record_read (user_id, resource_ref, read_at) VALUES (?, ?, ?)').run(userId, ref, nowIso());
+/** Potwierdzenie odczytu; pierwszy odczyt powiadamia personel (status „odczytano” w karcie pacjenta). */
+export function markRead(userId: string, ref: string, patientRef?: string): boolean {
+  const res = getDb().prepare('INSERT OR IGNORE INTO record_read (user_id, resource_ref, read_at) VALUES (?, ?, ?)').run(userId, ref, nowIso());
+  const first = res.changes > 0;
+  if (first) bus.publish({ type: ref.startsWith('DiagnosticReport/') ? 'report.changed' : 'document.changed', patientRef, resourceRef: ref });
+  return first;
 }
 
 /** Dostęp do pliku: pacjent tylko do plików udostępnionych mu dokumentów; personel kliniczny — do wszystkich. */

@@ -294,7 +294,7 @@ export async function patientRoutes(app: FastifyInstance): Promise<void> {
     if (!access.allowed) throw forbidden(access.reason);
     const ref = `${p.kind === 'r' ? 'DiagnosticReport' : 'DocumentReference'}/${p.id}`;
     const rec = await getRecord(ref, { patientRef: auth.patientRef });
-    markRead(auth.user.id, ref);
+    markRead(auth.user.id, ref, auth.patientRef);
     audit(actorOf(req), { action: 'R', subtype: 'record-read', entityRef: ref, patientRef: auth.patientRef });
     return { ...rec, readAt: rec.readAt ?? new Date().toISOString() };
   });

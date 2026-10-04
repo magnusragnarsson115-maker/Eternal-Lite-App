@@ -90,9 +90,9 @@ test('udostępnienie wyniku przez lekarza od razu pojawia się w aplikacji pacje
 
   await expect(patient.getByText('Lipidogram')).toBeVisible();
   await patient.getByText('Lipidogram').click();
-  await expect(patient.getByText('Cholesterol całkowity').first()).toBeVisible();
+  await expect(patient.locator('.obs-list').getByText('Cholesterol całkowity')).toBeVisible();
   await expect(patient.getByText('Aplikacja nie ocenia wyników', { exact: false }).first()).toBeVisible();
 
   // potwierdzenie odczytu wraca do lekarza
-  await expect(doctor.getByText(/odczytano/).nth(2)).toBeVisible();
+  await expect(doctor.getByRole('button', { name: /^Lipidogram .*odczytano/ })).toBeVisible();
 });
