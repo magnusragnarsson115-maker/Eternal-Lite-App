@@ -79,7 +79,6 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
       : false,
     trustProxy: config.trustProxy,
     bodyLimit: 5 * 1024 * 1024,
-    disableRequestLogging: config.isProduction,
   });
 
   await app.register(cookie);

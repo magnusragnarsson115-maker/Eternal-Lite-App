@@ -105,8 +105,7 @@ export async function submitResponse(
   if (!qId) throw badRequest('no_questionnaire');
   const q = await getQuestionnaire(qId);
   const items = buildItems(q.item, input.answers);
-  const existing = await fhir().search<QuestionnaireResponse>('QuestionnaireResponse', { subject: input.patientRef, questionnaire: canonicalOf(q) });
-  const prior = existing.find((r) => r.extension?.some((e) => e.url === ETERNAL.ext.appointment && e.valueReference?.reference === `Appointment/${appt.id}`));
+  const prior = await responseForAppointment(appt.id ?? '', input.patientRef);
   const resource: QuestionnaireResponse = {
     ...(prior ?? {}),
     resourceType: 'QuestionnaireResponse',
