@@ -49,7 +49,7 @@ export async function seedDemo(log: (m: string) => void = console.log): Promise<
   const loc = await fhir().create<Location>({
     resourceType: 'Location',
     status: 'active',
-    name: 'Przychodnia — ul. Przykładowa 1',
+    name: 'Przychodnia Eternal',
     address: { line: ['ul. Przykładowa 1'], postalCode: '00-000', city: 'Warszawa', country: 'PL' },
     telecom: [{ system: 'phone', value: '+48 22 000 00 00' }],
     managingOrganization: { reference: `Organization/${org.id}` },

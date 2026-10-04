@@ -21,8 +21,8 @@ import { staffRoutes } from './routes/staff.js';
 const here = path.dirname(fileURLToPath(import.meta.url));
 
 function webDistDir(): string | undefined {
-  const candidates = [path.resolve(here, '../web'), path.resolve(here, '../dist/web'), path.resolve(here, '../../dist/web')];
-  return candidates.find((p) => fs.existsSync(path.join(p, 'index.html')));
+  const candidates = [path.resolve(here, '../dist/web'), path.resolve(here, '../web')];
+  return candidates.find((p) => fs.existsSync(path.join(p, 'index.html')) && fs.existsSync(path.join(p, 'assets')));
 }
 
 const CSRF_EXEMPT = [/^\/api\/integrations\/rpm\/[^/]+\/webhook$/];
@@ -142,7 +142,7 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
   if (dist) {
     await app.register(fastifyStatic, { root: dist, prefix: '/', wildcard: false, index: false });
     app.setNotFoundHandler((req, reply) => {
-      if (req.url.startsWith('/api/') || req.url.startsWith('/fhir/') || req.method !== 'GET') {
+      if (req.url.startsWith('/api/') || req.url.startsWith('/fhir/') || !['GET', 'HEAD'].includes(req.method)) {
         return reply.status(404).send({ error: 'not_found' });
       }
       return reply.type('text/html').send(fs.readFileSync(path.join(dist, 'index.html')));

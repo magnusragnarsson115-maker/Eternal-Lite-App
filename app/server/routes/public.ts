@@ -26,6 +26,7 @@ export async function publicRoutes(app: FastifyInstance): Promise<void> {
       passwordMinLength: config.security.minPasswordLength,
       fhirBackend: config.fhir.backend,
       jitsiDomain: config.jitsi.domain,
+      timezone: config.clinic.timezone,
     };
   });
 }
