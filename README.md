@@ -13,6 +13,17 @@ Projekt Claude Code z dwoma systemami generowania dokumentów:
   projekty ustaw, dokumenty fikcyjne Science Fiction), bez manifestu.
   Specyfikacja: `GENERATOR_UNIWERSALNY.md`.
 
+## Aplikacja Eternal (`app/`)
+
+Katalog `app/` zawiera działającą aplikację **Eternal Pacjent** (PWA) i **Eternal Doctor** (panel placówki)
+na wspólnych danych HL7 FHIR R4: rezerwacje, odwołania, przypomnienia, udostępnianie wyników na żywo,
+wiadomości, teleporady, pomiary z urządzeń, zgody i dziennik dostępu. Szczegóły: [`app/README.md`](app/README.md),
+zgodność regulacyjna: [`app/docs/COMPLIANCE.md`](app/docs/COMPLIANCE.md), integracje: [`app/docs/INTEGRATIONS.md`](app/docs/INTEGRATIONS.md).
+
+```bash
+cd app && npm install && npm run seed:demo && npm run dev
+```
+
 ## Uruchomienie
 
 ```bash

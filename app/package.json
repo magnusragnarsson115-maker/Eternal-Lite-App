@@ -1,0 +1,59 @@
+{
+  "name": "eternal-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Eternal Pacjent i Eternal Doctor — aplikacja pacjenta i panel placówki na wspólnych danych FHIR R4",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"npm:dev:server\" \"npm:dev:web\"",
+    "dev:server": "NODE_OPTIONS=--disable-warning=ExperimentalWarning tsx watch --env-file-if-exists=.env server/index.ts",
+    "dev:web": "vite",
+    "build": "npm run build:web && npm run build:server",
+    "build:web": "vite build",
+    "build:server": "tsc -p tsconfig.server.json",
+    "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env dist/server/index.js",
+    "cli": "NODE_OPTIONS=--disable-warning=ExperimentalWarning tsx --env-file-if-exists=.env server/cli.ts",
+    "seed:demo": "NODE_OPTIONS=--disable-warning=ExperimentalWarning tsx --env-file-if-exists=.env server/cli.ts seed-demo",
+    "typecheck": "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.web.json --noEmit",
+    "test": "NODE_OPTIONS=--disable-warning=ExperimentalWarning vitest run",
+    "test:e2e": "playwright test",
+    "screenshots": "tsx scripts/screenshots.ts",
+    "icons": "tsx scripts/icons.ts"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/multipart": "^10.1.2",
+    "@fastify/static": "^10.1.5",
+    "@medplum/core": "^5.2.1",
+    "@medplum/definitions": "^5.2.1",
+    "@medplum/fhirtypes": "^5.2.1",
+    "fastify": "^5.12.5",
+    "nodemailer": "^10.0.14",
+    "qrcode": "^1.5.4",
+    "web-push": "^3.6.7",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@tanstack/react-query": "^5.104.1",
+    "@types/node": "^26.6.4",
+    "@types/nodemailer": "^8.0.2",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/web-push": "^3.6.4",
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "lucide-react": "^1.52.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router-dom": "^7.18.4",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  }
+}
