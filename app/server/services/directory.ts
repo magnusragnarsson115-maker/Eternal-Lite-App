@@ -100,7 +100,7 @@ async function load() {
         const name = p.name?.[0];
         return {
           id: p.id ?? '',
-          name: name ? formatHumanName(name, { prefix: false }) : 'Lekarz',
+          name: name ? formatHumanName(name, { prefix: true }) : 'Lekarz',
           prefix: name?.prefix?.join(' '),
           specialty: pr.flatMap((r) => r.specialty ?? []).map((s) => s.text ?? s.coding?.[0]?.display ?? '')[0],
           npwz: p.identifier?.find((i) => i.system === NPWZ_SYSTEM)?.value,

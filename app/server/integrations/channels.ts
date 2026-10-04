@@ -17,7 +17,7 @@ export class ChannelNotConfigured extends Error {
 
 // --- e-mail (dowolny serwer SMTP) ---------------------------------------------------------------
 
-let transporter: nodemailer.Transporter | undefined;
+let transporter: ReturnType<typeof nodemailer.createTransport> | undefined;
 
 export function emailConfigured(): boolean {
   return !!config.mail.smtpUrl;

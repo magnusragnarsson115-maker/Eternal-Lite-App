@@ -117,7 +117,7 @@ export async function getThread(threadId: string, access: { patientRef?: string;
   const replies = await fhir().search<Communication>('Communication', { 'part-of': `Communication/${threadId}`, _sort: 'sent' });
   const msgs = [root, ...replies].sort((a, b) => (a.sent ?? '').localeCompare(b.sent ?? ''));
   // otwarcie wątku = odczyt wiadomości przychodzących
-  const incoming = msgs.filter((m) => fromOf(m) === (access.staff ? 'patient' : 'clinic'));
+  const incoming = access.userId ? msgs.filter((m) => fromOf(m) === (access.staff ? 'patient' : 'clinic')) : [];
   const stmt = getDb().prepare('INSERT OR IGNORE INTO record_read (user_id, resource_ref, read_at) VALUES (?, ?, ?)');
   for (const m of incoming) stmt.run(access.userId, `Communication/${m.id}`, nowIso());
   if (incoming.length) bus.publish({ type: 'message.changed', patientRef: root.subject?.reference, resourceRef: `Communication/${threadId}` });

@@ -230,7 +230,7 @@ export async function createReport(actor: AuditActor, input: ReportInput): Promi
   const effective = new Date(input.effective).toISOString();
   const practitionerRef = actor.actorRef?.startsWith('Practitioner/') ? actor.actorRef : undefined;
 
-  const obsRefs: Reference[] = [];
+  const obsRefs: Reference<Observation>[] = [];
   for (const o of input.observations) {
     if (!o.name.trim() || !o.value.trim()) throw badRequest('observation_incomplete');
     const numeric = /^-?\d+([.,]\d+)?$/.test(o.value.trim()) ? Number(o.value.trim().replace(',', '.')) : undefined;
