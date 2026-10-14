@@ -176,14 +176,12 @@ export function InboxPage() {
                     </td>
                     <td>
                       <div className="btn-row">
-                        {p.sharing === 'none' || p.sharing === 'withdrawn' ? (
-                          <InviteButton appointmentId={p.appointment.id} size="sm" />
-                        ) : (
-                          p.status !== 'ready' && (
-                            <Button size="sm" variant="secondary" icon={<BellRing size={16} />} loading={remind.isPending && remind.variables === p.appointment.id} onClick={() => remind.mutate(p.appointment.id)}>
-                              {t('Przypomnij')}
-                            </Button>
-                          )
+                        {/* przycisk zaproszenia zostaje po wysłaniu — okno z kodem QR nie znika, gdy wiersz zmieni stan */}
+                        {p.sharing !== 'shared' && <InviteButton appointmentId={p.appointment.id} size="sm" />}
+                        {(p.sharing === 'invited' || p.sharing === 'shared') && p.status !== 'ready' && (
+                          <Button size="sm" variant="secondary" icon={<BellRing size={16} />} loading={remind.isPending && remind.variables === p.appointment.id} onClick={() => remind.mutate(p.appointment.id)}>
+                            {t('Przypomnij')}
+                          </Button>
                         )}
                         <Link className="btn sm" to={`/panel/wizyta/${p.appointment.id}`}>
                           <Stethoscope size={16} /> {t('Otwórz')}

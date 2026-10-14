@@ -194,7 +194,7 @@ function publish(row: Pick<IntakeRow, 'patient_ref' | 'org_id' | 'id'>): void {
   bus.publish({ type: 'intake.changed', patientRef: row.patient_ref, resourceRef: `urn:eternal:intake:${row.id}`, orgIds: row.org_id ? [row.org_id] : undefined });
 }
 
-export async function uploadIntake(ctx: IntakeContext, file: { data: Buffer; filename: string; contentType: string }, hint?: DocumentKind): Promise<IntakeView> {
+export async function uploadIntake(ctx: IntakeContext, file: { data: Buffer; filename: string; contentType: string }, hint?: DocumentKind, opts: { background?: boolean } = {}): Promise<IntakeView> {
   const uploaded = await registerUpload(ctx.actor, file);
   getDb().prepare('UPDATE binary_owner SET patient_ref = ? WHERE binary_id = ?').run(ctx.patientRef, uploaded.binaryId);
   const id = newId();
@@ -222,8 +222,8 @@ export async function uploadIntake(ctx: IntakeContext, file: { data: Buffer; fil
   audit(ctx.actor, { action: 'C', subtype: 'intake-upload', entityRef: `Binary/${uploaded.binaryId}`, patientRef: ctx.patientRef, detail: { intake: id, source: ctx.source } });
   const row = rowById(id)!;
   publish(row);
-  // odczyt w tle; strona pacjenta odpytuje stan, panel dostaje zdarzenie
-  setImmediate(() => void runInScope({ patientRef: ctx.patientRef, patientOrgIds: ctx.orgId ? [ctx.orgId] : [] }, () => processIntake(id)));
+  // odczyt w tle; strona pacjenta odpytuje stan, panel dostaje zdarzenie (background=false: wywołujący sam czeka na processIntake)
+  if (opts.background !== false) setImmediate(() => void runInScope({ patientRef: ctx.patientRef, patientOrgIds: ctx.orgId ? [ctx.orgId] : [] }, () => processIntake(id)));
   return toIntakeView(row, true);
 }
 

@@ -18,6 +18,7 @@ import { createPatient } from '../services/patients.js';
 import { createDocument, createReport, registerUpload, setShared } from '../services/records.js';
 import { bookAppointment, createAvailability } from '../services/scheduling.js';
 import { simplePdf } from './pdf.js';
+import { seedPilot } from './pilot.js';
 
 /**
  * Dane demonstracyjne — WSZYSTKIE osoby, placówka, wyniki i terminy są fikcyjne.
@@ -235,12 +236,12 @@ export async function seedDemo(log: (m: string) => void = console.log): Promise<
   let day = addDays(today, 1);
   while (isoWeekday(day) > 5) day = addDays(day, 1);
   const s1 = (await freeSlots(svc.internal.id, nowicka.id, day))[3];
-  if (s1) await bookAppointment(annaActor, { slotId: s1.id ?? '', serviceId: svc.internal.id, patientRef: annaRef, comment: 'Kontrola po leczeniu infekcji.', bookedBy: 'patient' });
+  const annaNext = s1 ? await bookAppointment(annaActor, { slotId: s1.id ?? '', serviceId: svc.internal.id, patientRef: annaRef, comment: 'Kontrola po leczeniu infekcji.', bookedBy: 'patient' }) : undefined;
   const teleDay = addDays(day, 2);
   const s2 = (await freeSlots(svc.tele.id, nowicka.id, teleDay))[1];
   if (s2) await bookAppointment(annaActor, { slotId: s2.id ?? '', serviceId: svc.tele.id, patientRef: annaRef, bookedBy: 'patient' });
   const janSlot = (await freeSlots(svc.cardio.id, zielinski.id, today))[2];
-  if (janSlot) await bookAppointment(system, { slotId: janSlot.id ?? '', serviceId: svc.cardio.id, patientRef: `Patient/${jan.id}`, bookedBy: 'staff' });
+  const janAppt = janSlot ? await bookAppointment(system, { slotId: janSlot.id ?? '', serviceId: svc.cardio.id, patientRef: `Patient/${jan.id}`, bookedBy: 'staff' }) : undefined;
   const mariaSlot = (await freeSlots(svc.lab.id, wojcik.id, day))[0];
   if (mariaSlot) await bookAppointment(system, { slotId: mariaSlot.id ?? '', serviceId: svc.lab.id, patientRef: mariaRef, bookedBy: 'staff' });
 
@@ -354,6 +355,18 @@ export async function seedDemo(log: (m: string) => void = console.log): Promise<
     if (i % 4 === 0) await addMeasurement(annaActor, annaRef, { kind: 'weight', value: 64.2 + (i % 3) * 0.3, effective: d.toISOString(), source: 'manual' });
   }
   await addMedication(annaActor, annaRef, { name: 'Witamina D3 2000 j.m.', dosage: '1 kapsułka dziennie', since: '2025-10' });
+
+  // --- pilotaż i MVP: zaproszenia, materiały od pacjentki, Scribe, karta „Po wizycie”, SOS ---
+  await seedPilot({
+    orgId: org.id ?? '',
+    patientId: anna.id ?? '',
+    patientRef: annaRef,
+    nextAppointmentId: annaNext?.id,
+    otherPatientId: jan.id,
+    otherAppointmentId: janAppt?.id,
+    pastAppointmentId: pastAppt.id,
+    log,
+  });
 
   log('Dane demonstracyjne utworzone (wszystkie osoby i wyniki są fikcyjne).');
 }

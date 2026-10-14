@@ -12,7 +12,7 @@ async function loginPatient(browser: Browser): Promise<Page> {
   await page.goto('/logowanie');
   await page.getByLabel('E-mail').fill('pacjent@eternal.local');
   await page.getByLabel('Hasło').fill(PASSWORD);
-  await page.getByRole('button', { name: 'Zaloguj się' }).click();
+  await page.getByRole('button', { name: 'Zaloguj się', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Anna');
   return page;
 }
@@ -23,7 +23,7 @@ async function loginDoctor(browser: Browser): Promise<Page> {
   await page.goto('/panel/logowanie');
   await page.getByLabel('E-mail').fill('anna.nowicka@eternal.local');
   await page.getByLabel('Hasło').fill(PASSWORD);
-  await page.getByRole('button', { name: 'Zaloguj się' }).click();
+  await page.getByRole('button', { name: 'Zaloguj się', exact: true }).click();
   await page.waitForURL(/\/panel\/mfa/);
   await page.getByLabel('Kod z aplikacji').fill(totpCode(TOTP, Date.now() + 30_000 * totpStep++));
   await page.getByRole('button', { name: 'Potwierdź' }).click();

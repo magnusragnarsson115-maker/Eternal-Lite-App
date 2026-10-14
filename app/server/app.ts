@@ -13,6 +13,7 @@ import { config } from './config.js';
 import { frameSources } from './services/tele.js';
 import { FhirConflictError, FhirNotFoundError, FhirValidationError } from './fhir/repository.js';
 import { HttpError } from './lib/util.js';
+import { reportError, SECURITY_POLICY, securityTxt } from './lib/monitoring.js';
 import { adminRoutes } from './routes/admin.js';
 import { authRoutes } from './routes/auth.js';
 import { eventRoutes } from './routes/events.js';
@@ -150,10 +151,18 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
     if (err instanceof FhirValidationError) return reply.status(422).send({ error: 'fhir_validation_failed', message: err.message, details: err.issues });
     if (err.statusCode && err.statusCode < 500) return reply.status(err.statusCode).send({ error: err.code ?? 'bad_request', message: err.message });
     req.log.error({ err }, 'unhandled error');
+    reportError(err, { route: req.routeOptions?.url, method: req.method });
     return reply.status(500).send({ error: 'internal_error' });
   });
 
   app.get('/api/health', async () => ({ status: 'ok', time: new Date().toISOString() }));
+  // zgłaszanie podatności (A18.9, RFC 9116)
+  app.get('/.well-known/security.txt', async (_req, reply) => {
+    const txt = securityTxt();
+    if (!txt) return reply.status(404).send({ error: 'not_found' });
+    return reply.type('text/plain; charset=utf-8').header('Cache-Control', 'max-age=86400').send(txt);
+  });
+  app.get('/security-policy.txt', async (_req, reply) => reply.type('text/plain; charset=utf-8').send(SECURITY_POLICY));
 
   await app.register(publicRoutes);
   await app.register(authRoutes);

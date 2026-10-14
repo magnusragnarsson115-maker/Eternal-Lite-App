@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { buildApp } from '../../server/app.js';
+import { config } from '../../server/config.js';
 import { hashPassword } from '../../server/auth/passwords.js';
 import { totpCode } from '../../server/auth/totp.js';
 import { createUser, updateUser } from '../../server/auth/users.js';
@@ -70,6 +71,19 @@ describe('API end-to-end', () => {
     expect(res.headers['content-security-policy']).toContain("default-src 'self'");
     expect(res.headers['x-frame-options']).toBe('DENY');
     expect(res.headers['cache-control']).toBe('no-store');
+  });
+
+  it('security.txt (RFC 9116) z kontaktem do zgłaszania podatności', async () => {
+    const before = config.security.contact;
+    (config.security as { contact?: string }).contact = undefined;
+    expect((await new Client(app).req('GET', '/.well-known/security.txt')).status).toBe(404);
+    (config.security as { contact?: string }).contact = 'security@eternal.example';
+    const res = await new Client(app).req('GET', '/.well-known/security.txt');
+    expect(res.status).toBe(200);
+    expect(res.body).toContain('Contact: mailto:security@eternal.example');
+    expect(res.body).toMatch(/Expires: \d{4}-\d{2}-\d{2}T/);
+    expect((await new Client(app).req('GET', '/security-policy.txt')).body).toContain('Zgłaszanie podatności');
+    (config.security as { contact?: string }).contact = before;
   });
 
   it('rejestracja wymaga zgód obowiązkowych i silnego hasła', async () => {

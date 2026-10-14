@@ -91,9 +91,16 @@ function takeUnit(tokens: string[], start: number): { raw: string; ucum: string;
   return undefined;
 }
 
+/** Układ „nazwa [jednostka] wynik (zakres)” → „nazwa wynik jednostka zakres”; zakres w nawiasie na końcu linii bez nawiasu. */
+function normalizeLayout(text: string): string {
+  const m = text.match(new RegExp(String.raw`^(.*?\p{L}.*?)\s*\[([^\]]{1,20})\]\s+((?:[<>≤≥]=?\s?)?${NUMBER})(?:\s+(.*))?$`, 'u'));
+  const out = m && toUcum(m[2]) ? `${m[1]} ${m[3]} ${m[2]} ${m[4] ?? ''}`.trim() : text;
+  return out.replace(/\s\((\d[^()]*)\)$/, ' $1');
+}
+
 /** Rozbiór jednej linii wyniku; undefined, gdy linia nie wygląda na wynik badania. */
 export function parseLine(rawText: string): Omit<ParsedItem, 'id' | 'line' | 'page' | 'origin' | 'confidence' | 'issues'> | undefined {
-  const text = cleanLine(rawText);
+  const text = normalizeLayout(cleanLine(rawText));
   if (text.length < 3 || text.length > 200) return undefined;
   VALUE_RE.lastIndex = 0;
   let valueMatch: RegExpExecArray | null;

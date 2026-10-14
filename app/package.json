@@ -21,7 +21,9 @@
     "test": "NODE_OPTIONS=--disable-warning=ExperimentalWarning vitest run",
     "test:e2e": "playwright test",
     "screenshots": "tsx scripts/screenshots.ts",
-    "icons": "tsx scripts/icons.ts"
+    "icons": "tsx scripts/icons.ts",
+    "sbom": "npm sbom --sbom-format cyclonedx --omit dev > sbom.cdx.json && echo Zapisano sbom.cdx.json",
+    "audit:deps": "npm audit --omit dev --audit-level high"
   },
   "dependencies": {
     "@anthropic-ai/bedrock-sdk": "^0.34.4",
