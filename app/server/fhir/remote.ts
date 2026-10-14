@@ -170,6 +170,14 @@ export class GenericFhirRepository implements FhirRepository {
     });
   }
 
+  async expunge(type: ResourceType, id: string): Promise<void> {
+    await this.request('DELETE', `${type}/${encodeURIComponent(id)}`).catch((err: Error) => {
+      if (!/404|410/.test(err.message)) throw err;
+    });
+    // serwery z operacją $expunge (np. HAPI) usuwają też historię; brak operacji — zostaje usunięcie logiczne
+    await this.request('POST', `${type}/${encodeURIComponent(id)}/$expunge`, { resourceType: 'Parameters', parameter: [{ name: 'expungeEverything', valueBoolean: true }] }).catch(() => undefined);
+  }
+
   async health(): Promise<{ ok: boolean; detail: string }> {
     try {
       const meta = await this.request<{ fhirVersion?: string; software?: { name?: string } }>('GET', 'metadata');
@@ -265,6 +273,13 @@ export class MedplumFhirRepository implements FhirRepository {
   async readBinary(id: string): Promise<{ data: Buffer; contentType: string }> {
     const blob = (await this.wrap(this.client.download(`Binary/${id}`))) as Blob;
     return { data: Buffer.from(await blob.arrayBuffer()), contentType: blob.type || 'application/octet-stream' };
+  }
+
+  async expunge(type: ResourceType, id: string): Promise<void> {
+    await this.wrap(this.client.deleteResource(type, id), type, id).catch((err: Error) => {
+      if (!(err instanceof FhirNotFoundError)) throw err;
+    });
+    await this.client.post(this.client.fhirUrl(type, id, '$expunge'), {}).catch(() => undefined);
   }
 
   async deleteBinary(id: string): Promise<void> {

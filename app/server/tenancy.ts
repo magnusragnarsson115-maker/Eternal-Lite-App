@@ -153,6 +153,11 @@ export class ScopedFhirRepository implements FhirRepository {
     return this.base.delete(type, id);
   }
 
+  async expunge(type: ResourceType, id: string): Promise<void> {
+    if (currentOrgId()) await this.read(type, id);
+    return this.base.expunge(type, id);
+  }
+
   async search<T extends Resource>(type: T['resourceType'], params: SearchParams = {}): Promise<T[]> {
     const orgId = currentOrgId();
     if (!orgId) return this.base.search<T>(type, params);

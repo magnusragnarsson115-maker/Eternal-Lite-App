@@ -69,6 +69,14 @@ export class LocalFhirRepository implements FhirRepository {
     });
   }
 
+  async expunge(type: ResourceType, id: string): Promise<void> {
+    transaction(this.db, () => {
+      this.db.prepare('DELETE FROM fhir_resource WHERE type = ? AND id = ?').run(type, id);
+      this.db.prepare('DELETE FROM fhir_history WHERE type = ? AND id = ?').run(type, id);
+      this.db.prepare('DELETE FROM fhir_ref WHERE type = ? AND id = ?').run(type, id);
+    });
+  }
+
   async search<T extends Resource>(type: T['resourceType'], params: SearchParams = {}): Promise<T[]> {
     const request = parseSearchRequest<T>(type, params);
     const filters = request.filters ?? [];

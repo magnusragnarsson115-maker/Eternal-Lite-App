@@ -213,6 +213,7 @@ export async function accountRoutes(app: FastifyInstance): Promise<void> {
       await fhir().update<Patient>({ ...p, telecom });
     }
     audit(actorOf(req), { action: 'U', subtype: 'phone-verified' });
+    auth.user = findUserById(auth.user.id)!;
     return meResponse(req);
   });
 

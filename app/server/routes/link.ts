@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { audit } from '../audit.js';
+import { findUserByFhirRef, issueToken } from '../auth/users.js';
 import { AI_NOTICE, LINK_CONSENT_TEXT, PURPOSE_TEXT, renderText } from '../content/texts.js';
 import { body, params } from '../lib/http.js';
 import { formatLocal } from '../lib/time.js';
@@ -140,6 +141,19 @@ export async function linkRoutes(app: FastifyInstance): Promise<void> {
       const f = await intakeFile(item);
       reply.header('Content-Type', f.contentType).header('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(f.filename)}`);
       return f.data;
+    }),
+  );
+
+  /**
+   * „Załóż konto i przejmij dane” (D1, MVP-1): kod aktywacyjny dla kartoteki z linku. Rejestracja wymaga dodatkowo
+   * daty urodzenia zgodnej z kartoteką — sam link nie wystarcza do założenia konta.
+   */
+  app.post('/api/link/:token/takeover', async (req) =>
+    withLink(req, async (row) => {
+      if (findUserByFhirRef(row.patient_ref)) throw conflict('account_exists');
+      const code = issueToken('patient-activation', { payload: { patientRef: row.patient_ref }, ttlMinutes: 30, code: 'activation' });
+      audit(linkActor(req, row), { action: 'C', subtype: 'link-takeover-code', patientRef: row.patient_ref, detail: { invite: row.id } });
+      return { activationCode: code, expiresInMinutes: 30 };
     }),
   );
 

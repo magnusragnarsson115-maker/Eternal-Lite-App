@@ -10,6 +10,7 @@ import { fhir } from '../fhir/index.js';
 import { idFromRef } from '../fhir/repository.js';
 import { teleWindowOpen } from '../integrations/jitsi.js';
 import { patientEnter } from '../services/tele.js';
+import { crisisMentioned } from '../services/safety.js';
 import { orgIdsOf } from '../tenancy.js';
 import { PROVINCES, searchBenefits, searchQueues } from '../integrations/nfz.js';
 import { searchMedicinalProducts } from '../integrations/rpl.js';
@@ -334,7 +335,9 @@ export async function patientRoutes(app: FastifyInstance): Promise<void> {
     const auth = requirePatient(req);
     messageLimiter.check(`msg:${auth.user.id}`);
     const input = body(req, z.object({ subject: z.string().max(120), category: z.enum(MESSAGE_CATEGORIES), body: z.string().max(2000) }));
-    return startThreadAsPatient(actorOf(req), { ...input, patientRef: auth.patientRef });
+    const thread = await startThreadAsPatient(actorOf(req), { ...input, patientRef: auth.patientRef });
+    // F8.1: przy słowach kryzysowych aplikacja pokazuje numery pomocy (wiadomość do placówki nie jest pomocą doraźną)
+    return { ...thread, crisis: crisisMentioned(`${input.subject} ${input.body}`) };
   });
 
   app.post('/api/me/threads/:id/reply', async (req) => {
@@ -342,7 +345,8 @@ export async function patientRoutes(app: FastifyInstance): Promise<void> {
     messageLimiter.check(`msg:${auth.user.id}`);
     const { id } = params(req, IdParams);
     const input = body(req, z.object({ body: z.string().max(2000) }));
-    return reply(actorOf(req), { threadId: id, body: input.body, as: 'patient', patientRef: auth.patientRef });
+    const res = await reply(actorOf(req), { threadId: id, body: input.body, as: 'patient', patientRef: auth.patientRef });
+    return { ...res, crisis: crisisMentioned(input.body) };
   });
 
   // --- pomiary domowe ----------------------------------------------------------------------------

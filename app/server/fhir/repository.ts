@@ -21,6 +21,8 @@ export interface FhirRepository {
   update<T extends Resource>(resource: T, opts?: { ifMatch?: string }): Promise<T>;
   /** Usunięcie logiczne — historia wersji zostaje (wymóg przechowywania dokumentacji). */
   delete(type: ResourceType, id: string): Promise<void>;
+  /** Trwałe usunięcie z historią — wyłącznie dane własne pacjenta na jego żądanie (art. 17 RODO), nie dokumentacja placówki. */
+  expunge(type: ResourceType, id: string): Promise<void>;
   search<T extends Resource>(type: T['resourceType'], params?: SearchParams): Promise<T[]>;
   history<T extends Resource>(type: T['resourceType'], id: string): Promise<T[]>;
   saveBinary(data: Buffer, contentType: string, filename?: string): Promise<StoredBinary>;

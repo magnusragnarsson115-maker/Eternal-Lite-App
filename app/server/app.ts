@@ -23,6 +23,7 @@ import { visitRoutes } from './routes/visit.js';
 import { scribeRoutes } from './routes/scribe.js';
 import { orgRoutes } from './routes/org.js';
 import { accountRoutes } from './routes/account.js';
+import { meRoutes } from './routes/me.js';
 import { patientRoutes } from './routes/patient.js';
 import { publicRoutes } from './routes/public.js';
 import { staffRoutes } from './routes/staff.js';
@@ -167,6 +168,7 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
   await app.register(scribeRoutes);
   await app.register(orgRoutes);
   await app.register(accountRoutes);
+  await app.register(meRoutes);
 
   const dist = webDistDir();
   if (dist) {
