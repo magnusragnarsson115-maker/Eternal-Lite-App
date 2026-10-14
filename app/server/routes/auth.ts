@@ -29,6 +29,7 @@ import { getClinicSettings, getPractitioner } from '../services/directory.js';
 import { enqueue } from '../services/notifications.js';
 import { createPatient, findPatientByPesel, toPatientView } from '../services/patients.js';
 import type { Patient } from '@medplum/fhirtypes';
+import { credentialsOf, recoveryCodesLeft } from '../auth/webauthn.js';
 
 const lastTotpStep = new Map<string, number>();
 
@@ -65,7 +66,7 @@ function verifyTotpOnce(user: AppUser, code: string): boolean {
   return true;
 }
 
-async function meResponse(req: FastifyRequest) {
+export async function meResponse(req: FastifyRequest) {
   const auth = req.auth;
   if (!auth) return { authenticated: false };
   const u = auth.user;
@@ -77,11 +78,18 @@ async function meResponse(req: FastifyRequest) {
     if (p) patient = toPatientView(p);
   }
   if (u.fhir_ref?.startsWith('Practitioner/')) practitioner = await getPractitioner(u.fhir_ref.split('/')[1]).catch(() => undefined);
+  const keys = credentialsOf(u.id).length;
   const mfaNeeded = staff || u.totp_enabled;
   return {
     authenticated: true,
     csrfToken: auth.csrfToken,
-    mfa: { required: mfaNeeded && !auth.mfaPassed, enrolled: u.totp_enabled, enrollRequired: staff && !u.totp_enabled },
+    ...(auth.bearerToken ? { token: auth.bearerToken } : {}),
+    mfa: {
+      required: mfaNeeded && !auth.mfaPassed,
+      enrolled: u.totp_enabled || (staff && keys > 0),
+      enrollRequired: staff && !u.totp_enabled && keys === 0,
+      methods: { totp: u.totp_enabled, keys, recoveryCodes: recoveryCodesLeft(u.id) },
+    },
     user: {
       id: u.id,
       email: u.email,
@@ -93,6 +101,9 @@ async function meResponse(req: FastifyRequest) {
       mustChangePassword: u.must_change_password,
       status: u.status,
       fhirRef: u.fhir_ref,
+      phone: u.phone ?? undefined,
+      phoneVerified: u.phone_verified,
+      orgId: u.org_id ?? undefined,
     },
     patient,
     practitioner,
@@ -175,7 +186,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
   });
 
   app.post('/api/auth/login', async (req, reply) => {
-    const input = body(req, z.object({ email: z.string().max(200), password: z.string().max(256) }));
+    const input = body(req, z.object({ email: z.string().max(200), password: z.string().max(256), client: z.enum(['web', 'mobile']).default('web') }));
     authLimiter.check(`login:${req.ip}`);
     authLimiter.check(`login:${input.email.toLowerCase()}`);
     const user = findUserByEmail(input.email);
@@ -200,8 +211,8 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     }
     updateUser(user.id, { failed_logins: 0, locked_until: null, last_login_at: nowIso() });
     const fresh = findUserById(user.id)!;
-    const mfaNeeded = isStaff(fresh) || fresh.totp_enabled;
-    createSession(reply, req, fresh, !mfaNeeded);
+    const mfaNeeded = isStaff(fresh) || fresh.totp_enabled || (isStaff(fresh) && credentialsOf(fresh.id).length > 0);
+    createSession(reply, req, fresh, !mfaNeeded, { method: 'password', bearer: input.client === 'mobile' && !isStaff(fresh) });
     audit(actor, { action: 'E', subtype: mfaNeeded ? 'login-password-ok' : 'login' });
     return meResponse(req);
   });

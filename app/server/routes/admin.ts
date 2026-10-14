@@ -4,7 +4,9 @@ import { z } from 'zod';
 import { audit, listAudit, verifyAuditChain } from '../audit.js';
 import { hashPassword } from '../auth/passwords.js';
 import { actorOf, destroyAllSessions, requireStaff } from '../auth/sessions.js';
-import { createUser, findUserByEmail, findUserById, listUsers, type Role, updateUser } from '../auth/users.js';
+import { type AppUser, createUser, findUserByEmail, findUserById, isStaff, listUsers, type Role, updateUser } from '../auth/users.js';
+import { getDb } from '../db.js';
+import { staffOrgId } from '../services/orgs.js';
 import { listIntegrations } from '../integrations/registry.js';
 import { body, IdParams, params, query, zDate, zId } from '../lib/http.js';
 import { badRequest, conflict, forbidden, notFound } from '../lib/util.js';
@@ -70,6 +72,12 @@ const PractitionerSchema = z.object({
 
 export async function adminRoutes(app: FastifyInstance): Promise<void> {
   const admin = (req: Parameters<typeof requireStaff>[0]) => requireStaff(req, ['admin']);
+  /** Administrator zarządza wyłącznie kontami swojej organizacji (K13). */
+  const orgUser = (adminUser: AppUser, id: string) => {
+    const user = findUserById(id);
+    if (!user || (isStaff(user) && staffOrgId(user) !== staffOrgId(adminUser))) throw notFound('user_not_found');
+    return user;
+  };
 
   app.get('/api/admin/settings', async (req) => {
     admin(req);
@@ -119,15 +127,24 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
   });
 
   // --- użytkownicy ----------------------------------------------------------------------------
+  const patientInOrg = (ref: string, adminUser: AppUser) => {
+    const row = getDb().prepare('SELECT content FROM fhir_resource WHERE type = ? AND id = ?').get('Patient', ref.split('/')[1] ?? '') as { content: string } | undefined;
+    const orgId = staffOrgId(adminUser);
+    return !row || !orgId || row.content.includes(`"${orgId}"`);
+  };
+
   app.get('/api/admin/users', async (req) => {
-    admin(req);
+    const auth = admin(req);
     const q = query(req, z.object({ scope: z.enum(['staff', 'deletion']).default('staff') }));
-    const users = q.scope === 'staff' ? listUsers({ staffOnly: true }) : listUsers().filter((u) => u.status === 'deletion-requested');
+    const users =
+      q.scope === 'staff'
+        ? listUsers({ staffOnly: true }).filter((u) => staffOrgId(u) === staffOrgId(auth.user))
+        : listUsers().filter((u) => u.status === 'deletion-requested' && u.fhir_ref && patientInOrg(u.fhir_ref, auth.user));
     return { items: users.map(userView) };
   });
 
   app.post('/api/admin/users', async (req) => {
-    admin(req);
+    const auth = admin(req);
     const input = body(
       req,
       z.object({
@@ -153,6 +170,7 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
       displayName: input.displayName,
       emailVerified: true,
       mustChangePassword: true,
+      orgId: staffOrgId(auth.user),
     });
     audit(actorOf(req), { action: 'C', subtype: 'staff-user-create', entityRef: `urn:eternal:user:${user.id}`, detail: { roles: input.roles } });
     return { user: userView(user), temporaryPassword: password };
@@ -162,20 +180,24 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
     const auth = admin(req);
     const { id } = params(req, IdParams);
     const input = body(req, z.object({ roles: z.array(z.enum(['practitioner', 'reception', 'admin'])).min(1).optional(), status: z.enum(['active', 'disabled']).optional() }));
-    const user = findUserById(id);
-    if (!user || user.roles.includes('patient')) throw notFound('user_not_found');
+    const user = orgUser(auth.user, id);
+    if (user.roles.includes('patient')) throw notFound('user_not_found');
     if (id === auth.user.id && (input.status === 'disabled' || (input.roles && !input.roles.includes('admin')))) throw forbidden('cannot_demote_self');
     updateUser(id, { roles: input.roles as Role[] | undefined, status: input.status });
-    if (input.status === 'disabled') destroyAllSessions(id);
+    // odebranie dostępu po odejściu pracownika: sesje, klucze dostępu i linki nagrywania przestają działać od razu
+    if (input.status === 'disabled') {
+      destroyAllSessions(id);
+      getDb().prepare('DELETE FROM webauthn_credential WHERE user_id = ?').run(id);
+      getDb().prepare("UPDATE one_time_token SET used_at = ? WHERE user_id = ? AND used_at IS NULL").run(new Date().toISOString(), id);
+    }
     audit(actorOf(req), { action: 'U', subtype: 'staff-user-update', entityRef: `urn:eternal:user:${id}`, detail: input });
     return userView(findUserById(id)!);
   });
 
   app.post('/api/admin/users/:id/reset-mfa', async (req) => {
-    admin(req);
+    const auth = admin(req);
     const { id } = params(req, IdParams);
-    const user = findUserById(id);
-    if (!user) throw notFound('user_not_found');
+    orgUser(auth.user, id);
     updateUser(id, { totp_enabled: false, totp_secret: null });
     destroyAllSessions(id);
     audit(actorOf(req), { action: 'U', subtype: 'mfa-reset', entityRef: `urn:eternal:user:${id}` });
@@ -183,10 +205,10 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
   });
 
   app.post('/api/admin/users/:id/reset-password', async (req) => {
-    admin(req);
+    const auth = admin(req);
     const { id } = params(req, IdParams);
-    const user = findUserById(id);
-    if (!user || user.roles.includes('patient')) throw notFound('user_not_found');
+    const user = orgUser(auth.user, id);
+    if (user.roles.includes('patient')) throw notFound('user_not_found');
     const password = tempPassword();
     updateUser(id, { password_hash: await hashPassword(password), must_change_password: true, failed_logins: 0, locked_until: null });
     destroyAllSessions(id);
@@ -195,10 +217,10 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
   });
 
   app.post('/api/admin/users/:id/close', async (req) => {
-    admin(req);
+    const auth = admin(req);
     const { id } = params(req, IdParams);
     const user = findUserById(id);
-    if (!user || user.status !== 'deletion-requested') throw notFound('request_not_found');
+    if (!user || user.status !== 'deletion-requested' || !user.fhir_ref || !patientInOrg(user.fhir_ref, auth.user)) throw notFound('request_not_found');
     closeAccount(actorOf(req), id);
     return { ok: true };
   });
@@ -234,9 +256,12 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
 
   // --- dziennik zdarzeń i integracje ------------------------------------------------------------
   app.get('/api/admin/audit', async (req) => {
-    admin(req);
+    const auth = admin(req);
     const q = query(req, z.object({ patientRef: z.string().max(80).optional(), actorUserId: zId.optional(), before: z.coerce.number().int().optional(), limit: z.coerce.number().int().max(500).optional() }));
-    const items = listAudit(q);
+    // dziennik organizacji: zdarzenia jej personelu (bez treści klinicznej — tylko kto, co, kiedy)
+    const orgUsers = new Set(listUsers({ staffOnly: true }).filter((u) => staffOrgId(u) === staffOrgId(auth.user)).map((u) => u.id));
+    if (q.actorUserId && !orgUsers.has(q.actorUserId)) throw notFound('user_not_found');
+    const items = listAudit({ ...q, limit: Math.min((q.limit ?? 100) * 3, 500) }).filter((r) => (r.actor_user_id ? orgUsers.has(r.actor_user_id) : !r.patient_ref)).slice(0, q.limit ?? 100);
     audit(actorOf(req), { action: 'R', subtype: 'audit-read', detail: { filter: q } });
     return { items };
   });

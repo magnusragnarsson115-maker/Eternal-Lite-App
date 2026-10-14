@@ -7,6 +7,10 @@ import { getVapidKeys } from './integrations/channels.js';
 import { processOutbox } from './services/notifications.js';
 import { ensureOrganizations } from './services/orgs.js';
 import { runReminderSweep } from './services/reminders.js';
+import { expireGrants } from './services/grants.js';
+import { runMissingDocsSweep } from './services/inbox.js';
+import { purgeRecordings } from './services/scribe.js';
+import { runMonthlyReports } from './services/reports.js';
 
 export async function initCore(): Promise<void> {
   initDatabase(path.join(config.dataDir, 'eternal.sqlite'));
@@ -29,7 +33,17 @@ export function productionWarnings(): string[] {
 }
 
 export function startJobs(log: (msg: string, err?: unknown) => void): () => void {
+  const every = (ms: number, name: string, fn: () => Promise<unknown> | unknown) =>
+    setInterval(() => {
+      Promise.resolve()
+        .then(fn)
+        .catch((err) => log(`${name} failed`, err));
+    }, ms);
   const timers = [
+    every(10 * 60_000, 'grant expiry', expireGrants),
+    every(15 * 60_000, 'missing documents sweep', runMissingDocsSweep),
+    every(60 * 60_000, 'recording purge', purgeRecordings),
+    every(60 * 60_000, 'monthly pilot report', runMonthlyReports),
     setInterval(() => void runReminderSweep().catch((err) => log('reminder sweep failed', err)), 60_000),
     setInterval(() => void processOutbox().catch((err) => log('outbox failed', err)), 30_000),
     setInterval(() => {

@@ -189,6 +189,10 @@ export class LocalFhirRepository implements FhirRepository {
     return { data: Buffer.from(row.data), contentType: row.content_type };
   }
 
+  async deleteBinary(id: string): Promise<void> {
+    this.db.prepare('DELETE FROM fhir_binary WHERE id = ?').run(id);
+  }
+
   async health(): Promise<{ ok: boolean; detail: string }> {
     const row = this.db.prepare('SELECT COUNT(*) AS n FROM fhir_resource WHERE deleted = 0').get() as { n: number };
     return { ok: true, detail: `SQLite, ${row.n} zasobów FHIR` };

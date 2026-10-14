@@ -154,7 +154,8 @@ export type TokenPurpose =
   | 'magic-link'
   | 'staff-invite'
   | 'webauthn-challenge'
-  | 'link-takeover';
+  | 'link-takeover'
+  | 'scribe-record';
 
 const ACTIVATION_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 

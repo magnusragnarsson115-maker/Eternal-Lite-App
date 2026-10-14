@@ -175,6 +175,10 @@ export class ScopedFhirRepository implements FhirRepository {
     return this.base.readBinary(id);
   }
 
+  deleteBinary(id: string): Promise<void> {
+    return this.base.deleteBinary(id);
+  }
+
   health(): Promise<{ ok: boolean; detail: string }> {
     return this.base.health();
   }

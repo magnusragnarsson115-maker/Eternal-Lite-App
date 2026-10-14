@@ -10,6 +10,7 @@ import { isStaff } from './auth/users.js';
 import { patientOrgIds, staffOrgId } from './services/orgs.js';
 import { enterScope, type RequestScope } from './tenancy.js';
 import { config } from './config.js';
+import { frameSources } from './services/tele.js';
 import { FhirConflictError, FhirNotFoundError, FhirValidationError } from './fhir/repository.js';
 import { HttpError } from './lib/util.js';
 import { adminRoutes } from './routes/admin.js';
@@ -19,6 +20,9 @@ import { fhirRoutes } from './routes/fhir.js';
 import { integrationRoutes } from './routes/integrations.js';
 import { linkRoutes } from './routes/link.js';
 import { visitRoutes } from './routes/visit.js';
+import { scribeRoutes } from './routes/scribe.js';
+import { orgRoutes } from './routes/org.js';
+import { accountRoutes } from './routes/account.js';
 import { patientRoutes } from './routes/patient.js';
 import { publicRoutes } from './routes/public.js';
 import { staffRoutes } from './routes/staff.js';
@@ -33,7 +37,8 @@ function webDistDir(): string | undefined {
 const CSRF_EXEMPT = [/^\/api\/integrations\/rpm\/[^/]+\/webhook$/];
 
 function securityHeaders(reply: FastifyReply): void {
-  const jitsi = `https://${config.jitsi.domain}`;
+  const frames = frameSources().join(' ');
+  const jitsi = frames;
   reply.header(
     'Content-Security-Policy',
     [
@@ -56,7 +61,8 @@ function securityHeaders(reply: FastifyReply): void {
   reply.header('Referrer-Policy', 'no-referrer');
   reply.header('X-Frame-Options', 'DENY');
   reply.header('Cross-Origin-Opener-Policy', 'same-origin');
-  reply.header('Permissions-Policy', `camera=(self "${jitsi}"), microphone=(self "${jitsi}"), display-capture=(self "${jitsi}"), geolocation=(), payment=()`);
+  const allow = frameSources().map((f) => `"${f}"`).join(' ');
+  reply.header('Permissions-Policy', `camera=(self ${allow}), microphone=(self ${allow}), display-capture=(self ${allow}), geolocation=(self), payment=()`);
   if (config.isProduction) reply.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 }
 
@@ -109,7 +115,7 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
       const pathOnly = req.url.split('?')[0];
       if (CSRF_EXEMPT.some((re) => re.test(pathOnly))) return;
       if (!sameOrigin(req)) throw new HttpError(403, 'cross_origin_rejected');
-      if (req.auth && req.headers['x-csrf-token'] !== req.auth.csrfToken) throw new HttpError(403, 'csrf_token_invalid');
+      if (req.auth && !req.auth.bearer && req.headers['x-csrf-token'] !== req.auth.csrfToken) throw new HttpError(403, 'csrf_token_invalid');
     }
   });
 
@@ -158,6 +164,9 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
   await app.register(integrationRoutes);
   await app.register(linkRoutes);
   await app.register(visitRoutes);
+  await app.register(scribeRoutes);
+  await app.register(orgRoutes);
+  await app.register(accountRoutes);
 
   const dist = webDistDir();
   if (dist) {

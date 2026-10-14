@@ -164,6 +164,12 @@ export class GenericFhirRepository implements FhirRepository {
     return { data: Buffer.from(bin.data ?? '', 'base64'), contentType: bin.contentType ?? 'application/octet-stream' };
   }
 
+  async deleteBinary(id: string): Promise<void> {
+    await this.request('DELETE', `Binary/${encodeURIComponent(id)}`).catch((err: Error) => {
+      if (!/404|410/.test(err.message)) throw err;
+    });
+  }
+
   async health(): Promise<{ ok: boolean; detail: string }> {
     try {
       const meta = await this.request<{ fhirVersion?: string; software?: { name?: string } }>('GET', 'metadata');
@@ -259,6 +265,14 @@ export class MedplumFhirRepository implements FhirRepository {
   async readBinary(id: string): Promise<{ data: Buffer; contentType: string }> {
     const blob = (await this.wrap(this.client.download(`Binary/${id}`))) as Blob;
     return { data: Buffer.from(await blob.arrayBuffer()), contentType: blob.type || 'application/octet-stream' };
+  }
+
+  async deleteBinary(id: string): Promise<void> {
+    // Medplum: DELETE zostawia historię wersji — trwałe usunięcie wymaga dodatkowo $expunge (uprawnienia administratora projektu)
+    await this.wrap(this.client.deleteResource('Binary', id), 'Binary', id).catch((err: Error) => {
+      if (!(err instanceof FhirNotFoundError)) throw err;
+    });
+    await this.client.post(this.client.fhirUrl('Binary', id, '$expunge'), {}).catch(() => undefined);
   }
 
   async health(): Promise<{ ok: boolean; detail: string }> {

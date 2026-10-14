@@ -12,6 +12,10 @@ export interface AuthContext {
   sessionHash: string;
   csrfToken: string;
   mfaPassed: boolean;
+  /** Sesja aplikacji mobilnej (nagłówek Authorization) — bez ciasteczka, więc bez ryzyka CSRF. */
+  bearer?: boolean;
+  /** Token zwracany aplikacji mobilnej tylko w odpowiedzi na logowanie. */
+  bearerToken?: string;
 }
 
 declare module 'fastify' {
@@ -34,28 +38,94 @@ function idleMinutes(user: AppUser): number {
   return isStaff(user) ? config.security.staffIdleMinutes : config.security.patientIdleMinutes;
 }
 
-export function createSession(reply: FastifyReply, req: FastifyRequest, user: AppUser, mfaPassed: boolean): AuthContext {
+function deviceLabel(ua: string | undefined, mobile: boolean): string {
+  const u = ua ?? '';
+  const os = /iPhone|iPad/.test(u) ? 'iOS' : /Android/.test(u) ? 'Android' : /Windows/.test(u) ? 'Windows' : /Mac OS X/.test(u) ? 'macOS' : /Linux/.test(u) ? 'Linux' : '';
+  const app = mobile ? 'aplikacja Eternal' : /Edg\//.test(u) ? 'Edge' : /Firefox\//.test(u) ? 'Firefox' : /Chrome\//.test(u) ? 'Chrome' : /Safari\//.test(u) ? 'Safari' : 'przeglądarka';
+  return [app, os].filter(Boolean).join(' · ');
+}
+
+export function createSession(
+  reply: FastifyReply,
+  req: FastifyRequest,
+  user: AppUser,
+  mfaPassed: boolean,
+  opts: { method?: string; bearer?: boolean } = {},
+): AuthContext {
   const token = randomToken(32);
   const idHash = sha256(token);
   const csrf = randomToken(24);
   const now = new Date();
-  const expires = new Date(now.getTime() + config.security.sessionAbsoluteHours * 3_600_000);
-  getDb()
-    .prepare(
-      `INSERT INTO app_session (id_hash, user_id, csrf_token, mfa_passed, created_at, last_seen_at, expires_at, ip, user_agent)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .run(idHash, user.id, csrf, mfaPassed ? 1 : 0, now.toISOString(), now.toISOString(), expires.toISOString(), req.ip, req.headers['user-agent']?.slice(0, 300) ?? null);
-  reply.setCookie(SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: config.isProduction,
-    sameSite: 'strict',
-    path: '/',
-    expires,
-  });
-  const ctx = { user, sessionHash: idHash, csrfToken: csrf, mfaPassed };
+  const mobile = !!opts.bearer;
+  // aplikacja mobilna: dłuższa sesja odblokowywana biometrią/PIN-em na urządzeniu (F1.2, F1.5)
+  const hours = mobile && !isStaff(user) ? 30 * 24 : config.security.sessionAbsoluteHours;
+  const expires = new Date(now.getTime() + hours * 3_600_000);
+  const db = getDb();
+  // F1.13 — najwyżej N urządzeń pacjenta: najdawniej używane zostaje wylogowane
+  if (!isStaff(user)) {
+    const rows = db.prepare('SELECT id_hash FROM app_session WHERE user_id = ? ORDER BY last_seen_at DESC').all(user.id) as { id_hash: string }[];
+    for (const r of rows.slice(Math.max(0, config.security.maxDevices - 1))) db.prepare('DELETE FROM app_session WHERE id_hash = ?').run(r.id_hash);
+  }
+  db.prepare(
+    `INSERT INTO app_session (id_hash, user_id, csrf_token, mfa_passed, created_at, last_seen_at, expires_at, ip, user_agent, device_label, auth_method)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  ).run(
+    idHash,
+    user.id,
+    csrf,
+    mfaPassed ? 1 : 0,
+    now.toISOString(),
+    now.toISOString(),
+    expires.toISOString(),
+    req.ip,
+    req.headers['user-agent']?.slice(0, 300) ?? null,
+    deviceLabel(req.headers['user-agent'], mobile),
+    opts.method ?? 'password',
+  );
+  if (!mobile) {
+    reply.setCookie(SESSION_COOKIE, token, {
+      httpOnly: true,
+      secure: config.isProduction,
+      sameSite: 'strict',
+      path: '/',
+      expires,
+    });
+  }
+  const ctx: AuthContext = { user, sessionHash: idHash, csrfToken: csrf, mfaPassed, bearer: mobile, bearerToken: mobile ? token : undefined };
   req.auth = ctx;
   return ctx;
+}
+
+export interface SessionView {
+  id: string;
+  device: string;
+  method: string;
+  ip?: string;
+  createdAt: string;
+  lastSeenAt: string;
+  current: boolean;
+}
+
+export function listSessions(userId: string, currentHash?: string): SessionView[] {
+  const rows = getDb().prepare('SELECT * FROM app_session WHERE user_id = ? AND expires_at > ? ORDER BY last_seen_at DESC').all(userId, nowIso()) as unknown as (SessionRow & {
+    device_label: string | null;
+    auth_method: string | null;
+    ip: string | null;
+  })[];
+  return rows.map((r) => ({
+    id: r.id_hash.slice(0, 16),
+    device: r.device_label ?? 'urządzenie',
+    method: r.auth_method ?? 'password',
+    ip: r.ip ? r.ip.replace(/\.\d+$/, '.•••') : undefined,
+    createdAt: r.created_at,
+    lastSeenAt: r.last_seen_at,
+    current: r.id_hash === currentHash,
+  }));
+}
+
+export function revokeSession(userId: string, shortId: string): boolean {
+  const res = getDb().prepare('DELETE FROM app_session WHERE user_id = ? AND substr(id_hash, 1, 16) = ?').run(userId, shortId);
+  return res.changes > 0;
 }
 
 export function markMfaPassed(ctx: AuthContext): void {
@@ -75,7 +145,9 @@ export function destroyAllSessions(userId: string, exceptHash?: string): void {
 
 /** Odczytuje sesję z ciasteczka; wygasa po bezczynności i po czasie absolutnym. */
 export function loadSession(req: FastifyRequest): AuthContext | undefined {
-  const token = req.cookies?.[SESSION_COOKIE];
+  const authz = req.headers.authorization;
+  const bearer = authz?.startsWith('Bearer ') ? authz.slice(7).trim() : undefined;
+  const token = bearer || req.cookies?.[SESSION_COOKIE];
   if (!token) return undefined;
   const db = getDb();
   const idHash = sha256(token);
@@ -95,7 +167,7 @@ export function loadSession(req: FastifyRequest): AuthContext | undefined {
   if (now - Date.parse(row.last_seen_at) > 30_000) {
     db.prepare('UPDATE app_session SET last_seen_at = ? WHERE id_hash = ?').run(nowIso(), idHash);
   }
-  return { user, sessionHash: idHash, csrfToken: row.csrf_token, mfaPassed: !!row.mfa_passed };
+  return { user, sessionHash: idHash, csrfToken: row.csrf_token, mfaPassed: !!row.mfa_passed, bearer: !!bearer };
 }
 
 export function purgeExpiredSessions(): void {

@@ -6,7 +6,9 @@ import { actorOf, requireClinician, requireStaff } from '../auth/sessions.js';
 import { config } from '../config.js';
 import { fhir } from '../fhir/index.js';
 import { idFromRef } from '../fhir/repository.js';
-import { teleJoinInfo, teleWindowOpen } from '../integrations/jitsi.js';
+import { teleWindowOpen } from '../integrations/jitsi.js';
+import { admit, doctorEnter, endTele, waitingRoom } from '../services/tele.js';
+import { currentOrgId } from '../tenancy.js';
 import { searchIcd10, searchIcd11, searchLoinc } from '../integrations/terminology.js';
 import { body, IdParams, params, query, zDate, zId, zIso } from '../lib/http.js';
 import { addDays, localDate, zonedToUtc } from '../lib/time.js';
@@ -185,7 +187,32 @@ export async function staffRoutes(app: FastifyInstance): Promise<void> {
     const v = toAppointmentView(appt);
     if (auth.user.fhir_ref && auth.user.fhir_ref !== `Practitioner/${v.practitionerId}` && !auth.user.roles.includes('admin')) throw forbidden('not_your_appointment');
     audit(actorOf(req), { action: 'E', subtype: 'tele-join', entityRef: `Appointment/${id}`, patientRef: `Patient/${v.patientId}` });
-    return teleJoinInfo(room, { name: auth.user.display_name, id: auth.user.id, moderator: true });
+    return doctorEnter(appt, currentOrgId(), { name: auth.user.display_name, id: auth.user.id });
+  });
+
+  app.post('/api/staff/appointments/:id/tele/admit', async (req) => {
+    requireClinician(req);
+    const { id } = params(req, IdParams);
+    const v = toAppointmentView(await getAppointment(id));
+    return admit(id, `Patient/${v.patientId}`, actorOf(req));
+  });
+
+  app.post('/api/staff/appointments/:id/tele/end', async (req) => {
+    requireClinician(req);
+    const { id } = params(req, IdParams);
+    const v = toAppointmentView(await getAppointment(id));
+    return endTele(id, `Patient/${v.patientId}`, actorOf(req));
+  });
+
+  app.get('/api/staff/tele/waiting', async (req) => {
+    requireStaff(req);
+    const waiting = waitingRoom(currentOrgId());
+    const items = [];
+    for (const w of waiting) {
+      const appt = await getAppointment(w.appointmentId).catch(() => undefined);
+      if (appt) items.push({ ...w, appointment: toAppointmentView(appt) });
+    }
+    return { items };
   });
 
   app.get('/api/staff/slots/free', async (req) => {

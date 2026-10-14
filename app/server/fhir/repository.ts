@@ -25,6 +25,8 @@ export interface FhirRepository {
   history<T extends Resource>(type: T['resourceType'], id: string): Promise<T[]>;
   saveBinary(data: Buffer, contentType: string, filename?: string): Promise<StoredBinary>;
   readBinary(id: string): Promise<{ data: Buffer; contentType: string }>;
+  /** Trwałe usunięcie pliku (nagrania Scribe po okresie przechowywania, usunięcie danych na żądanie). */
+  deleteBinary(id: string): Promise<void>;
   health(): Promise<{ ok: boolean; detail: string }>;
 }
 

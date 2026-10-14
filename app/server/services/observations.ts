@@ -1,7 +1,8 @@
 import type { Observation, ObservationComponent } from '@medplum/fhirtypes';
 import { audit, type AuditActor } from '../audit.js';
 import { bus } from '../events.js';
-import { ETERNAL, LOINC, OBS_CATEGORY, UCUM, type VitalKind, VITALS } from '../fhir/constants.js';
+import { ETERNAL, LOINC, OBS_CATEGORY, TRUST, UCUM, type VitalKind, VITALS } from '../fhir/constants.js';
+import { recordProvenance } from '../fhir/provenance.js';
 import { fhir } from '../fhir/index.js';
 import { badRequest, forbidden, notFound, nowIso } from '../lib/util.js';
 import { hasConsent } from './consents.js';
@@ -49,6 +50,10 @@ export interface MeasurementView {
   source: string;
   device?: string;
   note?: string;
+  /** Wartość poprawiona przez pacjenta (A1.4) — poprzednie wersje w historii. */
+  corrected?: boolean;
+  correctionReason?: string;
+  version?: string;
 }
 
 function check(name: string, v: number | undefined): number {
@@ -76,7 +81,8 @@ export function toMeasurementView(o: Observation): MeasurementView | undefined {
   if (!kind) return undefined;
   const source = o.meta?.tag?.find((t) => t.system === ETERNAL.source)?.code ?? 'manual';
   const device = o.extension?.find((e) => e.url === ETERNAL.ext.device)?.valueString;
-  const base = { id: o.id ?? '', kind, effective: o.effectiveDateTime ?? '', source, device, note: o.note?.[0]?.text };
+  const reason = o.extension?.find((e) => e.url === ETERNAL.ext.correctionReason)?.valueString;
+  const base = { id: o.id ?? '', kind, effective: o.effectiveDateTime ?? '', source, device, note: o.note?.[0]?.text, corrected: o.status === 'amended', correctionReason: reason, version: o.meta?.versionId };
   if (kind === 'bp') {
     const comp = (code: string) => o.component?.find((c) => c.code.coding?.some((cd) => cd.code === code))?.valueQuantity?.value;
     return { ...base, systolic: comp(VITALS.systolic.code), diastolic: comp(VITALS.diastolic.code), unit: 'mmHg' };
@@ -101,7 +107,7 @@ export async function addMeasurement(actor: AuditActor, patientRef: string, inpu
     effectiveDateTime: effective.toISOString(),
     issued: nowIso(),
     performer: [{ reference: patientRef }],
-    meta: { tag: [{ system: ETERNAL.source, code: input.source }] },
+    meta: { tag: [{ system: ETERNAL.source, code: input.source }, ...(input.source === 'manual' ? [TRUST.manual] : [])] },
     note: input.note?.trim() ? [{ text: input.note.trim().slice(0, 300) }] : undefined,
     extension: input.device ? [{ url: ETERNAL.ext.device, valueString: input.device.slice(0, 120) }] : undefined,
     identifier: input.externalId ? [{ system: ETERNAL.source, value: input.externalId }] : undefined,
@@ -154,6 +160,11 @@ export async function addMeasurement(actor: AuditActor, patientRef: string, inpu
   for (const o of created) {
     audit(actor, { action: 'C', subtype: `measurement-${input.source.split(':')[0]}`, entityRef: `Observation/${o.id}`, patientRef });
   }
+  await recordProvenance({
+    targets: created.map((o) => `Observation/${o.id}`),
+    activity: input.source === 'manual' ? 'manual-entry' : 'document-read',
+    agents: [{ who: patientRef, display: input.source === 'manual' ? 'Pacjent (wpis ręczny)' : `Pacjent (${input.device ?? input.source})`, role: 'author' }],
+  });
   bus.publish({ type: 'observation.changed', patientRef });
   return created.map(toMeasurementView).filter((m): m is MeasurementView => !!m);
 }
@@ -182,4 +193,64 @@ export async function retractMeasurement(actor: AuditActor, patientRef: string, 
 export async function listMeasurementsForStaff(patientRef: string): Promise<{ shared: boolean; items: MeasurementView[] }> {
   if (!(await hasConsent(patientRef, 'share-measurements'))) return { shared: false, items: [] };
   return { shared: true, items: await listMeasurements(patientRef) };
+}
+
+/**
+ * Ręczna korekta wartości (A1.4): nowa wersja zasobu ze statusem „amended” i powodem; poprzednia wartość
+ * zostaje w historii wersji (FHIR _history) i jest widoczna w aplikacji.
+ */
+export async function correctMeasurement(
+  actor: AuditActor,
+  patientRef: string,
+  id: string,
+  input: { value?: number; systolic?: number; diastolic?: number; reason: string },
+): Promise<MeasurementView> {
+  const o = await fhir().readOptional<Observation>('Observation', id);
+  if (!o || o.subject?.reference !== patientRef || o.status === 'entered-in-error') throw notFound('measurement_not_found');
+  if (o.performer?.[0]?.reference !== patientRef) throw forbidden('not_patient_entered');
+  const reason = input.reason.trim();
+  if (reason.length < 3) throw badRequest('reason_required');
+  const kind = kindOf(o);
+  if (!kind) throw badRequest('not_a_measurement');
+  let next: Observation;
+  if (kind === 'bp') {
+    const sys = check('systolic', input.systolic);
+    const dia = check('diastolic', input.diastolic);
+    if (dia >= sys) throw badRequest('diastolic_not_lower');
+    next = {
+      ...o,
+      component: (o.component ?? []).map((c) =>
+        c.code.coding?.some((cd) => cd.code === VITALS.systolic.code) ? { ...c, valueQuantity: quantity(VITALS.systolic, sys) } : c.code.coding?.some((cd) => cd.code === VITALS.diastolic.code) ? { ...c, valueQuantity: quantity(VITALS.diastolic, dia) } : c,
+      ),
+    };
+  } else {
+    next = { ...o, valueQuantity: quantity(VITALS[kind], check(kind, input.value)) };
+  }
+  next.status = 'amended';
+  next.extension = [...(o.extension ?? []).filter((e) => e.url !== ETERNAL.ext.correctionReason), { url: ETERNAL.ext.correctionReason, valueString: reason.slice(0, 300) }];
+  const saved = await fhir().update<Observation>(next);
+  await recordProvenance({ targets: [`Observation/${id}`], activity: 'correction', agents: [{ who: patientRef, display: 'Pacjent', role: 'author' }], reason });
+  audit(actor, { action: 'U', subtype: 'measurement-correct', entityRef: `Observation/${id}`, patientRef });
+  bus.publish({ type: 'observation.changed', patientRef });
+  return toMeasurementView(saved)!;
+}
+
+/** Historia wersji wartości (najnowsza pierwsza). */
+export async function observationVersions(patientRef: string, id: string) {
+  const current = await fhir().readOptional<Observation>('Observation', id);
+  if (!current || current.subject?.reference !== patientRef) throw notFound('observation_not_found');
+  const versions = await fhir().history<Observation>('Observation', id);
+  return versions.map((v) => {
+    const m = toMeasurementView(v);
+    const q = v.valueQuantity;
+    return {
+      version: v.meta?.versionId,
+      at: v.meta?.lastUpdated,
+      status: v.status,
+      value: m ? (m.kind === 'bp' ? `${m.systolic}/${m.diastolic}` : String(m.value ?? '')) : q?.value !== undefined ? `${q.comparator ?? ''}${q.value}` : (v.valueString ?? ''),
+      unit: m?.unit ?? q?.unit,
+      reason: v.extension?.find((e) => e.url === ETERNAL.ext.correctionReason)?.valueString,
+      trust: v.meta?.tag?.find((t) => t.system === ETERNAL.trust)?.code,
+    };
+  });
 }

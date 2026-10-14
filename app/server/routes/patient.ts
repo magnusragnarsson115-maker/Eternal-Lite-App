@@ -8,7 +8,9 @@ import { getDb } from '../db.js';
 import { CONSENT_TYPES, type ConsentType } from '../fhir/constants.js';
 import { fhir } from '../fhir/index.js';
 import { idFromRef } from '../fhir/repository.js';
-import { teleJoinInfo, teleWindowOpen } from '../integrations/jitsi.js';
+import { teleWindowOpen } from '../integrations/jitsi.js';
+import { patientEnter } from '../services/tele.js';
+import { orgIdsOf } from '../tenancy.js';
 import { PROVINCES, searchBenefits, searchQueues } from '../integrations/nfz.js';
 import { searchMedicinalProducts } from '../integrations/rpl.js';
 import { authorizeUrl, disconnectWithings, syncWithings, withingsConfigured, withingsStatus } from '../integrations/withings.js';
@@ -234,8 +236,9 @@ export async function patientRoutes(app: FastifyInstance): Promise<void> {
     if (appt.status !== 'booked' && appt.status !== 'arrived') throw conflict('appointment_not_active');
     if (!teleWindowOpen(appt.start ?? '', appt.end ?? '')) throw conflict('tele_window_closed');
     if (!(await hasConsent(auth.patientRef, 'telemedicine'))) throw conflict('telemedicine_consent_required');
-    audit(actorOf(req), { action: 'E', subtype: 'tele-join', entityRef: `Appointment/${id}`, patientRef: auth.patientRef });
-    return teleJoinInfo(room, { name: auth.user.display_name, id: auth.user.id, moderator: false });
+    // poczekalnia: adres pokoju dopiero po wpuszczeniu przez lekarza (D7)
+    const orgId = orgIdsOf(appt)[0];
+    return patientEnter(appt, auth.patientRef, orgId, { name: auth.user.display_name, id: auth.user.id }, actorOf(req));
   });
 
   app.get('/api/me/appointments/:id/questionnaire', async (req) => {

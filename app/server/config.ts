@@ -59,6 +59,10 @@ export const config = {
     lockoutMinutes: int('LOCKOUT_MINUTES', 15),
     minPasswordLength: int('MIN_PASSWORD_LENGTH', 10),
     requireEmailVerification: bool('REQUIRE_EMAIL_VERIFICATION', isProduction),
+    /** Adres zgłoszeń bezpieczeństwa (security.txt, zgłoszenia podatności A18.9, incydenty bezpieczeństwa). */
+    contact: str('SECURITY_CONTACT'),
+    /** Najwięcej jednocześnie zalogowanych urządzeń na konto pacjenta (F1.13). */
+    maxDevices: int('MAX_DEVICES', 5),
   },
 
   clinic: {

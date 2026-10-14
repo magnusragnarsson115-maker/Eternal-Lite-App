@@ -5,6 +5,7 @@ import type { ConsentType } from '../fhir/constants.js';
 import { ChannelNotConfigured, PushGone, sendEmail, sendPush, sendSms } from '../integrations/channels.js';
 import { newId, nowIso } from '../lib/util.js';
 import { hasConsent } from './consents.js';
+import { config } from '../config.js';
 
 export type Channel = 'email' | 'sms' | 'push';
 
@@ -37,24 +38,80 @@ export interface OutboxRow {
 
 const MAX_ATTEMPTS = 5;
 
+// --- preferencje powiadomień i godziny ciszy (P8: A3.4, A14.2) ------------------------------------------
+
+export const NOTIFY_KINDS = ['appointment-reminder', 'docs-request', 'after-visit-card', 'record-shared', 'message', 'med-reminder', 'lab-flags'] as const;
+/** Zawsze dostarczane (bezpieczeństwo konta, SOS) — bez wyłączania i bez godzin ciszy. */
+const ALWAYS = new Set(['security', 'sos']);
+const IGNORE_QUIET = new Set(['security', 'sos', 'med-reminder']);
+
+export interface NotifyPrefs {
+  disabled: string[];
+  quiet: { enabled: boolean; from: string; to: string };
+}
+
+const DEFAULT_PREFS: NotifyPrefs = { disabled: [], quiet: { enabled: true, from: '22:00', to: '07:00' } };
+
+export function getNotifyPrefs(userId: string): NotifyPrefs {
+  const row = getDb().prepare("SELECT value FROM user_pref WHERE user_id = ? AND key = 'notify'").get(userId) as { value: string } | undefined;
+  return row ? { ...DEFAULT_PREFS, ...(JSON.parse(row.value) as Partial<NotifyPrefs>) } : DEFAULT_PREFS;
+}
+
+export function setNotifyPrefs(userId: string, prefs: NotifyPrefs): NotifyPrefs {
+  const clean: NotifyPrefs = {
+    disabled: prefs.disabled.filter((k) => (NOTIFY_KINDS as readonly string[]).includes(k)),
+    quiet: { enabled: prefs.quiet.enabled, from: prefs.quiet.from, to: prefs.quiet.to },
+  };
+  if (![clean.quiet.from, clean.quiet.to].every((t) => /^([01]\d|2[0-3]):[0-5]\d$/.test(t))) throw new Error('invalid_time');
+  getDb()
+    .prepare("INSERT INTO user_pref (user_id, key, value, updated_at) VALUES (?, 'notify', ?, ?) ON CONFLICT(user_id, key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at")
+    .run(userId, JSON.stringify(clean), nowIso());
+  return clean;
+}
+
+/** Koniec godzin ciszy (ISO), jeśli teraz trwają — wysyłka odroczona; inaczej undefined. */
+export function quietUntil(prefs: NotifyPrefs, now = new Date(), tz = config.clinic.timezone): string | undefined {
+  if (!prefs.quiet.enabled) return undefined;
+  const local = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(now);
+  const toMin = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  const cur = toMin(local);
+  const from = toMin(prefs.quiet.from);
+  const to = toMin(prefs.quiet.to);
+  const inQuiet = from <= to ? cur >= from && cur < to : cur >= from || cur < to;
+  if (!inQuiet) return undefined;
+  const minutesLeft = (to - cur + 24 * 60) % (24 * 60);
+  return new Date(now.getTime() + minutesLeft * 60_000).toISOString();
+}
+
 /** Powiadomienie w aplikacji (zawsze) + push, jeśli pacjent wyraził zgodę i ma subskrypcję. */
 export async function notifyUser(
   userId: string,
-  n: { kind: string; title: string; body: string; link?: string; push?: boolean; pushTitle?: string; pushBody?: string },
+  n: { kind: string; title: string; body: string; link?: string; push?: boolean; pushTitle?: string; pushBody?: string; fallback?: boolean },
 ): Promise<void> {
   const id = newId();
+  const prefs = getNotifyPrefs(userId);
+  const muted = !ALWAYS.has(n.kind) && prefs.disabled.includes(n.kind);
+  const notBefore = IGNORE_QUIET.has(n.kind) ? undefined : quietUntil(prefs);
   getDb()
     .prepare('INSERT INTO notification (id, user_id, kind, title, body, link, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
     .run(id, userId, n.kind, n.title, n.body, n.link ?? null, nowIso());
   bus.publish({ type: 'notification.created', userId, staff: false });
-  if (n.push !== false) {
+  if (n.push !== false && !muted) {
     const user = findUserById(userId);
     const allowed = user?.fhir_ref?.startsWith('Patient/') ? await hasConsent(user.fhir_ref, 'reminders-push') : true;
-    if (allowed) {
-      const subs = getDb().prepare('SELECT id FROM push_subscription WHERE user_id = ?').all(userId) as { id: string }[];
-      for (const s of subs) {
-        // treść push bywa widoczna na ekranie blokady — przy treści wrażliwej usługa podaje wersję ogólną
-        enqueue({ channel: 'push', userId, recipient: s.id, subject: n.pushTitle ?? n.title, body: n.pushBody ?? n.body, relatedRef: n.link, dedupeKey: `push:${id}:${s.id}` });
+    const subs = allowed ? (getDb().prepare('SELECT id FROM push_subscription WHERE user_id = ?').all(userId) as { id: string }[]) : [];
+    for (const s of subs) {
+      // treść push bywa widoczna na ekranie blokady — przy treści wrażliwej usługa podaje wersję ogólną
+      enqueue({ channel: 'push', userId, recipient: s.id, subject: n.pushTitle ?? n.title, body: n.pushBody ?? n.body, relatedRef: n.link, dedupeKey: `push:${id}:${s.id}`, notBefore });
+    }
+    // kolejność kanałów push → e-mail → SMS (R6): bez push — jedna wiadomość ogólna e-mailem albo SMS-em, za zgodą
+    if (!subs.length && n.fallback && user?.fhir_ref?.startsWith('Patient/')) {
+      const subject = n.pushTitle ?? 'Eternal';
+      const body = n.pushBody ?? 'Masz nową informację w aplikacji. Zaloguj się, aby ją zobaczyć.';
+      if (user.email && (await hasConsent(user.fhir_ref, 'reminders-email'))) {
+        enqueue({ channel: 'email', userId, recipient: user.email, subject, body, relatedRef: n.link, dedupeKey: `fb:${id}:email`, notBefore });
+      } else if (user.phone && user.phone_verified && (await hasConsent(user.fhir_ref, 'reminders-sms'))) {
+        enqueue({ channel: 'sms', userId, recipient: user.phone, subject: '', body: `${subject}: ${body}`, relatedRef: n.link, dedupeKey: `fb:${id}:sms`, notBefore });
       }
     }
   }
@@ -97,13 +154,14 @@ export function enqueue(input: {
   body: string;
   relatedRef?: string;
   dedupeKey?: string;
+  notBefore?: string;
 }): boolean {
   const res = getDb()
     .prepare(
-      `INSERT OR IGNORE INTO outbox (id, channel, user_id, recipient, subject, body, related_ref, dedupe_key, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT OR IGNORE INTO outbox (id, channel, user_id, recipient, subject, body, related_ref, dedupe_key, created_at, not_before)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
-    .run(newId(), input.channel, input.userId ?? null, input.recipient, input.subject, input.body, input.relatedRef ?? null, input.dedupeKey ?? null, nowIso());
+    .run(newId(), input.channel, input.userId ?? null, input.recipient, input.subject, input.body, input.relatedRef ?? null, input.dedupeKey ?? null, nowIso(), input.notBefore ?? null);
   if (res.changes > 0) {
     bus.publish({ type: 'outbox.changed' });
     setImmediate(() => void processOutbox());
@@ -118,7 +176,7 @@ export async function processOutbox(): Promise<void> {
   processing = true;
   try {
     const db = getDb();
-    const rows = db.prepare("SELECT * FROM outbox WHERE status = 'pending' ORDER BY created_at LIMIT 50").all() as unknown as OutboxRow[];
+    const rows = db.prepare("SELECT * FROM outbox WHERE status = 'pending' AND (not_before IS NULL OR not_before <= ?) ORDER BY created_at LIMIT 50").all(nowIso()) as unknown as OutboxRow[];
     for (const row of rows) {
       try {
         if (row.channel === 'email') await sendEmail(row.recipient, row.subject, row.body);

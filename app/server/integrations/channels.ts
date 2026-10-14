@@ -101,7 +101,20 @@ export function getVapidKeys(): { publicKey: string; privateKey: string } {
 
 export class PushGone extends Error {}
 
+/** Powiadomienia aplikacji mobilnej (Expo Notifications → usługi Apple i Google). Token zapisany jako „expo:<token>”. */
+async function sendExpoPush(token: string, payload: { title?: string; body?: string; url?: string }): Promise<void> {
+  const res = await fetchWithTimeout('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ to: token, title: payload.title, body: payload.body, data: { url: payload.url }, sound: 'default', priority: 'default' }),
+  });
+  const json = (await res.json().catch(() => ({}))) as { data?: { status?: string; details?: { error?: string } } };
+  if (json.data?.details?.error === 'DeviceNotRegistered') throw new PushGone('expo token expired');
+  if (!res.ok || json.data?.status === 'error') throw new Error(`Expo push: ${res.status}`);
+}
+
 export async function sendPush(subscription: { endpoint: string; keys: { p256dh: string; auth: string } }, payload: object): Promise<void> {
+  if (subscription.endpoint.startsWith('expo:')) return sendExpoPush(subscription.endpoint.slice(5), payload as { title?: string; body?: string; url?: string });
   getVapidKeys();
   try {
     await webpush.sendNotification(subscription, JSON.stringify(payload), { TTL: 3600, urgency: 'normal' });

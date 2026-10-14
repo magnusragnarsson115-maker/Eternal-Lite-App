@@ -520,6 +520,14 @@ const MIGRATIONS: string[] = [
     PRIMARY KEY (purpose, user_id)
   );
   `,
+  // 9 — godziny ciszy (wysyłka odroczona), eskalacja incydentów
+  `
+  ALTER TABLE outbox ADD COLUMN not_before TEXT;
+  ALTER TABLE incident ADD COLUMN escalated_to TEXT;
+  ALTER TABLE incident ADD COLUMN escalated_at TEXT;
+  ALTER TABLE incident ADD COLUMN reporter_display TEXT;
+  ALTER TABLE incident ADD COLUMN data_breach INTEGER NOT NULL DEFAULT 0;
+  `,
 ];
 
 export type Db = DatabaseSync;
