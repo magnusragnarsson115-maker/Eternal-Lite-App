@@ -1,4 +1,5 @@
 import { EventEmitter } from 'node:events';
+import { currentScope } from './tenancy.js';
 
 /**
  * Szyna zdarzeń domenowych. Zdarzenia nie zawierają danych medycznych —
@@ -16,7 +17,12 @@ export type DomainEventType =
   | 'questionnaire.changed'
   | 'consent.changed'
   | 'patient.changed'
-  | 'outbox.changed';
+  | 'outbox.changed'
+  | 'grant.changed'
+  | 'intake.changed'
+  | 'scribe.changed'
+  | 'tele.changed'
+  | 'incident.changed';
 
 export interface DomainEvent {
   type: DomainEventType;
@@ -27,6 +33,8 @@ export interface DomainEvent {
   resourceRef?: string;
   /** false = nie dostarczać do sesji personelu. */
   staff?: boolean;
+  /** Organizacje, których personel może otrzymać zdarzenie (brak = wszystkie — zdarzenia systemowe). */
+  orgIds?: string[];
   at: string;
 }
 
@@ -38,7 +46,9 @@ class EventBus {
   }
 
   publish(event: Omit<DomainEvent, 'at'>): void {
-    this.emitter.emit('event', { ...event, at: new Date().toISOString() } satisfies DomainEvent);
+    const scope = currentScope();
+    const orgIds = event.orgIds ?? (scope?.orgId ? [scope.orgId] : scope?.patientOrgIds);
+    this.emitter.emit('event', { ...event, orgIds, at: new Date().toISOString() } satisfies DomainEvent);
   }
 
   subscribe(handler: (event: DomainEvent) => void): () => void {

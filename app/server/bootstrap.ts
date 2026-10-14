@@ -5,6 +5,7 @@ import { initDatabase } from './db.js';
 import { createRepository, setRepo } from './fhir/index.js';
 import { getVapidKeys } from './integrations/channels.js';
 import { processOutbox } from './services/notifications.js';
+import { ensureOrganizations } from './services/orgs.js';
 import { runReminderSweep } from './services/reminders.js';
 
 export async function initCore(): Promise<void> {
@@ -12,6 +13,7 @@ export async function initCore(): Promise<void> {
   const repo = createRepository();
   await repo.init();
   setRepo(repo);
+  await ensureOrganizations();
   getVapidKeys();
 }
 

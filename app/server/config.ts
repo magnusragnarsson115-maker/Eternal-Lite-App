@@ -124,6 +124,81 @@ export const config = {
     hibp: bool('HIBP_ENABLED', true),
     timeoutMs: int('PUBLIC_API_TIMEOUT_MS', 8000),
   },
+
+  /**
+   * Brama modeli językowych (moduł R5). Dostawca podstawowy: Claude przez Amazon Bedrock w regionie UE
+   * (decyzja z pliku 12.8, A7 poz. 8) albo bezpośrednio API Anthropic; zapas: Mistral (UE).
+   * „demo” — deterministyczne reguły bez modelu (tylko DEMO_MODE), „none” — funkcje AI wyłączone.
+   */
+  ai: {
+    provider: str('AI_PROVIDER', bool('DEMO_MODE', !isProduction) ? 'demo' : 'none') as 'bedrock' | 'anthropic' | 'demo' | 'none',
+    awsRegion: str('AWS_REGION', 'eu-central-1'),
+    modelNote: str('AI_MODEL_NOTE', str('AI_PROVIDER') === 'bedrock' ? 'anthropic.claude-sonnet-5-5' : 'claude-sonnet-5-5'),
+    modelFast: str('AI_MODEL_FAST', str('AI_PROVIDER') === 'bedrock' ? 'anthropic.claude-haiku-5-5' : 'claude-haiku-5-5'),
+    /** Ponowienie odmowy modelu na innym modelu (SDK, middleware po stronie klienta). */
+    refusalFallback: bool('AI_REFUSAL_FALLBACK', true),
+    fallbackModelNote: str('AI_FALLBACK_MODEL_NOTE', str('AI_PROVIDER') === 'bedrock' ? 'anthropic.claude-sonnet-5' : 'claude-sonnet-5'),
+    fallbackModelFast: str('AI_FALLBACK_MODEL_FAST', str('AI_PROVIDER') === 'bedrock' ? 'anthropic.claude-sonnet-5-5' : 'claude-sonnet-5-5'),
+    /** Drugi dostawca (UE) przy błędzie dostawcy podstawowego. */
+    secondary: str('AI_SECONDARY_PROVIDER') as '' | 'mistral',
+    mistralApiKey: str('MISTRAL_API_KEY'),
+    mistralModel: str('MISTRAL_MODEL', 'mistral-medium-latest'),
+    dailyCallLimitPerOrg: int('AI_DAILY_CALL_LIMIT_PER_ORG', 3000),
+    timeoutMs: int('AI_TIMEOUT_MS', 120_000),
+  },
+
+  /** Odczyt dokumentów (decyzja D51: Mistral OCR 4 albo Google Document AI — wybór testem). */
+  ocr: {
+    provider: str('OCR_PROVIDER') as '' | 'mistral' | 'google',
+    mistralModel: str('MISTRAL_OCR_MODEL', 'mistral-ocr-latest'),
+    google: {
+      credentialsFile: str('GOOGLE_APPLICATION_CREDENTIALS'),
+      projectId: str('GOOGLE_DOCAI_PROJECT'),
+      location: str('GOOGLE_DOCAI_LOCATION', 'eu'),
+      processorId: str('GOOGLE_DOCAI_PROCESSOR'),
+    },
+  },
+
+  /** Mowa na tekst dla Scribe (decyzja D48 — wybór testem 20 nagrań; warunek: przetwarzanie w UE). */
+  stt: {
+    provider: str('STT_PROVIDER') as '' | 'elevenlabs' | 'azure' | 'openai',
+    elevenlabs: {
+      apiKey: str('ELEVENLABS_API_KEY'),
+      baseUrl: str('ELEVENLABS_BASE_URL', 'https://api.eu.residency.elevenlabs.io'),
+      model: str('ELEVENLABS_STT_MODEL', 'scribe_v2'),
+    },
+    azure: { key: str('AZURE_SPEECH_KEY'), region: str('AZURE_SPEECH_REGION', 'westeurope') },
+    openai: {
+      apiKey: str('OPENAI_API_KEY'),
+      baseUrl: str('OPENAI_BASE_URL', 'https://eu.api.openai.com/v1'),
+      model: str('OPENAI_STT_MODEL', 'gpt-4o-transcribe'),
+    },
+  },
+
+  /** Raporty PDF: Chromium (Playwright) — HTML → PDF. */
+  pdf: {
+    chromiumPath: str('CHROMIUM_PATH'),
+  },
+
+  /** Wideo w MVP-1 (decyzja D52): Whereby Embedded albo Jitsi u nas. */
+  video: {
+    provider: str('VIDEO_PROVIDER', 'jitsi') as 'jitsi' | 'whereby',
+    wherebyApiKey: str('WHEREBY_API_KEY'),
+    wherebyRegion: str('WHEREBY_REGION', 'eu-central-1'),
+  },
+
+  /** Logowanie zewnętrzną usługą tożsamości (decyzja D50: Cognito Essentials albo Keycloak) — OIDC. */
+  oidc: {
+    issuer: str('OIDC_ISSUER'),
+    clientId: str('OIDC_CLIENT_ID'),
+    clientSecret: str('OIDC_CLIENT_SECRET'),
+    label: str('OIDC_LABEL', 'Logowanie firmowe'),
+  },
+
+  /** Klucze dostępu (WebAuthn/FIDO2). */
+  webauthn: {
+    rpName: str('WEBAUTHN_RP_NAME', 'Eternal'),
+  },
 };
 
 export type AppConfig = typeof config;

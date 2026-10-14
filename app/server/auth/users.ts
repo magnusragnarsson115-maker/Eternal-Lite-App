@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { getDb } from '../db.js';
 import { newId, nowIso, randomToken, sha256 } from '../lib/util.js';
 
@@ -21,13 +22,18 @@ export interface AppUser {
   status: 'active' | 'disabled' | 'deletion-requested';
   created_at: string;
   last_login_at: string | null;
+  /** Organizacja (klinika) personelu; pacjent — null. */
+  org_id: string | null;
+  phone: string | null;
+  phone_verified: boolean;
 }
 
-interface UserRow extends Omit<AppUser, 'roles' | 'totp_enabled' | 'email_verified' | 'must_change_password'> {
+interface UserRow extends Omit<AppUser, 'roles' | 'totp_enabled' | 'email_verified' | 'must_change_password' | 'phone_verified'> {
   roles: string;
   totp_enabled: number;
   email_verified: number;
   must_change_password: number;
+  phone_verified: number;
 }
 
 function fromRow(row: UserRow | undefined): AppUser | undefined {
@@ -38,6 +44,7 @@ function fromRow(row: UserRow | undefined): AppUser | undefined {
     totp_enabled: !!row.totp_enabled,
     email_verified: !!row.email_verified,
     must_change_password: !!row.must_change_password,
+    phone_verified: !!row.phone_verified,
   };
 }
 
@@ -57,8 +64,12 @@ export function findUserByFhirRef(ref: string): AppUser | undefined {
   return fromRow(getDb().prepare('SELECT * FROM app_user WHERE fhir_ref = ?').get(ref) as UserRow | undefined);
 }
 
-export function listUsers(filter: { staffOnly?: boolean } = {}): AppUser[] {
-  const rows = getDb().prepare('SELECT * FROM app_user ORDER BY display_name').all() as unknown as UserRow[];
+export function listUsers(filter: { staffOnly?: boolean; orgId?: string } = {}): AppUser[] {
+  const rows = (
+    filter.orgId
+      ? getDb().prepare('SELECT * FROM app_user WHERE org_id = ? ORDER BY display_name').all(filter.orgId)
+      : getDb().prepare('SELECT * FROM app_user ORDER BY display_name').all()
+  ) as unknown as UserRow[];
   const users = rows.map((r) => fromRow(r)!);
   return filter.staffOnly ? users.filter(isStaff) : users;
 }
@@ -72,12 +83,14 @@ export function createUser(input: {
   locale?: string;
   emailVerified?: boolean;
   mustChangePassword?: boolean;
+  orgId?: string;
+  phone?: string;
 }): AppUser {
   const id = newId();
   getDb()
     .prepare(
-      `INSERT INTO app_user (id, email, password_hash, roles, fhir_ref, display_name, locale, email_verified, must_change_password, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO app_user (id, email, password_hash, roles, fhir_ref, display_name, locale, email_verified, must_change_password, created_at, org_id, phone)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       id,
@@ -90,6 +103,8 @@ export function createUser(input: {
       input.emailVerified ? 1 : 0,
       input.mustChangePassword ? 1 : 0,
       nowIso(),
+      input.orgId ?? null,
+      input.phone ?? null,
     );
   return findUserById(id)!;
 }
@@ -108,6 +123,9 @@ type Updatable = Partial<{
   locked_until: string | null;
   status: AppUser['status'];
   last_login_at: string;
+  org_id: string | null;
+  phone: string | null;
+  phone_verified: boolean;
 }>;
 
 export function updateUser(id: string, patch: Updatable): void {
@@ -127,7 +145,16 @@ export function updateUser(id: string, patch: Updatable): void {
 
 // --- tokeny jednorazowe (weryfikacja e-mail, reset hasła, kody aktywacyjne, stan OAuth) -----------------
 
-export type TokenPurpose = 'email-verify' | 'password-reset' | 'patient-activation' | 'oauth-state';
+export type TokenPurpose =
+  | 'email-verify'
+  | 'password-reset'
+  | 'patient-activation'
+  | 'oauth-state'
+  | 'phone-verify'
+  | 'magic-link'
+  | 'staff-invite'
+  | 'webauthn-challenge'
+  | 'link-takeover';
 
 const ACTIVATION_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -179,4 +206,36 @@ export function peekToken<T = unknown>(purpose: TokenPurpose, token: string): { 
     | undefined;
   if (!row || row.used_at || row.expires_at < nowIso()) return undefined;
   return { userId: row.user_id, payload: (row.payload ? JSON.parse(row.payload) : null) as T };
+}
+
+// --- kody 6-cyfrowe (weryfikacja telefonu SMS-em) — jeden aktywny kod na konto i cel, limit prób -----------
+
+const CODE_ATTEMPTS = 5;
+
+export function issueCode(purpose: 'phone-verify', userId: string, payload: unknown, ttlMinutes = 10): string {
+  const code = String(crypto.randomInt(0, 1_000_000)).padStart(6, '0');
+  const now = new Date();
+  getDb()
+    .prepare(
+      `INSERT INTO app_code (purpose, user_id, code_hash, payload, attempts, expires_at, created_at) VALUES (?, ?, ?, ?, 0, ?, ?)
+       ON CONFLICT(purpose, user_id) DO UPDATE SET code_hash = excluded.code_hash, payload = excluded.payload, attempts = 0,
+         expires_at = excluded.expires_at, created_at = excluded.created_at`,
+    )
+    .run(purpose, userId, sha256(`${purpose}:${userId}:${code}`), JSON.stringify(payload), new Date(now.getTime() + ttlMinutes * 60_000).toISOString(), now.toISOString());
+  return code;
+}
+
+export function consumeCode<T>(purpose: 'phone-verify', userId: string, code: string): { ok: true; payload: T } | { ok: false; reason: 'invalid' | 'expired' | 'too_many_attempts' } {
+  const db = getDb();
+  const row = db.prepare('SELECT * FROM app_code WHERE purpose = ? AND user_id = ?').get(purpose, userId) as
+    | { code_hash: string; payload: string; attempts: number; expires_at: string }
+    | undefined;
+  if (!row || row.expires_at < nowIso()) return { ok: false, reason: 'expired' };
+  if (row.attempts >= CODE_ATTEMPTS) return { ok: false, reason: 'too_many_attempts' };
+  if (sha256(`${purpose}:${userId}:${code.trim()}`) !== row.code_hash) {
+    db.prepare('UPDATE app_code SET attempts = attempts + 1 WHERE purpose = ? AND user_id = ?').run(purpose, userId);
+    return { ok: false, reason: 'invalid' };
+  }
+  db.prepare('DELETE FROM app_code WHERE purpose = ? AND user_id = ?').run(purpose, userId);
+  return { ok: true, payload: JSON.parse(row.payload) as T };
 }

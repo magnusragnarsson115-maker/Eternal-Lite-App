@@ -2,10 +2,11 @@ import type { Appointment, Location, Organization, Questionnaire, Slot } from '@
 import type { AuditActor } from '../audit.js';
 import { hashPassword } from '../auth/passwords.js';
 import { createUser, findUserByEmail, updateUser } from '../auth/users.js';
+import { setDefaultOrgId, withOrgTags } from '../tenancy.js';
 import { config } from '../config.js';
 import { getDb } from '../db.js';
 import { TAG_FICTIONAL } from '../fhir/constants.js';
-import { fhir } from '../fhir/index.js';
+import { fhir, fhirSystem } from '../fhir/index.js';
 import { addDays, isoWeekday, localDate, zonedToUtc } from '../lib/time.js';
 import { CONSENT_TYPES, type ConsentType } from '../fhir/constants.js';
 import { setConsent } from '../services/consents.js';
@@ -46,6 +47,9 @@ export async function seedDemo(log: (m: string) => void = console.log): Promise<
     meta: { tag: [TAG_FICTIONAL] },
     telecom: [{ system: 'phone', value: '+48 22 000 00 00' }, { system: 'email', value: 'rejestracja@eternal.local' }],
   });
+  // organizacja domyślna instancji — kolejne zasoby seeda dostają jej znacznik (tenancy.ts)
+  await fhirSystem().update(withOrgTags(org, [org.id ?? '']));
+  setDefaultOrgId(org.id ?? '');
   const loc = await fhir().create<Location>({
     resourceType: 'Location',
     status: 'active',
@@ -185,7 +189,7 @@ export async function seedDemo(log: (m: string) => void = console.log): Promise<
     { email: 'piotr.zielinski@eternal.local', name: 'dr n. med. Piotr Zieliński', roles: ['practitioner'] as const, ref: `Practitioner/${zielinski.id}` },
   ];
   for (const s of staff) {
-    const u = createUser({ email: s.email, passwordHash: pw, roles: [...s.roles], fhirRef: s.ref, displayName: s.name, emailVerified: true });
+    const u = createUser({ email: s.email, passwordHash: pw, roles: [...s.roles], fhirRef: s.ref, displayName: s.name, emailVerified: true, orgId: org.id });
     updateUser(u.id, { totp_secret: DEMO_TOTP_SECRET, totp_enabled: true });
   }
 

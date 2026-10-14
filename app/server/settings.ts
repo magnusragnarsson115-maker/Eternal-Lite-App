@@ -23,6 +23,36 @@ export interface ClinicSettings {
   emergencyInfo: string;
   messageResponseDays: number;
   privacyContact: string;
+  /** R10 — konfiguracja kliniki (MVP-1): specjalizacje, wymagane dokumenty, szablony notatek, limity. */
+  specialties: string[];
+  requiredDocuments: RequiredDocument[];
+  noteTemplates: string[];
+  /** Układ pól „Kopiuj do systemu gabinetowego”. */
+  ehrLayout: 'generic' | 'soap';
+  /** Limit wizyt Scribe na lekarza w miesiącu (licencja; plik 12.8 A8 — 300). */
+  scribeMonthlyLimitPerDoctor: number;
+  /** Ważność linku i udostępnienia: do wizyty + N dni [ZAŁ. 30]. */
+  inviteValidityDaysAfterVisit: number;
+  /** Usunięcie nagrania N dni po zatwierdzeniu notatki [ZAŁ. 30]. */
+  recordingRetentionDays: number;
+  /** Automatyczne przypomnienie o brakujących dokumentach N godzin przed wizytą (0 = wyłączone). */
+  autoRemindMissingHours: number;
+  /** Pomiar pilotażu (D12): tydzień bez Eternal i tydzień z Eternal. */
+  pilot: { baselineWeekStart?: string; eternalWeekStart?: string; surveyEveryDays: number };
+}
+
+export type DocumentKind = 'lab' | 'discharge' | 'imaging' | 'referral' | 'prescription' | 'certificate' | 'other';
+
+export interface RequiredDocument {
+  id: string;
+  label: string;
+  /** Rodzaje dokumentów, które spełniają wymóg. */
+  accept: DocumentKind[];
+  /** Dokument nie starszy niż N dni (data pobrania/wystawienia). */
+  maxAgeDays?: number;
+  /** Tylko dla wizyt tych specjalizacji (puste = wszystkie). */
+  specialties?: string[];
+  optional?: boolean;
 }
 
 export function cacheGet<T>(key: string): T | undefined {

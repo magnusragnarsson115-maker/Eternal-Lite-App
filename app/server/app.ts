@@ -6,6 +6,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadSession } from './auth/sessions.js';
+import { isStaff } from './auth/users.js';
+import { patientOrgIds, staffOrgId } from './services/orgs.js';
+import { enterScope, type RequestScope } from './tenancy.js';
 import { config } from './config.js';
 import { FhirConflictError, FhirNotFoundError, FhirValidationError } from './fhir/repository.js';
 import { HttpError } from './lib/util.js';
@@ -14,6 +17,8 @@ import { authRoutes } from './routes/auth.js';
 import { eventRoutes } from './routes/events.js';
 import { fhirRoutes } from './routes/fhir.js';
 import { integrationRoutes } from './routes/integrations.js';
+import { linkRoutes } from './routes/link.js';
+import { visitRoutes } from './routes/visit.js';
 import { patientRoutes } from './routes/patient.js';
 import { publicRoutes } from './routes/public.js';
 import { staffRoutes } from './routes/staff.js';
@@ -108,6 +113,21 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
     }
   });
 
+  // Kontekst organizacji dla repozytorium FHIR i szyny zdarzeń (tenancy.ts); als.run w haku callbackowym
+  // propaguje kontekst do handlera.
+  app.addHook('onRequest', (req, _reply, done) => {
+    const u = req.auth?.user;
+    const resolve = async (): Promise<RequestScope> => {
+      if (u && isStaff(u)) return { orgId: staffOrgId(u) };
+      if (u?.fhir_ref?.startsWith('Patient/')) return { patientRef: u.fhir_ref, patientOrgIds: await patientOrgIds(u.fhir_ref) };
+      return {};
+    };
+    resolve().then(
+      (scope) => enterScope(scope, done),
+      (err: Error) => done(err),
+    );
+  });
+
   app.addHook('onSend', async (req, reply) => {
     securityHeaders(reply);
     if (req.url.startsWith('/api/') || req.url.startsWith('/fhir/')) reply.header('Cache-Control', 'no-store');
@@ -136,6 +156,8 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
   await app.register(adminRoutes);
   await app.register(fhirRoutes);
   await app.register(integrationRoutes);
+  await app.register(linkRoutes);
+  await app.register(visitRoutes);
 
   const dist = webDistDir();
   if (dist) {

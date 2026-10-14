@@ -53,3 +53,37 @@ export function nextWorkday(minDays = 2): string {
   while (isoWeekday(d) > 5 || holidayName(d)) d = addDays(d, 1);
   return d;
 }
+
+/** Minimalny PDF z warstwą tekstową (Helvetica, znaki ASCII) — do testów odczytu bez Chromium. */
+export function simplePdf(lines: string[]): Buffer {
+  const escape = (s: string) => s.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+  const content = lines.map((l, i) => `BT /F1 10 Tf 50 ${780 - i * 16} Td (${escape(l)}) Tj ET`).join('\n');
+  const objects = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>',
+    `<< /Length ${Buffer.byteLength(content)} >>\nstream\n${content}\nendstream`,
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
+  ];
+  let out = '%PDF-1.4\n';
+  const offsets: number[] = [];
+  objects.forEach((o, i) => {
+    offsets.push(Buffer.byteLength(out));
+    out += `${i + 1} 0 obj\n${o}\nendobj\n`;
+  });
+  const xref = Buffer.byteLength(out);
+  out += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n${offsets.map((o) => `${String(o).padStart(10, '0')} 00000 n \n`).join('')}`;
+  out += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
+  return Buffer.from(out, 'latin1');
+}
+
+/** Ciało multipart/form-data dla app.inject. */
+export function multipart(fields: Record<string, string>, file: { name: string; filename: string; contentType: string; data: Buffer }) {
+  const boundary = `----eternal${Date.now()}`;
+  const parts: Buffer[] = [];
+  for (const [k, v] of Object.entries(fields)) parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="${k}"\r\n\r\n${v}\r\n`));
+  parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="${file.name}"; filename="${file.filename}"\r\nContent-Type: ${file.contentType}\r\n\r\n`));
+  parts.push(file.data);
+  parts.push(Buffer.from(`\r\n--${boundary}--\r\n`));
+  return { payload: Buffer.concat(parts), contentType: `multipart/form-data; boundary=${boundary}` };
+}

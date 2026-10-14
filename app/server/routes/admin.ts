@@ -6,7 +6,7 @@ import { hashPassword } from '../auth/passwords.js';
 import { actorOf, destroyAllSessions, requireStaff } from '../auth/sessions.js';
 import { createUser, findUserByEmail, findUserById, listUsers, type Role, updateUser } from '../auth/users.js';
 import { listIntegrations } from '../integrations/registry.js';
-import { body, IdParams, params, query, zId } from '../lib/http.js';
+import { body, IdParams, params, query, zDate, zId } from '../lib/http.js';
 import { badRequest, conflict, forbidden, notFound } from '../lib/util.js';
 import {
   getClinicSettings,
@@ -19,6 +19,7 @@ import {
   upsertService,
 } from '../services/directory.js';
 import { closeAccount } from '../services/privacy.js';
+import { NOTE_TEMPLATE_IDS } from '../scribe/templates.js';
 
 function tempPassword(): string {
   // 16 znaków z alfabetu bez znaków mylących — przekazywane osobiście, wymuszona zmiana przy logowaniu
@@ -89,6 +90,29 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
         emergencyInfo: z.string().max(300).optional(),
         messageResponseDays: z.number().int().min(1).max(14).optional(),
         privacyContact: z.string().max(200).optional(),
+        specialties: z.array(z.string().trim().min(1).max(60)).max(10).optional(),
+        requiredDocuments: z
+          .array(
+            z.object({
+              id: z.string().regex(/^[a-z0-9-]{1,40}$/),
+              label: z.string().trim().min(1).max(160),
+              accept: z.array(z.enum(['lab', 'discharge', 'imaging', 'referral', 'prescription', 'certificate', 'other'])).min(1),
+              maxAgeDays: z.number().int().min(1).max(3650).optional(),
+              specialties: z.array(z.string().max(60)).max(10).optional(),
+              optional: z.boolean().optional(),
+            }),
+          )
+          .max(20)
+          .optional(),
+        noteTemplates: z.array(z.enum(NOTE_TEMPLATE_IDS)).min(1).optional(),
+        ehrLayout: z.enum(['generic', 'soap']).optional(),
+        scribeMonthlyLimitPerDoctor: z.number().int().min(0).max(5000).optional(),
+        inviteValidityDaysAfterVisit: z.number().int().min(1).max(365).optional(),
+        recordingRetentionDays: z.number().int().min(0).max(90).optional(),
+        autoRemindMissingHours: z.number().int().min(0).max(168).optional(),
+        pilot: z
+          .object({ baselineWeekStart: zDate.optional(), eternalWeekStart: zDate.optional(), surveyEveryDays: z.number().int().min(7).max(60) })
+          .optional(),
       }),
     );
     return updateClinicSettings(actorOf(req), patch);

@@ -377,7 +377,7 @@ export async function staffRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/staff/files/:id', async (req, replyObj) => {
     requireClinician(req);
     const { id } = params(req, IdParams);
-    const file = await readBinaryFor(id, { clinician: true });
+    const file = await readBinaryFor(id, { clinician: true, user: req.auth?.user });
     audit(actorOf(req), { action: 'R', subtype: 'file-download', entityRef: `Binary/${id}`, patientRef: file.patientRef ?? undefined });
     replyObj.header('Content-Type', file.contentType).header('Content-Disposition', `inline; filename*=UTF-8''${encodeURIComponent(file.filename)}`);
     return file.data;

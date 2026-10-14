@@ -1,6 +1,8 @@
 import type { Bundle, BundleEntry, Communication, Consent, Patient, Resource, Task } from '@medplum/fhirtypes';
 import { audit, type AuditActor, listAudit, toAuditEvent } from '../audit.js';
-import { type AppUser, listUsers, updateUser } from '../auth/users.js';
+import { type AppUser, findUserById, isStaff, listUsers, updateUser } from '../auth/users.js';
+import { getClinicSettings } from './directory.js';
+import { staffOrgId } from './orgs.js';
 import { destroyAllSessions } from '../auth/sessions.js';
 import { getDb } from '../db.js';
 import { fhir } from '../fhir/index.js';
@@ -66,6 +68,8 @@ export interface AccessLogEntry {
   at: string;
   who: string;
   role: string;
+  /** Organizacja osoby z personelu (P2: „z rolą, organizacją i datą”). */
+  org?: string;
   action: string;
   subtype: string;
   resource?: string;
@@ -79,19 +83,32 @@ const ROLE_PL: Record<string, string> = {
 };
 
 /** Historia dostępu do danych pacjenta — kto, kiedy, co (bez adresów IP personelu). */
-export function accessLogForPatient(patientRef: string): AccessLogEntry[] {
-  return listAudit({ patientRef, limit: 300 }).map((r) => {
-    const roles = (r.actor_roles ?? '').split(',').filter(Boolean);
-    const isSelf = r.actor_ref === patientRef;
-    return {
-      at: r.ts,
-      who: isSelf ? 'Ty' : (r.actor_display ?? 'System'),
-      role: isSelf ? 'patient' : (roles.find((x) => x !== 'patient') ?? (r.actor_user_id ? 'staff' : 'system')),
-      action: r.action,
-      subtype: r.subtype,
-      resource: r.entity_ref?.split('/')[0],
-    };
-  });
+export function accessLogForPatient(patientRef: string, opts: { staffOnly?: boolean; since?: string } = {}): AccessLogEntry[] {
+  const orgOfUser = new Map<string, string | undefined>();
+  const orgName = (userId: string | null): string | undefined => {
+    if (!userId) return undefined;
+    if (!orgOfUser.has(userId)) {
+      const u = findUserById(userId);
+      const orgId = u && isStaff(u) ? staffOrgId(u) : undefined;
+      orgOfUser.set(userId, orgId ? getClinicSettings(orgId).name : undefined);
+    }
+    return orgOfUser.get(userId);
+  };
+  return listAudit({ patientRef, limit: 300 })
+    .filter((r) => (!opts.since || r.ts >= opts.since) && (!opts.staffOnly || (r.actor_roles ?? '').split(',').some((x) => x && x !== 'patient')))
+    .map((r) => {
+      const roles = (r.actor_roles ?? '').split(',').filter(Boolean);
+      const isSelf = r.actor_ref === patientRef;
+      return {
+        at: r.ts,
+        who: isSelf ? 'Ty' : (r.actor_display ?? 'System'),
+        role: isSelf ? 'patient' : (roles.find((x) => x !== 'patient') ?? (r.actor_user_id ? 'staff' : 'system')),
+        org: isSelf ? undefined : orgName(r.actor_user_id),
+        action: r.action,
+        subtype: r.subtype,
+        resource: r.entity_ref?.split('/')[0],
+      };
+    });
 }
 
 export { ROLE_PL };

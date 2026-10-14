@@ -40,7 +40,7 @@ const MAX_ATTEMPTS = 5;
 /** Powiadomienie w aplikacji (zawsze) + push, jeśli pacjent wyraził zgodę i ma subskrypcję. */
 export async function notifyUser(
   userId: string,
-  n: { kind: string; title: string; body: string; link?: string; push?: boolean },
+  n: { kind: string; title: string; body: string; link?: string; push?: boolean; pushTitle?: string; pushBody?: string },
 ): Promise<void> {
   const id = newId();
   getDb()
@@ -53,7 +53,8 @@ export async function notifyUser(
     if (allowed) {
       const subs = getDb().prepare('SELECT id FROM push_subscription WHERE user_id = ?').all(userId) as { id: string }[];
       for (const s of subs) {
-        enqueue({ channel: 'push', userId, recipient: s.id, subject: n.title, body: n.body, relatedRef: n.link, dedupeKey: `push:${id}:${s.id}` });
+        // treść push bywa widoczna na ekranie blokady — przy treści wrażliwej usługa podaje wersję ogólną
+        enqueue({ channel: 'push', userId, recipient: s.id, subject: n.pushTitle ?? n.title, body: n.pushBody ?? n.body, relatedRef: n.link, dedupeKey: `push:${id}:${s.id}` });
       }
     }
   }
@@ -61,7 +62,7 @@ export async function notifyUser(
 
 export async function notifyPatient(
   patientRef: string,
-  n: { kind: string; title: string; body: string; link?: string; push?: boolean },
+  n: { kind: string; title: string; body: string; link?: string; push?: boolean; pushTitle?: string; pushBody?: string },
 ): Promise<void> {
   const user = findUserByFhirRef(patientRef);
   if (user) await notifyUser(user.id, n);
@@ -121,7 +122,7 @@ export async function processOutbox(): Promise<void> {
     for (const row of rows) {
       try {
         if (row.channel === 'email') await sendEmail(row.recipient, row.subject, row.body);
-        else if (row.channel === 'sms') await sendSms(row.recipient, `${row.subject}. ${row.body}`.slice(0, 459));
+        else if (row.channel === 'sms') await sendSms(row.recipient, (row.subject ? `${row.subject}. ${row.body}` : row.body).slice(0, 459));
         else if (row.channel === 'push') {
           const sub = db.prepare('SELECT endpoint, keys FROM push_subscription WHERE id = ?').get(row.recipient) as
             | { endpoint: string; keys: string }

@@ -1,10 +1,12 @@
 import { config } from '../config.js';
 import { getDb } from '../db.js';
+import { ScopedFhirRepository } from '../tenancy.js';
 import { LocalFhirRepository } from './local.js';
 import { GenericFhirRepository, MedplumFhirRepository } from './remote.js';
 import type { FhirRepository } from './repository.js';
 
-let repo: FhirRepository | undefined;
+let base: FhirRepository | undefined;
+let scoped: FhirRepository | undefined;
 
 export function createRepository(): FhirRepository {
   switch (config.fhir.backend) {
@@ -20,10 +22,21 @@ export function createRepository(): FhirRepository {
 }
 
 export function setRepo(r: FhirRepository): void {
-  repo = r;
+  base = r;
+  scoped = new ScopedFhirRepository(r);
 }
 
+/** Repozytorium w kontekście żądania — personel widzi tylko zasoby swojej organizacji. */
 export function fhir(): FhirRepository {
-  if (!repo) throw new Error('FHIR repository not initialised');
-  return repo;
+  if (!scoped) throw new Error('FHIR repository not initialised');
+  return scoped;
+}
+
+/**
+ * Repozytorium bez filtra organizacji — wyłącznie dla usług, które same sprawdzają uprawnienia
+ * (udostępnienia pacjenta, link zaproszenia, zadania systemowe). Każde użycie musi mieć kontrolę dostępu.
+ */
+export function fhirSystem(): FhirRepository {
+  if (!base) throw new Error('FHIR repository not initialised');
+  return base;
 }

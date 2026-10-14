@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { requireUser } from '../auth/sessions.js';
 import { isStaff } from '../auth/users.js';
 import { bus, type DomainEvent } from '../events.js';
+import { defaultOrgId } from '../tenancy.js';
 
 /**
  * Server-Sent Events: zmiany po jednej stronie (pacjent/placówka) są natychmiast widoczne po drugiej.
@@ -22,9 +23,10 @@ export async function eventRoutes(app: FastifyInstance): Promise<void> {
     });
     res.write(`retry: 3000\n\n`);
 
+    const orgId = auth.user.org_id ?? defaultOrgId();
     const relevant = (e: DomainEvent): boolean => {
       if (e.userId) return e.userId === auth.user.id;
-      if (staff) return e.staff !== false;
+      if (staff) return e.staff !== false && (!e.orgIds || (!!orgId && e.orgIds.includes(orgId)));
       return !!patientRef && e.patientRef === patientRef;
     };
     const unsubscribe = bus.subscribe((e) => {

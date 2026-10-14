@@ -1,7 +1,9 @@
 import type { Attachment, DiagnosticReport, DocumentReference, Observation, Patient, Reference } from '@medplum/fhirtypes';
 import crypto from 'node:crypto';
 import { audit, type AuditActor } from '../audit.js';
-import { findUserByFhirRef } from '../auth/users.js';
+import { type AppUser, findUserByFhirRef } from '../auth/users.js';
+import { ORG_TAG_SYSTEM, vaultOrgId } from '../tenancy.js';
+import { requireGrantAccess } from './grants.js';
 import { getDb } from '../db.js';
 import { bus } from '../events.js';
 import { ETERNAL, LOINC, OBS_CATEGORY, TAG_IDENTITY_VERIFIED, TAG_PATIENT_VISIBLE, UCUM, V2_0074 } from '../fhir/constants.js';
@@ -404,17 +406,37 @@ export function markRead(userId: string, ref: string): boolean {
   return first;
 }
 
-/** Dostęp do pliku: pacjent tylko do plików udostępnionych mu dokumentów; personel kliniczny — do wszystkich. */
-export async function readBinaryFor(binaryId: string, access: { patientRef?: string; clinician?: boolean }) {
+/**
+ * Dostęp do pliku: pacjent tylko do plików udostępnionych mu dokumentów (albo wgranych przez siebie);
+ * personel kliniczny — do plików dokumentacji własnej organizacji, plików z sejfu pacjenta tylko przy aktywnym
+ * udostępnieniu, a do niepodpiętych plików — tylko własnych.
+ */
+export async function readBinaryFor(binaryId: string, access: { patientRef?: string; clinician?: boolean; user?: AppUser }) {
   const row = getDb().prepare('SELECT * FROM binary_owner WHERE binary_id = ?').get(binaryId) as
-    | { patient_ref: string | null; resource_ref: string | null; filename: string | null; content_type: string }
+    | { patient_ref: string | null; resource_ref: string | null; filename: string | null; content_type: string; uploaded_by: string | null }
     | undefined;
   if (!row) throw notFound('file_not_found');
   if (access.patientRef) {
     if (!row.resource_ref || row.patient_ref !== access.patientRef) throw notFound('file_not_found');
-    const r = await loadShareable(row.resource_ref);
-    if (!isVisible(r)) throw notFound('file_not_found');
-  } else if (!access.clinician) {
+    if (row.resource_ref.startsWith('DiagnosticReport/') || row.resource_ref.startsWith('DocumentReference/')) {
+      const r = await loadShareable(row.resource_ref);
+      const own = (r.meta?.tag ?? []).some((t) => t.system === ORG_TAG_SYSTEM && t.code === vaultOrgId(access.patientRef ?? ''));
+      if (!isVisible(r) && !own) throw notFound('file_not_found');
+    } else {
+      throw notFound('file_not_found');
+    }
+  } else if (access.clinician) {
+    if (!row.resource_ref) {
+      if (!access.user || row.uploaded_by !== access.user.id) throw notFound('file_not_found');
+    } else {
+      const [type, id] = row.resource_ref.split('/');
+      const visible = await fhir().readOptional(type as 'DocumentReference', id);
+      if (!visible) {
+        if (!access.user || !row.patient_ref) throw notFound('file_not_found');
+        requireGrantAccess(access.user, row.patient_ref);
+      }
+    }
+  } else {
     throw forbidden();
   }
   const data = await fhir().readBinary(binaryId);

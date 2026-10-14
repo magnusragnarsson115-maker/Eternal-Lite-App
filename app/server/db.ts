@@ -234,6 +234,292 @@ const MIGRATIONS: string[] = [
     PRIMARY KEY (appointment_id, kind)
   );
   `,
+  // 7 — organizacje, udostępnienia, zaproszenia, materiały, Scribe, AI, mierniki, incydenty, klucze dostępu
+  `
+  ALTER TABLE app_user ADD COLUMN org_id TEXT;
+  ALTER TABLE app_user ADD COLUMN phone TEXT;
+  ALTER TABLE app_user ADD COLUMN phone_verified INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE app_session ADD COLUMN device_label TEXT;
+  ALTER TABLE app_session ADD COLUMN auth_method TEXT;
+  CREATE INDEX app_user_org ON app_user(org_id);
+
+  CREATE TABLE access_grant (
+    id TEXT PRIMARY KEY,
+    patient_ref TEXT NOT NULL,
+    org_id TEXT NOT NULL,
+    practitioner_ref TEXT,
+    scope TEXT NOT NULL,
+    purpose TEXT NOT NULL,
+    appointment_id TEXT,
+    consent_ref TEXT,
+    source TEXT NOT NULL,
+    starts_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT NOT NULL,
+    revoked_at TEXT,
+    revoked_by TEXT
+  );
+  CREATE INDEX access_grant_patient ON access_grant(patient_ref, status);
+  CREATE INDEX access_grant_org ON access_grant(org_id, status, expires_at);
+
+  CREATE TABLE invite_link (
+    id TEXT PRIMARY KEY,
+    token_hash TEXT NOT NULL UNIQUE,
+    org_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    appointment_id TEXT,
+    purpose TEXT NOT NULL,
+    subject_ref TEXT,
+    phone TEXT,
+    email TEXT,
+    expires_at TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'active',
+    created_by TEXT,
+    created_at TEXT NOT NULL,
+    first_opened_at TEXT,
+    last_opened_at TEXT,
+    sent_channels TEXT
+  );
+  CREATE INDEX invite_link_appt ON invite_link(appointment_id);
+  CREATE INDEX invite_link_patient ON invite_link(patient_ref);
+
+  CREATE TABLE intake_item (
+    id TEXT PRIMARY KEY,
+    org_id TEXT,
+    patient_ref TEXT NOT NULL,
+    appointment_id TEXT,
+    invite_id TEXT,
+    uploaded_by TEXT NOT NULL,
+    binary_id TEXT NOT NULL,
+    filename TEXT,
+    content_type TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    status TEXT NOT NULL,
+    ocr_provider TEXT,
+    ocr_text TEXT,
+    ocr_pages INTEGER,
+    extracted TEXT,
+    laboratory TEXT,
+    collected_at TEXT,
+    document_ref TEXT,
+    report_ref TEXT,
+    confirmed_at TEXT,
+    confirmed_by TEXT,
+    error TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX intake_item_appt ON intake_item(appointment_id);
+  CREATE INDEX intake_item_patient ON intake_item(patient_ref, created_at);
+
+  CREATE TABLE scribe_session (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    appointment_id TEXT,
+    patient_ref TEXT NOT NULL,
+    practitioner_user_id TEXT NOT NULL,
+    template_id TEXT NOT NULL,
+    consent_at TEXT NOT NULL,
+    consent_note TEXT,
+    audio_binary_id TEXT,
+    audio_deleted_at TEXT,
+    audio_seconds REAL,
+    stt_provider TEXT,
+    transcript TEXT,
+    note TEXT,
+    note_original TEXT,
+    validation TEXT,
+    status TEXT NOT NULL,
+    error TEXT,
+    recorded_at TEXT,
+    draft_ready_at TEXT,
+    approved_at TEXT,
+    approved_by TEXT,
+    composition_ref TEXT,
+    corrected_ratio REAL,
+    summary TEXT,
+    summary_status TEXT,
+    summary_approved_at TEXT,
+    summary_sent_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX scribe_session_appt ON scribe_session(appointment_id);
+  CREATE INDEX scribe_session_org ON scribe_session(org_id, created_at);
+
+  CREATE TABLE ai_call (
+    id TEXT PRIMARY KEY,
+    ts TEXT NOT NULL,
+    org_id TEXT,
+    user_id TEXT,
+    task TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    model TEXT,
+    prompt_version TEXT,
+    input_units INTEGER,
+    output_units INTEGER,
+    latency_ms INTEGER,
+    outcome TEXT NOT NULL,
+    error_code TEXT
+  );
+  CREATE INDEX ai_call_ts ON ai_call(ts);
+
+  CREATE TABLE metric_event (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    ts TEXT NOT NULL,
+    type TEXT NOT NULL,
+    user_id TEXT,
+    appointment_id TEXT,
+    value REAL,
+    data TEXT
+  );
+  CREATE INDEX metric_event_org ON metric_event(org_id, type, ts);
+
+  CREATE TABLE incident (
+    id TEXT PRIMARY KEY,
+    org_id TEXT,
+    reporter_user_id TEXT,
+    reporter_kind TEXT NOT NULL,
+    category TEXT NOT NULL,
+    description TEXT NOT NULL,
+    severity TEXT NOT NULL,
+    status TEXT NOT NULL,
+    contact TEXT,
+    handled_by TEXT,
+    resolution TEXT,
+    due_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX incident_org ON incident(org_id, status);
+
+  CREATE TABLE webauthn_credential (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+    public_key TEXT NOT NULL,
+    counter INTEGER NOT NULL,
+    transports TEXT,
+    label TEXT,
+    created_at TEXT NOT NULL,
+    last_used_at TEXT
+  );
+  CREATE INDEX webauthn_user ON webauthn_credential(user_id);
+
+  CREATE TABLE recovery_code (
+    user_id TEXT NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+    code_hash TEXT NOT NULL,
+    used_at TEXT,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (user_id, code_hash)
+  );
+
+  CREATE TABLE user_pref (
+    user_id TEXT NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+    key TEXT NOT NULL,
+    value TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (user_id, key)
+  );
+
+  CREATE TABLE emergency_contact (
+    id TEXT PRIMARY KEY,
+    patient_ref TEXT NOT NULL,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    relation TEXT,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX emergency_contact_patient ON emergency_contact(patient_ref);
+
+  CREATE TABLE sos_event (
+    id TEXT PRIMARY KEY,
+    patient_ref TEXT NOT NULL,
+    ts TEXT NOT NULL,
+    notified TEXT NOT NULL,
+    location TEXT,
+    card_token_hash TEXT,
+    card_expires_at TEXT,
+    resolved_at TEXT
+  );
+  CREATE INDEX sos_event_patient ON sos_event(patient_ref, ts);
+
+  CREATE TABLE deletion_job (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    patient_ref TEXT,
+    requested_at TEXT NOT NULL,
+    status TEXT NOT NULL,
+    steps TEXT NOT NULL,
+    completed_at TEXT
+  );
+  `,
+  // 8 — powiązania linków z udostępnieniami, wideo z poczekalnią, harmonogram leków, wersje notatek
+  `
+  ALTER TABLE invite_link ADD COLUMN grant_id TEXT;
+  ALTER TABLE invite_link ADD COLUMN uses INTEGER NOT NULL DEFAULT 0;
+  ALTER TABLE access_grant ADD COLUMN recipient_label TEXT;
+  ALTER TABLE access_grant ADD COLUMN invite_id TEXT;
+  ALTER TABLE intake_item ADD COLUMN source TEXT NOT NULL DEFAULT 'invite';
+  ALTER TABLE scribe_session ADD COLUMN audio_content_type TEXT;
+  ALTER TABLE scribe_session ADD COLUMN card_ref TEXT;
+  ALTER TABLE scribe_session ADD COLUMN erecipe_code TEXT;
+  ALTER TABLE scribe_session ADD COLUMN edit_seconds REAL;
+  ALTER TABLE scribe_session ADD COLUMN ai_provider TEXT;
+  ALTER TABLE scribe_session ADD COLUMN ai_model TEXT;
+  ALTER TABLE scribe_session ADD COLUMN prompt_version TEXT;
+  ALTER TABLE scribe_session ADD COLUMN template_version TEXT;
+  ALTER TABLE scribe_session ADD COLUMN pdf_binary_id TEXT;
+  CREATE INDEX intake_item_org ON intake_item(org_id, created_at);
+
+  CREATE TABLE tele_session (
+    appointment_id TEXT PRIMARY KEY,
+    org_id TEXT,
+    provider TEXT NOT NULL,
+    room TEXT NOT NULL,
+    host_room TEXT,
+    patient_joined_at TEXT,
+    admitted_at TEXT,
+    admitted_by TEXT,
+    doctor_joined_at TEXT,
+    ended_at TEXT,
+    minutes REAL,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE med_schedule (
+    id TEXT PRIMARY KEY,
+    patient_ref TEXT NOT NULL,
+    medication_ref TEXT,
+    label TEXT NOT NULL,
+    times TEXT NOT NULL,
+    days TEXT NOT NULL,
+    active INTEGER NOT NULL DEFAULT 1,
+    created_by TEXT,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX med_schedule_patient ON med_schedule(patient_ref, active);
+  CREATE TABLE med_intake (
+    id TEXT PRIMARY KEY,
+    schedule_id TEXT NOT NULL REFERENCES med_schedule(id) ON DELETE CASCADE,
+    due_at TEXT NOT NULL,
+    status TEXT NOT NULL,
+    confirmed_at TEXT,
+    UNIQUE (schedule_id, due_at)
+  );
+
+  CREATE TABLE app_code (
+    purpose TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    code_hash TEXT NOT NULL,
+    payload TEXT,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    expires_at TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (purpose, user_id)
+  );
+  `,
 ];
 
 export type Db = DatabaseSync;

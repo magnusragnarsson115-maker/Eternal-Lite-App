@@ -11,10 +11,11 @@ import type {
 import { formatHumanName } from '@medplum/core';
 import { audit, type AuditActor } from '../audit.js';
 import { ETERNAL, NPWZ_SYSTEM } from '../fhir/constants.js';
-import { fhir } from '../fhir/index.js';
+import { fhir, fhirSystem } from '../fhir/index.js';
 import { badRequest, notFound } from '../lib/util.js';
 import { getSetting, setSetting, type ClinicSettings } from '../settings.js';
 import { config } from '../config.js';
+import { currentOrgId, currentScope, defaultOrgId, hasOrg } from '../tenancy.js';
 
 /** Katalog placówki: organizacja, lokalizacje, personel, usługi. Mała, często czytana — cache w pamięci. */
 
@@ -54,11 +55,17 @@ export interface LocationView {
   phone?: string;
 }
 
-let cache: { at: number; services: ServiceView[]; practitioners: PractitionerView[]; locations: LocationView[] } | undefined;
+type DirectoryCache = { at: number; services: ServiceView[]; practitioners: PractitionerView[]; locations: LocationView[] };
+const caches = new Map<string, DirectoryCache>();
 const TTL = 60_000;
 
 export function invalidateDirectory(): void {
-  cache = undefined;
+  caches.clear();
+}
+
+/** Organizacja, której katalog i ustawienia obowiązują w bieżącym kontekście. */
+export function contextOrgId(): string | undefined {
+  return currentOrgId() ?? currentScope()?.patientOrgIds?.[0] ?? defaultOrgId();
 }
 
 function ext<T = unknown>(r: { extension?: { url: string }[] }, url: string, key: string): T | undefined {
@@ -83,15 +90,20 @@ export function toServiceView(s: HealthcareService): ServiceView {
   };
 }
 
-async function load() {
-  if (cache && Date.now() - cache.at < TTL) return cache;
+async function load(): Promise<DirectoryCache> {
+  const orgId = contextOrgId();
+  const key = orgId ?? 'all';
+  const hit = caches.get(key);
+  if (hit && Date.now() - hit.at < TTL) return hit;
+  // personel: repozytorium filtruje po organizacji; pacjent: katalog jego placówki
+  const inOrg = <T extends { meta?: import('@medplum/fhirtypes').Meta }>(list: T[]) => (orgId && !currentOrgId() ? list.filter((r) => hasOrg(r, orgId)) : list);
   const [services, practitioners, roles, locations] = await Promise.all([
-    fhir().search<HealthcareService>('HealthcareService', { _sort: 'name' }),
-    fhir().search<Practitioner>('Practitioner', {}),
-    fhir().search<PractitionerRole>('PractitionerRole', {}),
-    fhir().search<Location>('Location', {}),
+    fhir().search<HealthcareService>('HealthcareService', { _sort: 'name' }).then(inOrg),
+    fhir().search<Practitioner>('Practitioner', {}).then(inOrg),
+    fhir().search<PractitionerRole>('PractitionerRole', {}).then(inOrg),
+    fhir().search<Location>('Location', {}).then(inOrg),
   ]);
-  cache = {
+  const cache: DirectoryCache = {
     at: Date.now(),
     services: services.map(toServiceView),
     practitioners: practitioners
@@ -118,6 +130,7 @@ async function load() {
       phone: l.telecom?.find((t) => t.system === 'phone')?.value,
     })),
   };
+  caches.set(key, cache);
   return cache;
 }
 
@@ -164,7 +177,11 @@ export async function ensureSchedule(practitionerId: string, locationId?: string
   });
 }
 
-export async function getOrganization(): Promise<Organization | undefined> {
+export async function getOrganization(orgId = contextOrgId()): Promise<Organization | undefined> {
+  if (orgId) {
+    const org = await fhirSystem().readOptional<Organization>('Organization', orgId);
+    if (org) return org;
+  }
   return (await fhir().search<Organization>('Organization', { _count: '1' }))[0];
 }
 
@@ -179,18 +196,40 @@ export function defaultClinicSettings(): ClinicSettings {
     emergencyInfo: 'W stanie nagłego zagrożenia życia lub zdrowia dzwoń pod numer alarmowy 112.',
     messageResponseDays: 2,
     privacyContact: '',
+    specialties: ['interna'],
+    requiredDocuments: [
+      { id: 'lab', label: 'Wyniki badań laboratoryjnych (ostatnie 6 miesięcy)', accept: ['lab'], maxAgeDays: 180 },
+      { id: 'history', label: 'Dokumentacja z wcześniejszego leczenia (karta wypisowa, opis badania)', accept: ['discharge', 'imaging', 'referral', 'other'], optional: true },
+    ],
+    noteTemplates: ['general', 'cardiology', 'pediatrics'],
+    ehrLayout: 'generic',
+    scribeMonthlyLimitPerDoctor: 300,
+    inviteValidityDaysAfterVisit: 30,
+    recordingRetentionDays: 30,
+    autoRemindMissingHours: 48,
+    pilot: { surveyEveryDays: 14 },
   };
 }
 
-export function getClinicSettings(): ClinicSettings {
-  return { ...defaultClinicSettings(), ...(getSetting<Partial<ClinicSettings>>('clinic') ?? {}) };
+function settingsKey(orgId: string | undefined): string {
+  // organizacja domyślna (instancja jednej kliniki) zachowuje dotychczasowy klucz
+  return orgId && orgId !== defaultOrgId() ? `clinic:${orgId}` : 'clinic';
 }
 
-export function updateClinicSettings(actor: AuditActor, patch: Partial<ClinicSettings>): ClinicSettings {
-  const next = { ...getClinicSettings(), ...patch };
+export function getClinicSettings(orgId = contextOrgId()): ClinicSettings {
+  return { ...defaultClinicSettings(), ...(getSetting<Partial<ClinicSettings>>(settingsKey(orgId)) ?? {}) };
+}
+
+export function updateClinicSettings(actor: AuditActor, patch: Partial<ClinicSettings>, orgId = contextOrgId()): ClinicSettings {
+  const next = { ...getClinicSettings(orgId), ...patch };
   if (next.cancelMinHours < 0 || next.cancelMinHours > 168) throw badRequest('invalid_cancel_window');
   if (next.reminderOffsetsHours.some((h) => !(h > 0 && h <= 168))) throw badRequest('invalid_reminder_offsets');
-  setSetting('clinic', next);
+  if (!(next.scribeMonthlyLimitPerDoctor >= 0 && next.scribeMonthlyLimitPerDoctor <= 5000)) throw badRequest('invalid_scribe_limit');
+  if (!(next.inviteValidityDaysAfterVisit >= 1 && next.inviteValidityDaysAfterVisit <= 365)) throw badRequest('invalid_invite_validity');
+  if (!(next.recordingRetentionDays >= 0 && next.recordingRetentionDays <= 90)) throw badRequest('invalid_recording_retention');
+  if (!(next.autoRemindMissingHours >= 0 && next.autoRemindMissingHours <= 168)) throw badRequest('invalid_auto_remind');
+  if (new Set(next.requiredDocuments.map((d) => d.id)).size !== next.requiredDocuments.length) throw badRequest('duplicate_required_document');
+  setSetting(settingsKey(orgId), next);
   audit(actor, { action: 'U', subtype: 'settings-update', detail: { keys: Object.keys(patch) } });
   return next;
 }

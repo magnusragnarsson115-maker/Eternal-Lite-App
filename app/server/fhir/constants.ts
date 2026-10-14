@@ -29,6 +29,12 @@ export const ETERNAL = {
   visitMode: 'urn:eternal:visit-mode',
   price: 'urn:eternal:price',
   thread: 'urn:eternal:thread',
+  /** Pochodzenie i poziom zaufania wartości (K19, R2). */
+  trust: 'urn:eternal:trust',
+  /** Rodzaj dokumentu wgranego przez pacjenta (P3). */
+  intakeKind: 'urn:eternal:intake-kind',
+  /** Treść wygenerowana z udziałem AI (A19.1). */
+  ai: 'urn:eternal:ai',
   ext: {
     readByPatient: 'urn:eternal:ext:read-by-patient',
     sharedAt: 'urn:eternal:ext:shared-at',
@@ -40,12 +46,35 @@ export const ETERNAL = {
     durationMinutes: 'urn:eternal:ext:duration-minutes',
     readByStaff: 'urn:eternal:ext:read-by-staff',
     device: 'urn:eternal:ext:device',
+    sourceLine: 'urn:eternal:ext:source-line',
+    sourceText: 'urn:eternal:ext:source-text',
+    confidence: 'urn:eternal:ext:confidence',
+    correctionReason: 'urn:eternal:ext:correction-reason',
+    entryMethod: 'urn:eternal:ext:entry-method',
+    aiModel: 'urn:eternal:ext:ai-model',
+    promptVersion: 'urn:eternal:ext:prompt-version',
+    templateVersion: 'urn:eternal:ext:template-version',
   },
 } as const;
 
 export const TAG_PATIENT_VISIBLE = { system: ETERNAL.visibility, code: 'patient-visible', display: 'Udostępnione pacjentowi' };
 export const TAG_IDENTITY_VERIFIED = { system: ETERNAL.identity, code: 'verified', display: 'Tożsamość potwierdzona' };
 export const TAG_FICTIONAL = { system: ETERNAL.data, code: 'fictional', display: 'Dane fikcyjne' };
+
+/**
+ * Poziom zaufania wartości (K19): skąd pochodzi i czy ktoś ją potwierdził. Raport faktów (D3) traktuje jako fakt
+ * tylko wartości potwierdzone; odczyt maszynowy niepotwierdzony pokazuje osobno.
+ */
+export const TRUST = {
+  machineUnconfirmed: { system: ETERNAL.trust, code: 'machine-unconfirmed', display: 'Odczyt maszynowy, niepotwierdzony' },
+  patientConfirmed: { system: ETERNAL.trust, code: 'patient-confirmed', display: 'Odczyt potwierdzony przez pacjenta' },
+  clinicianConfirmed: { system: ETERNAL.trust, code: 'clinician-confirmed', display: 'Odczyt potwierdzony przez personel' },
+  manual: { system: ETERNAL.trust, code: 'manual', display: 'Wpis ręczny' },
+  clinic: { system: ETERNAL.trust, code: 'clinic', display: 'Wprowadzone przez placówkę' },
+} as const;
+export type TrustCode = (typeof TRUST)[keyof typeof TRUST]['code'];
+
+export const TAG_AI_ASSISTED = { system: ETERNAL.ai, code: 'ai-assisted-approved', display: 'Przygotowane z udziałem AI, zatwierdzone przez lekarza' };
 
 /** Kody LOINC parametrów mierzonych samodzielnie (profil FHIR Vital Signs). */
 export const VITALS = {
