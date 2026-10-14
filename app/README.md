@@ -1,7 +1,7 @@
 # Eternal — aplikacja pacjenta i panel placówki
 
-**Eternal Pacjent** (PWA na telefon i komputer) i **Eternal Doctor** (panel lekarzy, rejestracji i administracji)
-działają na jednym repozytorium danych w standardzie **HL7 FHIR R4**. Każda zmiana po jednej stronie —
+**Eternal Pacjent** (PWA na telefon i komputer oraz aplikacja **iOS/Android** w `mobile/`) i **Eternal Doctor**
+(panel lekarzy, rejestracji i administracji) działają na jednym repozytorium danych w standardzie **HL7 FHIR R4**. Każda zmiana po jednej stronie —
 rezerwacja, odwołanie, przypomnienie, udostępnienie wyniku, wiadomość — jest widoczna po drugiej
 natychmiast (Server-Sent Events), bez przeładowania strony.
 
@@ -26,6 +26,24 @@ natychmiast (Server-Sent Events), bez przeładowania strony.
 | Prywatność | zgody z historią wersji, **historia dostępu do danych**, eksport FHIR Bundle (RODO art. 20), wniosek o usunięcie konta | dziennik zdarzeń z weryfikacją integralności, realizacja wniosków |
 | Tożsamość | rejestracja samodzielna lub kodem aktywacyjnym z placówki; wyniki dostępne po potwierdzeniu tożsamości | potwierdzenie tożsamości (dokument), wydawanie kodów aktywacyjnych |
 | Bezpieczeństwo | opcjonalne MFA (TOTP) | **obowiązkowe MFA** dla personelu, role i zasada najmniejszych uprawnień |
+
+### Moduły pilotażu i MVP (plik 12.8)
+
+Pełna mapa 78 funkcji na kod i testy: [`docs/MODULES.md`](docs/MODULES.md). Moduły włącza się bez wdrożenia
+(panel *Organizacja kliniki → Moduły* albo `npm run cli -- set-module`).
+
+| Moduł | Co robi |
+|---|---|
+| D1 Zaproszenie i przyjęcie danych | SMS z linkiem albo kod QR → strona bez konta: zgoda (udostępnienie do terminu), zdjęcie lub PDF, odczyt z potwierdzeniem pól, „kto oglądał”, wycofanie zgody |
+| D2 Skrzynka materiałów | wizyty dnia z paskiem kompletności wg wymagań kliniki, filtr braków, przypomnienia SMS (ręczne i automatyczne) |
+| D3 Raport faktów | wyniki z datą, jednostką, zakresem i oznaczeniem z dokumentu, odnośniki do źródła (plik, wiersz), odczyty niepotwierdzone osobno, PDF; układ wg specjalizacji |
+| D5 Eternal Scribe | zgoda na nagranie → transkrypcja (dostawca w UE) → szkic wg szablonu (POZ, kardiologia, pediatria, SOAP, SBAR) z odnośnikami do fragmentów rozmowy → walidator źródeł → zatwierdzenie (FHIR `Composition` + `Provenance`), wersje, PDF, pola do systemu gabinetowego; karta „Po wizycie” dla pacjenta zatwierdzana przez lekarza |
+| D7 Wideo | Whereby Embedded albo Jitsi, poczekalnia po stronie serwera, przypomnienia o wizytach i lekach |
+| D0 / D12 | zaproszenia personelu, role, odebranie dostępu, licznik użycia i CSV do faktury, incydenty z terminem 72 h, rejestr AI; mierniki pilotażu (czas dokumentacji, poprawki szkicu, kompletność, ankieta lekarza, raport miesięczny) |
+| P1–P14 | dokumenty z odczytem, oś czasu z wersjami, udostępnianie na czas, wpisy ręczne z korektą, powiadomienia z godzinami ciszy, SOS i karta ratunkowa, numery kryzysowe (nie do wyłączenia), usunięcie danych z potwierdzeniem; klucze dostępu, kody odzyskiwania, link z e-maila, weryfikacja telefonu, lista urządzeń |
+
+Aplikacja **nie ocenia** wyników: zakres i oznaczenia pochodzą z dokumentu laboratorium, a odczyt maszynowy
+jest oznaczony, dopóki ktoś go nie potwierdzi. Treści przygotowane przez AI są oznaczone w interfejsie, w PDF i w FHIR.
 
 Interfejs po polsku i angielsku (test pilnuje kompletności tłumaczeń), zgodny z WCAG 2.1 AA (kontrast,
 nawigacja klawiaturą, etykiety, czytniki ekranu, `prefers-reduced-motion`), tryb ciemny, instalowalny jako PWA.
@@ -79,7 +97,11 @@ npm start                # za reverse proxy z TLS
 albo kontener: `docker compose up -d --build` (aplikacja + Caddy z certyfikatem Let's Encrypt).
 
 Narzędzia: `npm run cli -- import-rpl` (Rejestr Produktów Leczniczych), `verify-audit` (integralność
-dziennika), `backup <katalog>` (spójna kopia bazy — zawiera dane osobowe, szyfruj).
+dziennika), `backup <katalog>` (spójna kopia bazy — zawiera dane osobowe, szyfruj), `create-org` / `orgs`
+(kliniki), `create-admin <email> "<imię>" --org <id>`, `modules` / `set-module` (moduły, wdrożenie procentowe),
+`synthetic --purpose "<cel>"` (dane syntetyczne z zestawem testowym PDF), `import-synthea <katalog>`.
+Bezpieczeństwo: `npm run sbom` (wykaz składników CycloneDX), `npm run audit:deps`, `/.well-known/security.txt`
+(`SECURITY_CONTACT`). Dostawcy i wymagane regiony: [`docs/VENDORS.md`](docs/VENDORS.md).
 
 ### Medplum jako repozytorium danych
 
@@ -93,9 +115,12 @@ Szczegóły i status każdej integracji: [`docs/INTEGRATIONS.md`](docs/INTEGRATI
 ## Testy
 
 ```bash
-npm test                 # 60 testów: FHIR, rezerwacje (w tym wyścig), uprawnienia, dziennik, integracje, API, i18n
-npm run test:e2e         # Playwright: dwie sesje (pacjent + lekarz) i synchronizacja na żywo
+npm test                 # 99 testów: FHIR, rezerwacje, uprawnienia, dziennik, link pacjenta, odczyt wyników,
+                         # raport faktów, Scribe, udostępnienia, SOS, usuwanie danych, dane syntetyczne, i18n
+npm run test:e2e         # Playwright: synchronizacja na żywo; zaproszenie → strona pod linkiem → raport lekarza;
+                         # Scribe z mikrofonem testowym → karta „Po wizycie” w aplikacji pacjenta
 npm run typecheck
+cd mobile && npm run typecheck    # aplikacja mobilna
 ```
 
 ## Struktura
@@ -107,9 +132,14 @@ server/            API (Fastify), domena, integracje
   services/        grafik i rezerwacje, wyniki, wiadomości, zgody, przypomnienia, pomiary, prywatność
   integrations/    NFZ, NLM/LOINC/ICD, WHO ICD-11, HIBP, Withings, RPM (Vitalera), Jitsi, RPL, e-mail/SMS/push
   routes/          trasy REST, fasada FHIR, SSE
-web/src/           React: aplikacja pacjenta (patient/), panel placówki (staff/), komponenty (ui/)
+  ai/              brama modeli (Claude/Bedrock, Mistral), odczyt dokumentów, mowa na tekst
+  labs/            słownik polskich nazw badań (LOINC, UCUM) i parser wyników
+  scribe/          szablony notatek
+  seed/            dane demonstracyjne, pilotaż, dane syntetyczne
+web/src/           React: aplikacja pacjenta (patient/), panel placówki (staff/), strony pod linkiem (link/)
+mobile/            aplikacja iOS/Android (Expo SDK 57) — patrz mobile/README.md
 tests/             unit (Vitest) i e2e (Playwright)
-docs/              zgodność, integracje, zrzuty ekranu
+docs/              zgodność, integracje, moduły (mapa 78 funkcji), rejestr dostawców, zrzuty ekranu
 ```
 
 ## Ograniczenia tej wersji
@@ -118,6 +148,11 @@ docs/              zgodność, integracje, zrzuty ekranu
 - Brak płatności online i rozliczeń NFZ.
 - Jedna instancja aplikacji (limiter i szyna zdarzeń w pamięci procesu); skalowanie poziome wymaga Redis/pub-sub.
 - Powiadomienia generowane przez serwer są po polsku.
+- Dostawcy AI, OCR, mowy na tekst i wideo są zaimplementowani według dokumentacji, ale bez kluczy w tym środowisku
+  działały w trybie demonstracyjnym (reguły bez modelu, przykładowa rozmowa). Wybór dostawców wymaga testów z
+  decyzji D48 i D51 (20 nagrań, 100 wyników) — patrz `docs/MODULES.md`.
+- Aplikacja mobilna jest sprawdzona typami i pełnym pakietem JS (Metro); biometria, schowek systemu i push
+  wymagają testu na urządzeniach (development build EAS).
 - Adaptery Withings, WHO ICD-11, Medplum i publicznych API zostały zaimplementowane według dokumentacji dostawców
   i przetestowane na danych przykładowych; w środowisku, w którym powstała ta wersja, ruch wychodzący do tych usług
   był zablokowany — przed wdrożeniem wykonaj test połączeń w panelu *Administracja → Integracje*.

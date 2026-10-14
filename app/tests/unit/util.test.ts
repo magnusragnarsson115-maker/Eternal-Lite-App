@@ -98,3 +98,11 @@ describe('iCalendar', () => {
     for (const line of ics.split('\r\n')) expect(Buffer.byteLength(line, 'utf8')).toBeLessThanOrEqual(75);
   });
 });
+
+describe('Redakcja identyfikatorów przed modelem językowym', () => {
+  it('usuwa PESEL, e-mail i telefon, zostawia wartości wyników', async () => {
+    const { redactIdentifiers } = await import('../../server/lib/redact.js');
+    const out = redactIdentifiers('Pacjent PESEL 85010112345, tel. +48 500 600 700, jan.k@poczta.pl. Glukoza 94 mg/dl 70 - 99');
+    expect(out).toBe('Pacjent PESEL [PESEL], tel. [TELEFON], [E-MAIL]. Glukoza 94 mg/dl 70 - 99');
+  });
+});

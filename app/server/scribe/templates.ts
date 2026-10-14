@@ -49,9 +49,22 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
       { key: 'P', title: 'P — plan', hint: 'Zalecenia i kontrola wypowiedziane przez lekarza.', ehr: { generic: 'Zalecenia', soap: 'P' } },
     ],
   },
+  {
+    // F3.19: raport SBAR (przekazanie pacjenta, konsultacja) — ocena wyłącznie słowami lekarza
+    id: 'sbar',
+    version: 'note-sbar/2026-10-1',
+    name: 'SBAR (przekazanie, konsultacja)',
+    specialty: 'ogólna',
+    sections: [
+      { key: 'sytuacja', title: 'S — sytuacja', hint: 'Z czym pacjent zgłasza się teraz — z relacji pacjenta.', ehr: { generic: 'Wywiad', soap: 'S' } },
+      { key: 'tlo', title: 'B — tło', hint: 'Przebieg, leki, wyniki i pomiary wymienione w rozmowie.', ehr: { generic: 'Badanie przedmiotowe', soap: 'O' } },
+      { key: 'ocena', title: 'A — ocena lekarza', hint: 'Tylko słowa lekarza; model nie stawia oceny.', ehr: { generic: 'Rozpoznanie', soap: 'A' } },
+      { key: 'zalecenie', title: 'R — zalecenie', hint: 'Zalecenia, zlecenia i kontrola wypowiedziane przez lekarza.', ehr: { generic: 'Zalecenia', soap: 'P' } },
+    ],
+  },
 ];
 
-export const NOTE_TEMPLATE_IDS = ['general', 'cardiology', 'pediatrics', 'soap'] as const;
+export const NOTE_TEMPLATE_IDS = ['general', 'cardiology', 'pediatrics', 'soap', 'sbar'] as const;
 
 export function getTemplate(id: string): NoteTemplate {
   return NOTE_TEMPLATES.find((t) => t.id === id) ?? NOTE_TEMPLATES[0];

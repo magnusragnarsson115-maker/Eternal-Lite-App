@@ -26,6 +26,15 @@ płatne, uzasadnienie, koszty, źródła; stan rynku 10.2026): [`ETERNAL_11_1_WY
 | **Web Push (VAPID)** | bezpłatne | opcjonalnie `VAPID_*` | — | tytuł i treść powiadomienia bez danych medycznych (przez usługę push przeglądarki) |
 | **E-mail (SMTP)** | zależnie od dostawcy | `SMTP_URL`, `MAIL_FROM` | ✅ kolejka i zgody | adres e-mail, treść przypomnienia bez danych medycznych |
 | **SMS** (SMSAPI.pl / własna bramka) | płatne | `SMS_PROVIDER`, `SMSAPI_TOKEN` / `SMS_WEBHOOK_URL` | ✅ normalizacja numerów | numer telefonu, treść przypomnienia bez danych medycznych |
+| **Claude (Amazon Bedrock, UE)** / API Anthropic | płatne za użycie | `AI_PROVIDER=bedrock|anthropic`, `AWS_REGION` | ✅ tryb demo i schematy odpowiedzi, 🌐 | tekst rozmowy / dokumentu / notatki po usunięciu PESEL, e-maili i telefonów |
+| **Mistral** (zapas modelu, OCR) | płatne za użycie | `AI_SECONDARY_PROVIDER=mistral`, `OCR_PROVIDER=mistral`, `MISTRAL_API_KEY` | 🌐 | jw. / obraz dokumentu |
+| **Google Document AI** (OCR) | płatne za stronę | `OCR_PROVIDER=google`, `GOOGLE_DOCAI_*` | 🌐 | obraz lub PDF dokumentu |
+| **ElevenLabs / Azure AI Speech / OpenAI** (mowa na tekst) | płatne za minutę | `STT_PROVIDER`, klucze, adresy z rezydencją UE | ✅ tryb demo, 🌐 | nagranie wizyty |
+| **Whereby Embedded** (wideo) | abonament | `VIDEO_PROVIDER=whereby`, `WHEREBY_API_KEY` | ✅ poczekalnia, 🌐 tworzenie pokoju | strumień wideo; pokój z czasem wygaśnięcia |
+| **OIDC** (Cognito, Keycloak, Entra — D50) | zależnie od usługi | `OIDC_ISSUER`, `OIDC_CLIENT_*` | 🌐 | adres e-mail z usługi tożsamości |
+| **Expo Notifications** (push w aplikacji mobilnej) | bezpłatne | — (token z aplikacji) | ✅ rejestracja tokenu | tytuł i treść bez danych o zdrowiu |
+| **Sentry** (błędy serwera, UE) | plan bezpłatny | `SENTRY_DSN` | — | typ błędu, kod, wzorzec trasy — bez treści i identyfikatorów |
+| **Synthea** (dane syntetyczne) | bezpłatne (open source) | `npm run cli -- import-synthea` | — | nic — import plików lokalnych |
 | Platforma P1 (CeR, EDM, e-skierowanie) | wymaga certyfikacji CeZ | — | — | nie zaimplementowano |
 | Węzeł Krajowy (login.gov.pl) | wymaga porozumienia | — | — | nie zaimplementowano |
 

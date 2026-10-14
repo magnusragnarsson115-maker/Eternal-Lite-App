@@ -3,7 +3,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { getDb } from '../../server/db.js';
 import { fhirSystem } from '../../server/fhir/index.js';
 import { pdfAvailable } from '../../server/pdf/render.js';
-import { correctedRatio, validateNote, type NoteDoc } from '../../server/services/scribe.js';
+import { demoTranscript } from '../../server/ai/stt.js';
+import { getTemplate } from '../../server/scribe/templates.js';
+import { correctedRatio, demoNote, validateNote, type NoteDoc } from '../../server/services/scribe.js';
 import { Client, waitFor } from './client.js';
 import { orgFixture } from './fixture.js';
 import { multipart } from './helpers.js';
@@ -31,6 +33,14 @@ describe('Eternal Scribe i karta „Po wizycie”', () => {
     expect(a.problems?.join(' ')).toContain('I10');
     expect(b.problems?.[0]).toContain('Brak odnośnika');
     expect(correctedRatio(note, { ...note, sections: [{ ...note.sections[0], paragraphs: [{ ...note.sections[0].paragraphs[0] }] }] })).toBe(0.333);
+  });
+
+  it('szablon SBAR (F3.19): fragmenty rozmowy trafiają do sekcji S/B/A/R, każdy akapit ma źródło', () => {
+    const note = demoNote(getTemplate('sbar'), demoTranscript());
+    expect(note.sections.map((x) => x.key)).toEqual(['sytuacja', 'tlo', 'ocena', 'zalecenie']);
+    expect(note.sections.find((x) => x.key === 'sytuacja')!.paragraphs.length).toBeGreaterThan(0);
+    expect(note.sections.find((x) => x.key === 'zalecenie')!.paragraphs.length).toBeGreaterThan(0);
+    expect(note.sections.flatMap((x) => x.paragraphs).every((p) => p.sources.length > 0)).toBe(true);
   });
 
   it('bez zgody pacjenta nie da się rozpocząć nagrania; rejestracja nie ma dostępu', async () => {

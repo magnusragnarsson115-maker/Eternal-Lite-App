@@ -397,7 +397,7 @@ function ClinicConfigTab() {
           <TextField label={t('Automatyczne przypomnienie o brakach (godzin przed wizytą; 0 = wyłączone)')} type="number" value={s.autoRemindMissingHours} onChange={num('autoRemindMissingHours')} />
         </div>
         <div className="row" style={{ gap: 12, flexWrap: 'wrap', marginTop: 8 }}>
-          {['general', 'cardiology', 'pediatrics', 'soap'].map((id) => (
+          {['general', 'cardiology', 'pediatrics', 'soap', 'sbar'].map((id) => (
             <Checkbox key={id} label={t(TEMPLATE_PL[id])} checked={s.noteTemplates.includes(id)} onChange={(e) => setS({ ...s, noteTemplates: e.target.checked ? [...s.noteTemplates, id] : s.noteTemplates.filter((x) => x !== id) })} />
           ))}
         </div>
@@ -418,7 +418,7 @@ function ClinicConfigTab() {
 }
 
 const KIND_SHORT: Record<string, string> = { lab: 'wyniki laboratoryjne', discharge: 'karta wypisowa', imaging: 'opis badania obrazowego', referral: 'skierowanie', prescription: 'recepta', certificate: 'zaświadczenie', other: 'inny dokument' };
-const TEMPLATE_PL: Record<string, string> = { general: 'Wizyta ogólna (POZ, interna)', cardiology: 'Kardiologia', pediatrics: 'Pediatria', soap: 'SOAP' };
+const TEMPLATE_PL: Record<string, string> = { general: 'Wizyta ogólna (POZ, interna)', cardiology: 'Kardiologia', pediatrics: 'Pediatria', soap: 'SOAP', sbar: 'SBAR (przekazanie, konsultacja)' };
 
 function StaffInvitesTab() {
   const { t, fmt } = useI18n();

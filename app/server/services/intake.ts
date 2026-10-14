@@ -1,4 +1,5 @@
 import type { Attachment, DiagnosticReport, DocumentReference, Observation, Reference } from '@medplum/fhirtypes';
+import { redactIdentifiers } from '../lib/redact.js';
 import { audit, type AuditActor } from '../audit.js';
 import { aiMode, runAiTask } from '../ai/gateway.js';
 import { readDocument } from '../ai/ocr.js';
@@ -136,12 +137,7 @@ const FLAG_CODE: Record<string, string> = { H: 'H', L: 'L', HH: 'HH', LL: 'LL', 
 // --- odczyt i rozbiór --------------------------------------------------------------------------------
 
 /** Minimalizacja danych przed wysłaniem tekstu do modelu: PESEL, telefony, adresy e-mail zastąpione znacznikiem. */
-export function redactIdentifiers(text: string): string {
-  return text
-    .replace(/\b\d{11}\b/g, '[PESEL]')
-    .replace(/\b[\w.+-]+@[\w-]+\.[\w.]+\b/g, '[E-MAIL]')
-    .replace(/(?:\+48[\s-]?)?\b\d{3}[\s-]\d{3}[\s-]\d{3}\b/g, '[TELEFON]');
-}
+export { redactIdentifiers };
 
 const HEADING_RE =
   /^(rozpoznanie(?: zasadnicze| główne)?|rozpoznania współistniejące|epikryza|zalecenia(?: lekarskie| przy wypisie)?|leki|leczenie|wywiad|badanie przedmiotowe|przebieg hospitalizacji|wyniki badań(?: dodatkowych)?|opis badania|wnioski|cel skierowania|skierowanie do|rozpoznanie wstępne|treść zaświadczenia)\s*:?/i;

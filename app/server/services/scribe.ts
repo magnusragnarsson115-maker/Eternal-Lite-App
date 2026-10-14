@@ -1,4 +1,5 @@
 import type { Composition, Consent, DocumentReference, Patient } from '@medplum/fhirtypes';
+import { redactIdentifiers } from '../lib/redact.js';
 import { audit, type AuditActor } from '../audit.js';
 import { aiMode, runAiTask } from '../ai/gateway.js';
 import { PatientSummarySchema, type PatientSummary, ScribeNoteSchema, type ScribeNote, ScribeValidationSchema } from '../ai/schemas.js';
@@ -276,8 +277,10 @@ export function demoNote(tpl: NoteTemplate, t: Transcript): ScribeNote {
     ['zalecenia', /(proszę|zlecam|zalecam|należy|zapisuj)/i],
   ];
   const soap: Record<string, string> = { wywiad: 'S', leki: 'S', rozwoj: 'S', badanie: 'O', pomiary: 'O', wyniki: 'O', rozpoznanie: 'A', zalecenia: 'P', kontrola: 'P' };
+  const sbar: Record<string, string> = { wywiad: 'sytuacja', leki: 'tlo', rozwoj: 'tlo', badanie: 'tlo', pomiary: 'tlo', wyniki: 'tlo', rozpoznanie: 'ocena', zalecenia: 'zalecenie', kontrola: 'zalecenie' };
   const keys = new Set(tpl.sections.map((s) => s.key));
-  const target = (k: string) => (keys.has(k) ? k : keys.has(soap[k] ?? '') ? soap[k] : k === 'pomiary' && keys.has('badanie') ? 'badanie' : k === 'leki' && keys.has('wywiad') ? 'wywiad' : undefined);
+  const target = (k: string) =>
+    keys.has(k) ? k : keys.has(soap[k] ?? '') ? soap[k] : keys.has(sbar[k] ?? '') ? sbar[k] : k === 'pomiary' && keys.has('badanie') ? 'badanie' : k === 'leki' && keys.has('wywiad') ? 'wywiad' : undefined;
   const buckets = new Map<string, { text: string; sources: string[] }[]>();
   for (const seg of t.segments) {
     const isDoctor = seg.speaker === 'lekarz' || seg.speaker === 'speaker_0' || seg.speaker === 'speaker_1';
@@ -358,7 +361,7 @@ export async function processSession(id: string): Promise<void> {
       return;
     }
     save(id, { transcript: JSON.stringify(transcript), stt_provider: transcript.provider, audio_seconds: row.audio_seconds ?? transcript.durationSec ?? null });
-    const user = `Szablon sekcji (klucz: tytuł — wskazówka):\n${templatePrompt(tpl)}\n\nTranskrypcja (fragmenty S#):\n${transcriptText(transcript)}`;
+    const user = `Szablon sekcji (klucz: tytuł — wskazówka):\n${templatePrompt(tpl)}\n\nTranskrypcja (fragmenty S#):\n${redactIdentifiers(transcriptText(transcript))}`;
     let note: NoteDoc;
     let ai: { provider: string; model: string; promptVersion: string } | undefined;
     try {
@@ -375,7 +378,7 @@ export async function processSession(id: string): Promise<void> {
     if (aiMode() === 'model') {
       const paragraphs = note.sections.flatMap((s) => s.paragraphs).map((p) => ({ id: p.id, text: p.text, sources: p.sources.map((sid) => `${sid}: ${transcript.segments.find((x) => x.id === sid)?.text ?? ''}`) }));
       try {
-        const v = await runAiTask('scribe-validate', { user: JSON.stringify({ paragraphs }), schema: ScribeValidationSchema, orgId: row.org_id, userId: row.practitioner_user_id });
+        const v = await runAiTask('scribe-validate', { user: redactIdentifiers(JSON.stringify({ paragraphs })), schema: ScribeValidationSchema, orgId: row.org_id, userId: row.practitioner_user_id });
         const bad = new Map(v.data.paragraphs.filter((p) => !p.supported).map((p) => [p.id, p.problems]));
         note = { ...note, sections: note.sections.map((s) => ({ ...s, paragraphs: s.paragraphs.map((p) => (bad.has(p.id) ? { ...p, problems: [...(p.problems ?? []), ...(bad.get(p.id) ?? ['Treść nie wynika ze wskazanych fragmentów.'])] } : p)) })) };
       } catch {
@@ -634,7 +637,7 @@ export async function generateCard(row: Row, actor: AuditActor): Promise<ScribeV
   if (row.status !== 'approved' || !row.note) throw conflict('scribe_not_approved');
   if (row.summary_status === 'sent') throw conflict('card_already_sent');
   const note = JSON.parse(row.note) as NoteDoc;
-  const run = await runAiTask('patient-summary', { user: noteText(note), schema: PatientSummarySchema, orgId: row.org_id, userId: row.practitioner_user_id, demo: () => demoCard(note) });
+  const run = await runAiTask('patient-summary', { user: redactIdentifiers(noteText(note)), schema: PatientSummarySchema, orgId: row.org_id, userId: row.practitioner_user_id, demo: () => demoCard(note) });
   const card = checkCard({ ...run.data }, note);
   save(row.id, { summary: JSON.stringify(card), summary_status: 'draft' });
   audit(actor, { action: 'C', subtype: 'card-draft', patientRef: row.patient_ref, detail: { session: row.id, provider: run.provider } });

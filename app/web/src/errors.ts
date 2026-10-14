@@ -113,7 +113,7 @@ const MESSAGES: Record<string, string> = {
   invalid_erecipe_code: 'Kod e-recepty to 4 cyfry.',
   grant_empty_selection: 'Wybierz co najmniej jeden dokument.',
   grant_expiry_in_past: 'Data końca udostępnienia musi być w przyszłości.',
-  grant_too_long: 'Udostępnienie może trwać najwyżej 90 dni.',
+  grant_too_long: 'Udostępnienie może trwać najwyżej rok.',
   tele_not_started: 'Lekarz jeszcze nie rozpoczął wizyty wideo.',
   video_not_configured: 'Wideo nie jest skonfigurowane w placówce.',
   video_provider_error: 'Usługa wideo jest chwilowo niedostępna.',

@@ -23,14 +23,42 @@ lub terapeutycznym, co do zasady nie jest wyrobem medycznym. Kod został zaproje
 |---|---|
 | Interpretacja wyników, kolorowanie „poza normą” | wyświetlamy wartość, jednostkę, **zakres i oznaczenie przepisane z laboratorium** z podpisem „oznaczenie laboratorium”; brak własnych progów (`records.ts`, `RecordPages.tsx`) |
 | Alarmy i progi dla pomiarów domowych | brak progów i powiadomień o wartościach; zakresy w `observations.ts` służą wyłącznie kontroli literówek przy wprowadzaniu |
-| Triage, rekomendacje, AI | brak; wywiad przed wizytą trafia do lekarza bez automatycznej analizy |
+| Triage, rekomendacje, ocena stanu zdrowia przez AI | brak; wywiad przed wizytą trafia do lekarza bez automatycznej analizy. AI w pilotażu (niżej) tylko **przepisuje i porządkuje** treść: rozmowę w szkic notatki, dokument w pola do potwierdzenia, zatwierdzoną notatkę w kartę dla pacjenta — model nie dostaje zadań oceny (`server/ai/prompts.ts`) |
+| Alert „parametr poza normą” (F3.6) | powiadomienie wyłącznie o **oznaczeniu wydrukowanym przez laboratorium** (H/L) w dokumencie pacjenta — aplikacja nie porównuje wartości z normą |
+| Raport faktów dla lekarza (D3) | tylko wartości potwierdzone, z datą, jednostką, zakresem i oznaczeniem z dokumentu, z odnośnikiem do źródła; bez wniosków, sortowania „nieprawidłowe najpierw” ani wyróżnień |
 | Obliczenia kliniczne (dawki, ryzyko) | brak; lista leków bez sprawdzania interakcji (komunikat w interfejsie) |
 
 Komunikaty „Aplikacja nie ocenia wyników i nie zastępuje porady lekarza” oraz „w nagłym przypadku dzwoń 112”
 są stałym elementem interfejsu. ⚠️ Dodanie którejkolwiek funkcji z lewej kolumny wymaga ponownej analizy
 kwalifikacji (reguła 11 MDR) i — w razie potrzeby — procesu oceny zgodności (IEC 62304, ISO 14971, IEC 82304-1).
 
-**AI Act (2024/1689):** aplikacja nie zawiera systemów AI.
+**AI Act (2024/1689):** od wersji pilotażowej aplikacja korzysta z modeli językowych i mowy na tekst
+(Eternal Scribe, odczyt dokumentów, karta „Po wizycie”). Rozwiązania w kodzie:
+
+| Obszar | Realizacja |
+|---|---|
+| Przejrzystość, oznaczanie treści (art. 50) | „odczyt maszynowy”, „przygotowane przez AI, zatwierdzone przez lekarza” w interfejsie, w PDF i w FHIR (`TAG_AI_ASSISTED`, znaczniki zaufania, `Provenance` z modelem i wersją polecenia); tekst o AI dla pacjenta w wersji (`AI_NOTICE`) |
+| Nadzór człowieka | każda notatka i karta wymaga zatwierdzenia lekarza; każde pole odczytu — potwierdzenia pacjenta albo lekarza; niepotwierdzone pola są oddzielone w raporcie |
+| Wierność źródłu | walidator deterministyczny (liczby i kody z akapitu muszą wystąpić we wskazanych fragmentach rozmowy) + walidator modelowy; model odczytu może wskazać tylko wartość obecną w tekście danej linii |
+| Rejestr zastosowań i zapytań (A19.6) | `ai_call`: zadanie, wersja polecenia, dostawca, model, czas — **bez treści medycznej**; panel „Rejestr AI” |
+| Minimalizacja | PESEL, e-maile i telefony usuwane z tekstu przed wysłaniem do modelu (`server/lib/redact.ts`); dostawcy wyłącznie z przetwarzaniem w UE (`docs/VENDORS.md`) |
+| Kompetencje w zakresie AI (art. 4) | ⚠️ obowiązek placówki jako podmiotu stosującego — krótkie szkolenie personelu przed pilotażem |
+
+⚠️ Kwalifikacja Scribe i odczytu dokumentów (MDR reguła 11 / AI Act art. 6) wymaga formalnej analizy — przygotuj ją
+przez `/dokument` z udziałem `ekspert-prawno-regulacyjny`; zweryfikuj aktualne terminy stosowania przepisów AI Act.
+
+### Funkcje pilotażu i MVP — ochrona danych w kodzie
+
+| Funkcja | Realizacja |
+|---|---|
+| Link z SMS (D1) | token jednorazowy (skrót w bazie), ważny do wizyty + okres z ustawień; zgoda z wersją tekstu przed wgraniem; udostępnienie wygasa automatycznie; wycofanie zgody natychmiast odbiera dostęp i unieważnia link; treść SMS bez danych o zdrowiu |
+| Sejf pacjenta | dane wniesione przez pacjenta są oddzielone od dokumentacji kliniki; klinika czyta je tylko przy aktywnym udostępnieniu (zakres × odbiorca × czas), każdy odczyt trafia do dziennika widocznego dla pacjenta |
+| Nagranie wizyty (D5) | zgoda pacjenta zapisana jako `Consent` z datą przed nagraniem; nagranie i transkrypcja usuwane N dni po zatwierdzeniu (`recordingRetentionDays`); recepcja nie ma dostępu |
+| Przekazanie karty osobie upoważnionej | wymagana podstawa: upoważnienie pacjenta albo art. 31 ust. 6 ustawy o zawodach lekarza; zapis w dzienniku |
+| SOS (P14) | SMS do osób bliskich bez danych o zdrowiu; karta ratunkowa ważna 24 h, każde otwarcie w dzienniku pacjenta |
+| Usunięcie danych (A18.12) | usunięcie sejfu, plików, udostępnień, linków i konta; potwierdzenie (PDF) z listą: co usunięto, co zostaje w placówkach (art. 29 ustawy o prawach pacjenta) i w dzienniku, kiedy dane znikną z kopii |
+| Dane syntetyczne (D5.3) | wyłącznie osoby fikcyjne bez PESEL, każde uruchomienie z celem w dzienniku |
+| Aplikacja mobilna | na telefonie tylko token sesji i skrót PIN-u w Keychain/Keystore (bez kopii zapasowej); brak danych medycznych w pamięci urządzenia; blokada biometrią/PIN-em |
 
 ## 2. RODO (2016/679) i ochrona danych
 
@@ -43,8 +71,8 @@ kwalifikacji (reguła 11 MDR) i — w razie potrzeby — procesu oceny zgodnośc
 | Minimalizacja (art. 5 ust. 1 lit. c) | treść e-mail/SMS/push bez danych o zdrowiu (bez nazwy usługi i lekarza); recepcja widzi PESEL zamaskowany i nie ma dostępu do treści klinicznej |
 | Rozliczalność i bezpieczeństwo (art. 5 ust. 2, art. 32) | dziennik zdarzeń append-only z łańcuchem HMAC (`audit.ts`), weryfikacja integralności w panelu i CLI; MFA dla personelu; szyfrowane hasła (scrypt); sesje z limitem bezczynności; CSRF; CSP; limity prób logowania; walidacja plików (sygnatura) |
 | Przejrzystość wobec pacjenta | **historia dostępu do danych** w aplikacji pacjenta: kto (rola), kiedy, jaka czynność |
-| Usunięcie danych (art. 17) z uwzględnieniem obowiązku przechowywania | wniosek o usunięcie konta → zamknięcie dostępu i danych logowania; dokumentacja medyczna pozostaje (art. 17 ust. 3 lit. b i c) |
-| Przetwarzanie przez podmioty trzecie (art. 28) | ⚠️ umowy powierzenia: hosting, Medplum (jeśli używany), dostawca SMTP, SMS, serwer Jitsi; preferowany hosting w EOG |
+| Usunięcie danych (art. 17) z uwzględnieniem obowiązku przechowywania | „Usuń moje dane” z potwierdzeniem (A18.12): dane wniesione przez pacjenta usuwane trwale, dokumentacja medyczna placówek pozostaje (art. 17 ust. 3 lit. b i c) — pacjent dostaje wykaz |
+| Przetwarzanie przez podmioty trzecie (art. 28) | ⚠️ umowy powierzenia: hosting, Medplum (jeśli używany), dostawca SMTP, SMS, serwer Jitsi, dostawcy AI/OCR/mowy/wideo — rejestr i wymagane regiony: [`VENDORS.md`](VENDORS.md); preferowany hosting w EOG |
 | DPIA (art. 35) | ⚠️ wymagana — przetwarzanie danych o zdrowiu na dużą skalę (lista UODO); przygotuj przed uruchomieniem |
 | Transfery poza EOG | publiczne API bez danych osobowych (NFZ, NLM: wyłącznie hasła wyszukiwania; HIBP: 5 znaków skrótu hasła); meet.jit.si wyłącznie do testów |
 
@@ -126,3 +154,9 @@ organizacyjny teleporady (m.in. weryfikacja tożsamości pacjenta na początku t
 - [ ] import Rejestru Produktów Leczniczych (`import-rpl`) i test integracji w panelu
 - [ ] decyzja dot. CeR/P1 dla świadczeń NFZ objętych centralną e-rejestracją
 - [ ] regulamin świadczenia usług drogą elektroniczną (ustawa o świadczeniu usług drogą elektroniczną)
+- [ ] pilotaż i MVP: umowy powierzenia z dostawcami AI, OCR, mowy na tekst i wideo (region UE, brak retencji treści) — `VENDORS.md`
+- [ ] testy wyboru dostawców D48 (20 nagrań) i D51 (100 wyników); zestaw testowy: `npm run cli -- synthetic --pdf <katalog>`
+- [ ] szkolenie personelu z korzystania z AI (art. 4 AI Act); procedura zatwierdzania notatek i kart
+- [ ] `SECURITY_CONTACT`, `SENTRY_DSN` w regionie UE (opcjonalnie), Dependabot i skan Trivy włączone; przegląd OWASP ASVS poziom 1
+- [ ] potwierdzenie godzin działania numerów pomocowych (116 123) przed wydaniem
+- [ ] aplikacja mobilna: development build i test biometrii/PIN na urządzeniach, opis prywatności w sklepach, `MOBILE_MIN_VERSION`
