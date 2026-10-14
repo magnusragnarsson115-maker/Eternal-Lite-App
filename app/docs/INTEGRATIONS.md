@@ -3,6 +3,9 @@
 Wszystkie integracje są opcjonalne — aplikacja działa w pełni bez nich (lokalny magazyn FHIR, powiadomienia w aplikacji).
 Status połączeń i test na żywo: panel **Administracja → Integracje → Sprawdź połączenia**.
 
+Wybór dostawców dla wszystkich funkcji MVP z pliku 11.1 na etapach Demo / MVP / MLP / FINAL (open source, bezpłatne,
+płatne, uzasadnienie, koszty, źródła; stan rynku 10.2026): [`ETERNAL_11_1_WYBOR_ROZWIAZAN.xlsx`](ETERNAL_11_1_WYBOR_ROZWIAZAN.xlsx).
+
 **Legenda testów:** ✅ test automatyczny na danych przykładowych · 🌐 test połączenia na żywo wymaga dostępu do internetu
 (środowisko, w którym zbudowano tę wersję, blokowało ruch wychodzący do usług zewnętrznych).
 
