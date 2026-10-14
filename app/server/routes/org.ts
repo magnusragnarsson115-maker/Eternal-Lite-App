@@ -299,6 +299,13 @@ export async function orgRoutes(app: FastifyInstance): Promise<void> {
   });
 
   // --- teksty: przeznaczenie, instrukcja (wersjonowane), informacja o AI, numery kryzysowe -----------------
+  // kontrolowana dystrybucja aktualizacji aplikacji mobilnej (A18.7); aktualizacje JS — kanały EAS Update z wdrożeniem procentowym
+  app.get('/api/public/app-version', async () => ({
+    minimum: config.mobile.minVersion,
+    latest: config.mobile.latestVersion,
+    storeUrl: { ios: config.mobile.iosStoreUrl || undefined, android: config.mobile.androidStoreUrl || undefined },
+  }));
+
   app.get('/api/public/texts', async (req) => {
     const q = query(req, z.object({ lang: z.enum(['pl', 'en']).default('pl') }));
     return {

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { EN as EN_MOBILE } from '../../mobile/src/i18n-en.js';
 import { EN } from '../../web/src/i18n-en.js';
 
 function files(dir: string): string[] {
@@ -19,8 +20,19 @@ describe('Tłumaczenie angielskie', () => {
     }
     expect([...missing]).toEqual([]);
   });
+  it('aplikacja mobilna: każdy tekst przekazany do t() ma tłumaczenie EN', () => {
+    const missing = new Set<string>();
+    for (const f of files(path.resolve('mobile/src'))) {
+      const src = fs.readFileSync(f, 'utf8');
+      for (const m of src.matchAll(/\bt\(\s*'((?:[^'\\]|\\.)*)'/g)) {
+        const s = m[1].replace(/\\'/g, "'");
+        if (!(s in EN_MOBILE)) missing.add(`${path.basename(f)}: ${s}`);
+      }
+    }
+    expect([...missing]).toEqual([]);
+  });
   it('zmienne w nawiasach klamrowych są zachowane w tłumaczeniu', () => {
-    const bad = Object.entries(EN).filter(([pl, en]) => {
+    const bad = [...Object.entries(EN), ...Object.entries(EN_MOBILE)].filter(([pl, en]) => {
       const vars = (s: string) => (s.match(/\{\w+\}/g) ?? []).sort().join(',');
       return vars(pl) !== vars(en);
     });

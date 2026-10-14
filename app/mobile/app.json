@@ -1,0 +1,80 @@
+{
+  "expo": {
+    "name": "Eternal",
+    "slug": "eternal",
+    "scheme": "eternal",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "pl.eternal.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "pl.eternal.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0E6F78",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "allowBackup": false,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Eternal używa Face ID do odblokowania aplikacji."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Eternal używa Face ID do odblokowania aplikacji."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Aparat służy do zrobienia zdjęcia dokumentu medycznego, który chcesz dodać.",
+          "photosPermission": "Dostęp do zdjęć służy do wybrania zdjęcia dokumentu medycznego.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#0E6F78"
+        }
+      ],
+      "expo-updates"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "extra": {
+      "apiUrl": "http://localhost:3000",
+      "eas": {
+        "projectId": "00000000-0000-0000-0000-000000000000"
+      }
+    }
+  }
+}

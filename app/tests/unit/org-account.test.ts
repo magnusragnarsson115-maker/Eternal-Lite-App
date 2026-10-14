@@ -131,6 +131,17 @@ describe('Organizacja, konto i wideo', () => {
     expect(me.statusCode).toBe(200);
     const post = await fx.app.inject({ method: 'PUT', url: '/api/me/notification-prefs', payload: { disabled: [], quiet: { enabled: false, from: '22:00', to: '07:00' } }, headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' } });
     expect(post.statusCode).toBe(200);
+    // token push z aplikacji Expo (P8) — zapis jako kanał „expo:”; nieprawidłowy format odrzucony
+    const auth = { authorization: `Bearer ${token}`, 'content-type': 'application/json' };
+    const bad = await fx.app.inject({ method: 'POST', url: '/api/push/expo', payload: { token: 'nie-token' }, headers: auth });
+    expect(bad.statusCode).toBe(400);
+    const push = await fx.app.inject({ method: 'POST', url: '/api/push/expo', payload: { token: 'ExponentPushToken[abcDEF123_-xyz]' }, headers: auth });
+    expect(push.statusCode).toBe(200);
+    // wylogowanie unieważnia token — kolejne żądanie z tym samym tokenem jest odrzucane
+    const out = await fx.app.inject({ method: 'POST', url: '/api/auth/logout', payload: {}, headers: auth });
+    expect(out.statusCode).toBe(200);
+    const after = await fx.app.inject({ method: 'GET', url: '/api/me/emergency', headers: { authorization: `Bearer ${token}` } });
+    expect(after.statusCode).toBe(401);
   });
 
   it('wideo: poczekalnia — pacjent dostaje adres pokoju dopiero po wpuszczeniu', async () => {

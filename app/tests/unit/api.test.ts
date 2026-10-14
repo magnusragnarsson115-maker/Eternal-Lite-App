@@ -86,6 +86,12 @@ describe('API end-to-end', () => {
     (config.security as { contact?: string }).contact = before;
   });
 
+  it('aplikacja mobilna: najniższa obsługiwana wersja (A18.7)', async () => {
+    const res = await new Client(app).req('GET', '/api/public/app-version');
+    expect(res.status).toBe(200);
+    expect(res.json).toMatchObject({ minimum: expect.stringMatching(/^\d+\.\d+\.\d+$/), latest: expect.any(String) });
+  });
+
   it('rejestracja wymaga zgód obowiązkowych i silnego hasła', async () => {
     const c = new Client(app);
     expect((await c.req('POST', '/api/auth/register', { email: 'x@test.local', password: 'Spokojny-Poranek-42', given: 'A', family: 'B', birthDate: '1990-01-01', consents: { terms: true } })).json.error).toBe('required_consent_missing');

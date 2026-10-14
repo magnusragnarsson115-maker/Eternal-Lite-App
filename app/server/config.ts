@@ -65,6 +65,14 @@ export const config = {
     maxDevices: int('MAX_DEVICES', 5),
   },
 
+  /** Aplikacja mobilna (A18.7): najniższa obsługiwana wersja i adresy sklepów; starsze wersje widzą ekran aktualizacji. */
+  mobile: {
+    minVersion: str('MOBILE_MIN_VERSION', '1.0.0'),
+    latestVersion: str('MOBILE_LATEST_VERSION', '1.0.0'),
+    iosStoreUrl: str('MOBILE_IOS_STORE_URL'),
+    androidStoreUrl: str('MOBILE_ANDROID_STORE_URL'),
+  },
+
   clinic: {
     cancelMinHours: int('CANCEL_MIN_HOURS', 12),
     reminderOffsetsHours: str('REMINDER_OFFSETS_HOURS', '24,2')
