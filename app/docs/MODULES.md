@@ -180,3 +180,20 @@ Skróty ścieżek: `S/` = `server/`, `W/` = `web/src/`, `M/` = `mobile/src/`, `T
 | D52 wideo | `VIDEO_PROVIDER=whereby|jitsi`, `WHEREBY_API_KEY` |
 | D53 czat wiedzy | poza zakresem (MVP-2/MLP) |
 | D54 pilotaż bez aplikacji | moduły P* wyłączone (`set-module patient-intake off` itd.), pacjent przez link |
+
+## Zrzuty ekranu (dane fikcyjne)
+
+Odtworzenie: `npm run seed:demo && npm start`, potem `npm run screenshots:mvp`.
+
+| Ekran | Plik |
+|---|---|
+| Skrzynka materiałów (rejestracja) | [`s11-skrzynka.png`](screenshots/s11-skrzynka.png) |
+| Zaproszenie z kodem QR | [`s12-zaproszenie-qr.png`](screenshots/s12-zaproszenie-qr.png) |
+| Strona pod linkiem: przeznaczenie i zgoda | [`m01-link-zgoda.png`](screenshots/m01-link-zgoda.png) |
+| Strona pod linkiem: potwierdzenie odczytu | [`m02-link-potwierdzenie.png`](screenshots/m02-link-potwierdzenie.png) |
+| Raport faktów przed wizytą | [`s13-raport-faktow.png`](screenshots/s13-raport-faktow.png) |
+| Scribe: notatka zatwierdzona, karta wysłana | [`s14-scribe-notatka.png`](screenshots/s14-scribe-notatka.png) |
+| Mierniki pilotażu | [`s15-mierniki.png`](screenshots/s15-mierniki.png) |
+| Organizacja kliniki: moduły | [`s16-organizacja-moduly.png`](screenshots/s16-organizacja-moduly.png) |
+| Pacjent: dokumenty, oś czasu, udostępnianie, karty | [`p11`](screenshots/p11-dokumenty.png) · [`p12`](screenshots/p12-os-czasu.png) · [`p13`](screenshots/p13-udostepnianie.png) · [`p14`](screenshots/p14-karty.png) · [`p17`](screenshots/p17-karta-po-wizycie.png) |
+| Pacjent: SOS, pomoc i numery kryzysowe | [`p15`](screenshots/p15-bezpieczenstwo-sos.png) · [`p16`](screenshots/p16-pomoc-numery.png) |

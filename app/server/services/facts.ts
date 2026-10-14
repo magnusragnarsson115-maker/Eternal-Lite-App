@@ -250,7 +250,8 @@ export async function buildFacts(user: AppUser, actor: AuditActor, input: { pati
         binaryId: d.content[0]?.attachment.url ? idFromRef(d.content[0].attachment.url) : undefined,
         sections: docSections(d),
         accessCode: d.extension?.find((e) => e.url === 'urn:eternal:ext:access-code')?.valueString,
-        source: 'patient',
+        // karta „Po wizycie” leży w sejfie pacjenta, ale jej autorem jest placówka
+        source: kind === 'after-visit' ? 'clinic' : 'patient',
       });
     }
     // 3. wgrane, ale jeszcze niezapisane do rekordu — zawsze jako odczyt niepotwierdzony
