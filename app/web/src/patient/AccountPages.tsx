@@ -8,6 +8,8 @@ import { errorMessage } from '../errors';
 import { useI18n, type Locale } from '../i18n';
 import { currentPushSubscription, disablePush, enablePush, pushSupported } from '../lib/push';
 import { useSession } from '../session';
+import { PhoneVerifyCard, RecoveryCodesCard, SecurityKeysCard, SessionsCard } from '../shared/AccountCards';
+import { DeleteDataCard, NotificationPrefsCard } from './MvpPages';
 import type { AccessLogEntry, ConsentState, Me, NotificationRow, PatientView } from '../types';
 import { Badge, Button, Card, Empty, Modal, Notice, PageHead, QueryError, Segmented, SelectField, Skeleton, Switch, TextArea, TextField, useConfirm, useToast } from '../ui';
 
@@ -172,6 +174,10 @@ export function ProfilePage() {
         )}
       </Card>
 
+      <PhoneVerifyCard />
+      <SecurityKeysCard />
+      <RecoveryCodesCard />
+      <SessionsCard />
       <Card title={t('Zmiana hasła')}>
         <ChangePasswordPage />
       </Card>
@@ -233,8 +239,6 @@ export function PrivacyPage() {
   const toast = useToast();
   const { confirm, dialog } = useConfirm();
   const [historyFor, setHistoryFor] = useState<ConsentState | null>(null);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [reason, setReason] = useState('');
   const consents = useQuery({ queryKey: ['consents'], queryFn: () => get<{ items: ConsentState[] }>('/api/me/consents') });
   const log = useQuery({ queryKey: ['access-log'], queryFn: () => get<{ items: AccessLogEntry[] }>('/api/me/access-log') });
   const history = useQuery({
@@ -248,13 +252,6 @@ export function PrivacyPage() {
       qc.setQueryData(['consents'], r);
       void qc.invalidateQueries({ queryKey: ['access-log'] });
       toast(t('Zapisano zmianę zgody.'));
-    },
-  });
-  const del = useMutation({
-    mutationFn: () => post('/api/me/delete-account', { reason: reason || undefined }),
-    onSuccess: () => {
-      setDeleteOpen(false);
-      toast(t('Wniosek przekazany do placówki.'));
     },
   });
 
@@ -339,17 +336,7 @@ export function PrivacyPage() {
             </a>
           </div>
           <hr />
-          <div className="row-between">
-            <span className="grow">
-              <strong>{t('Usuń konto w aplikacji')}</strong>
-              <span className="small muted" style={{ display: 'block' }}>
-                {t('Dokumentacja medyczna pozostaje w placówce przez okres wymagany prawem (co do zasady 20 lat). Usuwamy dostęp online i dane logowania.')}
-              </span>
-            </span>
-            <Button variant="danger-outline" icon={<Trash2 size={18} />} onClick={() => setDeleteOpen(true)}>
-              {t('Złóż wniosek')}
-            </Button>
-          </div>
+          <DeleteDataCard />
           {config?.clinic.privacyContact && <p className="small muted">{t('Inspektor ochrony danych: {c}', { c: config.clinic.privacyContact })}</p>}
         </div>
       </Card>
@@ -369,30 +356,6 @@ export function PrivacyPage() {
         )}
       </Modal>
 
-      <Modal
-        open={deleteOpen}
-        onClose={() => setDeleteOpen(false)}
-        title={t('Wniosek o usunięcie konta')}
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setDeleteOpen(false)}>
-              {t('Anuluj')}
-            </Button>
-            <Button variant="danger" onClick={() => del.mutate()} loading={del.isPending}>
-              {t('Wyślij wniosek')}
-            </Button>
-          </>
-        }
-      >
-        <div className="stack">
-          <p>{t('Administrator placówki zrealizuje wniosek. Po zamknięciu konta nie zalogujesz się do aplikacji.')}</p>
-          <TextArea label={t('Uwagi (opcjonalnie)')} maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} />
-          {del.isError && <Notice kind="danger">{errorMessage(del.error, t)}</Notice>}
-          <Button variant="ghost" onClick={() => void logout()}>
-            {t('Wyloguj')}
-          </Button>
-        </div>
-      </Modal>
       {dialog}
     </div>
   );
@@ -434,6 +397,7 @@ export function NotificationsPage({ staff }: { staff?: boolean }) {
           </ul>
         </div>
       )}
+      {!staff && <NotificationPrefsCard />}
     </div>
   );
 }

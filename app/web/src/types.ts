@@ -57,7 +57,8 @@ export interface LocationView {
 export interface Me {
   authenticated: boolean;
   csrfToken?: string;
-  mfa?: { required: boolean; enrolled: boolean; enrollRequired: boolean };
+  mfa?: { required: boolean; enrolled: boolean; enrollRequired: boolean; methods?: { totp: boolean; keys: number; recoveryCodes: number } };
+  token?: string;
   user?: {
     id: string;
     email: string;
@@ -69,6 +70,9 @@ export interface Me {
     mustChangePassword: boolean;
     status: string;
     fhirRef: string | null;
+    phone?: string;
+    phoneVerified?: boolean;
+    orgId?: string;
   };
   patient?: PatientView;
   practitioner?: PractitionerView;

@@ -8,6 +8,7 @@ import { HomePage } from './patient/HomePage';
 import { MessagesPage, ThreadPage } from './patient/MessagePages';
 import { MorePage, PatientShell } from './patient/PatientShell';
 import { RecordDetailPage, RecordsPage } from './patient/RecordPages';
+import { CardDetailPage, CardsPage, DocumentDetailPage, DocumentsPage, HelpPage, SafetyPage, SharingPage, TimelinePage } from './patient/MvpPages';
 import { lazy, Suspense } from 'react';
 import { hasRole, useSession } from './session';
 import { Spinner } from './ui';
@@ -22,6 +23,20 @@ const StaffMessagesPage = lazy(() => import('./staff/OrgPages').then((m) => ({ d
 const SchedulePage = lazy(() => import('./staff/OrgPages').then((m) => ({ default: m.SchedulePage })));
 const OutboxPage = lazy(() => import('./staff/OrgPages').then((m) => ({ default: m.OutboxPage })));
 const AdminPage = lazy(() => import('./staff/OrgPages').then((m) => ({ default: m.AdminPage })));
+const InboxPage = lazy(() => import('./staff/VisitPages').then((m) => ({ default: m.InboxPage })));
+const VisitPage = lazy(() => import('./staff/VisitPages').then((m) => ({ default: m.VisitPage })));
+const SharedPatientsPage = lazy(() => import('./staff/VisitPages').then((m) => ({ default: m.SharedPatientsPage })));
+const FactsPage = lazy(() => import('./staff/VisitPages').then((m) => ({ default: m.FactsPage })));
+const MetricsPage = lazy(() => import('./staff/ClinicPages').then((m) => ({ default: m.MetricsPage })));
+const OrgManagePage = lazy(() => import('./staff/ClinicPages').then((m) => ({ default: m.OrgManagePage })));
+const StaffAccountPage = lazy(() => import('./staff/ClinicPages').then((m) => ({ default: m.StaffAccountPage })));
+// strony pod linkiem (bez konta) — osobny pakiet, ładowany na telefonie pacjenta
+const IntakeLinkPage = lazy(() => import('./link/LinkPages').then((m) => ({ default: m.IntakeLinkPage })));
+const CardLinkPage = lazy(() => import('./link/LinkPages').then((m) => ({ default: m.CardLinkPage })));
+const PhoneRecordPage = lazy(() => import('./link/LinkPages').then((m) => ({ default: m.PhoneRecordPage })));
+const SosCardPage = lazy(() => import('./link/LinkPages').then((m) => ({ default: m.SosCardPage })));
+const StaffInviteAcceptPage = lazy(() => import('./link/LinkPages').then((m) => ({ default: m.StaffInviteAcceptPage })));
+const MagicLinkPage = lazy(() => import('./link/LinkPages').then((m) => ({ default: m.MagicLinkPage })));
 
 function AdminOnly({ children }: { children: React.ReactElement }) {
   const { me } = useSession();
@@ -41,6 +56,12 @@ export function App() {
       <Route path="/panel/logowanie" element={<LoginPage staff />} />
       <Route path="/panel/mfa" element={<MfaPage staff />} />
       <Route path="/panel/zmiana-hasla" element={<ChangePasswordPage forced />} />
+      <Route path="/panel/zaproszenie/:token" element={<StaffInviteAcceptPage />} />
+      <Route path="/z/:token" element={<IntakeLinkPage />} />
+      <Route path="/k/:token" element={<CardLinkPage />} />
+      <Route path="/nagranie/:token" element={<PhoneRecordPage />} />
+      <Route path="/ratunek/:token" element={<SosCardPage />} />
+      <Route path="/logowanie/link" element={<MagicLinkPage />} />
 
       <Route path="/panel" element={<StaffShell />}>
         <Route index element={<StaffDashboardPage />} />
@@ -53,6 +74,13 @@ export function App() {
         <Route path="wysylka" element={<OutboxPage />} />
         <Route path="powiadomienia" element={<NotificationsPage staff />} />
         <Route path="admin" element={<AdminOnly><AdminPage /></AdminOnly>} />
+        <Route path="skrzynka" element={<InboxPage />} />
+        <Route path="wizyta/:id" element={<VisitPage />} />
+        <Route path="udostepnienia" element={<SharedPatientsPage />} />
+        <Route path="raport/:patientId" element={<FactsPage />} />
+        <Route path="mierniki" element={<MetricsPage />} />
+        <Route path="organizacja" element={<AdminOnly><OrgManagePage /></AdminOnly>} />
+        <Route path="konto" element={<StaffAccountPage />} />
         <Route path="*" element={<Navigate to="/panel" replace />} />
       </Route>
 
@@ -74,6 +102,14 @@ export function App() {
         <Route path="powiadomienia" element={<NotificationsPage />} />
         <Route path="nfz" element={<NfzPage />} />
         <Route path="wiecej" element={<MorePage />} />
+        <Route path="dokumenty" element={<DocumentsPage />} />
+        <Route path="dokumenty/:id" element={<DocumentDetailPage />} />
+        <Route path="os-czasu" element={<TimelinePage />} />
+        <Route path="udostepnianie" element={<SharingPage />} />
+        <Route path="karty" element={<CardsPage />} />
+        <Route path="karty/:id" element={<CardDetailPage />} />
+        <Route path="pomoc" element={<HelpPage />} />
+        <Route path="bezpieczenstwo" element={<SafetyPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

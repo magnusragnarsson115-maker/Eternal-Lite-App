@@ -1,8 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
-import { CalendarCheck, FileText, KeyRound, Lock, MessageSquare, ShieldCheck, Smartphone, Stethoscope, Users } from 'lucide-react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { CalendarCheck, FileText, Fingerprint, KeyRound, Lock, Mail, MessageSquare, ShieldCheck, Smartphone, Stethoscope, Users } from 'lucide-react';
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
-import { post } from '../api';
+import { get, post } from '../api';
+import { loginWithPasskey, passkeysSupported, registerPasskey, securityKeySecondFactor } from '../lib/passkeys';
 import { errorCode, errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import { useSession } from '../session';
@@ -113,6 +114,8 @@ export function LoginPage({ staff }: { staff?: boolean }) {
         <Button type="submit" block loading={login.isPending} icon={<Lock size={18} />}>
           {t('Zaloguj się')}
         </Button>
+        {!staff && <AltLogin email={email} />}
+        {staff && <OidcLogin />}
         <div className="row-between small">
           <Link to="/zapomniane-haslo">{t('Nie pamiętasz hasła?')}</Link>
           {!staff ? <Link to="/rejestracja">{t('Załóż konto')}</Link> : <Link to="/logowanie">{t('Jestem pacjentem')}</Link>}
@@ -139,6 +142,46 @@ export function LoginPage({ staff }: { staff?: boolean }) {
         )}
       </form>
     </AuthLayout>
+  );
+}
+
+function AltLogin({ email }: { email: string }) {
+  const { t } = useI18n();
+  const { setMe } = useSession();
+  const nav = useNavigate();
+  const [sent, setSent] = useState(false);
+  const passkey = useMutation({
+    mutationFn: loginWithPasskey,
+    onSuccess: (m) => {
+      setMe(m);
+      nav(landingFor(m), { replace: true });
+    },
+  });
+  const magic = useMutation({ mutationFn: () => post('/api/auth/magic-link', { email }), onSuccess: () => setSent(true) });
+  return (
+    <div className="stack" style={{ gap: 8 }}>
+      {passkeysSupported() && (
+        <Button variant="secondary" block icon={<Fingerprint size={18} />} loading={passkey.isPending} onClick={() => passkey.mutate()}>
+          {t('Zaloguj się kluczem dostępu (odcisk palca, twarz)')}
+        </Button>
+      )}
+      <Button variant="ghost" block icon={<Mail size={18} />} disabled={!email.includes('@')} loading={magic.isPending} onClick={() => magic.mutate()}>
+        {t('Wyślij mi link do logowania e-mailem')}
+      </Button>
+      {sent && <Notice kind="ok">{t('Jeśli konto istnieje, wysłaliśmy link do logowania (ważny 15 minut).')}</Notice>}
+      {passkey.isError && <Notice kind="danger">{errorMessage(passkey.error, t)}</Notice>}
+    </div>
+  );
+}
+
+function OidcLogin() {
+  const { t } = useI18n();
+  const q = useQuery({ queryKey: ['oidc'], queryFn: () => get<{ enabled: boolean; label: string }>('/api/auth/oidc') });
+  if (!q.data?.enabled) return null;
+  return (
+    <a className="btn secondary block" href="/api/auth/oidc/start?returnTo=/panel">
+      <KeyRound size={18} /> {q.data.label}
+    </a>
   );
 }
 
@@ -211,6 +254,7 @@ export function MfaPage({ staff }: { staff?: boolean }) {
         <Button type="submit" block loading={verify.isPending} disabled={code.length !== 6} icon={<Smartphone size={18} />}>
           {enroll ? t('Włącz i kontynuuj') : t('Potwierdź')}
         </Button>
+        <MfaAlternatives enroll={!!enroll} />
         <Button variant="ghost" onClick={() => void logout()}>
           {t('Wyloguj')}
         </Button>
@@ -219,12 +263,58 @@ export function MfaPage({ staff }: { staff?: boolean }) {
   );
 }
 
+function MfaAlternatives({ enroll }: { enroll: boolean }) {
+  const { t } = useI18n();
+  const { me, setMe } = useSession();
+  const nav = useNavigate();
+  const [recovery, setRecovery] = useState('');
+  const [showRecovery, setShowRecovery] = useState(false);
+  const done = (m: Me) => {
+    setMe(m);
+    nav(landingFor(m), { replace: true });
+  };
+  const key = useMutation({ mutationFn: securityKeySecondFactor, onSuccess: done });
+  const enrollKey = useMutation({ mutationFn: () => registerPasskey(t('Klucz sprzętowy')), onSuccess: (r) => done(r.me) });
+  const rec = useMutation({ mutationFn: () => post<Me>('/api/auth/mfa/recovery', { code: recovery }), onSuccess: done });
+  const keys = me?.mfa?.methods?.keys ?? 0;
+  return (
+    <div className="stack" style={{ gap: 8 }}>
+      {!enroll && keys > 0 && passkeysSupported() && (
+        <Button variant="secondary" block icon={<KeyRound size={18} />} loading={key.isPending} onClick={() => key.mutate()}>
+          {t('Użyj klucza sprzętowego')}
+        </Button>
+      )}
+      {enroll && passkeysSupported() && (
+        <Button variant="secondary" block icon={<KeyRound size={18} />} loading={enrollKey.isPending} onClick={() => enrollKey.mutate()}>
+          {t('Zamiast aplikacji: zarejestruj klucz sprzętowy (YubiKey)')}
+        </Button>
+      )}
+      {!enroll && (
+        <Button variant="ghost" size="sm" onClick={() => setShowRecovery(!showRecovery)}>
+          {t('Nie mam dostępu do aplikacji — użyj kodu odzyskiwania')}
+        </Button>
+      )}
+      {showRecovery && (
+        <div className="row" style={{ gap: 8, alignItems: 'flex-end' }}>
+          <TextField label={t('Kod odzyskiwania')} value={recovery} onChange={(e) => setRecovery(e.target.value.toUpperCase())} />
+          <Button disabled={recovery.replace(/[^A-Z0-9]/g, '').length !== 8} loading={rec.isPending} onClick={() => rec.mutate()}>
+            {t('Potwierdź')}
+          </Button>
+        </div>
+      )}
+      {(key.isError || enrollKey.isError || rec.isError) && <Notice kind="danger">{errorMessage(key.error ?? enrollKey.error ?? rec.error, t)}</Notice>}
+    </div>
+  );
+}
+
 export function RegisterPage() {
   const { t, locale } = useI18n();
   const { me, setMe, config } = useSession();
   const nav = useNavigate();
-  const [mode, setMode] = useState<'new' | 'code'>('new');
-  const [f, setF] = useState({ given: '', family: '', birthDate: '', pesel: '', phone: '', email: '', password: '', password2: '', activationCode: '' });
+  const [params] = useSearchParams();
+  const prefill = params.get('kod') ?? '';
+  const [mode, setMode] = useState<'new' | 'code'>(prefill ? 'code' : 'new');
+  const [f, setF] = useState({ given: '', family: '', birthDate: '', pesel: '', phone: '', email: '', password: '', password2: '', activationCode: prefill });
   const [consents, setConsents] = useState<Record<string, boolean>>({});
   const [localError, setLocalError] = useState('');
   const reg = useMutation({

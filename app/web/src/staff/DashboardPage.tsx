@@ -6,6 +6,7 @@ import { useI18n } from '../i18n';
 import { useSession } from '../session';
 import type { AppointmentView } from '../types';
 import { Card, Empty, PageHead, QueryError, Skeleton, StatusBadge } from '../ui';
+import { WaitingRoomCard } from './ClinicPages';
 
 interface StaffDashboard {
   date: string;
@@ -50,14 +51,25 @@ export function StaffDashboardPage() {
           </div>
         </Link>
       </div>
-      <Card title={t('Dzisiejsze wizyty')} action={<Link to="/panel/kalendarz" className="btn secondary sm"><CalendarDays size={16} /> {t('Kalendarz')}</Link>} className="card-flush" as="section">
+      <WaitingRoomCard />
+      <Card
+        title={t('Dzisiejsze wizyty')}
+        action={
+          <div className="btn-row">
+            <Link to="/panel/skrzynka" className="btn sm">{t('Skrzynka materiałów')}</Link>
+            <Link to="/panel/kalendarz" className="btn secondary sm"><CalendarDays size={16} /> {t('Kalendarz')}</Link>
+          </div>
+        }
+        className="card-flush"
+        as="section"
+      >
         {appts.length === 0 ? (
           <Empty title={t('Brak wizyt na dziś')} />
         ) : (
           <ul className="list">
             {appts.map((a) => (
               <li key={a.id}>
-                <Link to={`/panel/kalendarz?date=${d.date}&wizyta=${a.id}`} className="list-item">
+                <Link to={`/panel/wizyta/${a.id}`} className="list-item">
                   <strong className="tabular" style={{ width: 52 }}>{fmt.time(a.start)}</strong>
                   <span className="grow">
                     <span className="list-title" style={{ display: 'block' }}>

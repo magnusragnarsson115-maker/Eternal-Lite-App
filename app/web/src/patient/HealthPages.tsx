@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import { api, del, get, post, put, qs } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
+import { MedRemindersCard, MeasurementHistoryButton } from './MvpPages';
 import { BLE_PROFILES, bluetoothSupported, readFromDevice, type BleKind, type BleReading } from '../lib/ble';
 import type { MeasurementView, MedicationView, VitalKind } from '../types';
 import { Badge, Button, Card, Combobox, Empty, Modal, Notice, PageHead, QueryError, Segmented, SelectField, Skeleton, Switch, TextField, useConfirm, useToast } from '../ui';
@@ -184,7 +185,8 @@ export function MeasurementsPage() {
                     <td>
                       <Badge>{sourceLabel(m.source, t)}</Badge> {m.device && <span className="small muted">{m.device}</span>}
                     </td>
-                    <td>
+                    <td className="nowrap">
+                      {m.source === 'manual' && <MeasurementHistoryButton m={m} />}
                       {(m.source === 'manual' || m.source === 'bluetooth') && (
                         <Button
                           variant="ghost"
@@ -429,6 +431,7 @@ export function MedicationsPage() {
       </Card>
       {q.isLoading && <Skeleton />}
       {q.data && q.data.items.length === 0 && <Empty icon={<Pill size={36} />} title={t('Lista leków jest pusta')} />}
+      {q.data && <MedRemindersCard medications={q.data.items} />}
       {q.data && q.data.items.length > 0 && (
         <div className="card card-flush">
           <ul className="list">

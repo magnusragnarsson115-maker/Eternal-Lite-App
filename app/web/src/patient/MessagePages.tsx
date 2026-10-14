@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { get, post } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
+import { CrisisModal } from './MvpPages';
 import { useSession } from '../session';
 import type { ThreadView } from '../types';
 import { Button, Empty, Modal, Notice, PageHead, QueryError, SelectField, Skeleton, TextArea, TextField } from '../ui';
@@ -28,11 +29,11 @@ export function MessagesPage() {
   const [f, setF] = useState({ subject: '', category: (initialCategory as string) || 'question', body: '' });
   const q = useQuery({ queryKey: ['threads'], queryFn: () => get<{ items: ThreadView[] }>('/api/me/threads') });
   const create = useMutation({
-    mutationFn: () => post<ThreadView>('/api/me/threads', f),
+    mutationFn: () => post<ThreadView & { crisis?: boolean }>('/api/me/threads', f),
     onSuccess: (th) => {
       void qc.invalidateQueries({ queryKey: ['threads'] });
       setOpen(false);
-      nav(`/wiadomosci/${th.id}`);
+      nav(`/wiadomosci/${th.id}${th.crisis ? '?kryzys=1' : ''}`);
     },
   });
   const close = () => {
@@ -104,6 +105,9 @@ export function MessagesPage() {
 export function ThreadPage() {
   const { id = '' } = useParams();
   const { t } = useI18n();
+  const [params] = useSearchParams();
+  // F8.1 — przy słowach kryzysowych zawsze pokazujemy numery pomocy (wiadomość nie jest pomocą doraźną)
+  const [crisis, setCrisis] = useState(params.get('kryzys') === '1');
   const q = useQuery({ queryKey: ['thread', id], queryFn: () => get<ThreadView>(`/api/me/threads/${id}`) });
   if (q.isLoading) return <Skeleton />;
   if (q.isError) return <QueryError error={q.error} />;
@@ -111,7 +115,16 @@ export function ThreadPage() {
     <div className="stack-lg">
       <PageHead title={q.data!.subject} back={{ to: '/wiadomosci', label: t('Wiadomości') }} />
       <div className="card">
-        <ThreadConversation thread={q.data!} viewer="patient" replyUrl={`/api/me/threads/${id}/reply`} onSent={() => void q.refetch()} />
+        <ThreadConversation
+          thread={q.data!}
+          viewer="patient"
+          replyUrl={`/api/me/threads/${id}/reply`}
+          onSent={(res) => {
+            if (res?.crisis) setCrisis(true);
+            void q.refetch();
+          }}
+        />
+        <CrisisModal open={crisis} onClose={() => setCrisis(false)} />
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+import { EN_MVP } from './i18n-en-mvp';
+
 /** Słownik angielski: tekst polski → tekst angielski. Brak wpisu = tekst polski (test tests/unit/i18n.test.ts pilnuje kompletności). */
 export const EN: Record<string, string> = {
   'Aby umówić teleporadę, włącz zgodę na udział w teleporadach.': 'To book a video consultation, enable consent to video consultations.',
@@ -844,3 +846,4 @@ export const EN: Record<string, string> = {
   'Źródło': 'Source',
   'Źródło: API Terminy Leczenia NFZ. Dane przekazują świadczeniodawcy i mogą być nieaktualne — termin potwierdź telefonicznie.': 'Source: NFZ Waiting Times API. Data are reported by providers and may be outdated — confirm by phone.',
 };
+Object.assign(EN, EN_MVP);

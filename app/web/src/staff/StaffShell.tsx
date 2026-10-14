@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Bell, CalendarDays, CalendarRange, LayoutDashboard, LogOut, Menu, MessageSquare, Send, Settings, Users, X } from 'lucide-react';
+import { BarChart3, Bell, Building2, CalendarDays, CalendarRange, Inbox, LayoutDashboard, LogOut, Menu, MessageSquare, Send, Settings, Share2, UserCog, Users, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { get } from '../api';
@@ -17,6 +17,8 @@ export function StaffShell() {
   const authed = !!me?.authenticated && !!me.user?.staff && !me.mfa?.required && !me.user.mustChangePassword;
   const notifications = useQuery({ queryKey: ['notifications'], queryFn: () => get<{ unread: number }>('/api/notifications'), enabled: authed, refetchInterval: 60_000 });
   const threads = useQuery({ queryKey: ['threads', 'staff'], queryFn: () => get<{ items: { unread: boolean }[] }>('/api/staff/threads'), enabled: authed, refetchInterval: 120_000 });
+  const modules = useQuery({ queryKey: ['modules'], queryFn: () => get<{ items: { id: string; active: boolean }[] }>('/api/modules'), enabled: authed, staleTime: 300_000 });
+  const on = (id: string) => modules.data?.items.find((m) => m.id === id)?.active ?? true;
   const live = useRealtime(authed, (e: LiveEvent) => {
     if (e.type === 'notification.created') void notifications.refetch();
     if (e.type === 'message.changed') void threads.refetch();
@@ -60,6 +62,11 @@ export function StaffShell() {
             <NavLink to="/panel" end>
               <LayoutDashboard size={19} /> {t('Pulpit')}
             </NavLink>
+            {on('inbox') && hasRole(me, 'practitioner', 'reception') && (
+              <NavLink to="/panel/skrzynka">
+                <Inbox size={19} /> {t('Skrzynka materiałów')}
+              </NavLink>
+            )}
             <NavLink to="/panel/kalendarz">
               <CalendarDays size={19} /> {t('Kalendarz')}
             </NavLink>
@@ -70,6 +77,16 @@ export function StaffShell() {
               <MessageSquare size={19} /> {t('Wiadomości')}
               {unreadThreads > 0 && <span className="count-badge">{unreadThreads}</span>}
             </NavLink>
+            {hasRole(me, 'practitioner', 'reception') && (
+              <NavLink to="/panel/udostepnienia">
+                <Share2 size={19} /> {t('Udostępnienia')}
+              </NavLink>
+            )}
+            {on('metrics') && hasRole(me, 'practitioner', 'admin') && (
+              <NavLink to="/panel/mierniki">
+                <BarChart3 size={19} /> {t('Mierniki pilotażu')}
+              </NavLink>
+            )}
             <div className="nav-label">{t('Organizacja')}</div>
             <NavLink to="/panel/grafik">
               <CalendarRange size={19} /> {t('Grafik')}
@@ -80,10 +97,18 @@ export function StaffShell() {
               </NavLink>
             )}
             {hasRole(me, 'admin') && (
+              <NavLink to="/panel/organizacja">
+                <Building2 size={19} /> {t('Organizacja kliniki')}
+              </NavLink>
+            )}
+            {hasRole(me, 'admin') && (
               <NavLink to="/panel/admin">
                 <Settings size={19} /> {t('Administracja')}
               </NavLink>
             )}
+            <NavLink to="/panel/konto">
+              <UserCog size={19} /> {t('Moje konto')}
+            </NavLink>
           </nav>
           <div className="side-foot">
             <div style={{ color: '#fff', fontWeight: 600 }}>{me.user.displayName}</div>

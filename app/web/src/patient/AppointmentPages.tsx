@@ -5,8 +5,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { get, post } from '../api';
 import { errorCode, errorMessage } from '../errors';
 import { useI18n } from '../i18n';
+import type { TeleState } from '../mvp-types';
 import type { AppointmentView, Questionnaire, QuestionnaireItem, ServiceView } from '../types';
-import { Badge, Button, Card, Empty, LinkButton, Modal, Notice, PageHead, QueryError, Skeleton, StatusBadge, TextArea, Tabs, useToast } from '../ui';
+import { Badge, Button, Card, Empty, LinkButton, Modal, Notice, PageHead, QueryError, Skeleton, Spinner, StatusBadge, TextArea, Tabs, useToast } from '../ui';
 
 export function AppointmentsPage() {
   const { t, fmt } = useI18n();
@@ -404,24 +405,36 @@ export function QuestionnairePage() {
 export function TelePage() {
   const { id = '' } = useParams();
   const { t } = useI18n();
+  // poczekalnia (D7): adres pokoju dopiero po wpuszczeniu przez lekarza; stan odświeżany co kilka sekund
   const q = useQuery({
     queryKey: ['tele', id],
-    queryFn: () => get<{ url: string; domain: string; publicServer: boolean }>(`/api/me/appointments/${id}/tele`),
+    queryFn: () => get<TeleState>(`/api/me/appointments/${id}/tele`),
     retry: false,
-    staleTime: Infinity,
+    refetchInterval: (qq) => (qq.state.data?.join || qq.state.data?.ended ? false : 4000),
   });
+  const join = q.data?.join;
   return (
     <div className="stack-lg">
       <PageHead title={t('Teleporada')} back={{ to: `/wizyty/${id}`, label: t('Wizyta') }} />
       {q.isLoading && <Skeleton height={320} count={1} />}
       {q.isError && <Notice kind={errorCode(q.error) === 'tele_window_closed' ? 'info' : 'danger'}>{errorMessage(q.error, t)}</Notice>}
-      {q.data && (
+      {q.data && !join && !q.data.ended && (
+        <Card>
+          <div className="stack center">
+            <Spinner label={t('Poczekalnia')} />
+            <h2>{t('Jesteś w poczekalni')}</h2>
+            <p className="muted">{t('Lekarz wpuści Cię do rozmowy. Nie zamykaj tej strony.')}</p>
+          </div>
+        </Card>
+      )}
+      {q.data?.ended && <Notice kind="info">{t('Wizyta wideo została zakończona.')}</Notice>}
+      {join && !q.data?.ended && (
         <>
-          {q.data.publicServer && <Notice kind="warn">{t('Instancja testowa: połączenie przez publiczny serwer meet.jit.si. W produkcji placówka używa własnego serwera wideo.')}</Notice>}
+          {join.publicServer && <Notice kind="warn">{t('Instancja testowa: połączenie przez publiczny serwer meet.jit.si. W produkcji placówka używa własnego serwera wideo.')}</Notice>}
           <iframe
             className="tele-frame"
             title={t('Połączenie wideo z lekarzem')}
-            src={q.data.url}
+            src={join.url}
             allow="camera; microphone; display-capture; autoplay; clipboard-write"
             referrerPolicy="no-referrer"
           />

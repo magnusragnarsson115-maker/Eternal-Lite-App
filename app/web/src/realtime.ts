@@ -14,6 +14,11 @@ const INVALIDATE: Record<string, string[]> = {
   'consent.changed': ['consents', 'patient', 'measurements'],
   'patient.changed': ['patient', 'profile', 'me', 'patients'],
   'outbox.changed': ['outbox'],
+  'intake.changed': ['inbox', 'prep', 'my-intake', 'my-intake-item', 'staff-intake', 'facts', 'my-docs'],
+  'grant.changed': ['grants', 'inbox', 'prep', 'shared-patients', 'facts'],
+  'scribe.changed': ['scribe', 'scribe-list', 'scribe-config'],
+  'tele.changed': ['tele', 'tele-waiting', 'tele-doc'],
+  'incident.changed': ['incidents'],
 };
 
 export interface LiveEvent {

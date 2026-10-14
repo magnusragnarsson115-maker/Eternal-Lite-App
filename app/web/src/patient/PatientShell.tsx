@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Bell, CalendarDays, FileText, Home, LogOut, Menu, MessageSquare, Pill, Search, Shield, User } from 'lucide-react';
+import { Activity, Bell, CalendarDays, ClipboardCheck, FileText, FolderOpen, Home, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { get, msSinceOwnMutation } from '../api';
@@ -91,14 +91,19 @@ export function PatientShell() {
           <nav>
             <NavItem to="/" end icon={<Home size={20} />} label={t('Start')} />
             <NavItem to="/wizyty" icon={<CalendarDays size={20} />} label={t('Wizyty')} />
-            <NavItem to="/wyniki" icon={<FileText size={20} />} label={t('Wyniki i dokumenty')} />
+            <NavItem to="/wyniki" icon={<FileText size={20} />} label={t('Wyniki od placówki')} />
+            <NavItem to="/dokumenty" icon={<FolderOpen size={20} />} label={t('Moje dokumenty')} />
+            <NavItem to="/karty" icon={<ClipboardCheck size={20} />} label={t('Karty „Po wizycie”')} />
             <NavItem to="/wiadomosci" icon={<MessageSquare size={20} />} label={t('Wiadomości')} badge={unreadMsg} />
             <NavItem to="/pomiary" icon={<Activity size={20} />} label={t('Pomiary')} />
             <NavItem to="/leki" icon={<Pill size={20} />} label={t('Leki')} />
             <div className="side-sep" />
             <NavItem to="/nfz" icon={<Search size={20} />} label={t('Terminy NFZ')} />
+            <NavItem to="/udostepnianie" icon={<Share2 size={20} />} label={t('Komu udostępniam')} />
             <NavItem to="/prywatnosc" icon={<Shield size={20} />} label={t('Prywatność i zgody')} />
             <NavItem to="/profil" icon={<User size={20} />} label={t('Profil i bezpieczeństwo')} />
+            <NavItem to="/bezpieczenstwo" icon={<Siren size={20} />} label={t('SOS i karta ratunkowa')} />
+            <NavItem to="/pomoc" icon={<LifeBuoy size={20} />} label={t('Pomoc · 112 · 116 123')} />
             <div className="side-sep" />
             <button type="button" className="btn ghost" style={{ justifyContent: 'flex-start' }} onClick={() => void logout()}>
               <LogOut size={20} /> {t('Wyloguj')}
@@ -143,6 +148,11 @@ export function MorePage() {
   const { t } = useI18n();
   const { me, logout } = useSession();
   const items: [string, ReactNode, string][] = [
+    ['/pomoc', <LifeBuoy size={20} key="h" />, t('Pomoc · 112 · 116 123')],
+    ['/bezpieczenstwo', <Siren size={20} key="s" />, t('SOS i karta ratunkowa')],
+    ['/dokumenty', <FolderOpen size={20} key="dd" />, t('Moje dokumenty')],
+    ['/karty', <ClipboardCheck size={20} key="k" />, t('Karty „Po wizycie”')],
+    ['/udostepnianie', <Share2 size={20} key="u" />, t('Komu udostępniam')],
     ['/pomiary', <Activity size={20} key="a" />, t('Pomiary')],
     ['/leki', <Pill size={20} key="b" />, t('Leki')],
     ['/nfz', <Search size={20} key="c" />, t('Terminy NFZ')],

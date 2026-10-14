@@ -8,15 +8,15 @@ import type { ThreadView } from '../types';
 import { Button, Notice } from './index';
 
 /** Widok wątku wiadomości z polem odpowiedzi — wspólny dla pacjenta i personelu. */
-export function ThreadConversation({ thread, viewer, replyUrl, onSent }: { thread: ThreadView; viewer: 'patient' | 'clinic'; replyUrl: string; onSent: () => void }) {
+export function ThreadConversation({ thread, viewer, replyUrl, onSent }: { thread: ThreadView; viewer: 'patient' | 'clinic'; replyUrl: string; onSent: (res?: { crisis?: boolean }) => void }) {
   const { t, fmt } = useI18n();
   const [body, setBody] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
   const send = useMutation({
-    mutationFn: () => post(replyUrl, { body }),
-    onSuccess: () => {
+    mutationFn: () => post<{ crisis?: boolean }>(replyUrl, { body }),
+    onSuccess: (res) => {
       setBody('');
-      onSent();
+      onSent(res);
     },
   });
   useEffect(() => {
