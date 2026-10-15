@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarClock, CalendarPlus, CalendarX2, ClipboardCheck, ClipboardList, Download, MapPin, Phone, Video } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { get, post } from '../api';
 import { errorCode, errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import type { TeleState } from '../mvp-types';
 import type { AppointmentView, Questionnaire, QuestionnaireItem, ServiceView } from '../types';
-import { Badge, Button, Card, Empty, FullText, LinkButton, Modal, Notice, PageHead, QueryError, Skeleton, Spinner, StatusBadge, Tabs, TextArea, useToast } from '../ui';
+import { Badge, Button, Card, Empty, FullText, LinkButton, Modal, Notice, PageHead, QueryError, Segmented, Skeleton, Spinner, StatusBadge, Tabs, TextArea, useToast } from '../ui';
+import { useSession } from '../session';
 
 export function AppointmentsPage() {
   const { t, fmt } = useI18n();
@@ -296,6 +297,16 @@ function QItem({ item, answers, set }: { item: QuestionnaireItem; answers: Answe
           <div className="stack" style={{ gap: 6 }}>
             {item.answerOption?.map((o) => {
               const code = o.valueCoding?.code ?? o.valueString ?? '';
+              if (item.repeats) {
+                // wielokrotny wybór — zaznacz wszystkie pasujące
+                const list = Array.isArray(v) ? v : typeof v === 'string' && v ? [v] : [];
+                return (
+                  <label key={code} className="check">
+                    <input type="checkbox" checked={list.includes(code)} onChange={(e) => set(item.linkId, e.target.checked ? [...list, code] : list.filter((x) => x !== code))} />
+                    <span>{o.valueCoding?.display ?? o.valueString}</span>
+                  </label>
+                );
+              }
               return (
                 <label key={code} className="check">
                   <input type="radio" name={id} checked={v === code} onChange={() => set(item.linkId, code)} />
@@ -343,7 +354,10 @@ function answersFromResponse(resp: { item?: { linkId: string; answer?: Record<st
   const walk = (items: { linkId: string; answer?: Record<string, unknown>[]; item?: unknown[] }[] = []) => {
     for (const i of items) {
       const a = i.answer?.[0];
-      if (a) {
+      if (i.answer && i.answer.length > 1) {
+        // wielokrotny wybór
+        out[i.linkId] = i.answer.map((x) => String((x.valueCoding as { code?: string } | undefined)?.code ?? x.valueString ?? ''));
+      } else if (a) {
         const coding = a.valueCoding as { code?: string } | undefined;
         const v = a.valueBoolean ?? a.valueString ?? coding?.code ?? a.valueInteger ?? a.valueDecimal ?? a.valueDate;
         out[i.linkId] = v === undefined ? null : (v as Answers[string]);
@@ -358,10 +372,17 @@ function answersFromResponse(resp: { item?: { linkId: string; answer?: Record<st
 export function QuestionnairePage() {
   const { id = '' } = useParams();
   const { t } = useI18n();
+  const { a11y } = useSession();
   const nav = useNavigate();
   const toast = useToast();
   const qc = useQueryClient();
   const [answers, setAnswers] = useState<Answers | null>(null);
+  // M27 — wywiad w formie rozmowy: jedno pytanie na ekranie, podsumowanie przed wysłaniem.
+  // Domyślnie przy prostym języku albo dużym tekście; zawsze do przełączenia.
+  const [mode, setMode] = useState<'all' | 'step'>(a11y.simpleLanguage || a11y.textScale >= 150 ? 'step' : 'all');
+  const [step, setStep] = useState(0);
+  const [missing, setMissing] = useState(false);
+  const stepRef = useRef<HTMLDivElement>(null);
   const q = useQuery({
     queryKey: ['appointment', id, 'questionnaire'],
     queryFn: () => get<{ questionnaire: Questionnaire; response: Parameters<typeof answersFromResponse>[0] }>(`/api/me/appointments/${id}/questionnaire`),
@@ -375,29 +396,120 @@ export function QuestionnairePage() {
       nav(`/wizyty/${id}`);
     },
   });
+  useEffect(() => {
+    if (mode === 'step') stepRef.current?.focus();
+  }, [step, mode]);
   if (q.isLoading) return <Skeleton count={4} />;
   if (q.isError) return <QueryError error={q.error} />;
   const current = answers ?? answersFromResponse(q.data!.response);
-  const set = (k: string, v: Answers[string]) => setAnswers({ ...current, [k]: v });
+  const set = (k: string, v: Answers[string]) => {
+    setMissing(false);
+    setAnswers({ ...current, [k]: v });
+  };
+  const items = q.data!.questionnaire.item ?? [];
+  const steps = items.filter((i) => i.type !== 'display' && enabled(i, current));
+  const notes = items.filter((i) => i.type === 'display');
+  const reviewing = step >= steps.length;
+  const isEmpty = (v: Answers[string] | undefined) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0);
+  const next = () => {
+    const item = steps[step];
+    if (item?.required && isEmpty(current[item.linkId])) return setMissing(true);
+    setMissing(false);
+    setStep(step + 1);
+  };
+  const submit = () => {
+    if (!answers) setAnswers(current);
+    save.mutate();
+  };
   return (
     <div className="stack-lg">
       <PageHead title={q.data!.questionnaire.title ?? t('Wywiad przed wizytą')} sub={q.data!.questionnaire.description} back={{ to: `/wizyty/${id}`, label: t('Wizyta') }} />
-      <form
-        className="card stack-lg"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!answers) setAnswers(current);
-          save.mutate();
+      <Segmented
+        label={t('Sposób wypełniania')}
+        value={mode}
+        onChange={(m) => {
+          setMode(m);
+          setStep(0);
         }}
-      >
-        {q.data!.questionnaire.item?.map((item) => <QItem key={item.linkId} item={item} answers={current} set={set} />)}
-        {save.isError && <Notice kind="danger">{errorMessage(save.error, t)}</Notice>}
-        <Button type="submit" loading={save.isPending}>
-          {t('Wyślij odpowiedzi')}
-        </Button>
-      </form>
+        options={[
+          { value: 'step', label: t('Po jednym pytaniu') },
+          { value: 'all', label: t('Wszystkie pytania') },
+        ]}
+      />
+      {mode === 'all' ? (
+        <form
+          className="card stack-lg"
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit();
+          }}
+        >
+          {items.map((item) => <QItem key={item.linkId} item={item} answers={current} set={set} />)}
+          {save.isError && <Notice kind="danger">{errorMessage(save.error, t)}</Notice>}
+          <Button type="submit" loading={save.isPending}>
+            {t('Wyślij odpowiedzi')}
+          </Button>
+        </form>
+      ) : (
+        <div className="card stack-lg">
+          <div>
+            <p className="small muted" style={{ margin: '0 0 6px' }}>
+              {reviewing ? t('Sprawdź odpowiedzi przed wysłaniem') : t('Pytanie {n} z {m}', { n: step + 1, m: steps.length })}
+            </p>
+            <div className="step-progress" role="progressbar" aria-label={t('Postęp wywiadu')} aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={Math.min(step, steps.length)}>
+              <span style={{ width: `${steps.length ? Math.round((Math.min(step, steps.length) / steps.length) * 100) : 100}%` }} />
+            </div>
+          </div>
+          <div ref={stepRef} tabIndex={-1} className="stack" style={{ outline: 'none' }}>
+            {!reviewing && steps[step] && <QItem item={steps[step]} answers={current} set={set} />}
+            {!reviewing && missing && <Notice kind="warn">{t('To pytanie jest wymagane — odpowiedz, żeby przejść dalej.')}</Notice>}
+            {reviewing && (
+              <dl className="answers-review">
+                {steps.map((item, i) => (
+                  <div key={item.linkId}>
+                    <dt>{item.text}</dt>
+                    <dd>
+                      {answerText(item, current, t) || <span className="muted">{t('bez odpowiedzi')}</span>}{' '}
+                      <button type="button" className="link-btn" onClick={() => setStep(i)} aria-label={t('Zmień odpowiedź: {q}', { q: item.text ?? '' })}>
+                        {t('Zmień')}
+                      </button>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            {reviewing && notes.map((n) => <p key={n.linkId} className="small muted" style={{ margin: 0 }}>{n.text}</p>)}
+          </div>
+          {save.isError && <Notice kind="danger">{errorMessage(save.error, t)}</Notice>}
+          <div className="btn-row">
+            {step > 0 && (
+              <Button variant="secondary" onClick={() => setStep(step - 1)}>
+                {t('Wstecz')}
+              </Button>
+            )}
+            {reviewing ? (
+              <Button onClick={submit} loading={save.isPending}>
+                {t('Wyślij odpowiedzi')}
+              </Button>
+            ) : (
+              <Button onClick={next}>{step === steps.length - 1 ? t('Podsumowanie') : t('Dalej')}</Button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+/** Odpowiedź w czytelnej postaci (podsumowanie przed wysłaniem). */
+function answerText(item: QuestionnaireItem, answers: Answers, t: (s: string) => string): string {
+  if (item.type === 'group') return (item.item ?? []).filter((c) => enabled(c, answers)).map((c) => answerText(c, answers, t)).filter(Boolean).join('; ');
+  const v = answers[item.linkId];
+  if (v === undefined || v === null || v === '') return '';
+  if (typeof v === 'boolean') return v ? t('Tak') : t('Nie');
+  const label = (code: string) => item.answerOption?.find((o) => (o.valueCoding?.code ?? o.valueString) === code)?.valueCoding?.display ?? code;
+  if (Array.isArray(v)) return v.map(label).join(', ');
+  return item.type === 'choice' ? label(String(v)) : String(v);
 }
 
 // --- teleporada -------------------------------------------------------------------------------------

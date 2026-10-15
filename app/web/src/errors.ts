@@ -125,6 +125,7 @@ const MESSAGES: Record<string, string> = {
   period_invalid: 'Nieprawidłowy okres — sprawdź daty (początek nie może być późniejszy niż koniec).',
   period_too_long: 'Własny zakres może obejmować najwyżej 366 dni.',
   period_in_future: 'Ten okres jeszcze się nie zaczął.',
+  package_already_applied: 'Pakiet tej specjalizacji jest już zastosowany.',
   webauthn_not_verified: 'Nie udało się potwierdzić klucza dostępu.',
   webauthn_unknown_credential: 'Ten klucz dostępu nie jest przypisany do konta.',
   webauthn_flow_invalid: 'Sesja logowania kluczem wygasła. Spróbuj ponownie.',

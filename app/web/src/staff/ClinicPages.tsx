@@ -238,7 +238,7 @@ function SurveyCard({ questions, onDone }: { questions: { id: string; pl: string
 
 // --- D0: organizacja kliniki (administrator) ------------------------------------------------------
 
-type OrgTab = 'gotowosc' | 'moduly' | 'konfiguracja' | 'personel' | 'uzycie' | 'incydenty' | 'ai';
+type OrgTab = 'gotowosc' | 'moduly' | 'pakiety' | 'konfiguracja' | 'personel' | 'uzycie' | 'incydenty' | 'ai';
 
 export function OrgManagePage() {
   const { t } = useI18n();
@@ -254,6 +254,7 @@ export function OrgManagePage() {
         tabs={[
           { value: 'gotowosc', label: t('Gotowość do pracy') },
           { value: 'moduly', label: t('Moduły') },
+          { value: 'pakiety', label: t('Pakiety specjalizacji') },
           { value: 'konfiguracja', label: t('Konfiguracja') },
           { value: 'personel', label: t('Zaproszenia personelu') },
           { value: 'uzycie', label: t('Użycie i faktura') },
@@ -263,6 +264,7 @@ export function OrgManagePage() {
       />
       {tab === 'gotowosc' && <ReadinessTab />}
       {tab === 'moduly' && <ModulesTab />}
+      {tab === 'pakiety' && <PackagesTab />}
       {tab === 'konfiguracja' && <ClinicConfigTab />}
       {tab === 'personel' && <StaffInvitesTab />}
       {tab === 'uzycie' && <UsageTab />}
@@ -335,6 +337,134 @@ function ReadinessTab() {
         </ul>
       </Card>
       <p className="small muted">{t('To samo z wiersza poleceń: npm run cli -- check --live')}</p>
+    </div>
+  );
+}
+
+interface PackagePreview {
+  id: string;
+  name: string;
+  version: string;
+  description: string;
+  applied: boolean;
+  changes: {
+    specialties: string[];
+    noteTemplates: string[];
+    requiredDocuments: { add: { id: string; label: string; optional?: boolean; maxAgeDays?: number }[]; keep: string[] };
+    questionnaire: { action: 'create' | 'new-version' | 'none'; title: string; questions: number };
+    services: { attach: { id: string; name: string }[]; skippedOwnQuestionnaire: { id: string; name: string }[]; noMatch: boolean };
+  };
+}
+
+/** M30 — pakiety specjalizacji: podgląd zmian i zastosowanie. Pakiet tylko dodaje; nie usuwa ustawień placówki. */
+function PackagesTab() {
+  const { t } = useI18n();
+  const toast = useToast();
+  const qc = useQueryClient();
+  const [open, setOpen] = useState<PackagePreview | null>(null);
+  const q = useQuery({ queryKey: ['admin-packages'], queryFn: () => get<{ items: PackagePreview[] }>('/api/admin/packages') });
+  const apply = useMutation({
+    mutationFn: (id: string) => post<PackagePreview>(`/api/admin/packages/${id}/apply`),
+    onSuccess: (p) => {
+      toast(t('Zastosowano pakiet: {n}', { n: p.name }));
+      setOpen(null);
+      void qc.invalidateQueries({ queryKey: ['admin-packages'] });
+      void qc.invalidateQueries({ queryKey: ['admin-settings'] });
+    },
+  });
+  if (q.isLoading) return <Skeleton />;
+  if (q.isError) return <QueryError error={q.error} retry={() => void q.refetch()} />;
+  const c = open?.changes;
+  return (
+    <div className="stack">
+      <Notice kind="info">
+        {t('Pakiet to gotowy zestaw dla poradni: wymagane dokumenty przed wizytą, wywiad przed wizytą, szablon notatki i układ raportu faktów. Pakiet tylko dodaje — nie usuwa ani nie zmienia Twoich ustawień, a własnych wywiadów usług nie podmienia.')}
+      </Notice>
+      <Card className="card-flush">
+        <ul className="list">
+          {q.data!.items.map((p) => (
+            <li key={p.id} className="list-item">
+              <span className="grow">
+                <span className="list-title" style={{ display: 'block' }}>{t(p.name)}</span>
+                <span className="list-sub">{t(p.description)}</span>
+                <span className="small muted" style={{ display: 'block' }}>{p.version}</span>
+              </span>
+              {p.applied ? (
+                <Badge kind="ok">{t('zastosowany')}</Badge>
+              ) : (
+                <Button variant="secondary" size="sm" onClick={() => setOpen(p)}>
+                  {t('Podgląd zmian')}
+                </Button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <Modal
+        open={!!open}
+        onClose={() => setOpen(null)}
+        title={open ? t('Pakiet: {n}', { n: t(open.name) }) : ''}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setOpen(null)}>
+              {t('Anuluj')}
+            </Button>
+            <Button loading={apply.isPending} onClick={() => open && apply.mutate(open.id)}>
+              {t('Zastosuj pakiet')}
+            </Button>
+          </>
+        }
+      >
+        {c && (
+          <div className="stack">
+            <div>
+              <strong>{t('Wymagane dokumenty przed wizytą')}</strong>
+              <ul className="small" style={{ margin: '4px 0 0 18px', padding: 0 }}>
+                {c.requiredDocuments.add.map((d) => (
+                  <li key={d.id}>
+                    {t('dodamy')}: {d.label}
+                    {d.optional ? ` (${t('opcjonalny')})` : ''}
+                  </li>
+                ))}
+                {c.requiredDocuments.keep.map((l) => (
+                  <li key={l} className="muted">
+                    {t('już spełnione przez obecne ustawienia')}: {l}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <strong>{t('Wywiad przed wizytą')}</strong>
+              <p className="small" style={{ margin: '4px 0 0' }}>
+                {c.questionnaire.action === 'none'
+                  ? t('bez zmian')
+                  : t('{a}: „{title}” ({n} pytań, bez oceny odpowiedzi)', { a: c.questionnaire.action === 'create' ? t('utworzymy') : t('nowa wersja'), title: c.questionnaire.title, n: c.questionnaire.questions })}
+              </p>
+              <ul className="small" style={{ margin: '4px 0 0 18px', padding: 0 }}>
+                {c.services.attach.map((s) => (
+                  <li key={s.id}>
+                    {t('przypniemy do usługi')}: {s.name}
+                  </li>
+                ))}
+                {c.services.skippedOwnQuestionnaire.map((s) => (
+                  <li key={s.id} className="muted">
+                    {t('pominiemy (usługa ma własny wywiad)')}: {s.name}
+                  </li>
+                ))}
+              </ul>
+              {c.services.noMatch && <p className="small muted" style={{ margin: '4px 0 0' }}>{t('Brak usług tej specjalizacji w katalogu — wywiad przypniesz ręcznie w katalogu usług.')}</p>}
+            </div>
+            <div>
+              <strong>{t('Szablon notatki i układ raportu')}</strong>
+              <p className="small" style={{ margin: '4px 0 0' }}>
+                {c.noteTemplates.length ? t('włączymy szablon notatki: {n}', { n: c.noteTemplates.join(', ') }) : t('szablon notatki już włączony')}
+                {c.specialties.length ? ` · ${t('dodamy specjalizację: {n}', { n: c.specialties.join(', ') })}` : ''}
+              </p>
+            </div>
+            {apply.isError && <Notice kind="danger">{errorMessage(apply.error, t)}</Notice>}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

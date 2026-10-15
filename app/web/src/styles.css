@@ -661,3 +661,12 @@ html[data-contrast='high'] .card-hero { box-shadow: none; }
 html[data-contrast='high'] .card-hero { background: var(--primary); }
 html[data-contrast='high'] .segmented button[aria-pressed='true'],
 html[data-contrast='high'] .tabs button[aria-selected='true'] { outline: 2px solid var(--ink); outline-offset: -2px; text-decoration: underline; }
+
+/* M27 — postęp wywiadu „po jednym pytaniu” */
+.step-progress { height: 6px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.step-progress > span { display: block; height: 100%; background: var(--primary); transition: width 0.2s ease; }
+html[data-contrast='high'] .step-progress { border: 1px solid var(--border-strong); }
+.answers-review { margin: 0; display: grid; gap: 12px; }
+.answers-review > div { border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.answers-review dt { font-weight: 600; color: var(--ink-2); margin-bottom: 2px; }
+.answers-review dd { margin: 0; }

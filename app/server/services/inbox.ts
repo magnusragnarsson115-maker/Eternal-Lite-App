@@ -14,6 +14,7 @@ import { listIntake, type IntakeRow } from './intake.js';
 import { type InviteRow, remindInvite, toInviteView, type InviteView } from './invites.js';
 import { listOrganizations } from './orgs.js';
 import { type AppointmentView, listAppointmentsInRange } from './scheduling.js';
+import { specialtyKey } from './packages.js';
 
 /**
  * Skrzynka materiałów i kompletność przed wizytą (D2, DOC-03). Porządek według daty i braków —
@@ -47,7 +48,11 @@ export interface VisitPrep {
 const ACTIVE_APPT = ['booked', 'arrived', 'checked-in', 'pending', 'fulfilled'];
 
 function requirementsFor(settings: ReturnType<typeof getClinicSettings>, specialty?: string): RequiredDocument[] {
-  return settings.requiredDocuments.filter((r) => !r.specialties?.length || (specialty && r.specialties.map((s) => s.toLowerCase()).includes(specialty.toLowerCase())));
+  // specjalizacja z pakietu (M30) dopasowana po kluczu: „Kardiolog”, „Poradnia kardiologiczna” → kardiologia
+  const key = specialtyKey(specialty);
+  return settings.requiredDocuments.filter(
+    (r) => !r.specialties?.length || (specialty && r.specialties.some((s) => s.toLowerCase() === specialty.toLowerCase() || (key !== undefined && s === key))),
+  );
 }
 
 function itemDate(r: IntakeRow): string {

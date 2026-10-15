@@ -23,6 +23,7 @@ import {
   upsertService,
 } from '../services/directory.js';
 import { closeAccount } from '../services/privacy.js';
+import { applyPackage, listPackages } from '../services/packages.js';
 import { NOTE_TEMPLATE_IDS } from '../scribe/templates.js';
 
 function tempPassword(): string {
@@ -273,6 +274,18 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
     const result = verifyAuditChain();
     audit(actorOf(req), { action: 'E', subtype: 'audit-verify', outcome: result.ok ? 'success' : 'failure', detail: result });
     return result;
+  });
+
+  // M30 — pakiety specjalizacji: podgląd zmian i zastosowanie (tylko dodaje, nie nadpisuje ustawień placówki)
+  app.get('/api/admin/packages', async (req) => {
+    admin(req);
+    return { items: await listPackages() };
+  });
+
+  app.post('/api/admin/packages/:id/apply', async (req) => {
+    admin(req);
+    const { id } = params(req, z.object({ id: z.enum(['interna', 'kardiologia', 'pediatria']) }));
+    return applyPackage(actorOf(req), id);
   });
 
   // A18.9 — wykaz składników oprogramowania dla administratora placówki i audytora
