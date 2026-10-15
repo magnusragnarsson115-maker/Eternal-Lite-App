@@ -86,3 +86,21 @@ export interface SessionItem {
   lastSeenAt?: string;
   current: boolean;
 }
+
+/** Ankiety (A12.3) — GET /api/me/surveys. */
+export interface SurveyCard {
+  id: string;
+  title: string;
+  description: string;
+  minutes: number;
+  kind: 'health' | 'product';
+  reason: string;
+  reasonVars?: Record<string, number>;
+  due: boolean;
+  completedAt?: string;
+}
+
+export interface SurveysData {
+  items: SurveyCard[];
+  history: { id: string; surveyId?: string; title: string; authored: string }[];
+}

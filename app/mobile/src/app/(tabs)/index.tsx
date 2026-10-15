@@ -7,7 +7,7 @@ import { get } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
 import { useSession } from '../../lib/session';
 import { space, useColors } from '../../lib/theme';
-import type { CardView, IntakeView } from '../../lib/types';
+import type { CardView, IntakeView, SurveysData } from '../../lib/types';
 
 interface LatestFacts {
   measurements: { kind: string; effective: string; value?: number; systolic?: number; diastolic?: number; unit: string; source: string; device?: string }[];
@@ -35,15 +35,17 @@ export default function HomeScreen() {
   const intake = useQuery({ queryKey: ['intake'], queryFn: () => get<{ items: IntakeView[] }>('/api/me/intake') });
   const cards = useQuery({ queryKey: ['cards'], queryFn: () => get<{ items: CardView[] }>('/api/me/cards') });
   const facts = useQuery({ queryKey: ['facts-latest'], queryFn: () => get<LatestFacts>('/api/me/facts/latest') });
+  const surveys = useQuery({ queryKey: ['surveys'], queryFn: () => get<SurveysData>('/api/me/surveys'), retry: false });
+  const dueSurvey = surveys.data?.items.find((s) => s.due);
   const next = appts.data?.items.filter((a) => ['booked', 'pending', 'arrived'].includes(a.status) && Date.parse(a.start) > Date.now() - 3600_000).sort((a, b) => a.start.localeCompare(b.start))[0];
   const toReview = intake.data?.items.filter((i) => i.status === 'needs_review').length ?? 0;
-  const refreshing = appts.isRefetching || intake.isRefetching || cards.isRefetching || facts.isRefetching;
+  const refreshing = appts.isRefetching || intake.isRefetching || cards.isRefetching || facts.isRefetching || surveys.isRefetching;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['left', 'right']}>
       <ScrollView
         contentContainerStyle={{ padding: space(4), gap: space(4), paddingBottom: space(10) }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void Promise.all([appts.refetch(), intake.refetch(), cards.refetch(), facts.refetch()])} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void Promise.all([appts.refetch(), intake.refetch(), cards.refetch(), facts.refetch(), surveys.refetch()])} />}
       >
         <H1>{t('Dzień dobry, {n}', { n: me?.user?.displayName.split(' ')[0] ?? '' })}</H1>
 
@@ -68,6 +70,15 @@ export default function HomeScreen() {
         {cards.data?.items[0] ? (
           <Card title={t('Ostatnia karta „Po wizycie”')}>
             <Row title={cards.data.items[0].clinic} sub={`${cards.data.items[0].doctor} · ${dateTime(cards.data.items[0].date)}`} onPress={() => router.push(`/card/${cards.data!.items[0].id}`)} />
+          </Card>
+        ) : null}
+
+        {dueSurvey ? (
+          <Card title={t(dueSurvey.title)}>
+            <P muted>
+              {t(dueSurvey.reason, dueSurvey.reasonVars)} · {t('ok. {n} min', { n: dueSurvey.minutes })}
+            </P>
+            <Button title={t('Wypełnij')} onPress={() => router.push(`/surveys/${dueSurvey.id}`)} />
           </Card>
         ) : null}
 

@@ -79,6 +79,8 @@ function Gate() {
           <Stack.Screen name="timeline" options={{ title: t('Oś czasu wyników') }} />
           <Stack.Screen name="report" options={{ title: t('Raport okresowy') }} />
           <Stack.Screen name="readability" options={{ title: t('Czytelność') }} />
+          <Stack.Screen name="surveys/index" options={{ title: t('Ankiety') }} />
+          <Stack.Screen name="surveys/[id]" options={{ title: t('Ankieta') }} />
           <Stack.Screen name="notifications" options={{ title: t('Powiadomienia') }} />
           <Stack.Screen name="share-new" options={{ title: t('Nowe udostępnienie') }} />
         </Stack.Protected>
