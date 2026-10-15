@@ -1,6 +1,6 @@
 # Braki względem pliku 12.8 i przejście z trybu demo na pracę produkcyjną
 
-Stan na 15.10.2026. Zakres zrobiony (78 pozycji pilotażu, MVP-1 i MVP): [`MODULES.md`](MODULES.md).
+Stan na 15.10.2026. Zakres zrobiony (78 pozycji pilotażu, MVP-1 i MVP oraz domknięcia MVP P0 z Biznesplanu 7.1 i moduły M27/M30): [`MODULES.md`](MODULES.md).
 Aktualny stan każdego składnika pokazuje polecenie **`npm run cli -- check --live`** albo panel
 **Organizacja kliniki → Gotowość do pracy** (działa / tryb demo / brakuje / do decyzji, z dokładnym ustawieniem do zmiany).
 
@@ -40,11 +40,19 @@ Aktualny stan każdego składnika pokazuje polecenie **`npm run cli -- check --l
 |---|---|---|---|
 | R5, D5, P3 | **Zbiory testowe**: 30 (pilotaż) / 100 (MVP-1) polskich nagrań z poprawnymi notatkami, 100 polskich wyników | wymagają nagrań scenek i wydruków — nie da się ich wygenerować | Nagrać scenki (zespół, znajomi), zebrać wydruki bez danych osobowych; do wyników jest generator syntetyczny `npm run cli -- synthetic --pdf <katalog>` |
 | P3 (MVP) | **Skaner dokumentu systemu telefonu** (VisionKit, ML Kit) | wymaga biblioteki natywnej i buildu na urządzenie | Biblioteka skanera dla React Native + development build EAS; teraz: aparat, galeria, PDF |
-| P3 (pilotaż) | **Wycinek oryginału obok odczytanego pola** | odczyt podaje wiersz tekstu, nie współrzędne na obrazie | Współrzędne z OCR (Mistral/Google zwracają układ strony) i wycinek obrazu |
+| P3 (pilotaż) | **Wycinek oryginału przy zdjęciach odczytanych przez Mistral OCR** | zrobione dla PDF z warstwą tekstu i dla Google Document AI; Mistral OCR zwraca tekst strony bez współrzędnych wierszy | Do zdjęć wybrać Google Document AI (D51) albo dopasowanie tekstu do obrazu po stronie serwera |
 | D5 (MVP-1) | **Nagrywanie w aplikacji telefonu lekarza** | jest nagrywanie telefonem przez przeglądarkę (kod QR) | Ekran nagrywania w osobnej aplikacji lekarza albo w obecnej aplikacji z rolą personelu |
 | D5 (zapas) | Gotowy Scribe partnera (Corti albo Nabla) jako wyjście awaryjne | A3 traktuje to jako zapas, nie funkcję | Umowa i adapter tylko wtedy, gdy własna notatka nie przejdzie oceny lekarzy |
 | D7, P1 | Rezerwacja, wiadomości i wideo **w aplikacji mobilnej** | są w aplikacji w przeglądarce (PWA) | Ekrany w Expo korzystające z tego samego API |
 | P1 | Logowanie Apple i Google | według A3 dopiero MLP | Konfiguracja przez OIDC |
+
+### 2.2a. Treści, które napisałem jako projekt — wymagają zatwierdzenia przez ludzi
+
+| Treść | Gdzie | Kto zatwierdza | Jak |
+|---|---|---|---|
+| Objaśnienia 73 badań i jednostek (A2.4) | `server/labs/explanations.ts` | lekarz (z numerem PWZ) | `npm run cli -- explanations-review > objasnienia.md` → poprawki → `npm run cli -- approve-explanations "lek. Imię Nazwisko, PWZ …"`; do tego czasu pacjenci ich nie widzą (w demo — z oznaczeniem „projekt”) |
+| Wywiady i wymagane dokumenty w pakietach specjalizacji (M30) | `server/services/packages.ts` | lekarz danej specjalizacji | przegląd pytań i listy dokumentów przed zastosowaniem pakietu w pierwszej poradni; zmiana treści = nowa wersja pakietu |
+| Teksty w prostym języku (A23.2) | `web/src/simple-pl.ts`, `mobile/src/simple-pl.ts` | redakcja + test z 3–5 seniorami | test zrozumienia na prawdziwych zadaniach (rezerwacja, wynik, raport) |
 
 ### 2.3. Sprawdzone tylko częściowo (w tym środowisku nie było kont ani urządzeń)
 

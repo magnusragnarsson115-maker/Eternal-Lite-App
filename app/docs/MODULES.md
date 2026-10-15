@@ -78,7 +78,7 @@ Skróty ścieżek: `S/` = `server/`, `W/` = `web/src/`, `M/` = `mobile/src/`, `T
 | 23 | F3.3 = 22 (Tesseract) | pilotaż | zamiast Tesseract — wybór z A7 poz. 9 (patrz „Odstępstwa”) | |
 | 24 | F10.4 = 22 | pilotaż | jw. | |
 | 25 | A2.2 rozbiór do FHIR Observation | pilotaż | `submitIntake`: `DocumentReference` + `DiagnosticReport` + `Observation` (LOINC, UCUM, zakres i oznaczenie z dokumentu, znacznik zaufania, `Provenance`) | `visit-flow.test.ts`, `patient-mvp.test.ts` |
-| 26 | A2.3 walidacja i korekta OCR | pilotaż | ekran potwierdzania pól z wierszem źródłowym (`W/shared/IntakeReview.tsx`, `M/app/intake/[id].tsx`): potwierdź / popraw / „to nie jest wynik”; model może tylko wskazać wartości obecne w tekście danej linii (`mergeModelItems`) | `visit-flow.test.ts`, E2E |
+| 26 | A2.3 walidacja i korekta OCR | pilotaż | ekran potwierdzania pól z wierszem źródłowym (`W/shared/IntakeReview.tsx`, `M/app/intake/[id].tsx`): potwierdź / popraw / „to nie jest wynik”; model może tylko wskazać wartości obecne w tekście danej linii (`mergeModelItems`); **wycinek oryginału z podświetlonym wierszem** obok pola (`W/shared/SourceSnippet.tsx`, współrzędne z warstwy tekstu PDF i Google Document AI) | `visit-flow.test.ts`, `mvp-p0.test.ts`, E2E |
 | 27 | A11.4 standaryzacja jednostek | pilotaż | `S/labs/dictionary.ts` (jednostki z polskich wydruków → UCUM, jednostki dopuszczalne dla badania, kontrola „nietypowa jednostka”) | `visit-flow.test.ts`, `synthetic.test.ts` |
 | 28 | F3.1 skan dokumentu aparatem | pilotaż | strona pod linkiem: `capture="environment"`; aplikacja: `expo-image-picker` (`M/app/(tabs)/documents.tsx`) | E2E (PDF) |
 | 29 | F3.2 PDF z Google Drive i plików telefonu | pilotaż | wybór pliku systemowego (dostawcy Dysk Google, iCloud, pliki) — przeglądarka i `expo-document-picker` | E2E |
@@ -131,6 +131,25 @@ Skróty ścieżek: `S/` = `server/`, `W/` = `web/src/`, `M/` = `mobile/src/`, `T
 | 76 | F4.5 = 74 (nie do zasłonięcia) | MVP | jw. — moduł `crisis` ma `switchable: false` | |
 | 77 | F8.4 lista numerów kryzysowych | MVP | 112, 116 123, 800 70 2222, 116 111, 800 120 002 (godziny tylko tam, gdzie źródła są zgodne) | |
 
+### MVP P0 — domknięcia według Biznesplanu 7.1 (arkusz 02 Macierzy v11) i Doctor OS
+
+Pozycje dodane po 78 pozycjach pliku 12.8 — brakujące elementy listy 32 zdolności MVP P0 oraz modułów M27/M30.
+Pozostałe wertykale (Vet, Insurance, Employer, Matrix, Forge, Hub, Twin, Capsule, Station) świadomie nie są
+uruchamiane — zgodnie z zasadą dokumentów „nie uruchamiać wszystkich MVP naraz”.
+
+| Pozycja | Gdzie w kodzie | Testy |
+|---|---|---|
+| A1.6 import pomiarów z pliku (CSV z Excela/ciśnieniomierza, JSON, FHIR) z podglądem każdego wiersza | `S/services/measurementImport.ts` (jednostki: mmol/L→mg/dL, lb→kg, m→cm z notatką; ponowny import nie tworzy kopii), `W/patient/MeasurementImport.tsx` | `mvp-p0.test.ts` |
+| A1.7 duplikaty i rozbieżne odczyty bez rozstrzygania | `flagReadings` w `S/services/observations.ts`: „inny odczyt z tej samej minuty” / „ten sam odczyt także z…”; nic nie jest usuwane | `mvp-p0.test.ts` |
+| A2.4 objaśnienia badań, jednostek i kolumn ze słownika | `S/labs/explanations.ts` (73 badania — co jest mierzone, bez oceny; wersja + skrót treści; zatwierdzenie lekarza unieważniane zmianą treści), CLI `explanations-review`, `approve-explanations`, `W/shared/Explanations.tsx`, `M/app/timeline.tsx` | `mvp-p0.test.ts` (pokrycie, brak słów oceniających, zatwierdzenie) |
+| A2.6 eksport danych do arkusza (CSV dla Excela) | `exportCsv` w `S/services/patientData.ts`, `/api/me/export.csv` (z zakresem dat) | `mvp-p0.test.ts` (eksport → import bez kopii) |
+| A3.1 pulpit faktów | karta „Moje dane — ostatnie odczyty” (`W/patient/HomePage.tsx`, `M/app/(tabs)/index.tsx`): ostatni odczyt każdego rodzaju z datą i źródłem, data ostatnich potwierdzonych wyników, stany „brak danych” | `period-report.test.ts` |
+| A4.1 / A4.2 raport tygodniowy, miesięczny, kwartalny, własny zakres + PDF | `S/services/periodReport.ts` (granice okresu w strefie czasowej, grupy według rodzaju, jednostki, źródła i urządzenia, liczba / najniższa / najwyższa / średnia z metodą, tylko wyniki potwierdzone), `/api/me/report(.pdf)`, `W/patient/ReportPage.tsx`, `M/app/report.tsx` | `period-report.test.ts` (DST, granica niedziela/poniedziałek, brak słów oceniających, PDF) |
+| A23.2 tryb prostego języka | `W/simple-pl.ts`, `M/simple-pl.ts`, `FullText` („Pokaż pełny opis”) | `i18n.test.ts` (klucze, tłumaczenia, zdania ≤ 16 słów) |
+| A23.3 duży kontrast i skalowanie | ustawienia na koncie (`S/services/a11y.ts`, `/api/auth/a11y`), tekst 100–200% bez poziomego przewijania, paleta wysokiego kontrastu (też według systemu), karta „Czytelność”, przycisk rozmiaru tekstu przed zalogowaniem; mobile: `M/lib/a11y.ts`, `M/app/readability.tsx` | `a11y.test.ts` |
+| M27 wywiad przed wizytą w formie rozmowy | tryb „po jednym pytaniu” z postępem i podsumowaniem (`QuestionnairePage`), pytania wielokrotnego wyboru; bez triażu i punktacji | E2E ręczne (Playwright), `packages.test.ts` (treść bez oceny) |
+| M30 pakiety specjalizacji | `S/services/packages.ts` (interna, kardiologia, pediatria: wymagane dokumenty, wywiad, szablon notatki, układ raportu faktów; podgląd i zastosowanie tylko dodające), panel „Organizacja kliniki → Pakiety specjalizacji” | `packages.test.ts` |
+
 ### Rdzeń wspólny (R1–R10) i D0
 
 | Nr | Pozycja | Etap | Gdzie w kodzie | Testy |
@@ -140,7 +159,7 @@ Skróty ścieżek: `S/` = `server/`, `W/` = `web/src/`, `M/` = `mobile/src/`, `T
 | 36 | D1.1 baza danych pacjenta | pilotaż | rekord FHIR z wersjami, pochodzeniem (`S/fhir/provenance.ts`) i poziomem zaufania; sejf pacjenta oddzielony od dokumentacji kliniki | `fhir-local.test.ts`, `patient-mvp.test.ts` |
 | 37 | D1.5 niezmienialny dziennik zdarzeń | pilotaż | `S/audit.ts` — łańcuch HMAC, `npm run cli -- verify-audit` | `records-privacy.test.ts` |
 | 38 | A19.6 rejestr zastosowań i logowanie zapytań | pilotaż | `S/ai/gateway.ts` (rejestr wywołań bez treści medycznej: zadanie, wersja polecenia, dostawca, model, czas), limit wywołań na organizację, panel „Rejestr AI” | `org-account.test.ts` |
-| 39 | A18.9 wykaz składników i zgłaszanie podatności | pilotaż | `npm run sbom` (CycloneDX), `/.well-known/security.txt`, `/security-policy.txt`, `SECURITY.md`, Dependabot, cotygodniowy skan Trivy (`.github/workflows/security.yml`), zgłaszanie błędów serwera do Sentry UE bez danych (`S/lib/monitoring.ts`) | `api.test.ts` |
+| 39 | A18.9 wykaz składników i zgłaszanie podatności | pilotaż | `npm run sbom` (CycloneDX) — w obrazie Docker `dist/sbom.cdx.json`, pozycja w kontroli gotowości i pobranie przez administratora (`/api/admin/sbom`); `/.well-known/security.txt`, `/security-policy.txt`, `SECURITY.md`, Dependabot, cotygodniowy skan Trivy (`.github/workflows/security.yml`), zgłaszanie błędów serwera do Sentry UE bez danych (`S/lib/monitoring.ts`) | `api.test.ts`, `org-account.test.ts` |
 | 40 | D5.3 dane syntetyczne | pilotaż | `S/seed/synthetic.ts`, CLI `synthetic` (fikcyjni pacjenci z danymi podłużnymi, zestaw testowy PDF z oczekiwanymi wartościami, wpis w rejestrze użyć z celem) i `import-synthea` | `synthetic.test.ts` |
 | 41 | A18.4 zgłaszanie incydentu przez użytkownika | MVP-1 | `ReportIncidentCard` (pacjent i personel), `S/services/incidents.ts` (prywatność/bezpieczeństwo → priorytet wysoki, możliwe naruszenie: termin 72 h na ocenę, powiadomienie administratorów i `SECURITY_CONTACT`) | `org-account.test.ts` |
 | 43 | A5.1 wideokonsultacja | MVP-1 | = 10 | |
