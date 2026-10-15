@@ -322,6 +322,11 @@ function ReadinessTab() {
                   <span className="list-sub">{i.detail}</span>
                   {i.live && <span className={`small ${i.live.ok ? '' : 'danger-text'}`} style={{ display: 'block', color: i.live.ok ? 'var(--success)' : 'var(--danger)' }}>{t('Test: {r} — {d} ({ms} ms)', { r: i.live.ok ? 'OK' : t('błąd'), d: i.live.detail, ms: i.live.ms })}</span>}
                   {i.howTo && <span className="small muted" style={{ display: 'block', marginTop: 4 }}>→ {i.howTo}</span>}
+                  {i.id === 'sbom' && i.state === 'ok' && (
+                    <a className="small" href="/api/admin/sbom" download style={{ display: 'block', marginTop: 4 }}>
+                      {t('Pobierz wykaz składników (CycloneDX JSON)')}
+                    </a>
+                  )}
                 </span>
                 <Badge kind={st.kind}>{t(st.label)}</Badge>
               </li>,

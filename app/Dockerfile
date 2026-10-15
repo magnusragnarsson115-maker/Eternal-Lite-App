@@ -7,7 +7,8 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-RUN npm run build && npm prune --omit=dev
+# wykaz składników oprogramowania (A18.9) z zależności produkcyjnych — w obrazie: dist/sbom.cdx.json
+RUN npm run build && npm run sbom && mv sbom.cdx.json dist/ && npm prune --omit=dev
 
 FROM node:22-bookworm-slim
 # Chromium do raportów PDF (raport faktów, notatka Scribe, potwierdzenia) + czcionki z polskimi znakami

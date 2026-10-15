@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
 import { z } from 'zod';
 import { audit, listAudit, verifyAuditChain } from '../audit.js';
 import { hashPassword } from '../auth/passwords.js';
@@ -9,6 +10,7 @@ import { getDb } from '../db.js';
 import { staffOrgId } from '../services/orgs.js';
 import { listIntegrations } from '../integrations/registry.js';
 import { body, IdParams, params, query, zDate, zId } from '../lib/http.js';
+import { sbomFile } from '../lib/sbom.js';
 import { badRequest, conflict, forbidden, notFound } from '../lib/util.js';
 import {
   getClinicSettings,
@@ -271,6 +273,16 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
     const result = verifyAuditChain();
     audit(actorOf(req), { action: 'E', subtype: 'audit-verify', outcome: result.ok ? 'success' : 'failure', detail: result });
     return result;
+  });
+
+  // A18.9 — wykaz składników oprogramowania dla administratora placówki i audytora
+  app.get('/api/admin/sbom', async (req, reply) => {
+    admin(req);
+    const file = sbomFile();
+    if (!file) throw notFound('sbom_missing');
+    audit(actorOf(req), { action: 'R', subtype: 'sbom-download' });
+    reply.header('Content-Type', 'application/vnd.cyclonedx+json').header('Content-Disposition', 'attachment; filename="eternal-sbom.cdx.json"');
+    return fs.readFileSync(file);
   });
 
   app.get('/api/admin/integrations', async (req) => {

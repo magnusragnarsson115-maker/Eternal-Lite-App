@@ -8,6 +8,7 @@ import { currentApproval, EXPLANATIONS_VERSION } from '../labs/explanations.js';
 import { fhirSystem } from '../fhir/index.js';
 import { emailConfigured, smsConfigured, verifyEmailTransport } from '../integrations/channels.js';
 import { monitoringEnabled } from '../lib/monitoring.js';
+import { sbomFile, sbomSummary } from '../lib/sbom.js';
 import { pdfAvailable, renderPdf } from '../pdf/render.js';
 import { z } from 'zod';
 
@@ -80,6 +81,15 @@ function items(): ReadinessItem[] {
     state: config.security.contact ? 'ok' : 'missing',
     detail: config.security.contact || 'brak — /.well-known/security.txt zwraca 404',
     howTo: config.security.contact ? undefined : 'SECURITY_CONTACT=security@twoja-domena',
+  });
+  const sbom = sbomSummary();
+  add({
+    id: 'sbom',
+    group: 'Bezpieczeństwo',
+    name: 'Wykaz składników oprogramowania (SBOM, A18.9)',
+    state: sbom.present ? 'ok' : 'warn',
+    detail: sbom.present ? `${sbom.format}, ${sbom.components} składników${sbom.generatedAt ? `, ${sbom.generatedAt.slice(0, 10)}` : ''} — pobranie: panel administratora` : 'brak pliku sbom.cdx.json w tej instalacji',
+    howTo: sbom.present ? undefined : 'Obraz Docker generuje go przy budowaniu; lokalnie: npm run sbom. Skan podatności: .github/workflows/security.yml (co tydzień).',
   });
   add({
     id: 'monitoring',

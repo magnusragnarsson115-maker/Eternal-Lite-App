@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { hashPassword } from '../../server/auth/passwords.js';
 import { totpCode } from '../../server/auth/totp.js';
@@ -63,6 +66,25 @@ describe('Organizacja, konto i wideo', () => {
     expect(r.json.items.find((i: { id: string }) => i.id === 'mode').state).toBe('demo');
     expect(JSON.stringify(r.json)).not.toContain('test-audit-key');
     expect((await fx.clients.doctor.req('GET', '/api/admin/readiness')).status).toBe(403);
+  });
+
+  it('A18.9: wykaz składników (CycloneDX) w kontroli gotowości i do pobrania tylko przez administratora', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sbom-'));
+    const file = path.join(dir, 'sbom.cdx.json');
+    process.env.SBOM_PATH = file;
+    try {
+      fs.writeFileSync(file, JSON.stringify({ bomFormat: 'CycloneDX', specVersion: '1.5', metadata: { timestamp: '2026-10-15T10:00:00Z' }, components: [{ name: 'fastify' }, { name: 'zod' }] }));
+      const item = (await fx.clients.admin.req('GET', '/api/admin/readiness')).json.items.find((i: { id: string }) => i.id === 'sbom');
+      expect(item).toMatchObject({ state: 'ok' });
+      expect(item.detail).toContain('2 składników');
+      const dl = await fx.clients.admin.req('GET', '/api/admin/sbom');
+      expect(dl.status).toBe(200);
+      expect(dl.headers['content-type']).toContain('application/vnd.cyclonedx+json');
+      expect((await fx.clients.doctor.req('GET', '/api/admin/sbom')).status).toBe(403);
+    } finally {
+      delete process.env.SBOM_PATH;
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it('incydent: zgłoszenie personelu, termin wg wagi, obsługa i eskalacja', async () => {

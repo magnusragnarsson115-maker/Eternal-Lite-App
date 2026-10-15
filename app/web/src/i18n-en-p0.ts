@@ -164,4 +164,7 @@ export const EN_P0: Record<string, string> = {
   'Na ten numer przyjdą SMS-y z placówki. SMS nigdy nie zawiera informacji o zdrowiu.': 'Text messages from the clinic will come to this number. A text message never contains health information.',
   'Kod dostaniesz w rejestracji, gdy pokażesz dowód osobisty. Dzięki niemu zobaczysz swoje wyniki.': 'You will get the code at the reception when you show your ID. With it you will see your results.',
   'Jeśli masz u nas konto, wysłaliśmy link do zmiany hasła. Link działa 60 minut.': 'If you have an account with us, we have sent a link to change your password. The link works for 60 minutes.',
+  // A18.9
+  'Pobierz wykaz składników (CycloneDX JSON)': 'Download the software bill of materials (CycloneDX JSON)',
+  'Wykaz składników oprogramowania (SBOM, A18.9)': 'Software bill of materials (SBOM, A18.9)',
 };
