@@ -323,4 +323,9 @@ export const EN: Record<string, string> = {
   'Zmiana karty ratunkowej': 'Emergency card updated',
   'Przypomnienie o leku': 'Medication reminder',
   'Dodanie leku': 'Medication added',
+  'Pomiary zaimportowane z pliku': 'Measurements imported from a file',
+  'import z pliku': 'file import',
+  'inny odczyt z tej samej minuty': 'another reading from the same minute',
+  'ten sam odczyt z innego źródła': 'same reading from another source',
+  'Eksport danych (CSV)': 'Data export (CSV)',
 };

@@ -202,6 +202,8 @@ export interface MeasurementView {
   source: string;
   device?: string;
   note?: string;
+  /** Inny odczyt tego samego rodzaju z tej samej minuty (A1.7) — oznaczenie, bez rozstrzygania. */
+  flags?: { type: 'conflict' | 'same-reading'; withId: string; withSource: string }[];
 }
 
 export interface MedicationView {

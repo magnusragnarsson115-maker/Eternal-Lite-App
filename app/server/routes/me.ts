@@ -17,7 +17,9 @@ import { createGrant, listGrantsForPatient, revokeGrant, type GrantScope } from 
 import { getIntake, intakeFile, KIND_LABEL, listIntake, reviewIntake, submitIntake, toIntakeView, uploadIntake, type IntakeContext } from '../services/intake.js';
 import { confirmIntake, createSchedule, deleteSchedule, listIntakeLog, listSchedules, setScheduleActive } from '../services/medReminders.js';
 import { getNotifyPrefs, NOTIFY_KINDS, savePushSubscription, setNotifyPrefs } from '../services/notifications.js';
+import { commitImport, previewImport } from '../services/measurementImport.js';
 import { correctMeasurement, observationVersions } from '../services/observations.js';
+import { exportCsv, measurementsForExport, patientLabFacts } from '../services/patientData.js';
 import { listOrganizations } from '../services/orgs.js';
 import { patientCanViewRecords } from '../services/records.js';
 import { addContact, cardForSosToken, emergencyCard, getEmergencyInfo, listContacts, removeContact, setEmergencyInfo, triggerSos } from '../services/safety.js';
@@ -142,34 +144,32 @@ export async function meRoutes(app: FastifyInstance): Promise<void> {
   // --- oś czasu wyników z wersjami (A2.5) ----------------------------------------------------------------
   app.get('/api/me/timeline', async (req) => {
     const auth = patient(req);
-    const own = await fhirSystem().search<Observation>('Observation', { subject: auth.patientRef, _tag: `${ORG_TAG_SYSTEM}|${vaultOrgId(auth.patientRef)}`, _count: '2000' });
-    // wyniki placówki tylko udostępnione pacjentowi (jak w zakładce Wyniki)
-    const clinic: Observation[] = [];
-    if ((await patientCanViewRecords(auth.patientRef)).allowed) {
-      const reports = await fhir().search<DiagnosticReport>('DiagnosticReport', { subject: auth.patientRef, _tag: `${ETERNAL.visibility}|patient-visible`, _count: '500' });
-      const ids = reports.filter((r) => !orgIdsOf(r).includes(vaultOrgId(auth.patientRef))).flatMap((r) => (r.result ?? []).map((x) => idFromRef(x.reference)));
-      if (ids.length) clinic.push(...(await fhir().search<Observation>('Observation', { _id: ids.join(','), _count: '2000' })));
-    }
-    const rows = [...own.map((o) => ({ o, source: 'patient' as const })), ...clinic.map((o) => ({ o, source: 'clinic' as const }))]
-      .filter(({ o }) => !['entered-in-error', 'cancelled'].includes(o.status))
-      .map(({ o, source }) => ({
-        id: o.id,
-        name: o.code.text ?? o.code.coding?.[0]?.display ?? '',
-        loinc: o.code.coding?.find((c) => c.system === LOINC)?.code,
-        date: (o.effectiveDateTime ?? '').slice(0, 10),
-        value: o.valueQuantity?.value !== undefined ? `${o.valueQuantity.comparator ?? ''}${o.valueQuantity.value}` : (o.valueString ?? ''),
-        valueNum: o.valueQuantity?.comparator ? undefined : o.valueQuantity?.value,
-        unit: o.valueQuantity?.unit,
-        range: o.referenceRange?.[0]?.text?.replace(/ \(zakres z dokumentu laboratorium\)$/, ''),
-        labFlag: o.interpretation?.[0]?.coding?.[0]?.code,
-        status: o.status,
-        trust: o.meta?.tag?.find((t) => t.system === ETERNAL.trust)?.code ?? (source === 'clinic' ? TRUST.clinic.code : undefined),
-        version: o.meta?.versionId,
-        documentId: o.derivedFrom?.[0]?.reference ? idFromRef(o.derivedFrom[0].reference) : undefined,
-        source,
-      }))
-      .sort((a, b) => b.date.localeCompare(a.date));
-    return { items: rows };
+    return { items: await patientLabFacts(auth.patientRef) };
+  });
+
+  // --- import pomiarów z pliku (A1.6) i eksport CSV (A2.6) --------------------------------------------------
+  const ImportBody = z.object({ content: z.string().min(1).max(3_000_000), fileName: z.string().max(200).optional() });
+  app.post('/api/me/measurements/import/preview', async (req) => {
+    const auth = patient(req, 'manual-entries');
+    const input = body(req, ImportBody);
+    return previewImport(auth.patientRef, input.content);
+  });
+
+  app.post('/api/me/measurements/import', async (req) => {
+    const auth = patient(req, 'manual-entries');
+    const input = body(req, ImportBody);
+    return commitImport(actorOf(req), auth.patientRef, input.content, input.fileName);
+  });
+
+  app.get('/api/me/export.csv', async (req, reply) => {
+    const auth = patient(req);
+    const range = query(req, z.object({ from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional() }));
+    const [measurements, labs] = await Promise.all([measurementsForExport(auth.patientRef), patientLabFacts(auth.patientRef)]);
+    audit(actorOf(req), { action: 'E', subtype: 'patient-export-csv', patientRef: auth.patientRef, detail: { from: range.from, to: range.to } });
+    reply
+      .header('Content-Type', 'text/csv; charset=utf-8')
+      .header('Content-Disposition', `attachment; filename="eternal-dane-${new Date().toISOString().slice(0, 10)}.csv"`);
+    return exportCsv(measurements, labs, range);
   });
 
   app.get('/api/me/observations/:id/versions', async (req) => {

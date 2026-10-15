@@ -20,7 +20,11 @@ interface Measurement {
   source: string;
   corrected?: boolean;
   correctionReason?: string;
+  /** Inny odczyt z tej samej minuty (A1.7) — oznaczenie bez rozstrzygania. */
+  flags?: { type: 'conflict' | 'same-reading'; withId: string; withSource: string }[];
 }
+
+const SOURCE: Record<string, string> = { manual: 'wpis ręczny', bluetooth: 'Bluetooth', withings: 'Withings', import: 'import z pliku' };
 
 /** Lista parametrów z jednostką (UCUM po stronie serwera); zakres wprowadzania sprawdza serwer — tylko przeciw literówkom. */
 const KINDS: { id: Kind; label: string; unit: string }[] = [
@@ -125,7 +129,9 @@ export default function MeasurementsScreen() {
             <Row
               key={m.id}
               title={`${t(KINDS.find((k) => k.id === m.kind)?.label ?? m.kind)}: ${show(m)}`}
-              sub={`${dateTime(m.effective)} · ${m.source === 'manual' ? t('wpis ręczny') : m.source}${m.corrected ? ` · ${t('poprawione')}` : ''}`}
+              sub={`${dateTime(m.effective)} · ${SOURCE[m.source] ? t(SOURCE[m.source]) : m.source}${m.corrected ? ` · ${t('poprawione')}` : ''}${
+                m.flags?.some((fl) => fl.type === 'conflict') ? ` · ${t('inny odczyt z tej samej minuty')}` : m.flags?.length ? ` · ${t('ten sam odczyt z innego źródła')}` : ''
+              }`}
               right={m.source === 'manual' ? <Badge>{t('Popraw')}</Badge> : undefined}
               onPress={m.source === 'manual' ? () => (setFix(m), setFx({ systolic: String(m.systolic ?? ''), diastolic: String(m.diastolic ?? ''), value: String(m.value ?? ''), reason: '' })) : undefined}
             />

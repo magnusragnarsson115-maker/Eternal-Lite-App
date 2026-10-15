@@ -26,7 +26,7 @@ export interface IntakeField {
 
 export interface IntakeExtract {
   kind: DocumentKind;
-  lines: { page: number; text: string }[];
+  lines: { page: number; text: string; box?: [number, number, number, number] }[];
   items: IntakeField[];
   laboratory?: string;
   collectedAt?: string;

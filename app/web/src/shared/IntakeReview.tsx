@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useI18n } from '../i18n';
 import type { IntakeField, IntakeView } from '../mvp-types';
 import { Badge, Button, Notice, TextField } from '../ui';
+import { SourceSnippet } from './SourceSnippet';
 
 export type FieldAction = { id: string; action: 'confirm' | 'correct' | 'reject'; name?: string; value?: string; unit?: string; rangeText?: string };
 
@@ -35,7 +36,7 @@ export function IntakeStatusBadge({ item }: { item: Pick<IntakeView, 'status' | 
   }
 }
 
-function FieldRow({ f, editable, onAct }: { f: IntakeField; editable: boolean; onAct: (a: FieldAction) => void }) {
+function FieldRow({ f, editable, onAct, source }: { f: IntakeField; editable: boolean; onAct: (a: FieldAction) => void; source?: { fileUrl: string; contentType: string; page: number; box?: [number, number, number, number] } }) {
   const { t } = useI18n();
   const [edit, setEdit] = useState(false);
   const [v, setV] = useState({ value: f.value, unit: f.unitRaw ?? f.unit ?? '', rangeText: f.rangeText ?? '' });
@@ -64,6 +65,7 @@ function FieldRow({ f, editable, onAct }: { f: IntakeField; editable: boolean; o
           <div className="small" style={{ marginTop: 6, fontFamily: 'var(--mono)', background: 'var(--surface-3)', padding: '4px 8px', borderRadius: 6 }} title={t('Wiersz z dokumentu')}>
             <FileText size={12} aria-hidden /> {t('wiersz {n}', { n: f.line + 1 })}: „{f.sourceText}”
           </div>
+          {source && <SourceSnippet fileUrl={source.fileUrl} contentType={source.contentType} page={source.page} box={source.box} text={f.sourceText} />}
           {f.issues.length > 0 && f.state === 'pending' && (
             <div className="small" style={{ color: 'var(--warning)', marginTop: 4 }}>
               {f.issues.map((i) => ISSUE_PL[i] ?? i).map((s) => t(s)).join(' · ')}
@@ -182,7 +184,13 @@ export function IntakeReview({
           )}
           <ul className="obs-list stack" style={{ listStyle: 'none', padding: 0 }}>
             {items.map((f) => (
-              <FieldRow key={f.id} f={f} editable={editable && !busy} onAct={(a) => onReview([a])} />
+              <FieldRow
+                key={f.id}
+                f={f}
+                editable={editable && !busy}
+                onAct={(a) => onReview([a])}
+                source={{ fileUrl, contentType: item.contentType, page: ex?.lines[f.line]?.page ?? f.page, box: ex?.lines[f.line]?.box }}
+              />
             ))}
           </ul>
         </>

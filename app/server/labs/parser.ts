@@ -9,6 +9,12 @@ import { isUnitToken, matchTestName, toUcum } from './dictionary.js';
 export interface DocLine {
   page: number;
   text: string;
+  /**
+   * Położenie linii na stronie (A2.3): [x0, y0, x1, y1] jako ułamki szerokości i wysokości strony, początek
+   * w lewym górnym rogu. Jest dla PDF z warstwą tekstu i dla OCR podającego układ strony; bez niego aplikacja
+   * pokazuje tylko tekst wiersza.
+   */
+  box?: [number, number, number, number];
 }
 
 export type Confidence = 'high' | 'medium' | 'low';

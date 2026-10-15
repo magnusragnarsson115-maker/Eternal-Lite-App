@@ -28,7 +28,11 @@ export function ocrConfigured(): boolean {
 interface PdfTextItem {
   str: string;
   transform: number[];
+  width?: number;
+  height?: number;
 }
+
+const round4 = (n: number) => Math.round(Math.min(1, Math.max(0, n)) * 10_000) / 10_000;
 
 export async function pdfTextLayer(data: Buffer): Promise<OcrResult | undefined> {
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
@@ -39,9 +43,10 @@ export async function pdfTextLayer(data: Buffer): Promise<OcrResult | undefined>
     let chars = 0;
     for (let p = 1; p <= Math.min(doc.numPages, 30); p++) {
       const page = await doc.getPage(p);
+      const viewport = page.getViewport({ scale: 1 });
       const content = await page.getTextContent();
       // grupowanie fragmentów w linie po współrzędnej Y (tolerancja 2 pkt), w linii — po X
-      const rows: { y: number; items: { x: number; s: string }[] }[] = [];
+      const rows: { y: number; items: { x: number; s: string; w: number; h: number }[] }[] = [];
       for (const it of content.items as PdfTextItem[]) {
         if (!('str' in it) || !it.str.trim()) continue;
         const x = it.transform[4];
@@ -51,7 +56,7 @@ export async function pdfTextLayer(data: Buffer): Promise<OcrResult | undefined>
           row = { y, items: [] };
           rows.push(row);
         }
-        row.items.push({ x, s: it.str });
+        row.items.push({ x, s: it.str, w: it.width ?? 0, h: it.height || Math.abs(it.transform[3]) || 10 });
       }
       rows.sort((a, b) => b.y - a.y);
       for (const r of rows) {
@@ -62,7 +67,19 @@ export async function pdfTextLayer(data: Buffer): Promise<OcrResult | undefined>
           .replace(/\s+/g, ' ')
           .trim();
         if (text) {
-          lines.push({ page: p, text });
+          // prostokąt linii w układzie strony → ułamki widoku (uwzględnia obrót i przesunięcie strony)
+          const minX = Math.min(...r.items.map((i) => i.x));
+          const maxX = Math.max(...r.items.map((i) => i.x + i.w));
+          const h = Math.max(...r.items.map((i) => i.h));
+          const [ax, ay] = viewport.convertToViewportPoint(minX, r.y - h * 0.25) as [number, number];
+          const [bx, by] = viewport.convertToViewportPoint(maxX, r.y + h) as [number, number];
+          const box: [number, number, number, number] = [
+            round4(Math.min(ax, bx) / viewport.width),
+            round4(Math.min(ay, by) / viewport.height),
+            round4(Math.max(ax, bx) / viewport.width),
+            round4(Math.max(ay, by) / viewport.height),
+          ];
+          lines.push({ page: p, text, box });
           chars += text.length;
         }
       }
@@ -143,6 +160,7 @@ async function googleAccessToken(): Promise<string> {
 
 interface DocAiLayout {
   textAnchor?: { textSegments?: { startIndex?: string; endIndex?: string }[] };
+  boundingPoly?: { normalizedVertices?: { x?: number; y?: number }[] };
 }
 
 async function googleOcr(data: Buffer, contentType: string): Promise<OcrResult> {
@@ -171,7 +189,10 @@ async function googleOcr(data: Buffer, contentType: string): Promise<OcrResult> 
         .join('')
         .replace(/\s+/g, ' ')
         .trim();
-      if (seg) lines.push({ page: p.pageNumber ?? 1, text: seg });
+      const v = l.layout?.boundingPoly?.normalizedVertices ?? [];
+      const box: [number, number, number, number] | undefined =
+        v.length >= 2 ? [round4(Math.min(...v.map((q) => q.x ?? 0))), round4(Math.min(...v.map((q) => q.y ?? 0))), round4(Math.max(...v.map((q) => q.x ?? 0))), round4(Math.max(...v.map((q) => q.y ?? 0)))] : undefined;
+      if (seg) lines.push({ page: p.pageNumber ?? 1, text: seg, box });
     }
   }
   return { provider: 'google', lines, pages: pages.length };

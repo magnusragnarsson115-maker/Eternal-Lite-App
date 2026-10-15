@@ -15,7 +15,8 @@ export type ProvenanceActivity =
   | 'manual-entry'
   | 'correction'
   | 'ai-draft-approved'
-  | 'clinic-entry';
+  | 'clinic-entry'
+  | 'import';
 
 const ACTIVITY: Record<ProvenanceActivity, { code: string; display: string; system: string }> = {
   'document-read': { system: 'http://terminology.hl7.org/CodeSystem/v3-DataOperation', code: 'CREATE', display: 'Odczyt z dokumentu' },
@@ -25,6 +26,7 @@ const ACTIVITY: Record<ProvenanceActivity, { code: string; display: string; syst
   correction: { system: 'http://terminology.hl7.org/CodeSystem/v3-DataOperation', code: 'UPDATE', display: 'Korekta wartości' },
   'ai-draft-approved': { system: 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType', code: 'AUT', display: 'Szkic AI zatwierdzony przez lekarza' },
   'clinic-entry': { system: 'http://terminology.hl7.org/CodeSystem/v3-DataOperation', code: 'CREATE', display: 'Wprowadzone przez placówkę' },
+  import: { system: 'http://terminology.hl7.org/CodeSystem/v3-DataOperation', code: 'CREATE', display: 'Import z pliku' },
 };
 
 export interface ProvenanceAgent {

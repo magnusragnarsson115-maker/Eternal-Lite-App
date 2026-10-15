@@ -77,6 +77,8 @@ export const SUBTYPE_PL: Record<string, string> = {
   'emergency-info-update': 'Zmiana karty ratunkowej',
   'med-schedule-create': 'Przypomnienie o leku',
   'medication-add': 'Dodanie leku',
+  'measurement-import': 'Pomiary zaimportowane z pliku',
+  'patient-export-csv': 'Eksport danych (CSV)',
 };
 
 export function CardContent({ card, pdfUrl }: { card: CardView; pdfUrl: string }) {

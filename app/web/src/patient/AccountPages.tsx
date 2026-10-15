@@ -215,6 +215,7 @@ const AUDIT_LABELS: Record<string, string> = {
   'measurement-manual': 'Dodanie pomiaru',
   'measurement-bluetooth': 'Pomiar z urządzenia Bluetooth',
   'patient-export': 'Eksport danych',
+  'patient-export-csv': 'Eksport danych (CSV)',
   'identity-verified': 'Potwierdzenie tożsamości',
   'reminder-sent': 'Wysłanie przypomnienia',
   'reminder-manual': 'Przypomnienie wysłane przez placówkę',
@@ -333,6 +334,15 @@ export function PrivacyPage() {
             </span>
             <a className="btn secondary" href="/api/me/export" download>
               <Download size={18} /> {t('Pobierz')}
+            </a>
+          </div>
+          <div className="row-between">
+            <span className="grow">
+              <strong>{t('Pobierz tabelę (CSV)')}</strong>
+              <span className="small muted" style={{ display: 'block' }}>{t('Pomiary i wyniki badań w jednym arkuszu — otworzysz go w Excelu. Pomiary z tego pliku można zaimportować z powrotem.')}</span>
+            </span>
+            <a className="btn secondary" href="/api/me/export.csv" download>
+              <Download size={18} /> {t('Pobierz CSV')}
             </a>
           </div>
           <hr />

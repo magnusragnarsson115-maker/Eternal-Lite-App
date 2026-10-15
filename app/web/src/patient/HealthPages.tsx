@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Bluetooth, Link2, Pill, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { Bluetooth, FileUp, Link2, Pill, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api, del, get, post, put, qs } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
+import { ImportMeasurementsModal } from './MeasurementImport';
 import { MedRemindersCard, MeasurementHistoryButton } from './MvpPages';
 import { BLE_PROFILES, bluetoothSupported, readFromDevice, type BleKind, type BleReading } from '../lib/ble';
 import type { MeasurementView, MedicationView, VitalKind } from '../types';
@@ -15,12 +16,13 @@ const KINDS: { value: VitalKind; label: string; unit: string }[] = [
   { value: 'bp', label: 'Ciśnienie', unit: 'mmHg' },
   { value: 'heartRate', label: 'Tętno', unit: '/min' },
   { value: 'weight', label: 'Waga', unit: 'kg' },
+  { value: 'height', label: 'Wzrost', unit: 'cm' },
   { value: 'spo2', label: 'Saturacja', unit: '%' },
   { value: 'temperature', label: 'Temperatura', unit: '°C' },
   { value: 'glucose', label: 'Glukoza', unit: 'mg/dL' },
 ];
 
-const SOURCE_LABEL: Record<string, string> = { manual: 'ręcznie', bluetooth: 'Bluetooth', withings: 'Withings' };
+const SOURCE_LABEL: Record<string, string> = { manual: 'ręcznie', bluetooth: 'Bluetooth', withings: 'Withings', import: 'import z pliku' };
 
 function sourceLabel(s: string, t: (x: string) => string): string {
   if (s.startsWith('rpm:')) return `RPM · ${s.slice(4)}`;
@@ -35,6 +37,7 @@ export function MeasurementsPage() {
   const [kind, setKind] = useState<VitalKind>('bp');
   const [view, setView] = useState<'chart' | 'table'>('chart');
   const [addOpen, setAddOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [bleReading, setBleReading] = useState<{ reading: BleReading; deviceName: string } | null>(null);
   const [bleBusy, setBleBusy] = useState(false);
   const [bleError, setBleError] = useState('');
@@ -119,7 +122,20 @@ export function MeasurementsPage() {
 
   return (
     <div className="stack-lg">
-      <PageHead title={t('Pomiary domowe')} sub={t('Notuj wyniki pomiarów i — jeśli chcesz — udostępniaj je lekarzowi.')} action={<Button icon={<Plus size={18} />} onClick={() => setAddOpen(true)}>{t('Dodaj pomiar')}</Button>} />
+      <PageHead
+        title={t('Pomiary domowe')}
+        sub={t('Notuj wyniki pomiarów i — jeśli chcesz — udostępniaj je lekarzowi.')}
+        action={
+          <div className="btn-row">
+            <Button variant="secondary" icon={<FileUp size={18} />} onClick={() => setImportOpen(true)}>
+              {t('Importuj z pliku')}
+            </Button>
+            <Button icon={<Plus size={18} />} onClick={() => setAddOpen(true)}>
+              {t('Dodaj pomiar')}
+            </Button>
+          </div>
+        }
+      />
 
       <Card>
         <div className="row-between">
@@ -184,6 +200,15 @@ export function MeasurementsPage() {
                     </td>
                     <td>
                       <Badge>{sourceLabel(m.source, t)}</Badge> {m.device && <span className="small muted">{m.device}</span>}
+                      {m.flags?.map((fl) => (
+                        <div key={fl.withId + fl.type} className="small" style={{ marginTop: 4 }}>
+                          {fl.type === 'conflict' ? (
+                            <Badge kind="warn">{t('Inny odczyt z tej samej minuty: {s}', { s: sourceLabel(fl.withSource, t) })}</Badge>
+                          ) : (
+                            <Badge kind="info">{t('Ten sam odczyt także z: {s}', { s: sourceLabel(fl.withSource, t) })}</Badge>
+                          )}
+                        </div>
+                      ))}
                     </td>
                     <td className="nowrap">
                       {m.source === 'manual' && <MeasurementHistoryButton m={m} />}
@@ -263,6 +288,7 @@ export function MeasurementsPage() {
       </div>
 
       <AddMeasurementModal open={addOpen} onClose={() => setAddOpen(false)} initialKind={kind} />
+      <ImportMeasurementsModal open={importOpen} onClose={() => setImportOpen(false)} />
 
       <Modal
         open={!!bleReading}

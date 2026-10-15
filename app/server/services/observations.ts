@@ -24,7 +24,7 @@ export const INPUT_LIMITS: Record<string, [number, number]> = {
   glucose: [10, 1000],
 };
 
-export type MeasurementSource = 'manual' | 'bluetooth' | 'withings' | `rpm:${string}`;
+export type MeasurementSource = 'manual' | 'bluetooth' | 'withings' | 'import' | `rpm:${string}`;
 
 export interface MeasurementInput {
   kind: VitalKind;
@@ -54,6 +54,11 @@ export interface MeasurementView {
   corrected?: boolean;
   correctionReason?: string;
   version?: string;
+  /**
+   * Oznaczenia jakości danych (A1.7), bez rozstrzygania: inny odczyt tego samego rodzaju z tej samej minuty.
+   * „conflict” — inna wartość; „same-reading” — ta sama wartość z innego źródła. Żaden odczyt nie jest usuwany.
+   */
+  flags?: { type: 'conflict' | 'same-reading'; withId: string; withSource: string }[];
 }
 
 function check(name: string, v: number | undefined): number {
@@ -90,14 +95,15 @@ export function toMeasurementView(o: Observation): MeasurementView | undefined {
   return { ...base, value: o.valueQuantity?.value, unit: o.valueQuantity?.unit ?? '' };
 }
 
-export async function addMeasurement(actor: AuditActor, patientRef: string, input: MeasurementInput): Promise<MeasurementView[]> {
+/** Tworzy zasoby pomiaru bez audytu, proweniencji i zdarzenia (wspólne dla wpisu, urządzeń i importu). */
+async function createMeasurementResources(patientRef: string, input: MeasurementInput): Promise<{ created: Observation[]; existing: Observation[] }> {
   const effective = input.effective ? new Date(input.effective) : new Date();
   if (Number.isNaN(effective.getTime())) throw badRequest('invalid_date');
   if (effective.getTime() > Date.now() + 5 * 60_000) throw badRequest('date_in_future');
 
   if (input.externalId) {
     const dup = await fhir().search<Observation>('Observation', { subject: patientRef, identifier: `${ETERNAL.source}|${input.externalId}` });
-    if (dup.length) return dup.map(toMeasurementView).filter((m): m is MeasurementView => !!m);
+    if (dup.length) return { created: [], existing: dup };
   }
 
   const common: Partial<Observation> = {
@@ -157,6 +163,12 @@ export async function addMeasurement(actor: AuditActor, patientRef: string, inpu
       }),
     );
   }
+  return { created, existing: [] };
+}
+
+export async function addMeasurement(actor: AuditActor, patientRef: string, input: MeasurementInput): Promise<MeasurementView[]> {
+  const { created, existing } = await createMeasurementResources(patientRef, input);
+  if (!created.length) return existing.map(toMeasurementView).filter((m): m is MeasurementView => !!m);
   for (const o of created) {
     audit(actor, { action: 'C', subtype: `measurement-${input.source.split(':')[0]}`, entityRef: `Observation/${o.id}`, patientRef });
   }
@@ -169,14 +181,70 @@ export async function addMeasurement(actor: AuditActor, patientRef: string, inpu
   return created.map(toMeasurementView).filter((m): m is MeasurementView => !!m);
 }
 
+/**
+ * Zapis wielu pomiarów z jednego pliku (A1.6): jeden wpis proweniencji z nazwą pliku, audyt każdego zasobu,
+ * jedno zdarzenie odświeżenia. Pomiary z tym samym identyfikatorem importu są pomijane (ponowny import).
+ */
+export async function addMeasurementsBatch(actor: AuditActor, patientRef: string, inputs: MeasurementInput[], fileLabel: string): Promise<{ created: number; existing: number }> {
+  const all: Observation[] = [];
+  let existing = 0;
+  for (const input of inputs) {
+    const r = await createMeasurementResources(patientRef, input);
+    all.push(...r.created);
+    if (!r.created.length && r.existing.length) existing++;
+  }
+  for (const o of all) audit(actor, { action: 'C', subtype: 'measurement-import', entityRef: `Observation/${o.id}`, patientRef });
+  if (all.length) {
+    await recordProvenance({
+      targets: all.map((o) => `Observation/${o.id}`),
+      activity: 'import',
+      agents: [{ who: patientRef, display: `Pacjent (import z pliku ${fileLabel})`, role: 'author' }],
+    });
+    bus.publish({ type: 'observation.changed', patientRef });
+  }
+  return { created: all.length, existing };
+}
+
+function readingKey(m: MeasurementView): string {
+  return m.kind === 'bp' ? `${m.systolic}/${m.diastolic}` : String(m.value);
+}
+
+/** Oznacza odczyty tego samego rodzaju z tej samej minuty (A1.7). Nie usuwa i nie wybiera „właściwego”. */
+export function flagReadings(items: MeasurementView[]): MeasurementView[] {
+  const byKind = new Map<string, MeasurementView[]>();
+  for (const m of items) byKind.set(m.kind, [...(byKind.get(m.kind) ?? []), m]);
+  const flags = new Map<string, NonNullable<MeasurementView['flags']>>();
+  const add = (a: MeasurementView, b: MeasurementView, type: 'conflict' | 'same-reading') => flags.set(a.id, [...(flags.get(a.id) ?? []), { type, withId: b.id, withSource: b.source }]);
+  for (const list of byKind.values()) {
+    const sorted = [...list].sort((a, b) => a.effective.localeCompare(b.effective));
+    for (let i = 0; i < sorted.length; i++) {
+      for (let j = i + 1; j < sorted.length; j++) {
+        const a = sorted[i];
+        const b = sorted[j];
+        if (Date.parse(b.effective) - Date.parse(a.effective) >= 60_000) break;
+        if (readingKey(a) !== readingKey(b)) {
+          add(a, b, 'conflict');
+          add(b, a, 'conflict');
+        } else if (a.source !== b.source) {
+          add(a, b, 'same-reading');
+          add(b, a, 'same-reading');
+        }
+      }
+    }
+  }
+  return items.map((m) => (flags.has(m.id) ? { ...m, flags: flags.get(m.id) } : m));
+}
+
 export async function listMeasurements(patientRef: string, kind?: VitalKind): Promise<MeasurementView[]> {
-  const params: Record<string, string> = { subject: patientRef, category: `${OBS_CATEGORY}|vital-signs`, _sort: '-date', _count: '500' };
+  const params: Record<string, string> = { subject: patientRef, category: `${OBS_CATEGORY}|vital-signs`, _sort: '-date', _count: '2000' };
   if (kind) params.code = `${LOINC}|${kind === 'bp' ? VITALS.bpPanel.code : VITALS[kind].code}`;
   const obs = await fhir().search<Observation>('Observation', params);
-  return obs
-    .filter((o) => o.status !== 'entered-in-error')
-    .map(toMeasurementView)
-    .filter((m): m is MeasurementView => !!m);
+  return flagReadings(
+    obs
+      .filter((o) => o.status !== 'entered-in-error')
+      .map(toMeasurementView)
+      .filter((m): m is MeasurementView => !!m),
+  );
 }
 
 /** Pomiar wprowadzony omyłkowo — status entered-in-error (FHIR), historia pozostaje. */
