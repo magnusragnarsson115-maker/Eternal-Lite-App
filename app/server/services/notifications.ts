@@ -1,7 +1,10 @@
+import type { Patient } from '@medplum/fhirtypes';
+import { proxyRecipients } from '../auth/proxy.js';
 import { findUserByFhirRef, findUserById } from '../auth/users.js';
 import { getDb } from '../db.js';
 import { bus } from '../events.js';
 import type { ConsentType } from '../fhir/constants.js';
+import { fhirSystem } from '../fhir/index.js';
 import { ChannelNotConfigured, PushGone, sendEmail, sendPush, sendSms } from '../integrations/channels.js';
 import { newId, nowIso } from '../lib/util.js';
 import { hasConsent } from './consents.js';
@@ -122,7 +125,14 @@ export async function notifyPatient(
   n: { kind: string; title: string; body: string; link?: string; push?: boolean; pushTitle?: string; pushBody?: string },
 ): Promise<void> {
   const user = findUserByFhirRef(patientRef);
-  if (user) await notifyUser(user.id, n);
+  if (user) return notifyUser(user.id, n);
+  // profil prowadzony przez opiekuna (A24.1): powiadomienie trafia do opiekunów, z imieniem profilu w tytule
+  const proxies = proxyRecipients(patientRef);
+  if (!proxies.length) return;
+  const p = await fhirSystem().readOptional<Patient>('Patient', patientRef.split('/')[1] ?? '');
+  const given = p?.name?.[0]?.given?.[0];
+  const link = n.link ? `${n.link}${n.link.includes('?') ? '&' : '?'}profile=${patientRef.split('/')[1]}` : undefined;
+  for (const id of proxies) await notifyUser(id, { ...n, title: given ? `${given}: ${n.title}` : n.title, link });
 }
 
 /** Wiadomość poza aplikację, wyłącznie za zgodą pacjenta na dany kanał. */

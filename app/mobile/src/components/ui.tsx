@@ -1,14 +1,46 @@
 import type { ReactNode } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { useFontSize } from '../lib/a11y';
+import { useI18n } from '../lib/i18n';
+import { setActiveProfile, useActiveProfile } from '../lib/profile';
 import { radius, space, useColors } from '../lib/theme';
 
 /** Komponenty wspólne: duże pola dotyku (min. 48 pt), etykiety dla czytników ekranu, kolory z tokenów panelu. */
 
+/** Tryb opiekuna (A24.2): pasek z imieniem profilu na każdym ekranie, żeby nie pomylić osób. */
+export function ProxyBanner() {
+  const c = useColors();
+  const fs = useFontSize();
+  const { t } = useI18n();
+  const profile = useActiveProfile();
+  if (!profile) return null;
+  return (
+    <View accessibilityRole="summary" style={{ borderWidth: 2, borderColor: c.primary, backgroundColor: c.primarySoft, borderRadius: radius, padding: space(3), gap: space(2) }}>
+      <Text style={{ color: c.ink, fontSize: fs(16), fontWeight: '700' }}>{t('Działasz w profilu: {name}', { name: profile.name })}</Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => {
+          setActiveProfile(undefined);
+          router.replace('/');
+        }}
+        style={{ minHeight: 44, justifyContent: 'center' }}
+      >
+        <Text style={{ color: c.primary, fontSize: fs(15), fontWeight: '700' }}>{t('Wróć do swojego profilu')}</Text>
+      </Pressable>
+    </View>
+  );
+}
+
 export function Screen({ children, scroll = true, padded = true }: { children: ReactNode; scroll?: boolean; padded?: boolean }) {
   const c = useColors();
-  const inner = <View style={{ padding: padded ? space(4) : 0, gap: space(4) }}>{children}</View>;
+  const inner = (
+    <View style={{ padding: padded ? space(4) : 0, gap: space(4) }}>
+      <ProxyBanner />
+      {children}
+    </View>
+  );
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['left', 'right']}>
       {scroll ? <ScrollView contentContainerStyle={{ paddingBottom: space(10) }}>{inner}</ScrollView> : inner}
@@ -154,4 +186,28 @@ export function Empty({ title }: { title: string }) {
   const c = useColors();
   const fs = useFontSize();
   return <Text style={{ color: c.muted, textAlign: 'center', padding: space(6), fontSize: fs(16) }}>{title}</Text>;
+}
+
+/** Wybór jednej opcji z kilku (przyciski-etykiety) — duże pola dotyku, stan dla czytnika ekranu. */
+export function Chips<T extends string | number>({ options, value, onChange, label }: { options: { value: T; label: string }[]; value: T; onChange: (v: T) => void; label?: string }) {
+  const c = useColors();
+  const fs = useFontSize();
+  return (
+    <View accessibilityRole="radiogroup" accessibilityLabel={label} style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(2) }}>
+      {options.map((o) => {
+        const selected = o.value === value;
+        return (
+          <Pressable
+            key={String(o.value)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected }}
+            onPress={() => onChange(o.value)}
+            style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: space(3), paddingVertical: space(2), borderRadius: radius, borderWidth: selected ? 2 : 1, borderColor: selected ? c.primary : c.border, backgroundColor: selected ? c.primarySoft : c.surface }}
+          >
+            <Text style={{ color: c.ink, fontSize: fs(15), fontWeight: selected ? '700' : '400' }}>{o.label}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
 }

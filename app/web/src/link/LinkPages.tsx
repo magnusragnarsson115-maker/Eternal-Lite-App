@@ -361,7 +361,7 @@ export function SosCardPage() {
   const q = useQuery({
     queryKey: ['sos-card', token],
     queryFn: () =>
-      get<{ name: string; birthDate?: string; notes: string; medications: string[]; contacts: { name: string; phone: string; relation?: string }[]; disclaimer: string; sosAt: string; location?: string; expiresAt: string }>(`/api/sos-card/${token}`),
+      get<{ name: string; birthDate?: string; notes: string; medications: string[]; directives?: string[]; contacts: { name: string; phone: string; relation?: string }[]; disclaimer: string; sosAt: string; location?: string; expiresAt: string }>(`/api/sos-card/${token}`),
     retry: false,
   });
   if (q.isLoading) return <Spinner />;
@@ -393,6 +393,15 @@ export function SosCardPage() {
         <Card title={t('Przyjmowane leki (lista pacjenta)')}>
           <ul style={{ margin: 0, paddingLeft: 20 }}>
             {c.medications.map((m, i) => (
+              <li key={i}>{m}</li>
+            ))}
+          </ul>
+        </Card>
+      )}
+      {!!c.directives?.length && (
+        <Card title={t('Dyspozycje pacjenta')}>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {c.directives.map((m, i) => (
               <li key={i}>{m}</li>
             ))}
           </ul>

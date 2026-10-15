@@ -7,6 +7,7 @@ import { useI18n } from '../i18n';
 import { useRealtime, type LiveEvent } from '../realtime';
 import { hasRole, useSession } from '../session';
 import { BrandMark, Button, DemoBanner, Segmented, Spinner, useToast } from '../ui';
+import { StatusBanner } from '../shared/SystemStatus';
 
 export function StaffShell() {
   const { me, config, loading, logout } = useSession();
@@ -137,6 +138,7 @@ export function StaffShell() {
             </Link>
           </header>
           <main className="s-content" id="main" tabIndex={-1}>
+            <StatusBanner />
             <Outlet />
           </main>
         </div>

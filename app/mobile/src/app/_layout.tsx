@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -9,8 +9,8 @@ import { getLocale } from '../lib/secure';
 import { SessionProvider, useSession } from '../lib/session';
 import { useColors } from '../lib/theme';
 import { setA11y } from '../lib/a11y';
+import { queryClient } from '../lib/query';
 
-const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } });
 
 export default function RootLayout() {
   return (
@@ -83,6 +83,11 @@ function Gate() {
           <Stack.Screen name="surveys/[id]" options={{ title: t('Ankieta') }} />
           <Stack.Screen name="notifications" options={{ title: t('Powiadomienia') }} />
           <Stack.Screen name="share-new" options={{ title: t('Nowe udostępnienie') }} />
+          <Stack.Screen name="family" options={{ title: t('Rodzina i opiekunowie') }} />
+          <Stack.Screen name="journal" options={{ title: t('Dzienniki') }} />
+          <Stack.Screen name="health-history" options={{ title: t('Historia zdrowia') }} />
+          <Stack.Screen name="doctor-report" options={{ title: t('Dla lekarza i na wyjazd') }} />
+          <Stack.Screen name="plan" options={{ title: t('Plan i kalendarz') }} />
         </Stack.Protected>
         <Stack.Screen name="crisis" options={{ title: t('Numery pomocowe'), presentation: ready ? 'card' : 'modal' }} />
       </Stack>

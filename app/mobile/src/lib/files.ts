@@ -1,6 +1,6 @@
 import { Directory, File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { API_URL, ApiError } from './api';
+import { API_URL, ApiError, profileHeader } from './api';
 import { getToken } from './secure';
 
 /**
@@ -29,7 +29,7 @@ export async function downloadAndSharePdf(path: string, fileName: string, dialog
   let file: File;
   try {
     file = await File.downloadFileAsync(`${API_URL}${path}`, new File(d, fileName.replace(/[^\w.-]+/g, '_')), {
-      headers: { Accept: 'application/pdf', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      headers: { Accept: 'application/pdf', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...profileHeader() },
       idempotent: true,
     });
   } catch (e) {

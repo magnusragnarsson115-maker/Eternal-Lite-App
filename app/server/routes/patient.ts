@@ -26,6 +26,7 @@ import { listThreadsForPatient, getThread, MESSAGE_CATEGORIES, reply, startThrea
 import { listNotifications, markNotificationsRead, removePushSubscription, savePushSubscription } from '../services/notifications.js';
 import { addMeasurement, listMeasurements, retractMeasurement } from '../services/observations.js';
 import { toPatientView, updatePatient } from '../services/patients.js';
+import { listEmergencyForPatient } from '../services/emergencyAccess.js';
 import { accessLogForPatient, exportPatientBundle, requestAccountDeletion } from '../services/privacy.js';
 import { canonicalOf, getQuestionnaire, responseForAppointment, submitResponse } from '../services/questionnaires.js';
 import { getRecord, listPatientRecords, markRead, patientCanViewRecords, readBinaryFor } from '../services/records.js';
@@ -434,6 +435,12 @@ export async function patientRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/me/access-log', async (req) => {
     const auth = requirePatient(req);
     return { items: accessLogForPatient(auth.patientRef) };
+  });
+
+  // A24.5 — dostęp ratunkowy do moich danych: kto, kiedy, dlaczego, czy oceniony
+  app.get('/api/me/emergency-access', async (req) => {
+    const auth = requirePatient(req);
+    return { items: listEmergencyForPatient(auth.patientRef) };
   });
 
   app.get('/api/me/export', async (req, replyObj) => {

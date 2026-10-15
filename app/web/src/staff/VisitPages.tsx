@@ -11,6 +11,7 @@ import { useSession, hasRole } from '../session';
 import { Badge, Button, Card, Empty, Modal, Notice, PageHead, QueryError, Skeleton, StatusBadge, Tabs, TextField, useConfirm, useToast } from '../ui';
 import { TrendChart } from '../ui/TrendChart';
 import { ScribePanel } from './ScribePanel';
+import { EmergencyAccessControl } from './EmergencyAccess';
 
 function todayLocal(): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Warsaw' }).format(new Date());
@@ -450,7 +451,13 @@ export function FactsReportView({ patientId, appointmentId }: { patientId: strin
           </ul>
         </Notice>
       )}
-      {!r.sharing.vaultIncluded && <Notice kind="info">{t('Brak aktywnego udostępnienia — raport zawiera tylko dane wprowadzone przez placówkę.')}</Notice>}
+      {r.sharing.emergency && <EmergencyAccessControl patientId={patientId} active={r.sharing.emergency} />}
+      {!r.sharing.vaultIncluded && (
+        <Notice kind="info">
+          <span style={{ display: 'block', marginBottom: 8 }}>{t('Brak aktywnego udostępnienia — raport zawiera tylko dane wprowadzone przez placówkę.')}</span>
+          <EmergencyAccessControl patientId={patientId} />
+        </Notice>
+      )}
       <Card title={t('Wyniki potwierdzone')}>{r.results.length ? <FactTable rows={r.results} fileBase="/api/staff/files" /> : <Empty title={t('Brak potwierdzonych wyników')} />}</Card>
       {r.unconfirmed.length > 0 && (
         <Card title={t('Odczyty niepotwierdzone')}>

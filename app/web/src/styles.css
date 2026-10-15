@@ -670,3 +670,275 @@ html[data-contrast='high'] .step-progress { border: 1px solid var(--border-stron
 .answers-review > div { border-bottom: 1px solid var(--border); padding-bottom: 10px; }
 .answers-review dt { font-weight: 600; color: var(--ink-2); margin-bottom: 2px; }
 .answers-review dd { margin: 0; }
+
+/* --- profile rodzinne i tryb opiekuna (A24.1, A24.2) ------------------------------------------------------------- */
+.profile-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+.profile-switch .select {
+  min-height: 40px;
+  padding: 6px 30px 6px 10px;
+  max-width: 16rem;
+  font-weight: 600;
+}
+.proxy-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  max-width: 1080px;
+  width: calc(100% - 32px);
+  margin: 12px auto 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary-soft-ink);
+}
+.invite-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: center;
+  padding: 14px;
+  border: 2px dashed var(--border-strong);
+  border-radius: 12px;
+  margin: 0;
+  user-select: all;
+}
+.overview-tile {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--surface-2);
+}
+.overview-tile h3 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+}
+.overview-tile p {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin: 4px 0;
+}
+.overview-tile p svg {
+  flex: none;
+  margin-top: 2px;
+}
+@media (max-width: 640px) {
+  /* na telefonie wybór profilu ma pierwszeństwo przed nazwą placówki */
+  .p-header-inner:has(.profile-switch) .header-clinic {
+    visibility: hidden;
+  }
+  .profile-switch .select {
+    min-width: 9rem;
+    max-width: 11rem;
+  }
+}
+
+/* --- dzienniki (F8.2, F8.14, A21.3, A8.6) ------------------------------------------------------------------------ */
+.scale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.scale button {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.scale button.on {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-ink);
+}
+.scale button:focus-visible,
+.chip:focus-visible,
+.body-map .region:focus-visible {
+  outline: 3px solid var(--focus, var(--primary));
+  outline-offset: 2px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip {
+  min-height: 40px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.chip.on {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary-soft-ink);
+  font-weight: 650;
+}
+.body-map {
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.body-map svg {
+  width: 100%;
+  max-height: 340px;
+}
+.body-map .body-outline {
+  fill: var(--surface-3);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+.body-map .region {
+  fill: transparent;
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+  cursor: pointer;
+}
+.body-map .region:hover {
+  fill: var(--primary-soft);
+}
+.body-map .region.on {
+  fill: var(--chart-line-2);
+  fill-opacity: 0.75;
+  stroke: var(--chart-line-2);
+  stroke-dasharray: none;
+}
+@media (max-width: 560px) {
+  .body-map {
+    grid-template-columns: 1fr;
+  }
+  .body-map svg {
+    max-height: 280px;
+  }
+}
+.breath {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 220px;
+}
+.breath-circle {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  border: 3px solid var(--primary);
+  transform: scale(1);
+  transition: transform var(--phase-s, 4s) ease-in-out;
+}
+.breath.phase-in .breath-circle {
+  transform: scale(1.75);
+}
+.breath.phase-hold .breath-circle {
+  transform: scale(1.75);
+  transition-duration: 0.2s;
+}
+.breath.phase-out .breath-circle {
+  transform: scale(1);
+}
+.breath-text {
+  position: relative;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .breath-circle {
+    transition: none;
+  }
+}
+
+/* --- plan rehabilitacji, cele, kalendarz (A22.4, A7.6, A17.13) --------------------------------------------------------- */
+.rehab-activity {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px 14px;
+  display: grid;
+  gap: 10px;
+}
+.rehab-activity legend {
+  font-weight: 650;
+  padding: 0 6px;
+}
+.progress {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.progress > span {
+  display: block;
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+}
+.cal-day {
+  border-top: 1px solid var(--border);
+  padding: 10px 0;
+}
+.cal-day:first-child {
+  border-top: 0;
+}
+.cal-day h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+.cal-day.today h3::after {
+  content: ' •';
+  color: var(--primary);
+}
+.cal-event {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 6px 0;
+  color: inherit;
+  text-decoration: none;
+}
+.cal-event:hover .cal-title {
+  text-decoration: underline;
+}
+.cal-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 6px;
+  background: var(--chart-line);
+}
+.cal-dot.vaccination {
+  background: var(--chart-line-2);
+}
+.cal-dot.rehab {
+  background: var(--success, #1f7a4d);
+}
+.cal-dot.medication {
+  background: var(--muted);
+}
+.feed-url {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  word-break: break-all;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface-3);
+}

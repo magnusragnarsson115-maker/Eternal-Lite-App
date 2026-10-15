@@ -14,6 +14,16 @@ export class ApiError extends Error {
 }
 
 let onUnauthorized: (() => void) | undefined;
+let profileId: string | undefined;
+
+/** Profil, w którym działa opiekun (A24.2) — nagłówek X-Eternal-Profile w każdym żądaniu. */
+export function setApiProfile(id: string | undefined): void {
+  profileId = id;
+}
+
+export function profileHeader(): Record<string, string> {
+  return profileId ? { 'X-Eternal-Profile': profileId } : {};
+}
 /** Sesja wygasła albo została odwołana z innego urządzenia — aplikacja wraca do logowania. */
 export function setUnauthorizedHandler(fn: () => void): void {
   onUnauthorized = fn;
@@ -28,6 +38,7 @@ async function request<T>(method: string, path: string, body?: unknown, init: { 
       headers: {
         Accept: 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...profileHeader(),
         ...(body !== undefined && !init.form ? { 'Content-Type': 'application/json' } : {}),
       },
       body: init.form ?? (body !== undefined ? JSON.stringify(body) : undefined),

@@ -2,9 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Badge, Button, Card, H1, P, Row } from '../../components/ui';
+import { Badge, Button, Card, H1, Notice, P, ProxyBanner, Row } from '../../components/ui';
 import { get } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
+import { useActiveProfile } from '../../lib/profile';
 import { useSession } from '../../lib/session';
 import { space, useColors } from '../../lib/theme';
 import type { CardView, IntakeView, SurveysData } from '../../lib/types';
@@ -35,7 +36,12 @@ export default function HomeScreen() {
   const intake = useQuery({ queryKey: ['intake'], queryFn: () => get<{ items: IntakeView[] }>('/api/me/intake') });
   const cards = useQuery({ queryKey: ['cards'], queryFn: () => get<{ items: CardView[] }>('/api/me/cards') });
   const facts = useQuery({ queryKey: ['facts-latest'], queryFn: () => get<LatestFacts>('/api/me/facts/latest') });
-  const surveys = useQuery({ queryKey: ['surveys'], queryFn: () => get<SurveysData>('/api/me/surveys'), retry: false });
+  const profile = useActiveProfile();
+  // A18.8 — tryb degradacji: co działa ograniczenie i co aplikacja robi zamiast tego
+  const status = useQuery({ queryKey: ['system-status'], queryFn: () => get<{ items: { id: string; label: string; status: string; fallback: string }[] }>('/api/public/status'), retry: false, refetchInterval: 120_000 });
+  const degraded = status.data?.items.filter((i) => i.status === 'degraded') ?? [];
+  // ankiety dotyczą właściciela konta — w profilu dziecka lub osoby pod opieką ich nie ma (A24.2)
+  const surveys = useQuery({ queryKey: ['surveys'], queryFn: () => get<SurveysData>('/api/me/surveys'), retry: false, enabled: !profile });
   const dueSurvey = surveys.data?.items.find((s) => s.due);
   const next = appts.data?.items.filter((a) => ['booked', 'pending', 'arrived'].includes(a.status) && Date.parse(a.start) > Date.now() - 3600_000).sort((a, b) => a.start.localeCompare(b.start))[0];
   const toReview = intake.data?.items.filter((i) => i.status === 'needs_review').length ?? 0;
@@ -45,9 +51,11 @@ export default function HomeScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['left', 'right']}>
       <ScrollView
         contentContainerStyle={{ padding: space(4), gap: space(4), paddingBottom: space(10) }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void Promise.all([appts.refetch(), intake.refetch(), cards.refetch(), facts.refetch(), surveys.refetch()])} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void Promise.all([appts.refetch(), intake.refetch(), cards.refetch(), facts.refetch(), ...(profile ? [] : [surveys.refetch()])])} />}
       >
-        <H1>{t('Dzień dobry, {n}', { n: me?.user?.displayName.split(' ')[0] ?? '' })}</H1>
+        <ProxyBanner />
+        {degraded.length ? <Notice kind="warn">{degraded.map((i) => `${t(i.label)}: ${t(i.fallback)}`).join('\n')}</Notice> : null}
+        <H1>{profile ? t('Profil: {name}', { name: profile.name }) : t('Dzień dobry, {n}', { n: me?.user?.displayName.split(' ')[0] ?? '' })}</H1>
 
         <Card title={t('Najbliższa wizyta')}>
           {next ? (

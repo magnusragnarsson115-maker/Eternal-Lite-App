@@ -5,6 +5,7 @@ import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest }
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { requestedProfile, resolveProxy } from './auth/proxy.js';
 import { loadSession } from './auth/sessions.js';
 import { isStaff } from './auth/users.js';
 import { patientOrgIds, staffOrgId } from './services/orgs.js';
@@ -17,6 +18,8 @@ import { reportError, SECURITY_POLICY, securityTxt } from './lib/monitoring.js';
 import { adminRoutes } from './routes/admin.js';
 import { authRoutes } from './routes/auth.js';
 import { eventRoutes } from './routes/events.js';
+import { familyRoutes } from './routes/family.js';
+import { healthRoutes } from './routes/health.js';
 import { fhirRoutes } from './routes/fhir.js';
 import { integrationRoutes } from './routes/integrations.js';
 import { linkRoutes } from './routes/link.js';
@@ -127,7 +130,12 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
     const u = req.auth?.user;
     const resolve = async (): Promise<RequestScope> => {
       if (u && isStaff(u)) return { orgId: staffOrgId(u) };
-      if (u?.fhir_ref?.startsWith('Patient/')) return { patientRef: u.fhir_ref, patientOrgIds: await patientOrgIds(u.fhir_ref) };
+      if (u?.fhir_ref?.startsWith('Patient/')) {
+        // profil wybrany przez opiekuna — tylko przy aktywnym powiązaniu (auth/proxy.ts)
+        const profile = requestedProfile(req);
+        const ref = profile && profile !== u.fhir_ref && resolveProxy(u.id, profile) ? profile : u.fhir_ref;
+        return { patientRef: ref, patientOrgIds: await patientOrgIds(ref) };
+      }
       return {};
     };
     resolve().then(
@@ -168,6 +176,8 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
   await app.register(authRoutes);
   await app.register(eventRoutes);
   await app.register(patientRoutes);
+  await app.register(familyRoutes);
+  await app.register(healthRoutes);
   await app.register(staffRoutes);
   await app.register(adminRoutes);
   await app.register(fhirRoutes);

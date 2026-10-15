@@ -14,6 +14,8 @@ interface Text {
 export default function AboutScreen() {
   const { t, locale } = useI18n();
   const q = useQuery({ queryKey: ['texts', locale], queryFn: () => get<{ purpose: Text; instructions: Text; ai: Text; securityContact?: string }>(`/api/public/texts?lang=${locale}`) });
+  // A18.2 — karty zastosowań AI: co robi, czego nie robi, kto sprawdza wynik
+  const cards = useQuery({ queryKey: ['ai-cards'], queryFn: () => get<{ version: string; items: { id: string; name: string; purpose: string; doesNot: string; oversight: string; provider: string }[] }>('/api/public/ai-cards') });
   if (!q.data) return <Screen>{<Loading />}</Screen>;
   const block = (x: Text) => (
     <Card title={x.title} key={x.version}>
@@ -30,6 +32,20 @@ export default function AboutScreen() {
       {block(q.data.purpose)}
       {block(q.data.instructions)}
       {block(q.data.ai)}
+      {cards.data?.items.map((c) => (
+        <Card key={c.id} title={t(c.name)}>
+          <P>{t(c.purpose)}</P>
+          <P small>
+            {t('Czego nie robi')}: {t(c.doesNot)}
+          </P>
+          <P small>
+            {t('Kto sprawdza wynik')}: {t(c.oversight)}
+          </P>
+          <P small muted>
+            {t('Dostawca')}: {c.provider}
+          </P>
+        </Card>
+      ))}
       <P small muted>
         {t('Wersja aplikacji: {v}', { v: Application.nativeApplicationVersion ?? '—' })}
         {q.data.securityContact ? ` · ${t('Zgłoszenia bezpieczeństwa: {c}', { c: q.data.securityContact })}` : ''}

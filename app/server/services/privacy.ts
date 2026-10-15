@@ -5,7 +5,9 @@ import { getClinicSettings } from './directory.js';
 import { staffOrgId } from './orgs.js';
 import { destroyAllSessions } from '../auth/sessions.js';
 import { getDb } from '../db.js';
-import { fhir } from '../fhir/index.js';
+import { fhir, fhirSystem } from '../fhir/index.js';
+import { ORG_TAG_SYSTEM, vaultOrgId } from '../tenancy.js';
+import { VAULT_TYPES } from './deletion.js';
 import { idFromRef } from '../fhir/repository.js';
 import { nowIso } from '../lib/util.js';
 import { listMeasurements } from './observations.js';
@@ -51,6 +53,16 @@ export async function exportPatientBundle(actor: AuditActor, patientRef: string)
     const o = await fhir().readOptional('Observation', m.id);
     if (o) resources.push(o);
   }
+  // sejf pacjenta: dokumenty i odczyty wgrane przez pacjenta, dzienniki, szczepienia, wywiad rodzinny, dyspozycje, cele
+  const seen = new Set(resources.map((r) => `${r.resourceType}/${r.id}`));
+  for (const type of VAULT_TYPES) {
+    for (const r of await fhirSystem().search(type, { _tag: `${ORG_TAG_SYSTEM}|${vaultOrgId(patientRef)}`, _count: '5000' })) {
+      if (!seen.has(`${r.resourceType}/${r.id}`)) {
+        seen.add(`${r.resourceType}/${r.id}`);
+        resources.push(r);
+      }
+    }
+  }
   for (const row of listAudit({ patientRef, limit: 500 })) resources.push(toAuditEvent(row));
 
   audit(actor, { action: 'E', subtype: 'patient-export', entityRef: patientRef, patientRef, detail: { resources: resources.length } });
@@ -80,6 +92,7 @@ const ROLE_PL: Record<string, string> = {
   practitioner: 'Lekarz',
   reception: 'Rejestracja',
   admin: 'Administrator',
+  caregiver: 'Opiekun',
 };
 
 /** Historia dostępu do danych pacjenta — kto, kiedy, co (bez adresów IP personelu). */
@@ -102,7 +115,8 @@ export function accessLogForPatient(patientRef: string, opts: { staffOnly?: bool
       return {
         at: r.ts,
         who: isSelf ? 'Ty' : (r.actor_display ?? 'System'),
-        role: isSelf ? 'patient' : (roles.find((x) => x !== 'patient') ?? (r.actor_user_id ? 'staff' : 'system')),
+        // konto pacjenta działające w cudzym profilu = opiekun (A24.2)
+        role: isSelf ? 'patient' : (roles.find((x) => x !== 'patient') ?? (roles.includes('patient') ? 'caregiver' : r.actor_user_id ? 'staff' : 'system')),
         org: isSelf ? undefined : orgName(r.actor_user_id),
         action: r.action,
         subtype: r.subtype,

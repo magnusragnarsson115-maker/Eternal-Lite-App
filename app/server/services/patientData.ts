@@ -1,4 +1,5 @@
 import type { DiagnosticReport, Observation } from '@medplum/fhirtypes';
+import { isJournal } from './journal.js';
 import { ETERNAL, LOINC, TRUST } from '../fhir/constants.js';
 import { fhir, fhirSystem } from '../fhir/index.js';
 import { idFromRef } from '../fhir/repository.js';
@@ -40,6 +41,7 @@ export async function patientLabFacts(patientRef: string): Promise<LabFact[]> {
   return [...own.map((o) => ({ o, source: 'patient' as const })), ...clinic.map((o) => ({ o, source: 'clinic' as const }))]
     .filter(({ o }) => !['entered-in-error', 'cancelled'].includes(o.status))
     .filter(({ o }) => !o.category?.some((c) => c.coding?.some((cd) => cd.code === 'vital-signs')))
+    .filter(({ o }) => !isJournal(o)) // dzienniki pacjenta to samoocena, nie wyniki badań
     .map(({ o, source }) => ({
       id: o.id,
       name: o.code.text ?? o.code.coding?.[0]?.display ?? '',

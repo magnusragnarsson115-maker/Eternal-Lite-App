@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarClock, CalendarPlus, CalendarX2, ClipboardCheck, ClipboardList, Download, MapPin, Phone, Video } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { get, post } from '../api';
+import { get, post, withProfile } from '../api';
 import { errorCode, errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import type { TeleState } from '../mvp-types';
@@ -174,7 +174,7 @@ export function AppointmentDetailPage() {
 
       {active && (
         <div className="btn-row">
-          <a className="btn secondary" href={`/api/me/appointments/${a.id}/ics`} download>
+          <a className="btn secondary" href={withProfile(`/api/me/appointments/${a.id}/ics`)} download>
             <Download size={18} /> {t('Dodaj do kalendarza')}
           </a>
           {a.canCancelOnline ? (

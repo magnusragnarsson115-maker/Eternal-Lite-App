@@ -1,3 +1,4 @@
+import { directiveCardLines, listDirectives } from './healthHistory.js';
 import type { MedicationStatement, Patient } from '@medplum/fhirtypes';
 import { audit, type AuditActor } from '../audit.js';
 import { config } from '../config.js';
@@ -86,6 +87,8 @@ export async function emergencyCard(patientRef: string) {
     notes: info.notes,
     medications,
     contacts: listContacts(patientRef).map((c) => ({ name: c.name, phone: c.phone, relation: c.relation })),
+    // A22.5 — dyspozycje, które pacjent zaznaczył do pokazania na karcie
+    directives: directiveCardLines(await listDirectives(patientRef)).map((l) => l.pl),
     disclaimer: 'Informacje wpisane przez pacjenta w aplikacji Eternal, bez weryfikacji medycznej.',
   };
 }

@@ -8,6 +8,7 @@ import { localDate } from '../lib/time.js';
 import { conflict, forbidden, notFound } from '../lib/util.js';
 import { requireModule } from '../modules.js';
 import { renderPdf } from '../pdf/render.js';
+import { activeEmergencyFor, EMERGENCY_REASONS, endEmergencyAccess, startEmergencyAccess } from '../services/emergencyAccess.js';
 import { buildFacts, clinicNameFor, factsHtml } from '../services/facts.js';
 import { requireGrantAccess, revokeGrant } from '../services/grants.js';
 import { dayInbox, prepFor, sendDocsReminder, sharedPatients } from '../services/inbox.js';
@@ -162,6 +163,27 @@ export async function visitRoutes(app: FastifyInstance): Promise<void> {
     const { id } = params(req, IdParams);
     const q = query(req, FactsQuery);
     return buildFacts(auth.user, actorOf(req), { patientId: id, appointmentId: q.appointmentId });
+  });
+
+  // --- A24.5: dostęp ratunkowy z pełnym logiem --------------------------------------------------------
+  app.get('/api/staff/patients/:id/emergency-access', async (req) => {
+    const auth = requireClinician(req);
+    const { id } = params(req, IdParams);
+    return { active: activeEmergencyFor(auth.user, `Patient/${id}`) ?? null, reasons: EMERGENCY_REASONS };
+  });
+
+  app.post('/api/staff/patients/:id/emergency-access', async (req) => {
+    const auth = requireClinician(req);
+    const { id } = params(req, IdParams);
+    const input = body(req, z.object({ reason: z.enum(EMERGENCY_REASONS), justification: z.string().max(2000), confirm: z.literal(true) }));
+    return startEmergencyAccess(actorOf(req), auth.user, id, input);
+  });
+
+  app.post('/api/staff/emergency-access/:id/end', async (req) => {
+    const auth = requireClinician(req);
+    const { id } = params(req, z.object({ id: z.string().uuid() }));
+    endEmergencyAccess(actorOf(req), auth.user, id);
+    return { ok: true };
   });
 
   app.get('/api/staff/patients/:id/facts.pdf', async (req, reply) => {

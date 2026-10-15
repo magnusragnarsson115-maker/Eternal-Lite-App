@@ -1,12 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Bell, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, FolderOpen, Home, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User } from 'lucide-react';
-import type { ReactNode } from 'react';
-import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Activity, BookHeart, Bell, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, FolderOpen, Home, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users } from 'lucide-react';
+import { useEffect, type ReactNode } from 'react';
+import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { get, msSinceOwnMutation } from '../api';
 import { useI18n } from '../i18n';
 import { useRealtime, type LiveEvent } from '../realtime';
 import { useSession } from '../session';
 import { BrandMark, Button, DemoBanner, FullText, Notice, Spinner, useToast } from '../ui';
+import { ProfileSwitcher, ProxyBanner } from './FamilyPages';
+import { StatusBanner } from '../shared/SystemStatus';
 
 const LIVE_MESSAGES: Record<string, string> = {
   'appointment.changed': 'Zaktualizowano Twoje wizyty.',
@@ -30,7 +32,10 @@ function NavItem({ to, icon, label, badge, end }: { to: string; icon: ReactNode;
 }
 
 export function PatientShell() {
-  const { me, config, loading, logout } = useSession();
+  const { me, config, loading, logout, profile, profiles, switchProfile } = useSession();
+  const navigate = useNavigate();
+  // tryb opiekuna (A24.2): obszary osobiste konta (ankiety, SOS, profil i bezpieczeństwo) zostają przy właścicielu
+  const proxy = !!profile;
   const { t } = useI18n();
   const toast = useToast();
   const location = useLocation();
@@ -41,6 +46,16 @@ export function PatientShell() {
     enabled: authed,
     refetchInterval: 120_000,
   });
+  // link z powiadomienia dla opiekuna (…?profile=<id>) otwiera właściwy profil
+  const linkProfile = new URLSearchParams(location.search).get('profile');
+  useEffect(() => {
+    if (!linkProfile || !profiles.length) return;
+    const target = profiles.find((p) => p.id === linkProfile);
+    if (target && (target.self ? !!profile : profile?.id !== target.id)) switchProfile(target.self ? undefined : target.id);
+    const params = new URLSearchParams(location.search);
+    params.delete('profile');
+    navigate({ pathname: location.pathname, search: params.toString() ? `?${params}` : '' }, { replace: true });
+  }, [linkProfile, profiles, profile, switchProfile, navigate, location.pathname, location.search]);
   useRealtime(authed, (e: LiveEvent) => {
     const msg = LIVE_MESSAGES[e.type];
     if (msg && document.visibilityState === 'visible' && msSinceOwnMutation() > 5000) toast(t(msg));
@@ -68,9 +83,10 @@ export function PatientShell() {
               eternal <em>Pacjent</em>
             </span>
           </Link>
-          <span className="grow small muted" style={{ textAlign: 'center' }}>
+          <span className="grow small muted header-clinic" style={{ textAlign: 'center' }}>
             {config?.clinic.name}
           </span>
+          <ProfileSwitcher />
           <Link to="/powiadomienia" className="btn ghost icon" aria-label={t('Powiadomienia ({n} nieprzeczytanych)', { n: unreadNotif })} style={{ position: 'relative' }}>
             <Bell size={22} />
             {unreadNotif > 0 && (
@@ -81,6 +97,8 @@ export function PatientShell() {
           </Link>
         </div>
       </header>
+      <ProxyBanner />
+      <StatusBanner />
       {me.user && !me.user.emailVerified && (
         <div style={{ maxWidth: 1080, margin: '12px auto 0', padding: '0 16px', width: '100%' }}>
           <Notice kind="warn">{t('Potwierdź adres e-mail — wysłaliśmy link na {email}.', { email: me.user.email })}</Notice>
@@ -91,20 +109,26 @@ export function PatientShell() {
           <nav>
             <NavItem to="/" end icon={<Home size={20} />} label={t('Start')} />
             <NavItem to="/wizyty" icon={<CalendarDays size={20} />} label={t('Wizyty')} />
+            <NavItem to="/kalendarz" icon={<CalendarRange size={20} />} label={t('Kalendarz zdrowia')} />
             <NavItem to="/wyniki" icon={<FileText size={20} />} label={t('Wyniki od placówki')} />
             <NavItem to="/dokumenty" icon={<FolderOpen size={20} />} label={t('Moje dokumenty')} />
             <NavItem to="/karty" icon={<ClipboardCheck size={20} />} label={t('Karty „Po wizycie”')} />
             <NavItem to="/wiadomosci" icon={<MessageSquare size={20} />} label={t('Wiadomości')} badge={unreadMsg} />
             <NavItem to="/pomiary" icon={<Activity size={20} />} label={t('Pomiary')} />
             <NavItem to="/raport" icon={<FileChartColumn size={20} />} label={t('Raport okresowy')} />
-            <NavItem to="/ankiety" icon={<ClipboardList size={20} />} label={t('Ankiety')} />
+            <NavItem to="/dla-lekarza" icon={<Stethoscope size={20} />} label={t('Dla lekarza i na wyjazd')} />
+            {!proxy && <NavItem to="/ankiety" icon={<ClipboardList size={20} />} label={t('Ankiety')} />}
             <NavItem to="/leki" icon={<Pill size={20} />} label={t('Leki')} />
+            <NavItem to="/dzienniki" icon={<BookHeart size={20} />} label={t('Dzienniki')} />
+            <NavItem to="/historia-zdrowia" icon={<Syringe size={20} />} label={t('Historia zdrowia')} />
+            <NavItem to="/plan" icon={<Dumbbell size={20} />} label={t('Plan i cele')} />
             <div className="side-sep" />
+            <NavItem to="/rodzina" icon={<Users size={20} />} label={t('Rodzina i opiekunowie')} />
             <NavItem to="/nfz" icon={<Search size={20} />} label={t('Terminy NFZ')} />
             <NavItem to="/udostepnianie" icon={<Share2 size={20} />} label={t('Komu udostępniam')} />
             <NavItem to="/prywatnosc" icon={<Shield size={20} />} label={t('Prywatność i zgody')} />
-            <NavItem to="/profil" icon={<User size={20} />} label={t('Profil i bezpieczeństwo')} />
-            <NavItem to="/bezpieczenstwo" icon={<Siren size={20} />} label={t('SOS i karta ratunkowa')} />
+            {!proxy && <NavItem to="/profil" icon={<User size={20} />} label={t('Profil i bezpieczeństwo')} />}
+            {!proxy && <NavItem to="/bezpieczenstwo" icon={<Siren size={20} />} label={t('SOS i karta ratunkowa')} />}
             <NavItem to="/pomoc" icon={<LifeBuoy size={20} />} label={t('Pomoc · 112 · 116 123')} />
             <div className="side-sep" />
             <button type="button" className="btn ghost" style={{ justifyContent: 'flex-start' }} onClick={() => void logout()}>
@@ -148,26 +172,33 @@ export function PatientShell() {
 
 export function MorePage() {
   const { t } = useI18n();
-  const { me, logout } = useSession();
+  const { me, logout, profile } = useSession();
+  const own = (x: [string, ReactNode, string]) => (profile ? [] : [x]);
   const items: [string, ReactNode, string][] = [
     ['/pomoc', <LifeBuoy size={20} key="h" />, t('Pomoc · 112 · 116 123')],
-    ['/bezpieczenstwo', <Siren size={20} key="s" />, t('SOS i karta ratunkowa')],
+    ['/rodzina', <Users size={20} key="ro" />, t('Rodzina i opiekunowie')],
+    ...own(['/bezpieczenstwo', <Siren size={20} key="s" />, t('SOS i karta ratunkowa')]),
     ['/dokumenty', <FolderOpen size={20} key="dd" />, t('Moje dokumenty')],
     ['/karty', <ClipboardCheck size={20} key="k" />, t('Karty „Po wizycie”')],
     ['/udostepnianie', <Share2 size={20} key="u" />, t('Komu udostępniam')],
     ['/pomiary', <Activity size={20} key="a" />, t('Pomiary')],
     ['/raport', <FileChartColumn size={20} key="r" />, t('Raport okresowy')],
-    ['/ankiety', <ClipboardList size={20} key="an" />, t('Ankiety')],
+    ['/dla-lekarza', <Stethoscope size={20} key="dl" />, t('Dla lekarza i na wyjazd')],
+    ...own(['/ankiety', <ClipboardList size={20} key="an" />, t('Ankiety')]),
     ['/leki', <Pill size={20} key="b" />, t('Leki')],
+    ['/dzienniki', <BookHeart size={20} key="dz" />, t('Dzienniki')],
+    ['/historia-zdrowia', <Syringe size={20} key="hz" />, t('Historia zdrowia')],
+    ['/plan', <Dumbbell size={20} key="pl" />, t('Plan i cele')],
+    ['/kalendarz', <CalendarRange size={20} key="ka" />, t('Kalendarz zdrowia')],
     ['/nfz', <Search size={20} key="c" />, t('Terminy NFZ')],
     ['/powiadomienia', <Bell size={20} key="d" />, t('Powiadomienia')],
     ['/prywatnosc', <Shield size={20} key="e" />, t('Prywatność i zgody')],
-    ['/profil', <User size={20} key="f" />, t('Profil i bezpieczeństwo')],
+    ...own(['/profil', <User size={20} key="f" />, t('Profil i bezpieczeństwo')]),
   ];
   return (
     <div className="stack-lg">
       <div className="page-head">
-        <h1>{me?.patient?.name}</h1>
+        <h1>{profile?.name ?? me?.patient?.name}</h1>
         <p className="muted">{me?.user?.email}</p>
       </div>
       <div className="card card-flush">

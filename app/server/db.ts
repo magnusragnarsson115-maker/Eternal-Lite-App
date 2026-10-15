@@ -542,6 +542,95 @@ const MIGRATIONS: string[] = [
   );
   CREATE INDEX survey_submission_survey ON survey_submission(survey_id, submitted_at);
   `,
+  // 11 — profile rodzinne i dostęp opiekuna (A22.1, A24.1, A24.2): kto może działać w imieniu którego profilu
+  `
+  CREATE TABLE proxy_link (
+    id TEXT PRIMARY KEY,
+    patient_ref TEXT NOT NULL,
+    patient_birth_date TEXT,
+    proxy_user_id TEXT,
+    relation TEXT NOT NULL,
+    access TEXT NOT NULL,
+    status TEXT NOT NULL,
+    managed INTEGER NOT NULL DEFAULT 0,
+    code_hash TEXT,
+    code_expires_at TEXT,
+    basis TEXT,
+    created_by TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    activated_at TEXT,
+    expires_at TEXT,
+    revoked_at TEXT,
+    revoked_by TEXT
+  );
+  CREATE INDEX proxy_link_user ON proxy_link(proxy_user_id, status);
+  CREATE INDEX proxy_link_patient ON proxy_link(patient_ref, status);
+  CREATE UNIQUE INDEX proxy_link_code ON proxy_link(code_hash) WHERE code_hash IS NOT NULL;
+  `,
+  // 12 — dostęp ratunkowy personelu (A24.5): przełamanie szklanej szybki z uzasadnieniem i przeglądem
+  `
+  CREATE TABLE emergency_access (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    practitioner_ref TEXT,
+    user_display TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    justification TEXT NOT NULL,
+    started_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    ended_at TEXT,
+    reviewed_at TEXT,
+    reviewed_by TEXT,
+    review_outcome TEXT,
+    review_note TEXT
+  );
+  CREATE INDEX emergency_access_active ON emergency_access(org_id, patient_ref, expires_at);
+  CREATE INDEX emergency_access_review ON emergency_access(org_id, reviewed_at);
+  `,
+  // 13 — kalendarz zdrowia z subskrypcją ICS (A17.13, F5.6/F5.7), plan rehabilitacji (A22.4), cele (A7.6)
+  `
+  CREATE TABLE calendar_feed (
+    id TEXT PRIMARY KEY,
+    token_hash TEXT NOT NULL UNIQUE,
+    user_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    last_read_at TEXT,
+    revoked_at TEXT
+  );
+  CREATE INDEX calendar_feed_user ON calendar_feed(user_id, patient_ref);
+  CREATE TABLE rehab_log (
+    id TEXT PRIMARY KEY,
+    plan_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    activity INTEGER NOT NULL,
+    day TEXT NOT NULL,
+    done_at TEXT NOT NULL,
+    note TEXT,
+    UNIQUE (plan_id, activity, day)
+  );
+  CREATE INDEX rehab_log_plan ON rehab_log(plan_id, day);
+  CREATE TABLE goal_checkin (
+    goal_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    day TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (goal_id, day)
+  );
+  `,
+  // 14 — znane urządzenia logowania (F1.12, reguła zamiast modelu ML): powiadomienie o logowaniu z nowego urządzenia
+  `
+  CREATE TABLE known_device (
+    user_id TEXT NOT NULL,
+    device_hash TEXT NOT NULL,
+    label TEXT NOT NULL,
+    first_seen TEXT NOT NULL,
+    last_seen TEXT NOT NULL,
+    PRIMARY KEY (user_id, device_hash)
+  );
+  `,
 ];
 
 export type Db = DatabaseSync;

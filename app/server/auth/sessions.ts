@@ -3,6 +3,8 @@ import type { AuditActor } from '../audit.js';
 import { config } from '../config.js';
 import { getDb } from '../db.js';
 import { forbidden, nowIso, randomToken, sha256, unauthorized } from '../lib/util.js';
+import { enqueue, notifyUser } from '../services/notifications.js';
+import { proxyRouteVerdict, requestedProfile, resolveProxy } from './proxy.js';
 import { type AppUser, findUserById, isStaff, type Role } from './users.js';
 
 export const SESSION_COOKIE = config.isProduction ? '__Host-eternal_sid' : 'eternal_sid';
@@ -91,9 +93,50 @@ export function createSession(
       expires,
     });
   }
+  noteDevice(user, deviceLabel(req.headers['user-agent'], mobile), req.ip, now);
   const ctx: AuthContext = { user, sessionHash: idHash, csrfToken: csrf, mfaPassed, bearer: mobile, bearerToken: mobile ? token : undefined };
   req.auth = ctx;
   return ctx;
+}
+
+/** Sieć, z której nastąpiło logowanie (IPv4 /16, IPv6 /48) — zmiana adresu w tej samej sieci nie jest „nowym urządzeniem”. */
+function networkOf(ip: string | undefined): string {
+  if (!ip) return '';
+  if (ip.includes(':')) return ip.split(':').slice(0, 3).join(':');
+  return ip.split('.').slice(0, 2).join('.');
+}
+
+/**
+ * Logowanie z nowego urządzenia (F1.12 — reguła, nie model ML): pierwsze logowanie z danej przeglądarki/aplikacji
+ * i sieci → powiadomienie w aplikacji i e-mail z radą, co zrobić, jeśli to nie Ty. Bez danych o zdrowiu.
+ */
+function noteDevice(user: AppUser, label: string, ip: string | undefined, now: Date): void {
+  const db = getDb();
+  const hash = sha256(`${user.id}|${label}|${networkOf(ip)}`);
+  const known = db.prepare('SELECT 1 FROM known_device WHERE user_id = ? AND device_hash = ?').get(user.id, hash);
+  const any = db.prepare('SELECT COUNT(*) AS n FROM known_device WHERE user_id = ?').get(user.id) as { n: number };
+  db.prepare(
+    'INSERT INTO known_device (user_id, device_hash, label, first_seen, last_seen) VALUES (?, ?, ?, ?, ?) ON CONFLICT(user_id, device_hash) DO UPDATE SET last_seen = excluded.last_seen',
+  ).run(user.id, hash, label, now.toISOString(), now.toISOString());
+  if (known || any.n === 0) return;
+  const when = now.toISOString().slice(0, 16).replace('T', ' ');
+  void notifyUser(user.id, {
+    kind: 'security',
+    title: 'Logowanie z nowego urządzenia',
+    body: `${label}, ${when} UTC. Jeśli to nie Ty — zmień hasło i wyloguj pozostałe urządzenia w ustawieniach bezpieczeństwa.`,
+    link: isStaff(user) ? '/panel/konto' : '/profil',
+    push: false,
+  }).catch(() => undefined);
+  if (user.email && !user.email.endsWith('@invalid')) {
+    enqueue({
+      channel: 'email',
+      userId: user.id,
+      recipient: user.email,
+      subject: 'Eternal: logowanie z nowego urządzenia',
+      body: `Zalogowano się na Twoje konto: ${label}, ${when} UTC.\n\nJeśli to nie Ty — zmień hasło i wyloguj pozostałe urządzenia w ustawieniach bezpieczeństwa aplikacji.`,
+      dedupeKey: `new-device:${user.id}:${hash}`,
+    });
+  }
 }
 
 export interface SessionView {
@@ -184,9 +227,20 @@ export function requireUser(req: FastifyRequest): AuthContext {
   return auth;
 }
 
-export function requirePatient(req: FastifyRequest): AuthContext & { patientRef: string } {
+export function requirePatient(req: FastifyRequest, opts: { ownOnly?: boolean } = {}): AuthContext & { patientRef: string } {
   const auth = requireUser(req);
   if (!auth.user.roles.includes('patient') || !auth.user.fhir_ref) throw forbidden('patient_only');
+  // A24.2 — działanie w imieniu profilu dziecka lub osoby pod opieką (proxy.ts)
+  const profile = opts.ownOnly ? undefined : requestedProfile(req);
+  if (profile && profile !== auth.user.fhir_ref) {
+    const link = resolveProxy(auth.user.id, profile);
+    if (!link) throw forbidden('proxy_not_allowed');
+    const ctx = { linkId: link.id, relation: link.relation, access: link.access, managed: !!link.managed };
+    const verdict = proxyRouteVerdict(req.method, req.routeOptions?.url ?? req.url, ctx);
+    if (verdict) throw forbidden(verdict);
+    req.proxy = ctx;
+    return { ...auth, patientRef: profile };
+  }
   return { ...auth, patientRef: auth.user.fhir_ref };
 }
 
@@ -207,7 +261,8 @@ export function actorOf(req: FastifyRequest): AuditActor {
   return {
     userId: u?.id,
     actorRef: u?.fhir_ref ?? (u ? `urn:eternal:user:${u.id}` : undefined),
-    display: u?.display_name,
+    // w dzienniku dostępu profilu widać, że działał opiekun (A24.2)
+    display: req.proxy && u ? `${u.display_name} (opiekun)` : u?.display_name,
     roles: u?.roles,
     ip: req.ip,
     userAgent: req.headers['user-agent'],

@@ -10,6 +10,7 @@ import { hasRole, useSession } from '../session';
 import { ReadabilityCard, ReportIncidentCard, SecurityKeysCard, SessionsCard } from '../shared/AccountCards';
 import type { AppointmentView } from '../types';
 import { Badge, Button, Card, Checkbox, Empty, Modal, Notice, PageHead, QueryError, SelectField, Skeleton, Switch, Tabs, TextArea, TextField, useConfirm, useToast } from '../ui';
+import { EmergencyReviewTab } from './EmergencyAccess';
 
 // --- pulpit: poczekalnia wideo (D7) ----------------------------------------------------------------
 
@@ -238,7 +239,7 @@ function SurveyCard({ questions, onDone }: { questions: { id: string; pl: string
 
 // --- D0: organizacja kliniki (administrator) ------------------------------------------------------
 
-type OrgTab = 'gotowosc' | 'moduly' | 'pakiety' | 'ankiety' | 'konfiguracja' | 'personel' | 'uzycie' | 'incydenty' | 'ai';
+type OrgTab = 'gotowosc' | 'moduly' | 'pakiety' | 'ankiety' | 'konfiguracja' | 'personel' | 'uzycie' | 'incydenty' | 'ratunkowy' | 'ai';
 
 export function OrgManagePage() {
   const { t } = useI18n();
@@ -260,6 +261,7 @@ export function OrgManagePage() {
           { value: 'personel', label: t('Zaproszenia personelu') },
           { value: 'uzycie', label: t('Użycie i faktura') },
           { value: 'incydenty', label: t('Incydenty') },
+          { value: 'ratunkowy', label: t('Dostęp ratunkowy') },
           { value: 'ai', label: t('Rejestr AI') },
         ]}
       />
@@ -271,6 +273,7 @@ export function OrgManagePage() {
       {tab === 'personel' && <StaffInvitesTab />}
       {tab === 'uzycie' && <UsageTab />}
       {tab === 'incydenty' && <IncidentsTab />}
+      {tab === 'ratunkowy' && <EmergencyReviewTab />}
       {tab === 'ai' && <AiRegistryTab />}
     </div>
   );
@@ -906,6 +909,7 @@ function AiRegistryTab() {
         dictionaryVersion: string;
         dailyLimit: number;
         calls: { task: string; provider: string; model: string | null; prompt_version: string; outcome: string; calls: number; input_units: number; output_units: number; avg_latency_ms: number }[];
+        secondaryUse?: { objections: number; patients: number };
       }>('/api/admin/ai-registry'),
   });
   if (!q.data) return <Skeleton />;
@@ -913,6 +917,14 @@ function AiRegistryTab() {
   return (
     <div className="stack-lg">
       <Notice kind="info">{t('Rejestr zastosowań AI: zadania, wersje poleceń i szablonów, wywołania (bez treści medycznych). Model nie dostaje zadań oceny stanu zdrowia.')}</Notice>
+      {d.secondaryUse && (
+        <Card title={t('Wtórne wykorzystanie danych (EHDS)')}>
+          <p style={{ margin: 0 }}>
+            {t('Sprzeciwy pacjentów zapisane w rejestrze: {n} (pacjentów w placówce: {p}).', { n: d.secondaryUse.objections, p: d.secondaryUse.patients })}
+          </p>
+          <p className="small muted" style={{ marginBottom: 0 }}>{t('Eternal nie udostępnia dziś danych do celów wtórnych (badania, statystyka, trenowanie modeli). Rejestr sprzeciwów jest gotowy na dzień stosowania przepisów EHDS.')}</p>
+        </Card>
+      )}
       <Card title={t('Dostawcy')}>
         <dl className="kv">
           {Object.entries(d.providers).map(([k, v]) => (

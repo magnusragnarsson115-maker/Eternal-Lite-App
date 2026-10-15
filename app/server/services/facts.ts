@@ -1,4 +1,5 @@
 import type { Appointment, DiagnosticReport, DocumentReference, Observation, Patient } from '@medplum/fhirtypes';
+import { isJournal } from './journal.js';
 import { audit, type AuditActor } from '../audit.js';
 import type { AppUser } from '../auth/users.js';
 import { config } from '../config.js';
@@ -73,7 +74,7 @@ export interface FactsReport {
   documents: FactsDocument[];
   /** Ankiety zdrowotne pacjenta (A12.3) — odpowiedzi pacjenta bez oceny; tylko przy udostępnieniu. */
   surveys: { ref: string; title: string; authored: string; answers: { question: string; answer: string }[] }[];
-  sharing: { grants: GrantView[]; vaultIncluded: boolean };
+  sharing: { grants: GrantView[]; vaultIncluded: boolean; emergency?: { id: string; expiresAt: string } };
 }
 
 // --- układy dla specjalizacji (MVP-1): wyłącznie kolejność grup, bez ocen --------------------------------
@@ -213,6 +214,7 @@ export async function buildFacts(user: AppUser, actor: AuditActor, input: { pati
     const docById = new Map(vDocs.map((d) => [`DocumentReference/${d.id}`, d]));
     for (const o of vObs) {
       if (['entered-in-error', 'cancelled'].includes(o.status)) continue;
+      if (isJournal(o)) continue; // dzienniki — osobne zestawienie, nie wyniki badań
       const docRef = o.derivedFrom?.[0]?.reference ?? '';
       if (!grantAllows(grants, docRef, 'result')) continue;
       const doc = docById.get(docRef);
@@ -282,6 +284,8 @@ export async function buildFacts(user: AppUser, actor: AuditActor, input: { pati
 
   const prep = appt ? await prepFor(appt, orgId) : undefined;
   const name = patient.name?.[0];
+  // A24.5 — dostęp ratunkowy działa jak udostępnienie całości, ale raport mówi o nim wprost
+  const emergency = grants.find((g) => g.purpose === 'emergency');
   const report: FactsReport = {
     templateVersion: `${FACTS_TEMPLATE_VERSION}+${layout.name}`,
     layout: layout.name,
@@ -294,7 +298,7 @@ export async function buildFacts(user: AppUser, actor: AuditActor, input: { pati
     unconfirmed: finalize(unconfirmed, layout.order),
     documents,
     surveys,
-    sharing: { grants, vaultIncluded: grants.length > 0 },
+    sharing: { grants, vaultIncluded: grants.length > 0, emergency: emergency ? { id: emergency.id.replace('emergency:', ''), expiresAt: emergency.expiresAt } : undefined },
   };
   audit(actor, { action: 'R', subtype: 'facts-report', entityRef: input.appointmentId ? `Appointment/${input.appointmentId}` : patientRef, patientRef, detail: { results: report.results.length, unconfirmed: report.unconfirmed.length, vault: grants.length > 0 } });
   return report;

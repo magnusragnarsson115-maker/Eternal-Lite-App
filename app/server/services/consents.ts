@@ -1,8 +1,9 @@
-import type { Consent } from '@medplum/fhirtypes';
+import type { Consent, Patient } from '@medplum/fhirtypes';
 import { audit, type AuditActor } from '../audit.js';
 import { bus } from '../events.js';
 import { CONSENT_SCOPE, CONSENT_TYPES, type ConsentType, ETERNAL } from '../fhir/constants.js';
-import { fhir } from '../fhir/index.js';
+import { fhir, fhirSystem } from '../fhir/index.js';
+import { ORG_TAG_SYSTEM } from '../tenancy.js';
 import { nowIso } from '../lib/util.js';
 
 /** Wersja treści zgód — zmiana treści wymaga ponownego zebrania zgody (RODO art. 7 ust. 1: wykazanie zgody). */
@@ -93,4 +94,16 @@ export async function consentHistory(consentId: string): Promise<{ at: string; g
     granted: v.provision?.type === 'permit',
     version: v.policy?.[0]?.uri?.split(':').pop(),
   }));
+}
+
+/**
+ * Rejestr sprzeciwów wobec wtórnego wykorzystania danych (D5.4, EHDS art. 71): liczba aktywnych sprzeciwów pacjentów
+ * placówki. Eternal nie udostępnia dziś danych do celów wtórnych — rejestr jest gotowy na dzień stosowania przepisów.
+ */
+export async function secondaryUseObjections(orgId: string): Promise<{ objections: number; patients: number }> {
+  const all = await fhirSystem().search<Consent>('Consent', { category: `${ETERNAL.consentType}|secondary-use-objection`, _count: '5000' });
+  const active = all.filter((c) => c.status === 'active' && c.provision?.type === 'permit');
+  const patients = await fhirSystem().search<Patient>('Patient', { _tag: `${ORG_TAG_SYSTEM}|${orgId}`, _count: '10000' });
+  const refs = new Set(patients.map((p) => `Patient/${p.id}`));
+  return { objections: active.filter((c) => c.patient?.reference && refs.has(c.patient.reference)).length, patients: refs.size };
 }

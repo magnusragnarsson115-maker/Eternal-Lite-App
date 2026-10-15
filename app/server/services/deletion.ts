@@ -1,4 +1,4 @@
-import type { MedicationStatement, Observation, Resource, ResourceType } from '@medplum/fhirtypes';
+import type { MedicationStatement, Observation, Patient, Resource, ResourceType } from '@medplum/fhirtypes';
 import { audit, type AuditActor } from '../audit.js';
 import { destroyAllSessions } from '../auth/sessions.js';
 import { type AppUser, updateUser } from '../auth/users.js';
@@ -34,7 +34,19 @@ export interface DeletionConfirmation {
   backupsGoneBy: string;
 }
 
-const VAULT_TYPES: ResourceType[] = ['Observation', 'DiagnosticReport', 'DocumentReference', 'QuestionnaireResponse', 'Provenance'];
+export const VAULT_TYPES: ResourceType[] = [
+  'Observation',
+  'DiagnosticReport',
+  'DocumentReference',
+  'QuestionnaireResponse',
+  'Provenance',
+  'RelatedPerson',
+  'Immunization',
+  'ImmunizationRecommendation',
+  'FamilyMemberHistory',
+  'Consent',
+  'Goal',
+];
 
 async function expungeAll(resources: Resource[]): Promise<number> {
   let n = 0;
@@ -46,50 +58,97 @@ async function expungeAll(resources: Resource[]): Promise<number> {
   return n;
 }
 
+/** Dane własne profilu pacjenta: udostępnienia, sejf, wpisy z aplikacji (kroki 1–3 potwierdzenia). */
+async function erasePatientData(actor: AuditActor, patientRef: string): Promise<DeletionStep[]> {
+  const db = getDb();
+  const steps: DeletionStep[] = [];
+  // 1. udostępnienia i linki — natychmiastowe odebranie dostępu
+  const grants = db.prepare("SELECT id FROM access_grant WHERE patient_ref = ? AND status = 'active'").all(patientRef) as { id: string }[];
+  for (const g of grants) await revokeGrant(actor, g.id, { patientRef });
+  const links = db.prepare("UPDATE invite_link SET status = 'revoked' WHERE patient_ref = ? AND status = 'active'").run(patientRef);
+  // opiekunowie tracą dostęp do profilu (A24.2)
+  const proxies = db
+    .prepare("UPDATE proxy_link SET status = 'revoked', revoked_at = ?, revoked_by = ?, code_hash = NULL WHERE patient_ref = ? AND status IN ('pending', 'active')")
+    .run(nowIso(), actor.userId ?? null, patientRef);
+  steps.push({ key: 'sharing', label: 'Udostępnienia klinikom, linki i dostęp opiekunów', status: 'deleted', count: grants.length + Number(links.changes) + Number(proxies.changes), detail: 'Kliniki i opiekunowie stracili dostęp do materiałów, linki przestały działać.' });
+
+  // 2. sejf pacjenta: dokumenty i wyniki wgrane przez pacjenta, odczyty, pochodzenie
+  const vaultTag = `${ORG_TAG_SYSTEM}|${vaultOrgId(patientRef)}`;
+  const vault: Resource[] = [];
+  for (const t of VAULT_TYPES) vault.push(...(await fhirSystem().search(t, { _tag: vaultTag, _count: '5000' })));
+  // karty „Po wizycie” są także dokumentacją placówki — zostają u niej, usuwamy tylko kopię w sejfie (znacznik)
+  const clinicCopies = vault.filter((r) => orgIdsOf(r).some((o) => o !== vaultOrgId(patientRef)));
+  for (const r of clinicCopies) {
+    await fhirSystem().update({ ...r, meta: { ...r.meta, tag: (r.meta?.tag ?? []).filter((t) => !(t.system === ORG_TAG_SYSTEM && t.code === vaultOrgId(patientRef))) } });
+  }
+  const own = vault.filter((r) => !clinicCopies.includes(r));
+  const intake = db.prepare('SELECT binary_id FROM intake_item WHERE patient_ref = ?').all(patientRef) as { binary_id: string }[];
+  for (const b of intake) {
+    await fhirSystem().deleteBinary(b.binary_id).catch(() => undefined);
+    db.prepare('DELETE FROM binary_owner WHERE binary_id = ?').run(b.binary_id);
+  }
+  db.prepare('DELETE FROM intake_item WHERE patient_ref = ?').run(patientRef);
+  const n = await expungeAll(own);
+  steps.push({ key: 'vault', label: 'Dokumenty i wyniki wgrane przez Ciebie, odczyty, pliki, odpowiedzi w ankietach', status: 'deleted', count: n + intake.length, detail: 'Usunięte trwale, razem z historią wersji.' });
+
+  // 3. wpisy z aplikacji: pomiary i lista leków wprowadzone przez pacjenta
+  const obs = (await fhirSystem().search<Observation>('Observation', { subject: patientRef, _count: '5000' })).filter((o) => o.performer?.[0]?.reference === patientRef);
+  const meds = (await fhirSystem().search<MedicationStatement>('MedicationStatement', { subject: patientRef, _count: '1000' })).filter((m) => m.informationSource?.reference === patientRef);
+  const m = await expungeAll([...obs, ...meds]);
+  transaction(db, () => {
+    db.prepare('DELETE FROM med_schedule WHERE patient_ref = ?').run(patientRef);
+    db.prepare('DELETE FROM emergency_contact WHERE patient_ref = ?').run(patientRef);
+    db.prepare('DELETE FROM setting WHERE key = ?').run(`emergency:${patientRef}`);
+  });
+  steps.push({ key: 'entries', label: 'Pomiary, leki, przypomnienia, osoby bliskie i karta ratunkowa', status: 'deleted', count: m, detail: 'Wpisy wprowadzone przez Ciebie w aplikacji.' });
+  return steps;
+}
+
+/**
+ * Usunięcie profilu prowadzonego przez opiekuna (dziecko, osoba pod opieką — A24.1): dane własne profilu jak przy
+ * usunięciu konta, profil oznaczony jako nieaktywny. Dokumentacja placówek i dziennik zdarzeń zostają.
+ */
+export async function deleteManagedProfileData(actor: AuditActor, patientRef: string): Promise<DeletionStep[]> {
+  const steps = await erasePatientData(actor, patientRef);
+  const p = await fhirSystem().readOptional<Patient>('Patient', patientRef.split('/')[1] ?? '');
+  if (p) await fhirSystem().update<Patient>({ ...p, active: false });
+  audit(actor, { action: 'D', subtype: 'managed-profile-deleted', patientRef, detail: { steps: steps.map((x) => `${x.key}:${x.status}:${x.count ?? ''}`) } });
+  return steps;
+}
+
 export async function deleteMyData(actor: AuditActor, user: AppUser): Promise<DeletionConfirmation> {
   const patientRef = user.fhir_ref ?? '';
   const id = newId();
   const requestedAt = nowIso();
   const db = getDb();
   db.prepare("INSERT INTO deletion_job (id, user_id, patient_ref, requested_at, status, steps) VALUES (?, ?, ?, ?, 'running', '[]')").run(id, user.id, patientRef || null, requestedAt);
-  const steps: DeletionStep[] = [];
+  const steps: DeletionStep[] = patientRef ? await erasePatientData(actor, patientRef) : [];
 
-  if (patientRef) {
-    // 1. udostępnienia i linki — natychmiastowe odebranie dostępu
-    const grants = db.prepare("SELECT id FROM access_grant WHERE patient_ref = ? AND status = 'active'").all(patientRef) as { id: string }[];
-    for (const g of grants) await revokeGrant(actor, g.id, { patientRef });
-    const links = db.prepare("UPDATE invite_link SET status = 'revoked' WHERE patient_ref = ? AND status = 'active'").run(patientRef);
-    steps.push({ key: 'sharing', label: 'Udostępnienia klinikom i linki', status: 'deleted', count: grants.length + Number(links.changes), detail: 'Kliniki straciły dostęp do Twoich materiałów, linki przestały działać.' });
-
-    // 2. sejf pacjenta: dokumenty i wyniki wgrane przez pacjenta, odczyty, pochodzenie
-    const vaultTag = `${ORG_TAG_SYSTEM}|${vaultOrgId(patientRef)}`;
-    const vault: Resource[] = [];
-    for (const t of VAULT_TYPES) vault.push(...(await fhirSystem().search(t, { _tag: vaultTag, _count: '5000' })));
-    // karty „Po wizycie” są także dokumentacją placówki — zostają u niej, usuwamy tylko kopię w sejfie (znacznik)
-    const clinicCopies = vault.filter((r) => orgIdsOf(r).some((o) => o !== vaultOrgId(patientRef)));
-    for (const r of clinicCopies) {
-      await fhirSystem().update({ ...r, meta: { ...r.meta, tag: (r.meta?.tag ?? []).filter((t) => !(t.system === ORG_TAG_SYSTEM && t.code === vaultOrgId(patientRef))) } });
+  // profile dzieci i osób pod opieką, których ta osoba była jedynym opiekunem, nie mogą zostać bez opiekuna
+  const managed = db
+    .prepare("SELECT DISTINCT patient_ref FROM proxy_link WHERE proxy_user_id = ? AND status = 'active' AND managed = 1")
+    .all(user.id) as { patient_ref: string }[];
+  let orphaned = 0;
+  for (const m of managed) {
+    const others = db
+      .prepare("SELECT COUNT(*) AS n FROM proxy_link WHERE patient_ref = ? AND status = 'active' AND access = 'full' AND proxy_user_id <> ?")
+      .get(m.patient_ref, user.id) as { n: number };
+    if (others.n === 0) {
+      await deleteManagedProfileData(actor, m.patient_ref);
+      orphaned++;
     }
-    const own = vault.filter((r) => !clinicCopies.includes(r));
-    const intake = db.prepare('SELECT binary_id FROM intake_item WHERE patient_ref = ?').all(patientRef) as { binary_id: string }[];
-    for (const b of intake) {
-      await fhirSystem().deleteBinary(b.binary_id).catch(() => undefined);
-      db.prepare('DELETE FROM binary_owner WHERE binary_id = ?').run(b.binary_id);
-    }
-    db.prepare('DELETE FROM intake_item WHERE patient_ref = ?').run(patientRef);
-    const n = await expungeAll(own);
-    steps.push({ key: 'vault', label: 'Dokumenty i wyniki wgrane przez Ciebie, odczyty, pliki, odpowiedzi w ankietach', status: 'deleted', count: n + intake.length, detail: 'Usunięte trwale, razem z historią wersji.' });
-
-    // 3. wpisy z aplikacji: pomiary i lista leków wprowadzone przez pacjenta
-    const obs = (await fhirSystem().search<Observation>('Observation', { subject: patientRef, _count: '5000' })).filter((o) => o.performer?.[0]?.reference === patientRef);
-    const meds = (await fhirSystem().search<MedicationStatement>('MedicationStatement', { subject: patientRef, _count: '1000' })).filter((m) => m.informationSource?.reference === patientRef);
-    const m = await expungeAll([...obs, ...meds]);
-    transaction(db, () => {
-      db.prepare('DELETE FROM med_schedule WHERE patient_ref = ?').run(patientRef);
-      db.prepare('DELETE FROM emergency_contact WHERE patient_ref = ?').run(patientRef);
-      db.prepare('DELETE FROM setting WHERE key = ?').run(`emergency:${patientRef}`);
+  }
+  const resigned = db
+    .prepare("UPDATE proxy_link SET status = 'revoked', revoked_at = ?, revoked_by = ?, code_hash = NULL WHERE proxy_user_id = ? AND status IN ('pending', 'active')")
+    .run(nowIso(), user.id, user.id);
+  if (managed.length || Number(resigned.changes)) {
+    steps.push({
+      key: 'family',
+      label: 'Profile dzieci i osób pod opieką',
+      status: 'deleted',
+      count: orphaned,
+      detail: 'Profile, w których byłeś jedynym opiekunem, usunięto razem z ich danymi; z pozostałych profili zostałeś wypisany.',
     });
-    steps.push({ key: 'entries', label: 'Pomiary, leki, przypomnienia, osoby bliskie i karta ratunkowa', status: 'deleted', count: m, detail: 'Wpisy wprowadzone przez Ciebie w aplikacji.' });
   }
 
   // 4. konto: logowanie, klucze, urządzenia, powiadomienia, preferencje

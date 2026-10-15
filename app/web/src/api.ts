@@ -1,4 +1,5 @@
 let csrfToken = '';
+let activeProfile: string | undefined;
 let onAuthLost: (() => void) | undefined;
 let lastMutation = 0;
 
@@ -9,6 +10,21 @@ export function msSinceOwnMutation(): number {
 
 export function setCsrfToken(token: string | undefined): void {
   csrfToken = token ?? '';
+}
+
+/** Profil, w którym działa opiekun (A24.2) — id zasobu Patient; undefined = własny profil. */
+export function setApiProfile(id: string | undefined): void {
+  activeProfile = id;
+}
+
+export function apiProfile(): string | undefined {
+  return activeProfile;
+}
+
+/** Adres pliku (PDF, CSV, ICS) otwieranego linkiem — w trybie opiekuna z parametrem profilu. */
+export function withProfile(url: string): string {
+  if (!activeProfile) return url;
+  return `${url}${url.includes('?') ? '&' : '?'}profile=${encodeURIComponent(activeProfile)}`;
 }
 
 export function setOnAuthLost(fn: () => void): void {
@@ -36,6 +52,7 @@ interface Options {
 export async function api<T = unknown>(path: string, opts: Options = {}): Promise<T> {
   const method = opts.method ?? (opts.body !== undefined || opts.form ? 'POST' : 'GET');
   const headers: Record<string, string> = { Accept: 'application/json' };
+  if (activeProfile) headers['X-Eternal-Profile'] = activeProfile;
   if (method !== 'GET') {
     headers['X-CSRF-Token'] = csrfToken;
     lastMutation = Date.now();

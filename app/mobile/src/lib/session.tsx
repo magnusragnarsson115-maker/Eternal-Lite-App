@@ -6,6 +6,7 @@ import { registerPush } from './push';
 import * as secure from './secure';
 import type { Me } from './types';
 import { clearDownloads } from './files';
+import { setActiveProfile } from './profile';
 
 /** Blokada po powrocie z tła: po tylu sekundach wymagamy biometrii albo PIN-u. */
 const LOCK_AFTER_SECONDS = 60;
@@ -41,6 +42,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const signOutLocal = useCallback(async () => {
     clearDownloads(); // pobrane PDF z danymi o zdrowiu nie zostają po wylogowaniu
+    setActiveProfile(undefined);
     await secure.wipe();
     setMe(undefined);
     setPhase('signed-out');
@@ -87,6 +89,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (state === 'active' && backgroundAt.current) {
         const away = (Date.now() - backgroundAt.current) / 1000;
         backgroundAt.current = undefined;
+        if (away > LOCK_AFTER_SECONDS) setActiveProfile(undefined); // po blokadzie zawsze własny profil
         setPhase((p) => (p === 'ready' && away > LOCK_AFTER_SECONDS ? 'locked' : p));
       }
     });

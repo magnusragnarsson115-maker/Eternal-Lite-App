@@ -8,7 +8,7 @@ export class Client {
   cookie = '';
   csrf = '';
   constructor(private app: FastifyInstance) {}
-  async req(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, body?: unknown, opts: { csrf?: boolean; origin?: string } = {}) {
+  async req(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, body?: unknown, opts: { csrf?: boolean; origin?: string; headers?: Record<string, string> } = {}) {
     const res = await this.app.inject({
       method,
       url,
@@ -19,6 +19,7 @@ export class Client {
         ...(opts.csrf !== false && this.csrf ? { 'x-csrf-token': this.csrf } : {}),
         origin: opts.origin ?? ORIGIN,
         host: 'localhost:3000',
+        ...opts.headers,
       },
     });
     return this.handle(res);

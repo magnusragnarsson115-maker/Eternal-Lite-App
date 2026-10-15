@@ -101,6 +101,12 @@ export const CONSENT_TYPES = {
   'reminders-push': { required: false, pl: 'Powiadomienia push w przeglądarce/telefonie', en: 'Push notifications' },
   telemedicine: { required: false, pl: 'Udział w teleporadach (wideo)', en: 'Participation in video consultations' },
   'share-measurements': { required: false, pl: 'Przekazywanie pomiarów domowych do placówki', en: 'Sharing home measurements with the clinic' },
+  // D5.4 — rejestr sprzeciwów wobec wtórnego wykorzystania danych (EHDS, rozporządzenie (UE) 2025/327, art. 71)
+  'secondary-use-objection': {
+    required: false,
+    pl: 'Sprzeciw wobec wtórnego wykorzystania moich danych o zdrowiu (badania, statystyka — EHDS)',
+    en: 'Objection to secondary use of my health data (research, statistics — EHDS)',
+  },
 } as const;
 
 export type ConsentType = keyof typeof CONSENT_TYPES;

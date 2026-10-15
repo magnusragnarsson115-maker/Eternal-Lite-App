@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bell, BellOff, Download, History, MapPin, Search, ShieldCheck, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { get, post, put, qs } from '../api';
+import { get, post, put, qs, withProfile } from '../api';
 import { ChangePasswordPage } from '../auth/AuthPages';
 import { errorMessage } from '../errors';
 import { useI18n, type Locale } from '../i18n';
@@ -12,6 +12,7 @@ import { PhoneVerifyCard, ReadabilityCard, RecoveryCodesCard, SecurityKeysCard, 
 import { DeleteDataCard, NotificationPrefsCard } from './MvpPages';
 import type { AccessLogEntry, ConsentState, Me, NotificationRow, PatientView } from '../types';
 import { Badge, Button, Card, Empty, FullText, Modal, Notice, PageHead, QueryError, Segmented, SelectField, Skeleton, Switch, TextArea, TextField, useConfirm, useToast } from '../ui';
+import { EmergencyAccessCard } from '../staff/EmergencyAccess';
 
 // --- profil i bezpieczeństwo ------------------------------------------------------------------------
 
@@ -234,9 +235,44 @@ const AUDIT_LABELS: Record<string, string> = {
   'medication-add': 'Dodanie leku',
   'medication-stop': 'Odstawienie leku',
   'waitlist-join': 'Zapis na listę oczekujących',
+  'break-glass': 'Dostęp ratunkowy lekarza (nagły przypadek)',
+  'break-glass-end': 'Zakończenie dostępu ratunkowego',
+  'break-glass-review': 'Ocena dostępu ratunkowego',
+  'caregiver-overview': 'Panel opiekuna',
+  'managed-profile-create': 'Założenie profilu przez opiekuna',
+  'managed-profile-deleted': 'Usunięcie profilu przez opiekuna',
+  'proxy-invite-create': 'Kod zaproszenia dla opiekuna',
+  'proxy-link-accept': 'Opiekun otrzymał dostęp',
+  'proxy-link-revoke': 'Odebranie dostępu opiekunowi',
+  'proxy-link-resign': 'Opiekun zrezygnował z dostępu',
+  'journal-mood': 'Wpis w dzienniku nastroju',
+  'journal-sleep': 'Wpis w dzienniku snu',
+  'journal-pain': 'Wpis w dzienniku bólu',
+  'journal-breathing': 'Ćwiczenie oddechowe',
+  'journal-retract': 'Usunięcie wpisu z dziennika',
+  'vaccination-add': 'Dodanie szczepienia',
+  'vaccination-plan': 'Planowany termin szczepienia',
+  'vaccination-remove': 'Usunięcie wpisu o szczepieniu',
+  'family-history-add': 'Wpis o chorobach w rodzinie',
+  'family-history-remove': 'Usunięcie wpisu o chorobach w rodzinie',
+  'doctor-report': 'Raport dla lekarza (SBAR)',
+  'doctor-report-pdf': 'Raport dla lekarza (PDF)',
+  'doctor-report-fhir': 'Raport dla lekarza (plik FHIR)',
+  'travel-card': 'Karta zdrowia na wyjazd',
+  'travel-card-pdf': 'Karta zdrowia na wyjazd (PDF)',
+  'calendar-feed-create': 'Włączenie subskrypcji kalendarza',
+  'calendar-feed-revoke': 'Wyłączenie subskrypcji kalendarza',
+  'calendar-feed-read': 'Pobranie kalendarza przez aplikację kalendarza',
+  'rehab-plan-create': 'Nowy plan rehabilitacji',
+  'rehab-plan-end': 'Zakończenie planu rehabilitacji',
+  'rehab-done': 'Oznaczenie ćwiczenia jako wykonanego',
+  'rehab-undone': 'Cofnięcie oznaczenia ćwiczenia',
+  'goal-create': 'Nowy cel',
+  'goal-check': 'Odhaczenie celu',
+  'goal-end': 'Zakończenie celu',
 };
 
-const ROLE_LABELS: Record<string, string> = { patient: 'Ty', practitioner: 'Lekarz', reception: 'Rejestracja', admin: 'Administrator', staff: 'Personel', system: 'System' };
+const ROLE_LABELS: Record<string, string> = { patient: 'Ty', practitioner: 'Lekarz', reception: 'Rejestracja', admin: 'Administrator', staff: 'Personel', system: 'System', caregiver: 'Opiekun' };
 
 export function PrivacyPage() {
   const { t, fmt, locale } = useI18n();
@@ -300,6 +336,8 @@ export function PrivacyPage() {
         )}
       </Card>
 
+      <EmergencyAccessCard />
+
       <Card title={t('Kto i kiedy miał dostęp do Twoich danych')} action={<History size={18} aria-hidden />}>
         <p className="small muted"><FullText text="Każdy wgląd personelu w Twoje dane jest rejestrowany w dzienniku zabezpieczonym przed modyfikacją." /></p>
         {log.isLoading && <Skeleton count={3} height={36} />}
@@ -346,7 +384,7 @@ export function PrivacyPage() {
               <strong>{t('Pobierz tabelę (CSV)')}</strong>
               <span className="small muted" style={{ display: 'block' }}><FullText text="Pomiary i wyniki badań w jednym arkuszu — otworzysz go w Excelu. Pomiary z tego pliku można zaimportować z powrotem." /></span>
             </span>
-            <a className="btn secondary" href="/api/me/export.csv" download>
+            <a className="btn secondary" href={withProfile('/api/me/export.csv')} download>
               <Download size={18} /> {t('Pobierz CSV')}
             </a>
           </div>

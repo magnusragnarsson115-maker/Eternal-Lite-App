@@ -1,3 +1,4 @@
+import { secondaryUseObjections } from '../services/consents.js';
 import type { Organization } from '@medplum/fhirtypes';
 import { readiness } from '../services/readiness.js';
 import type { FastifyInstance } from 'fastify';
@@ -169,6 +170,7 @@ export async function orgRoutes(app: FastifyInstance): Promise<void> {
       dictionaryVersion: DICTIONARY_VERSION,
       dailyLimit: config.ai.dailyCallLimitPerOrg,
       calls: aiCallStats(orgId, q.days),
+      secondaryUse: await secondaryUseObjections(orgId),
     };
   });
 

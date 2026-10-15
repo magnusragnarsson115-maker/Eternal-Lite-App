@@ -75,6 +75,7 @@ export interface AccessEntry {
   who: string;
   org?: string;
   subtype: string;
+  role?: string;
 }
 
 export interface SessionItem {
@@ -103,4 +104,67 @@ export interface SurveyCard {
 export interface SurveysData {
   items: SurveyCard[];
   history: { id: string; surveyId?: string; title: string; authored: string }[];
+}
+
+// --- profile rodzinne (A22.1, A24.1, A24.2) ------------------------------------------------------------------------
+
+export type ProxyRelation = 'parent' | 'guardian' | 'caregiver' | 'family';
+export type ProxyAccess = 'full' | 'view';
+
+export interface FamilyProfile {
+  patientRef: string;
+  id: string;
+  name: string;
+  given: string;
+  birthDate?: string;
+  age?: number;
+  self: boolean;
+  managed: boolean;
+  relation?: ProxyRelation;
+  access: ProxyAccess | 'self';
+  linkId?: string;
+  lapsed?: boolean;
+}
+
+export interface FamilyAccess {
+  id: string;
+  name?: string;
+  relation: ProxyRelation;
+  access: ProxyAccess;
+  status: 'pending' | 'active' | 'expired';
+  you: boolean;
+  activatedAt?: string;
+  expiresAt?: string;
+  codeExpiresAt?: string;
+}
+
+export interface FamilyData {
+  profiles: FamilyProfile[];
+  access: FamilyAccess[];
+  basis: { version: string; text: Record<'parent' | 'guardian' | 'caregiver', string> };
+}
+
+export interface CaregiverOverviewItem {
+  patientRef: string;
+  name: string;
+  age?: number;
+  relation: ProxyRelation;
+  access: ProxyAccess;
+  nextAppointment?: { start: string; service: string; practitioner?: string };
+  medsToday: { due: number; taken: number; skipped: number; missed: number };
+  unreadMessages: number;
+}
+
+/** Dostęp ratunkowy do danych pacjenta (A24.5). */
+export interface EmergencyAccessView {
+  id: string;
+  who: string;
+  clinic?: string;
+  reason: string;
+  reasonText: string;
+  startedAt: string;
+  expiresAt: string;
+  endedAt?: string;
+  active: boolean;
+  review?: { outcome: 'justified' | 'unjustified'; at: string };
 }

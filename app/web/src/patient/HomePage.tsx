@@ -22,17 +22,15 @@ interface Dashboard {
 
 export function HomePage() {
   const { t, fmt } = useI18n();
-  const { me } = useSession();
+  const { me, profile } = useSession();
   const q = useQuery({ queryKey: ['dashboard'], queryFn: () => get<Dashboard>('/api/me/dashboard') });
   const greeting = new Date().getHours() >= 18 ? t('Dobry wieczór') : t('Dzień dobry');
 
   return (
     <div className="stack-lg">
       <div className="page-head">
-        <h1>
-          {greeting}, {me?.patient?.given ?? me?.user?.displayName}
-        </h1>
-        <p className="muted">{t('Co chcesz dziś zrobić?')}</p>
+        <h1>{profile ? t('Profil: {name}', { name: profile.name }) : `${greeting}, ${me?.patient?.given ?? me?.user?.displayName ?? ''}`}</h1>
+        <p className="muted">{profile ? t('Wszystko na tej stronie dotyczy tej osoby.') : t('Co chcesz dziś zrobić?')}</p>
       </div>
 
       {q.isLoading && <Skeleton height={120} count={2} />}
@@ -83,7 +81,7 @@ export function HomePage() {
             </Notice>
           )}
 
-          <SurveyInvite />
+          {!profile && <SurveyInvite />}
 
           <LatestFactsCard />
 

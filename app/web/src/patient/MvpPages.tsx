@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bell, Camera, FileText, FileUp, HeartPulse, History, LifeBuoy, Phone, Plus, Share2, ShieldCheck, Siren, Trash2, X } from 'lucide-react';
 import { useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { del, get, post, put } from '../api';
+import { del, get, post, put, withProfile } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import { AccessLogList, CardContent } from '../shared/LinkShared';
@@ -130,7 +130,7 @@ export function DocumentsPage() {
         {!item.data || item.data.status === 'processing' ? (
           <Skeleton count={2} />
         ) : (
-          <IntakeReview item={item.data} fileUrl={`/api/me/intake/${item.data.id}/file`} editable busy={review.isPending || submit.isPending} submitLabel={t('Zapisz w moich dokumentach')} onReview={(x) => review.mutate(x)} onSubmit={() => submit.mutate()} />
+          <IntakeReview item={item.data} fileUrl={withProfile(`/api/me/intake/${item.data.id}/file`)} editable busy={review.isPending || submit.isPending} submitLabel={t('Zapisz w moich dokumentach')} onReview={(x) => review.mutate(x)} onSubmit={() => submit.mutate()} />
         )}
         {(review.isError || submit.isError) && <Notice kind="danger">{errorMessage(review.error ?? submit.error, t)}</Notice>}
       </Modal>
@@ -171,7 +171,7 @@ export function DocumentDetailPage() {
       <PageHead back={{ to: '/dokumenty', label: t('Moje dokumenty') }} title={d.title ?? t('Dokument')} sub={d.date ? fmt.date(d.date) : undefined} />
       <div className="btn-row">
         {d.binaryId && (
-          <a className="btn secondary" href={`/api/me/documents/${id}/file`} target="_blank" rel="noreferrer">
+          <a className="btn secondary" href={withProfile(`/api/me/documents/${id}/file`)} target="_blank" rel="noreferrer">
             <FileText size={16} /> {t('Oryginał')}
           </a>
         )}
@@ -595,6 +595,9 @@ export function HelpPage() {
       <TextCard text={q.data?.purpose} />
       <TextCard text={q.data?.instructions} />
       <TextCard text={q.data?.ai} />
+      <Link to="/jak-dziala-ai" className="btn secondary block">
+        {t('Jak działa AI w aplikacji — karty zastosowań')}
+      </Link>
       <ReportIncidentCard />
       {q.data?.securityContact && <p className="small muted">{t('Zgłoszenia podatności bezpieczeństwa: {c}', { c: q.data.securityContact })}</p>}
       <p className="small muted">{t('Wersja aplikacji: {v}', { v: q.data?.version.app ?? '' })}</p>

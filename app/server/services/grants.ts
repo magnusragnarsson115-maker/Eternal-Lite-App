@@ -18,8 +18,8 @@ import { staffOrgId } from './orgs.js';
 export const CONSENT_TEXT_VERSION = 'udostepnienie/2026-10-1';
 
 export type GrantScope = { kind: 'all' } | { kind: 'results' } | { kind: 'documents' } | { kind: 'selected'; refs: string[] };
-export type GrantPurpose = 'visit' | 'consultation' | 'second-opinion' | 'other';
-export type GrantSource = 'invite' | 'app';
+export type GrantPurpose = 'visit' | 'consultation' | 'second-opinion' | 'other' | 'emergency';
+export type GrantSource = 'invite' | 'app' | 'emergency';
 
 export interface GrantRow {
   id: string;
@@ -83,6 +83,7 @@ const PURPOSE_PL: Record<GrantPurpose, string> = {
   consultation: 'Konsultacja',
   'second-opinion': 'Druga opinia',
   other: 'Inny cel wskazany przez pacjenta',
+  emergency: 'Dostęp ratunkowy (nagły przypadek)',
 };
 
 const SCOPE_PL: Record<GrantScope['kind'], string> = {
@@ -266,7 +267,33 @@ export function activeGrantsFor(orgId: string, patientRef: string, practitionerR
   const rows = getDb()
     .prepare("SELECT * FROM access_grant WHERE org_id = ? AND patient_ref = ? AND status = 'active' AND starts_at <= ? AND expires_at > ?")
     .all(orgId, patientRef, nowIso(), nowIso()) as unknown as GrantRow[];
-  return rows.filter((r) => !r.practitioner_ref || r.practitioner_ref === practitionerRef).map(toGrantView);
+  return [...rows.filter((r) => !r.practitioner_ref || r.practitioner_ref === practitionerRef).map(toGrantView), ...emergencyGrantsFor(orgId, patientRef, practitionerRef)];
+}
+
+/**
+ * Dostęp ratunkowy (A24.5, services/emergencyAccess.ts) działa jak udostępnienie całości — wyłącznie dla lekarza,
+ * który go otworzył, przez 60 minut, z pełnym zapisem w dzienniku i przeglądem administratora.
+ */
+export function emergencyGrantsFor(orgId: string, patientRef: string, practitionerRef?: string): GrantView[] {
+  if (!practitionerRef) return [];
+  const now = nowIso();
+  const rows = getDb()
+    .prepare('SELECT id, started_at, expires_at, user_display FROM emergency_access WHERE org_id = ? AND patient_ref = ? AND practitioner_ref = ? AND ended_at IS NULL AND expires_at > ?')
+    .all(orgId, patientRef, practitionerRef, now) as { id: string; started_at: string; expires_at: string; user_display: string }[];
+  return rows.map((r) => ({
+    id: `emergency:${r.id}`,
+    patientRef,
+    orgId,
+    recipient: r.user_display,
+    practitionerRef,
+    scope: { kind: 'all' as const },
+    purpose: 'emergency' as const,
+    source: 'emergency' as const,
+    startsAt: r.started_at,
+    expiresAt: r.expires_at,
+    status: 'active' as const,
+    createdAt: r.started_at,
+  }));
 }
 
 /**

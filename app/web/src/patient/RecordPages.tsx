@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, FlaskConical, Paperclip, Printer } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { get, put } from '../api';
+import { get, put, withProfile } from '../api';
 import { useI18n } from '../i18n';
 import { ExplanationsPanel } from '../shared/Explanations';
 import type { RecordView } from '../types';
@@ -175,7 +175,7 @@ export function RecordBody({ record, fileBase, explain }: { record: RecordView; 
       )}
       {record.text && <div style={{ whiteSpace: 'pre-wrap', background: 'var(--surface-2)', padding: 14, borderRadius: 12, border: '1px solid var(--border)' }}>{record.text}</div>}
       {record.attachment && (
-        <a className="btn secondary" href={`${fileBase}/${record.attachment.binaryId}`} target="_blank" rel="noopener">
+        <a className="btn secondary" href={withProfile(`${fileBase}/${record.attachment.binaryId}`)} target="_blank" rel="noopener">
           <Paperclip size={18} /> {record.attachment.title ?? t('Otwórz załącznik')} {record.attachment.size ? `(${formatBytes(record.attachment.size)})` : ''}
         </a>
       )}

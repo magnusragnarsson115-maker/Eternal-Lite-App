@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, FileDown, Sheet } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { get } from '../api';
+import { get, withProfile } from '../api';
 import { errorMessage } from '../errors';
 import { addDaysIso, useI18n } from '../i18n';
 import { Badge, Button, Card, Empty, FullText, Notice, PageHead, Segmented, Skeleton, TextField } from '../ui';
@@ -157,10 +157,10 @@ export function ReportPage() {
           )}
           {r && (
             <div className="btn-row">
-              <a className="btn" href={`/api/me/report.pdf?${qs}`} download>
+              <a className="btn" href={withProfile(`/api/me/report.pdf?${qs}`)} download>
                 <FileDown size={18} /> {t('Pobierz raport PDF')}
               </a>
-              <a className="btn secondary" href={`/api/me/export.csv?from=${r.period.from}&to=${r.period.to}`} download>
+              <a className="btn secondary" href={withProfile(`/api/me/export.csv?from=${r.period.from}&to=${r.period.to}`)} download>
                 <Sheet size={18} /> {t('Dane z okresu (CSV)')}
               </a>
             </div>

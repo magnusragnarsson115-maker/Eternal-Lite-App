@@ -25,6 +25,7 @@ import {
 import { closeAccount } from '../services/privacy.js';
 import { applyPackage, listPackages } from '../services/packages.js';
 import { feedbackSummary } from '../services/surveys.js';
+import { listEmergencyForOrg, reviewEmergencyAccess } from '../services/emergencyAccess.js';
 import { NOTE_TEMPLATE_IDS } from '../scribe/templates.js';
 
 function tempPassword(): string {
@@ -290,6 +291,23 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
   });
 
   // A12.3 — ankiety: ocena aplikacji (anonimowa) i liczba wypełnień, bez treści zdrowotnych
+  // A24.5 — przegląd każdego dostępu ratunkowego
+  app.get('/api/admin/emergency-access', async (req) => {
+    const auth = admin(req);
+    const orgId = staffOrgId(auth.user);
+    if (!orgId) throw forbidden('no_org');
+    const items = await listEmergencyForOrg(orgId);
+    audit(actorOf(req), { action: 'R', subtype: 'break-glass-list', detail: { count: items.length } });
+    return { items };
+  });
+
+  app.post('/api/admin/emergency-access/:id/review', async (req) => {
+    const auth = admin(req);
+    const { id } = params(req, z.object({ id: z.string().uuid() }));
+    const input = body(req, z.object({ outcome: z.enum(['justified', 'unjustified']), note: z.string().max(2000).optional() }));
+    return reviewEmergencyAccess(actorOf(req), auth.user, id, input);
+  });
+
   app.get('/api/admin/surveys', async (req) => {
     const auth = admin(req);
     const orgId = staffOrgId(auth.user);

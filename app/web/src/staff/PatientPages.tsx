@@ -9,6 +9,7 @@ import { RecordBody } from '../patient/RecordPages';
 import { hasRole, useSession } from '../session';
 import type { AppointmentView, ConsentState, MeasurementView, MedicationView, PatientView, RecordView, ServiceView, SlotView, ThreadView } from '../types';
 import { Badge, Button, Card, Checkbox, Combobox, Empty, Modal, Notice, PageHead, QueryError, SelectField, Skeleton, StatusBadge, Switch, Tabs, TextArea, TextField, useToast } from '../ui';
+import { RehabPanel } from './RehabPanel';
 import { SlotPicker } from '../ui/SlotPicker';
 import { TrendChart } from '../ui/TrendChart';
 import { AppointmentModal, BookSlotModal } from './CalendarPage';
@@ -160,7 +161,7 @@ interface ClinicalData {
   questionnaires: { id: string; authored: string; answers: { question: string; answer: string }[]; appointmentId: string }[];
 }
 
-type Tab = 'data' | 'appointments' | 'records' | 'measurements' | 'medications' | 'questionnaires' | 'messages' | 'consents';
+type Tab = 'data' | 'appointments' | 'records' | 'measurements' | 'medications' | 'questionnaires' | 'rehab' | 'messages' | 'consents';
 
 export function PatientDetailPage() {
   const { id = '' } = useParams();
@@ -217,6 +218,7 @@ export function PatientDetailPage() {
           { value: 'measurements', label: t('Pomiary') },
           { value: 'medications', label: t('Leki') },
           { value: 'questionnaires', label: t('Wywiady') },
+          { value: 'rehab', label: t('Rehabilitacja') },
         ] as { value: Tab; label: string }[])
       : []),
     { value: 'messages', label: t('Wiadomości') },
@@ -383,6 +385,8 @@ export function PatientDetailPage() {
           </ul>
         </Card>
       )}
+
+      {tab === 'rehab' && clinician && <RehabPanel patientId={id} />}
 
       {tab === 'questionnaires' && clinician && (
         <div className="stack">

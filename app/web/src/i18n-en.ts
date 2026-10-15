@@ -1,6 +1,7 @@
 import { EN_MVP } from './i18n-en-mvp';
 import { EN_P0 } from './i18n-en-p0';
 import { EN_SURVEYS } from './i18n-en-surveys';
+import { EN_R3 } from './i18n-en-r3';
 
 /** Słownik angielski: tekst polski → tekst angielski. Brak wpisu = tekst polski (test tests/unit/i18n.test.ts pilnuje kompletności). */
 export const EN: Record<string, string> = {
@@ -848,4 +849,4 @@ export const EN: Record<string, string> = {
   'Źródło': 'Source',
   'Źródło: API Terminy Leczenia NFZ. Dane przekazują świadczeniodawcy i mogą być nieaktualne — termin potwierdź telefonicznie.': 'Source: NFZ Waiting Times API. Data are reported by providers and may be outdated — confirm by phone.',
 };
-Object.assign(EN, EN_MVP, EN_P0, EN_SURVEYS);
+Object.assign(EN, EN_MVP, EN_P0, EN_SURVEYS, EN_R3);

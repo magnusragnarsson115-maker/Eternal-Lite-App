@@ -65,9 +65,9 @@ export interface GrantView {
   recipient: string;
   practitionerRef?: string;
   scope: GrantScope;
-  purpose: 'visit' | 'consultation' | 'second-opinion' | 'other';
+  purpose: 'visit' | 'consultation' | 'second-opinion' | 'other' | 'emergency';
   appointmentId?: string;
-  source: 'invite' | 'app';
+  source: 'invite' | 'app' | 'emergency';
   startsAt: string;
   expiresAt: string;
   status: 'active' | 'revoked' | 'expired';
@@ -173,7 +173,7 @@ export interface FactsReport {
   unconfirmed: FactRow[];
   documents: { ref: string; kind: string; title: string; date: string; binaryId?: string; sections: { title: string; text: string }[]; accessCode?: string; source: 'clinic' | 'patient' }[];
   surveys?: { ref: string; title: string; authored: string; answers: { question: string; answer: string }[] }[];
-  sharing: { grants: GrantView[]; vaultIncluded: boolean };
+  sharing: { grants: GrantView[]; vaultIncluded: boolean; emergency?: { id: string; expiresAt: string } };
 }
 
 export interface NoteParagraph {
@@ -294,4 +294,76 @@ export interface PublicTexts {
   crisis: { number: string; label: string; hours?: string }[];
   securityContact?: string;
   version: { app: string };
+}
+
+// --- profile rodzinne i dostęp opiekuna (A22.1, A24.1, A24.2) -------------------------------------------------------
+
+export type ProxyRelation = 'parent' | 'guardian' | 'caregiver' | 'family';
+export type ProxyAccess = 'full' | 'view';
+
+export interface FamilyProfile {
+  patientRef: string;
+  id: string;
+  name: string;
+  given: string;
+  birthDate?: string;
+  age?: number;
+  self: boolean;
+  managed: boolean;
+  relation?: ProxyRelation;
+  access: ProxyAccess | 'self';
+  linkId?: string;
+  lapsed?: boolean;
+}
+
+export interface FamilyAccess {
+  id: string;
+  name?: string;
+  relation: ProxyRelation;
+  access: ProxyAccess;
+  status: 'pending' | 'active' | 'expired';
+  managed: boolean;
+  you: boolean;
+  createdAt: string;
+  activatedAt?: string;
+  expiresAt?: string;
+  codeExpiresAt?: string;
+}
+
+export interface FamilyData {
+  profiles: FamilyProfile[];
+  access: FamilyAccess[];
+  basis: { version: string; text: Record<'parent' | 'guardian' | 'caregiver', string> };
+}
+
+export interface CaregiverOverviewItem {
+  patientRef: string;
+  name: string;
+  age?: number;
+  relation: ProxyRelation;
+  access: ProxyAccess;
+  nextAppointment?: { start: string; service: string; practitioner?: string };
+  medsToday: { due: number; taken: number; skipped: number; missed: number };
+  unreadMessages: number;
+  lastActivityAt?: string;
+}
+
+// --- dostęp ratunkowy (A24.5) --------------------------------------------------------------------------------------
+
+export type EmergencyReason = 'unconscious' | 'life-threat' | 'urgent-care';
+
+export interface EmergencyAccessView {
+  id: string;
+  patientRef: string;
+  patientName?: string;
+  who: string;
+  reason: EmergencyReason;
+  reasonText: string;
+  justification?: string;
+  startedAt: string;
+  expiresAt: string;
+  endedAt?: string;
+  active: boolean;
+  clinic?: string;
+  review?: { outcome: 'justified' | 'unjustified'; at: string; by?: string; note?: string };
 }

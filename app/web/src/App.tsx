@@ -10,6 +10,12 @@ import { MorePage, PatientShell } from './patient/PatientShell';
 import { RecordDetailPage, RecordsPage } from './patient/RecordPages';
 import { ReportPage } from './patient/ReportPage';
 import { SurveyPage, SurveyResponsePage, SurveysPage } from './patient/SurveyPages';
+import { FamilyPage } from './patient/FamilyPages';
+import { JournalPage } from './patient/JournalPages';
+import { HistoryPage } from './patient/HistoryPages';
+import { DoctorReportPage } from './patient/DoctorReportPage';
+import { HealthCalendarPage, PlanPage } from './patient/PlanPages';
+import { AiCardsPage } from './shared/SystemStatus';
 import { CardDetailPage, CardsPage, DocumentDetailPage, DocumentsPage, HelpPage, SafetyPage, SharingPage, TimelinePage } from './patient/MvpPages';
 import { lazy, Suspense } from 'react';
 import { hasRole, useSession } from './session';
@@ -109,6 +115,13 @@ export function App() {
         <Route path="os-czasu" element={<TimelinePage />} />
         <Route path="raport" element={<ReportPage />} />
         <Route path="ankiety" element={<SurveysPage />} />
+        <Route path="rodzina" element={<FamilyPage />} />
+        <Route path="dzienniki" element={<JournalPage />} />
+        <Route path="historia-zdrowia" element={<HistoryPage />} />
+        <Route path="dla-lekarza" element={<DoctorReportPage />} />
+        <Route path="kalendarz" element={<HealthCalendarPage />} />
+        <Route path="plan" element={<PlanPage />} />
+        <Route path="jak-dziala-ai" element={<AiCardsPage />} />
         <Route path="ankiety/odpowiedzi/:id" element={<SurveyResponsePage />} />
         <Route path="ankiety/:id" element={<SurveyPage />} />
         <Route path="udostepnianie" element={<SharingPage />} />
