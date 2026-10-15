@@ -1,9 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Button, Card, Empty, Loading, Notice, P, Row, Screen } from '../components/ui';
 import { get } from '../lib/api';
 import { errorMessage } from '../lib/errors';
+import { downloadAndSharePdf } from '../lib/files';
 import { useI18n } from '../lib/i18n';
 import { radius, space, useColors } from '../lib/theme';
 
@@ -46,6 +47,9 @@ export default function ReportScreen() {
   const [anchor, setAnchor] = useState(today());
   const q = useQuery({ queryKey: ['report', kind, anchor], queryFn: () => get<Report>(`/api/me/report?period=${kind}&anchor=${anchor}`) });
   const r = q.data;
+  const pdf = useMutation({
+    mutationFn: () => downloadAndSharePdf(`/api/me/report.pdf?period=${kind}&anchor=${anchor}`, r ? `eternal-raport-${r.period.from}-${r.period.to}.pdf` : 'eternal-raport.pdf', t('Raport okresowy')),
+  });
   const num = (v: number) => String(v).replace('.', ',');
   const kinds: { id: PeriodKind; label: string }[] = [
     { id: 'week', label: t('Tydzień') },
@@ -129,9 +133,8 @@ export default function ReportScreen() {
           <Card title={t('Wizyty')}>
             {r.appointments.length ? r.appointments.map((a) => <Row key={a.start} title={dateTime(a.start)} sub={[a.serviceName, a.practitionerName].filter(Boolean).join(' · ')} />) : <P muted>{t('Brak wizyt w tym okresie.')}</P>}
           </Card>
-          <P small muted>
-            {t('Raport PDF do wydruku pobierzesz w wersji przeglądarkowej (Raport okresowy).')}
-          </P>
+          <Button title={t('Zapisz lub wyślij PDF')} loading={pdf.isPending} onPress={() => pdf.mutate()} accessibilityHint={t('Otwiera systemowe okno udostępniania: zapis w plikach, poczta, drukarka')} />
+          {pdf.isError ? <Notice kind="danger">{errorMessage(pdf.error, t)}</Notice> : null}
         </>
       ) : null}
     </Screen>

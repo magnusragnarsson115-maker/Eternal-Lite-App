@@ -288,6 +288,7 @@ export async function scribeRoutes(app: FastifyInstance): Promise<void> {
     const { id } = params(req, z.object({ id: zId }));
     const { view } = await patientCard(auth.patientRef, id);
     const pdf = await renderPdf(cardHtml(view), { footerLeft: `Karta „Po wizycie” · ${view.clinic}` });
+    audit(actorOf(req), { action: 'E', subtype: 'card-pdf', entityRef: view.ref, patientRef: auth.patientRef });
     reply.header('Content-Type', 'application/pdf').header('Content-Disposition', 'attachment; filename="karta-po-wizycie.pdf"');
     return pdf;
   });

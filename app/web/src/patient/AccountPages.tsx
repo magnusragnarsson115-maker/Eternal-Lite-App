@@ -219,6 +219,7 @@ const AUDIT_LABELS: Record<string, string> = {
   'patient-export-csv': 'Eksport danych (CSV)',
   'patient-report': 'Raport okresowy',
   'patient-report-pdf': 'Raport okresowy (PDF)',
+  'card-pdf': 'Karta „Po wizycie” (PDF)',
   'patient-facts-latest': 'Pulpit — ostatnie odczyty',
   'identity-verified': 'Potwierdzenie tożsamości',
   'reminder-sent': 'Wysłanie przypomnienia',

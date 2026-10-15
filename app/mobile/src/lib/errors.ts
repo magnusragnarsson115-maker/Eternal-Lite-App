@@ -15,6 +15,9 @@ const MESSAGES: Record<string, string> = {
   intake_processing: 'Dokument jest jeszcze odczytywany. Spróbuj za chwilę.',
   too_many_contacts: 'Możesz dodać najwyżej 5 osób bliskich.',
   unauthenticated: 'Zaloguj się ponownie.',
+  unauthorized: 'Sesja wygasła. Zaloguj się ponownie.',
+  download_failed: 'Nie udało się pobrać pliku. Spróbuj ponownie za chwilę.',
+  sharing_unavailable: 'Udostępnianie plików nie jest dostępne na tym urządzeniu.',
 };
 
 export function errorMessage(err: unknown, t: (s: string) => string): string {

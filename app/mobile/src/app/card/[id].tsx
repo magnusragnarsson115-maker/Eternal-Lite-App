@@ -5,6 +5,7 @@ import { Text, View } from 'react-native';
 import { Button, Card, Field, H1, Loading, Notice, P, Screen } from '../../components/ui';
 import { get, post } from '../../lib/api';
 import { errorMessage } from '../../lib/errors';
+import { downloadAndSharePdf } from '../../lib/files';
 import { useI18n } from '../../lib/i18n';
 import { space, useColors } from '../../lib/theme';
 import type { CardView } from '../../lib/types';
@@ -16,6 +17,7 @@ export default function CardDetailScreen() {
   const q = useQuery({ queryKey: ['card', id], queryFn: () => get<CardView>(`/api/me/cards/${id}`) });
   const [sh, setSh] = useState({ open: false, phone: '', label: '', days: 7 });
   const share = useMutation({ mutationFn: () => post<{ url: string; expiresAt: string }>(`/api/me/cards/${id}/share`, { days: sh.days, phone: sh.phone || undefined, label: sh.label || undefined }) });
+  const pdf = useMutation({ mutationFn: () => downloadAndSharePdf(`/api/me/cards/${id}/pdf`, 'karta-po-wizycie.pdf', t('Karta „Po wizycie”')) });
   if (!q.data) return <Screen>{q.isLoading ? <Loading /> : <Notice kind="danger">{t('Nie znaleziono.')}</Notice>}</Screen>;
   const k = q.data;
   const list = (title: string, items: string[]) =>
@@ -54,6 +56,8 @@ export default function CardDetailScreen() {
           </P>
         </Card>
       ) : null}
+      <Button title={t('Zapisz lub wyślij PDF')} variant="secondary" loading={pdf.isPending} onPress={() => pdf.mutate()} accessibilityHint={t('Otwiera systemowe okno udostępniania: zapis w plikach, poczta, drukarka')} />
+      {pdf.isError ? <Notice kind="danger">{errorMessage(pdf.error, t)}</Notice> : null}
       <Card title={t('Udostępnij osobie bliskiej')}>
         {!sh.open ? (
           <Button title={t('Udostępnij kartę na czas')} variant="secondary" onPress={() => setSh({ ...sh, open: true })} />

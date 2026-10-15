@@ -5,6 +5,7 @@ import { ApiError, get, post, setUnauthorizedHandler } from './api';
 import { registerPush } from './push';
 import * as secure from './secure';
 import type { Me } from './types';
+import { clearDownloads } from './files';
 
 /** Blokada po powrocie z tła: po tylu sekundach wymagamy biometrii albo PIN-u. */
 const LOCK_AFTER_SECONDS = 60;
@@ -39,6 +40,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const backgroundAt = useRef<number | undefined>(undefined);
 
   const signOutLocal = useCallback(async () => {
+    clearDownloads(); // pobrane PDF z danymi o zdrowiu nie zostają po wylogowaniu
     await secure.wipe();
     setMe(undefined);
     setPhase('signed-out');

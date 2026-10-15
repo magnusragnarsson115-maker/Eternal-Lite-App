@@ -78,6 +78,7 @@ export const SUBTYPE_PL: Record<string, string> = {
   'patient-export-csv': 'Eksport danych (CSV)',
   'patient-report': 'Raport okresowy',
   'patient-report-pdf': 'Raport okresowy (PDF)',
+  'card-pdf': 'Karta „Po wizycie” (PDF)',
   'patient-facts-latest': 'Pulpit — ostatnie odczyty',
 };
 

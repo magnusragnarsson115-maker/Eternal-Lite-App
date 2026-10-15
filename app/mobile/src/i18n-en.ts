@@ -369,7 +369,6 @@ export const EN: Record<string, string> = {
   'Pominięto niepotwierdzone odczyty maszynowe: {n} — nie są faktem, dopóki ich nie sprawdzisz.': 'Unconfirmed machine readings skipped: {n} — they are not facts until you check them.',
   'Wizyty': 'Appointments',
   'Brak wizyt w tym okresie.': 'No visits in this period.',
-  'Raport PDF do wydruku pobierzesz w wersji przeglądarkowej (Raport okresowy).': 'You can download a printable PDF report in the web version (Period report).',
   'wartość': 'value',
   'skurczowe': 'systolic',
   'rozkurczowe': 'diastolic',
@@ -398,4 +397,11 @@ export const EN: Record<string, string> = {
   'Najlepiej dodaj PDF z laboratorium. Zdjęcie zrób z całej strony, bez cienia.': 'A PDF from the laboratory works best. Take a photo of the whole page, without shadows.',
   'Program odczytał dokument ({m}). Może się mylić. Sprawdź żółte pola.': 'A program read the document ({m}). It may be wrong. Check the yellow fields.',
   'Lekarz zobaczy, które pola nie zostały przez Ciebie sprawdzone.': 'The doctor will see which fields you have not checked.',
+  // pobieranie PDF (expo-file-system + expo-sharing)
+  'Zapisz lub wyślij PDF': 'Save or send PDF',
+  'Otwiera systemowe okno udostępniania: zapis w plikach, poczta, drukarka': 'Opens the system share sheet: save to files, e-mail, printer',
+  'Sesja wygasła. Zaloguj się ponownie.': 'Your session has expired. Please sign in again.',
+  'Nie udało się pobrać pliku. Spróbuj ponownie za chwilę.': 'Could not download the file. Please try again shortly.',
+  'Udostępnianie plików nie jest dostępne na tym urządzeniu.': 'File sharing is not available on this device.',
+  'Karta „Po wizycie” (PDF)': 'After-visit card (PDF)',
 };

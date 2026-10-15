@@ -209,4 +209,5 @@ export const EN_P0: Record<string, string> = {
   'Lipidogram z 12 miesięcy, EKG lub opis badań serca, wypis ze szpitala, wywiad kardiologiczny, notatka kardiologiczna.': 'Lipid panel from the last 12 months, ECG or cardiac test report, hospital discharge summary, cardiology questionnaire, cardiology note.',
   'Wyniki z 6 miesięcy, informacja o szczepieniach, wywiad z opiekunem dziecka, notatka pediatryczna.': 'Results from the last 6 months, vaccination information, questionnaire for the child’s guardian, paediatric note.',
   'Pakiet tej specjalizacji jest już zastosowany.': 'This specialty package has already been applied.',
+  'Karta „Po wizycie” (PDF)': 'After-visit card (PDF)',
 };
