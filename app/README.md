@@ -32,7 +32,8 @@ natychmiast (Server-Sent Events), bez przeładowania strony.
 Pełna mapa 78 funkcji na kod i testy: [`docs/MODULES.md`](docs/MODULES.md). Braki względem pliku 12.8 i przejście
 z trybu demo na pracę produkcyjną: [`docs/BRAKI_I_WDROZENIE.md`](docs/BRAKI_I_WDROZENIE.md). Jak zobaczyć aplikację
 i pokazać ją inwestorom (wideo 90 s, instancja pokazowa, scenariusz): [`docs/POKAZ.md`](docs/POKAZ.md). Moduły włącza się bez wdrożenia
-(panel *Organizacja kliniki → Moduły* albo `npm run cli -- set-module`).
+(panel *Organizacja kliniki → Moduły* albo `npm run cli -- set-module`). Cały ekosystem z Macierzy v11 (projekty P1–P7,
+69 modułów na etapach MVP, MLP i FINAL, komponenty i to, co może zbudować AI): [`docs/ETERNAL_13_1_PROJEKTY_AI.xlsx`](docs/ETERNAL_13_1_PROJEKTY_AI.xlsx).
 
 | Moduł | Co robi |
 |---|---|
