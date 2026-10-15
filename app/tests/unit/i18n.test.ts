@@ -5,6 +5,7 @@ import { EN as EN_MOBILE } from '../../mobile/src/i18n-en.js';
 import { EN } from '../../web/src/i18n-en.js';
 import { SIMPLE as SIMPLE_MOBILE } from '../../mobile/src/simple-pl.js';
 import { SIMPLE } from '../../web/src/simple-pl.js';
+import { SURVEYS } from '../../server/services/surveys.js';
 
 /** Teksty źródłowe: t('…') oraz <FullText text="…"> (tekst z wersją w prostym języku). */
 function literals(src: string): string[] {
@@ -60,5 +61,23 @@ describe('Tłumaczenie angielskie', () => {
       ...(longest(plain) <= 16 ? [] : [`zdanie dłuższe niż 16 słów: ${plain}`]),
     ]);
     expect(problems).toEqual([]);
+  });
+
+  it('ankiety (A12.3): każdy tytuł, opis, pytanie i odpowiedź z serwera ma tłumaczenie w przeglądarce i na telefonie', () => {
+    const texts = new Set<string>();
+    const walk = (items: { text?: string; answerOption?: { valueCoding?: { display?: string } }[]; item?: unknown[] }[] = []) => {
+      for (const i of items) {
+        if (i.text) texts.add(i.text);
+        for (const o of i.answerOption ?? []) if (o.valueCoding?.display && /[a-ząćęłńóśźż]/i.test(o.valueCoding.display)) texts.add(o.valueCoding.display);
+        walk(i.item as typeof items);
+      }
+    };
+    for (const s of SURVEYS) {
+      texts.add(s.title);
+      texts.add(s.description);
+      walk(s.item);
+    }
+    expect([...texts].filter((x) => !(x in EN))).toEqual([]);
+    expect([...texts].filter((x) => !(x in EN_MOBILE))).toEqual([]);
   });
 });

@@ -34,7 +34,7 @@ export interface DeletionConfirmation {
   backupsGoneBy: string;
 }
 
-const VAULT_TYPES: ResourceType[] = ['Observation', 'DiagnosticReport', 'DocumentReference', 'Provenance'];
+const VAULT_TYPES: ResourceType[] = ['Observation', 'DiagnosticReport', 'DocumentReference', 'QuestionnaireResponse', 'Provenance'];
 
 async function expungeAll(resources: Resource[]): Promise<number> {
   let n = 0;
@@ -78,7 +78,7 @@ export async function deleteMyData(actor: AuditActor, user: AppUser): Promise<De
     }
     db.prepare('DELETE FROM intake_item WHERE patient_ref = ?').run(patientRef);
     const n = await expungeAll(own);
-    steps.push({ key: 'vault', label: 'Dokumenty i wyniki wgrane przez Ciebie, odczyty, pliki', status: 'deleted', count: n + intake.length, detail: 'Usunięte trwale, razem z historią wersji.' });
+    steps.push({ key: 'vault', label: 'Dokumenty i wyniki wgrane przez Ciebie, odczyty, pliki, odpowiedzi w ankietach', status: 'deleted', count: n + intake.length, detail: 'Usunięte trwale, razem z historią wersji.' });
 
     // 3. wpisy z aplikacji: pomiary i lista leków wprowadzone przez pacjenta
     const obs = (await fhirSystem().search<Observation>('Observation', { subject: patientRef, _count: '5000' })).filter((o) => o.performer?.[0]?.reference === patientRef);

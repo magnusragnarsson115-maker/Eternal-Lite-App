@@ -9,6 +9,7 @@ import { MessagesPage, ThreadPage } from './patient/MessagePages';
 import { MorePage, PatientShell } from './patient/PatientShell';
 import { RecordDetailPage, RecordsPage } from './patient/RecordPages';
 import { ReportPage } from './patient/ReportPage';
+import { SurveyPage, SurveyResponsePage, SurveysPage } from './patient/SurveyPages';
 import { CardDetailPage, CardsPage, DocumentDetailPage, DocumentsPage, HelpPage, SafetyPage, SharingPage, TimelinePage } from './patient/MvpPages';
 import { lazy, Suspense } from 'react';
 import { hasRole, useSession } from './session';
@@ -107,6 +108,9 @@ export function App() {
         <Route path="dokumenty/:id" element={<DocumentDetailPage />} />
         <Route path="os-czasu" element={<TimelinePage />} />
         <Route path="raport" element={<ReportPage />} />
+        <Route path="ankiety" element={<SurveysPage />} />
+        <Route path="ankiety/odpowiedzi/:id" element={<SurveyResponsePage />} />
+        <Route path="ankiety/:id" element={<SurveyPage />} />
         <Route path="udostepnianie" element={<SharingPage />} />
         <Route path="karty" element={<CardsPage />} />
         <Route path="karty/:id" element={<CardDetailPage />} />

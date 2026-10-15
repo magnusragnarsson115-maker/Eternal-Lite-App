@@ -1,14 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarClock, CalendarPlus, CalendarX2, ClipboardCheck, ClipboardList, Download, MapPin, Phone, Video } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { get, post } from '../api';
 import { errorCode, errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import type { TeleState } from '../mvp-types';
-import type { AppointmentView, Questionnaire, QuestionnaireItem, ServiceView } from '../types';
-import { Badge, Button, Card, Empty, FullText, LinkButton, Modal, Notice, PageHead, QueryError, Segmented, Skeleton, Spinner, StatusBadge, Tabs, TextArea, useToast } from '../ui';
-import { useSession } from '../session';
+import type { AppointmentView, Questionnaire, ServiceView } from '../types';
+import { Badge, Button, Card, Empty, FullText, LinkButton, Modal, Notice, PageHead, QueryError, Skeleton, Spinner, StatusBadge, Tabs, TextArea, useToast } from '../ui';
+import { answersFromResponse, QuestionnaireForm, type Answers } from '../shared/QuestionnaireForm';
 
 export function AppointmentsPage() {
   const { t, fmt } = useI18n();
@@ -232,163 +232,20 @@ export function AppointmentDetailPage() {
   );
 }
 
-// --- wywiad przed wizytą -----------------------------------------------------------------------------
-
-type Answers = Record<string, string | number | boolean | string[] | null>;
-
-function enabled(item: QuestionnaireItem, answers: Answers): boolean {
-  if (!item.enableWhen?.length) return true;
-  const res = item.enableWhen.map((c) => {
-    const a = answers[c.question];
-    const expected = c.answerBoolean ?? c.answerString ?? c.answerCoding?.code;
-    if (c.operator === 'exists') return (a !== undefined && a !== null && a !== '') === c.answerBoolean;
-    if (c.operator === '=') return Array.isArray(a) ? a.includes(String(expected)) : a === expected;
-    if (c.operator === '!=') return a !== expected;
-    return true;
-  });
-  return item.enableBehavior === 'any' ? res.some(Boolean) : res.every(Boolean);
-}
-
-function QItem({ item, answers, set }: { item: QuestionnaireItem; answers: Answers; set: (k: string, v: Answers[string]) => void }) {
-  const { t } = useI18n();
-  if (!enabled(item, answers)) return null;
-  const id = `q-${item.linkId}`;
-  const label = (
-    <label htmlFor={id} style={{ fontWeight: 600 }}>
-      {item.text}
-      {item.required && <span aria-hidden> *</span>}
-    </label>
-  );
-  const v = answers[item.linkId];
-  switch (item.type) {
-    case 'display':
-      return <p className="small muted">{item.text}</p>;
-    case 'group':
-      return (
-        <fieldset className="stack" style={{ border: 0, padding: 0 }}>
-          <legend style={{ fontWeight: 650 }}>{item.text}</legend>
-          {item.item?.map((c) => <QItem key={c.linkId} item={c} answers={answers} set={set} />)}
-        </fieldset>
-      );
-    case 'boolean':
-      return (
-        <fieldset className="field" style={{ border: 0, padding: 0 }}>
-          <legend style={{ fontWeight: 600, marginBottom: 6 }}>
-            {item.text}
-            {item.required && <span aria-hidden> *</span>}
-          </legend>
-          <div className="segmented">
-            <button type="button" aria-pressed={v === true} onClick={() => set(item.linkId, true)}>
-              {t('Tak')}
-            </button>
-            <button type="button" aria-pressed={v === false} onClick={() => set(item.linkId, false)}>
-              {t('Nie')}
-            </button>
-          </div>
-        </fieldset>
-      );
-    case 'choice':
-      return (
-        <fieldset className="field" style={{ border: 0, padding: 0 }}>
-          <legend style={{ fontWeight: 600, marginBottom: 6 }}>
-            {item.text}
-            {item.required && <span aria-hidden> *</span>}
-          </legend>
-          <div className="stack" style={{ gap: 6 }}>
-            {item.answerOption?.map((o) => {
-              const code = o.valueCoding?.code ?? o.valueString ?? '';
-              if (item.repeats) {
-                // wielokrotny wybór — zaznacz wszystkie pasujące
-                const list = Array.isArray(v) ? v : typeof v === 'string' && v ? [v] : [];
-                return (
-                  <label key={code} className="check">
-                    <input type="checkbox" checked={list.includes(code)} onChange={(e) => set(item.linkId, e.target.checked ? [...list, code] : list.filter((x) => x !== code))} />
-                    <span>{o.valueCoding?.display ?? o.valueString}</span>
-                  </label>
-                );
-              }
-              return (
-                <label key={code} className="check">
-                  <input type="radio" name={id} checked={v === code} onChange={() => set(item.linkId, code)} />
-                  <span>{o.valueCoding?.display ?? o.valueString}</span>
-                </label>
-              );
-            })}
-          </div>
-        </fieldset>
-      );
-    case 'text':
-      return (
-        <div className="field">
-          {label}
-          <textarea id={id} className="textarea" maxLength={2000} value={(v as string) ?? ''} onChange={(e) => set(item.linkId, e.target.value)} required={item.required} />
-        </div>
-      );
-    case 'integer':
-    case 'decimal':
-      return (
-        <div className="field">
-          {label}
-          <input id={id} className="input" type="number" step={item.type === 'integer' ? 1 : 'any'} value={(v as number) ?? ''} onChange={(e) => set(item.linkId, e.target.value === '' ? null : Number(e.target.value))} />
-        </div>
-      );
-    case 'date':
-      return (
-        <div className="field">
-          {label}
-          <input id={id} className="input" type="date" value={(v as string) ?? ''} onChange={(e) => set(item.linkId, e.target.value)} />
-        </div>
-      );
-    default:
-      return (
-        <div className="field">
-          {label}
-          <input id={id} className="input" maxLength={300} value={(v as string) ?? ''} onChange={(e) => set(item.linkId, e.target.value)} required={item.required} />
-        </div>
-      );
-  }
-}
-
-function answersFromResponse(resp: { item?: { linkId: string; answer?: Record<string, unknown>[]; item?: unknown[] }[] } | null): Answers {
-  const out: Answers = {};
-  const walk = (items: { linkId: string; answer?: Record<string, unknown>[]; item?: unknown[] }[] = []) => {
-    for (const i of items) {
-      const a = i.answer?.[0];
-      if (i.answer && i.answer.length > 1) {
-        // wielokrotny wybór
-        out[i.linkId] = i.answer.map((x) => String((x.valueCoding as { code?: string } | undefined)?.code ?? x.valueString ?? ''));
-      } else if (a) {
-        const coding = a.valueCoding as { code?: string } | undefined;
-        const v = a.valueBoolean ?? a.valueString ?? coding?.code ?? a.valueInteger ?? a.valueDecimal ?? a.valueDate;
-        out[i.linkId] = v === undefined ? null : (v as Answers[string]);
-      }
-      walk(i.item as typeof items);
-    }
-  };
-  walk(resp?.item);
-  return out;
-}
+// --- wywiad przed wizytą (M27) -----------------------------------------------------------------------
 
 export function QuestionnairePage() {
   const { id = '' } = useParams();
   const { t } = useI18n();
-  const { a11y } = useSession();
   const nav = useNavigate();
   const toast = useToast();
   const qc = useQueryClient();
-  const [answers, setAnswers] = useState<Answers | null>(null);
-  // M27 — wywiad w formie rozmowy: jedno pytanie na ekranie, podsumowanie przed wysłaniem.
-  // Domyślnie przy prostym języku albo dużym tekście; zawsze do przełączenia.
-  const [mode, setMode] = useState<'all' | 'step'>(a11y.simpleLanguage || a11y.textScale >= 150 ? 'step' : 'all');
-  const [step, setStep] = useState(0);
-  const [missing, setMissing] = useState(false);
-  const stepRef = useRef<HTMLDivElement>(null);
   const q = useQuery({
     queryKey: ['appointment', id, 'questionnaire'],
     queryFn: () => get<{ questionnaire: Questionnaire; response: Parameters<typeof answersFromResponse>[0] }>(`/api/me/appointments/${id}/questionnaire`),
   });
   const save = useMutation({
-    mutationFn: () => post(`/api/me/appointments/${id}/questionnaire`, { answers: answers ?? {} }),
+    mutationFn: (answers: Answers) => post(`/api/me/appointments/${id}/questionnaire`, { answers }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['appointment'] });
       void qc.invalidateQueries({ queryKey: ['dashboard'] });
@@ -396,120 +253,20 @@ export function QuestionnairePage() {
       nav(`/wizyty/${id}`);
     },
   });
-  useEffect(() => {
-    if (mode === 'step') stepRef.current?.focus();
-  }, [step, mode]);
   if (q.isLoading) return <Skeleton count={4} />;
   if (q.isError) return <QueryError error={q.error} />;
-  const current = answers ?? answersFromResponse(q.data!.response);
-  const set = (k: string, v: Answers[string]) => {
-    setMissing(false);
-    setAnswers({ ...current, [k]: v });
-  };
-  const items = q.data!.questionnaire.item ?? [];
-  const steps = items.filter((i) => i.type !== 'display' && enabled(i, current));
-  const notes = items.filter((i) => i.type === 'display');
-  const reviewing = step >= steps.length;
-  const isEmpty = (v: Answers[string] | undefined) => v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0);
-  const next = () => {
-    const item = steps[step];
-    if (item?.required && isEmpty(current[item.linkId])) return setMissing(true);
-    setMissing(false);
-    setStep(step + 1);
-  };
-  const submit = () => {
-    if (!answers) setAnswers(current);
-    save.mutate();
-  };
   return (
     <div className="stack-lg">
       <PageHead title={q.data!.questionnaire.title ?? t('Wywiad przed wizytą')} sub={q.data!.questionnaire.description} back={{ to: `/wizyty/${id}`, label: t('Wizyta') }} />
-      <Segmented
-        label={t('Sposób wypełniania')}
-        value={mode}
-        onChange={(m) => {
-          setMode(m);
-          setStep(0);
-        }}
-        options={[
-          { value: 'step', label: t('Po jednym pytaniu') },
-          { value: 'all', label: t('Wszystkie pytania') },
-        ]}
+      <QuestionnaireForm
+        questionnaire={q.data!.questionnaire}
+        initial={answersFromResponse(q.data!.response)}
+        onSubmit={(a) => save.mutate(a)}
+        submitting={save.isPending}
+        error={save.isError ? <Notice kind="danger">{errorMessage(save.error, t)}</Notice> : undefined}
       />
-      {mode === 'all' ? (
-        <form
-          className="card stack-lg"
-          onSubmit={(e) => {
-            e.preventDefault();
-            submit();
-          }}
-        >
-          {items.map((item) => <QItem key={item.linkId} item={item} answers={current} set={set} />)}
-          {save.isError && <Notice kind="danger">{errorMessage(save.error, t)}</Notice>}
-          <Button type="submit" loading={save.isPending}>
-            {t('Wyślij odpowiedzi')}
-          </Button>
-        </form>
-      ) : (
-        <div className="card stack-lg">
-          <div>
-            <p className="small muted" style={{ margin: '0 0 6px' }}>
-              {reviewing ? t('Sprawdź odpowiedzi przed wysłaniem') : t('Pytanie {n} z {m}', { n: step + 1, m: steps.length })}
-            </p>
-            <div className="step-progress" role="progressbar" aria-label={t('Postęp wywiadu')} aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={Math.min(step, steps.length)}>
-              <span style={{ width: `${steps.length ? Math.round((Math.min(step, steps.length) / steps.length) * 100) : 100}%` }} />
-            </div>
-          </div>
-          <div ref={stepRef} tabIndex={-1} className="stack" style={{ outline: 'none' }}>
-            {!reviewing && steps[step] && <QItem item={steps[step]} answers={current} set={set} />}
-            {!reviewing && missing && <Notice kind="warn">{t('To pytanie jest wymagane — odpowiedz, żeby przejść dalej.')}</Notice>}
-            {reviewing && (
-              <dl className="answers-review">
-                {steps.map((item, i) => (
-                  <div key={item.linkId}>
-                    <dt>{item.text}</dt>
-                    <dd>
-                      {answerText(item, current, t) || <span className="muted">{t('bez odpowiedzi')}</span>}{' '}
-                      <button type="button" className="link-btn" onClick={() => setStep(i)} aria-label={t('Zmień odpowiedź: {q}', { q: item.text ?? '' })}>
-                        {t('Zmień')}
-                      </button>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-            {reviewing && notes.map((n) => <p key={n.linkId} className="small muted" style={{ margin: 0 }}>{n.text}</p>)}
-          </div>
-          {save.isError && <Notice kind="danger">{errorMessage(save.error, t)}</Notice>}
-          <div className="btn-row">
-            {step > 0 && (
-              <Button variant="secondary" onClick={() => setStep(step - 1)}>
-                {t('Wstecz')}
-              </Button>
-            )}
-            {reviewing ? (
-              <Button onClick={submit} loading={save.isPending}>
-                {t('Wyślij odpowiedzi')}
-              </Button>
-            ) : (
-              <Button onClick={next}>{step === steps.length - 1 ? t('Podsumowanie') : t('Dalej')}</Button>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
-}
-
-/** Odpowiedź w czytelnej postaci (podsumowanie przed wysłaniem). */
-function answerText(item: QuestionnaireItem, answers: Answers, t: (s: string) => string): string {
-  if (item.type === 'group') return (item.item ?? []).filter((c) => enabled(c, answers)).map((c) => answerText(c, answers, t)).filter(Boolean).join('; ');
-  const v = answers[item.linkId];
-  if (v === undefined || v === null || v === '') return '';
-  if (typeof v === 'boolean') return v ? t('Tak') : t('Nie');
-  const label = (code: string) => item.answerOption?.find((o) => (o.valueCoding?.code ?? o.valueString) === code)?.valueCoding?.display ?? code;
-  if (Array.isArray(v)) return v.map(label).join(', ');
-  return item.type === 'choice' ? label(String(v)) : String(v);
 }
 
 // --- teleporada -------------------------------------------------------------------------------------

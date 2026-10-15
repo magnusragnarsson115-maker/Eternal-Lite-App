@@ -238,7 +238,7 @@ function SurveyCard({ questions, onDone }: { questions: { id: string; pl: string
 
 // --- D0: organizacja kliniki (administrator) ------------------------------------------------------
 
-type OrgTab = 'gotowosc' | 'moduly' | 'pakiety' | 'konfiguracja' | 'personel' | 'uzycie' | 'incydenty' | 'ai';
+type OrgTab = 'gotowosc' | 'moduly' | 'pakiety' | 'ankiety' | 'konfiguracja' | 'personel' | 'uzycie' | 'incydenty' | 'ai';
 
 export function OrgManagePage() {
   const { t } = useI18n();
@@ -255,6 +255,7 @@ export function OrgManagePage() {
           { value: 'gotowosc', label: t('Gotowość do pracy') },
           { value: 'moduly', label: t('Moduły') },
           { value: 'pakiety', label: t('Pakiety specjalizacji') },
+          { value: 'ankiety', label: t('Ankiety') },
           { value: 'konfiguracja', label: t('Konfiguracja') },
           { value: 'personel', label: t('Zaproszenia personelu') },
           { value: 'uzycie', label: t('Użycie i faktura') },
@@ -265,6 +266,7 @@ export function OrgManagePage() {
       {tab === 'gotowosc' && <ReadinessTab />}
       {tab === 'moduly' && <ModulesTab />}
       {tab === 'pakiety' && <PackagesTab />}
+      {tab === 'ankiety' && <SurveysTab />}
       {tab === 'konfiguracja' && <ClinicConfigTab />}
       {tab === 'personel' && <StaffInvitesTab />}
       {tab === 'uzycie' && <UsageTab />}
@@ -465,6 +467,75 @@ function PackagesTab() {
           </div>
         )}
       </Modal>
+    </div>
+  );
+}
+
+interface SurveySummary {
+  responses: number;
+  umuxLite?: number;
+  nps?: number;
+  comments: { date: string; hard?: string; missing?: string }[];
+  completions: { surveyId: string; count: number }[];
+}
+
+const SURVEY_NAME: Record<string, string> = {
+  'health-intake': 'Ankieta zdrowotna na start',
+  'after-results': 'Po nowych wynikach',
+  'health-followup': 'Ankieta kontrolna',
+  'app-feedback': 'Jak działa aplikacja?',
+};
+
+/** A12.3 — ocena aplikacji (anonimowa) i liczba wypełnionych ankiet; bez treści zdrowotnych. */
+function SurveysTab() {
+  const { t, fmt } = useI18n();
+  const q = useQuery({ queryKey: ['admin-surveys'], queryFn: () => get<SurveySummary>('/api/admin/surveys') });
+  if (q.isLoading) return <Skeleton />;
+  if (q.isError) return <QueryError error={q.error} retry={() => void q.refetch()} />;
+  const d = q.data!;
+  return (
+    <div className="stack">
+      <Notice kind="info">
+        {t('Ocena aplikacji jest anonimowa — nie wiadomo, kto ją wypełnił. Odpowiedzi z ankiet zdrowotnych należą do pacjentów: tutaj widać tylko liczbę wypełnień; lekarz zobaczy treść w raporcie faktów, gdy pacjent udostępni dane.')}
+      </Notice>
+      <div className="grid-2">
+        <Card>
+          <p className="small muted" style={{ margin: 0 }}>{t('Użyteczność (UMUX-Lite, 0–100)')}</p>
+          <p className="stat-value" style={{ fontSize: '1.8rem', fontWeight: 750, margin: '4px 0' }}>{d.umuxLite === undefined ? '—' : fmt.number(d.umuxLite)}</p>
+          <p className="small muted" style={{ margin: 0 }}>{t('Średnia z 2 pytań („robi to, czego potrzebuję”, „łatwa w użyciu”), {n} odpowiedzi z 12 miesięcy.', { n: d.responses })}</p>
+        </Card>
+        <Card>
+          <p className="small muted" style={{ margin: 0 }}>{t('Skłonność do polecenia (NPS, −100…100)')}</p>
+          <p className="stat-value" style={{ fontSize: '1.8rem', fontWeight: 750, margin: '4px 0' }}>{d.nps === undefined ? '—' : d.nps}</p>
+          <p className="small muted" style={{ margin: 0 }}>{t('Odsetek ocen 9–10 minus odsetek ocen 0–6.')}</p>
+        </Card>
+      </div>
+      <Card title={t('Wypełnione ankiety (12 miesięcy)')}>
+        <ul className="list">
+          {d.completions.map((c) => (
+            <li key={c.surveyId} className="list-item">
+              <span className="grow">{t(SURVEY_NAME[c.surveyId] ?? c.surveyId)}</span>
+              <Badge>{c.count}</Badge>
+            </li>
+          ))}
+        </ul>
+      </Card>
+      <Card title={t('Uwagi pacjentów o aplikacji')}>
+        {d.comments.length === 0 ? (
+          <p className="muted" style={{ margin: 0 }}>{t('Brak uwag.')}</p>
+        ) : (
+          <ul className="list">
+            {d.comments.map((c, i) => (
+              <li key={i} className="list-item" style={{ display: 'block' }}>
+                <span className="small muted">{fmt.date(c.date)}</span>
+                {c.hard && <p style={{ margin: '4px 0 0' }}><strong>{t('Trudne:')}</strong> {c.hard}</p>}
+                {c.missing && <p style={{ margin: '4px 0 0' }}><strong>{t('Brakuje:')}</strong> {c.missing}</p>}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="small muted" style={{ marginBottom: 0 }}>{t('Adresy e-mail, numery telefonów i PESEL są usuwane z uwag przed zapisem.')}</p>
+      </Card>
     </div>
   );
 }

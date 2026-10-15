@@ -484,6 +484,28 @@ export function FactsReportView({ patientId, appointmentId }: { patientId: strin
           </div>
         </Card>
       )}
+      {(r.surveys ?? []).length > 0 && (
+        <Card title={t('Ankiety zdrowotne pacjenta')}>
+          <p className="small muted">{t('Odpowiedzi pacjenta, przepisane bez zmian i bez oceny.')}</p>
+          <div className="stack">
+            {r.surveys!.map((sv) => (
+              <details key={sv.ref} className="card" style={{ padding: 12 }}>
+                <summary style={{ cursor: 'pointer' }}>
+                  <strong>{t(sv.title)}</strong> <span className="muted small">{fmt.date(sv.authored)}</span>
+                </summary>
+                <dl className="answers-review" style={{ marginTop: 8 }}>
+                  {sv.answers.map((a, i) => (
+                    <div key={i}>
+                      <dt>{a.question}</dt>
+                      <dd>{a.answer}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </details>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

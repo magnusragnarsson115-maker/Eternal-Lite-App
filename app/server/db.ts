@@ -528,6 +528,20 @@ const MIGRATIONS: string[] = [
   ALTER TABLE incident ADD COLUMN reporter_display TEXT;
   ALTER TABLE incident ADD COLUMN data_breach INTEGER NOT NULL DEFAULT 0;
   `,
+  // 10 — ankiety (A12.3): rejestr wypełnień bez tożsamości; treść tylko dla ankiety o aplikacji (anonimowa)
+  `
+  CREATE TABLE survey_submission (
+    id TEXT PRIMARY KEY,
+    survey_id TEXT NOT NULL,
+    version TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    org_ids TEXT NOT NULL DEFAULT '',
+    platform TEXT,
+    answers TEXT,
+    submitted_at TEXT NOT NULL
+  );
+  CREATE INDEX survey_submission_survey ON survey_submission(survey_id, submitted_at);
+  `,
 ];
 
 export type Db = DatabaseSync;

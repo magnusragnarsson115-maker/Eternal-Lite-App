@@ -172,6 +172,7 @@ export interface FactsReport {
   results: FactRow[];
   unconfirmed: FactRow[];
   documents: { ref: string; kind: string; title: string; date: string; binaryId?: string; sections: { title: string; text: string }[]; accessCode?: string; source: 'clinic' | 'patient' }[];
+  surveys?: { ref: string; title: string; authored: string; answers: { question: string; answer: string }[] }[];
   sharing: { grants: GrantView[]; vaultIncluded: boolean };
 }
 

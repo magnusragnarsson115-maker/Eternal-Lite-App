@@ -24,6 +24,7 @@ import {
 } from '../services/directory.js';
 import { closeAccount } from '../services/privacy.js';
 import { applyPackage, listPackages } from '../services/packages.js';
+import { feedbackSummary } from '../services/surveys.js';
 import { NOTE_TEMPLATE_IDS } from '../scribe/templates.js';
 
 function tempPassword(): string {
@@ -286,6 +287,14 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
     admin(req);
     const { id } = params(req, z.object({ id: z.enum(['interna', 'kardiologia', 'pediatria']) }));
     return applyPackage(actorOf(req), id);
+  });
+
+  // A12.3 — ankiety: ocena aplikacji (anonimowa) i liczba wypełnień, bez treści zdrowotnych
+  app.get('/api/admin/surveys', async (req) => {
+    const auth = admin(req);
+    const orgId = staffOrgId(auth.user);
+    if (!orgId) throw forbidden('no_org');
+    return feedbackSummary(orgId);
   });
 
   // A18.9 — wykaz składników oprogramowania dla administratora placówki i audytora

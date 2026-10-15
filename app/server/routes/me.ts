@@ -22,6 +22,8 @@ import { correctMeasurement, observationVersions } from '../services/observation
 import { exportCsv, measurementsForExport, patientLabFacts } from '../services/patientData.js';
 import { listOrganizations } from '../services/orgs.js';
 import { buildPeriodReport, latestFacts, periodBounds, periodReportHtml } from '../services/periodReport.js';
+import { readableAnswers } from '../services/questionnaires.js';
+import { answersOf, deferSurvey, healthResponses, noteReportViewed, questionnaireOf, submitSurvey, surveyDef, surveyIdOf, surveysFor } from '../services/surveys.js';
 import { getClinicSettings } from '../services/directory.js';
 import { patientCanViewRecords } from '../services/records.js';
 import { addContact, cardForSosToken, emergencyCard, getEmergencyInfo, listContacts, removeContact, setEmergencyInfo, triggerSos } from '../services/safety.js';
@@ -181,6 +183,7 @@ export async function meRoutes(app: FastifyInstance): Promise<void> {
     const auth = patient(req);
     const q = query(req, ReportQuery);
     const period = periodBounds(q.period, q);
+    noteReportViewed(auth.user.id, `${period.kind}:${period.from}:${period.to}`); // ankieta kontrolna po kilku raportach
     return { auth, report: await buildPeriodReport(auth.patientRef, auth.user.display_name, period) };
   };
 
@@ -202,6 +205,53 @@ export async function meRoutes(app: FastifyInstance): Promise<void> {
     audit(actorOf(req), { action: 'E', subtype: 'patient-report-pdf', patientRef: auth.patientRef, detail: { period: report.period.kind, from: report.period.from, to: report.period.to } });
     reply.header('Content-Type', 'application/pdf').header('Content-Disposition', `attachment; filename="eternal-raport-${report.period.from}-${report.period.to}.pdf"`);
     return pdf;
+  });
+
+  // --- ankiety (A12.3): wstępna zdrowotna, po wynikach, kontrolna po raportach, ocena aplikacji -------------
+  const SurveyParams = z.object({ id: z.enum(['health-intake', 'health-followup', 'after-results', 'app-feedback']) });
+  app.get('/api/me/surveys', async (req) => {
+    const auth = patient(req, 'patient-surveys');
+    const [items, history] = await Promise.all([surveysFor(auth.user, auth.patientRef), healthResponses(auth.patientRef)]);
+    audit(actorOf(req), { action: 'R', subtype: 'surveys-list', patientRef: auth.patientRef });
+    return {
+      items,
+      history: history.map((r) => ({ id: r.id, surveyId: surveyIdOf(r), title: surveyIdOf(r) ? surveyDef(surveyIdOf(r)!).title : '', authored: r.authored })),
+    };
+  });
+
+  app.get('/api/me/surveys/:id', async (req) => {
+    const auth = patient(req, 'patient-surveys');
+    const { id } = params(req, SurveyParams);
+    const d = surveyDef(id);
+    // ankietę wstępną można aktualizować — formularz startuje od ostatnich odpowiedzi
+    const last = id === 'health-intake' ? (await healthResponses(auth.patientRef, id))[0] : undefined;
+    if (last) audit(actorOf(req), { action: 'R', subtype: 'survey-read', entityRef: `QuestionnaireResponse/${last.id}`, patientRef: auth.patientRef });
+    return { questionnaire: questionnaireOf(d), kind: d.kind, minutes: d.minutes, answers: answersOf(last), lastAuthored: last?.authored };
+  });
+
+  app.post('/api/me/surveys/:id', async (req) => {
+    const auth = patient(req, 'patient-surveys');
+    const { id } = params(req, SurveyParams);
+    const input = body(req, z.object({ answers: z.record(z.string().max(64), z.union([z.string().max(2000), z.number(), z.boolean(), z.array(z.string().max(64)).max(30), z.null()])), platform: z.enum(['web', 'mobile']).optional() }));
+    return submitSurvey(actorOf(req), auth.user, auth.patientRef, id, input.answers, { platform: input.platform });
+  });
+
+  app.post('/api/me/surveys/:id/defer', async (req) => {
+    const auth = patient(req, 'patient-surveys');
+    const { id } = params(req, SurveyParams);
+    const { mode } = body(req, z.object({ mode: z.enum(['later', 'skip']) }));
+    await deferSurvey(auth.user, auth.patientRef, id, mode);
+    return { ok: true };
+  });
+
+  app.get('/api/me/surveys/responses/:id', async (req) => {
+    const auth = patient(req, 'patient-surveys');
+    const { id } = params(req, IdParams);
+    const r = (await healthResponses(auth.patientRef)).find((x) => x.id === id);
+    if (!r) throw notFound('survey_response_not_found');
+    audit(actorOf(req), { action: 'R', subtype: 'survey-read', entityRef: `QuestionnaireResponse/${id}`, patientRef: auth.patientRef });
+    const sid = surveyIdOf(r);
+    return { id, surveyId: sid, title: sid ? surveyDef(sid).title : '', authored: r.authored, answers: readableAnswers(r) };
   });
 
   app.get('/api/me/observations/:id/versions', async (req) => {

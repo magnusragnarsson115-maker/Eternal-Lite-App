@@ -26,7 +26,8 @@ export function MessagesPage() {
   const [params, setParams] = useSearchParams();
   const initialCategory = params.get('nowa');
   const [open, setOpen] = useState(!!initialCategory);
-  const [f, setF] = useState({ subject: '', category: (initialCategory as string) || 'question', body: '' });
+  // wstępne wypełnienie (np. pytanie z ankiety „po wynikach”) — pacjent sam decyduje, czy wysłać
+  const [f, setF] = useState({ subject: (params.get('temat') ?? '').slice(0, 120), category: (initialCategory as string) || 'question', body: (params.get('tresc') ?? '').slice(0, 2000) });
   const q = useQuery({ queryKey: ['threads'], queryFn: () => get<{ items: ThreadView[] }>('/api/me/threads') });
   const create = useMutation({
     mutationFn: () => post<ThreadView & { crisis?: boolean }>('/api/me/threads', f),

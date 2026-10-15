@@ -7,6 +7,7 @@ import { useSession } from '../session';
 import type { AppointmentView, NotificationRow } from '../types';
 import { Card, FullText, LinkButton, Notice, QueryError, Skeleton } from '../ui';
 import { KIND_LABEL, sourceText } from './ReportPage';
+import { SurveyInvite } from './SurveyPages';
 
 interface Dashboard {
   nextAppointment: AppointmentView | null;
@@ -81,6 +82,8 @@ export function HomePage() {
               </Link>
             </Notice>
           )}
+
+          <SurveyInvite />
 
           <LatestFactsCard />
 

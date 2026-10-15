@@ -61,7 +61,8 @@ function toAnswer(item: QuestionnaireItem, value: AnswerValue): QuestionnaireRes
   }
 }
 
-function buildItems(items: QuestionnaireItem[] = [], answers: Record<string, AnswerValue>): QuestionnaireResponseItem[] {
+/** Odpowiedzi → pozycje QuestionnaireResponse z walidacją typów, warunków (enableWhen) i pytań wymaganych. */
+export function buildItems(items: QuestionnaireItem[] = [], answers: Record<string, AnswerValue>): QuestionnaireResponseItem[] {
   const out: QuestionnaireResponseItem[] = [];
   for (const item of items) {
     if (!SUPPORTED.includes(item.type)) continue;

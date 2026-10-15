@@ -1,3 +1,5 @@
+import { EN_SURVEYS } from './i18n-en-surveys';
+
 /** Słownik angielski aplikacji mobilnej: tekst polski → tekst angielski (test kompletności: tests/unit/i18n.test.ts). */
 export const EN: Record<string, string> = {
   '{r} natychmiast straci dostęp do Twoich dokumentów i wyników.': '{r} will immediately lose access to your documents and results.',
@@ -405,3 +407,5 @@ export const EN: Record<string, string> = {
   'Udostępnianie plików nie jest dostępne na tym urządzeniu.': 'File sharing is not available on this device.',
   'Karta „Po wizycie” (PDF)': 'After-visit card (PDF)',
 };
+
+Object.assign(EN, EN_SURVEYS);

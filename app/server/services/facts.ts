@@ -17,6 +17,7 @@ import { type IntakeExtract, KIND_LABEL, listIntake } from './intake.js';
 import { staffOrgId } from './orgs.js';
 import { toAppointmentView } from './scheduling.js';
 import { labRange } from './patientData.js';
+import { latestHealthSurveys } from './surveys.js';
 
 /**
  * Raport faktów przed wizytą (D3, DOC-04). Model odczytu tylko z potwierdzonych danych; każda liczba ma
@@ -70,6 +71,8 @@ export interface FactsReport {
   results: FactRow[];
   unconfirmed: FactRow[];
   documents: FactsDocument[];
+  /** Ankiety zdrowotne pacjenta (A12.3) — odpowiedzi pacjenta bez oceny; tylko przy udostępnieniu. */
+  surveys: { ref: string; title: string; authored: string; answers: { question: string; answer: string }[] }[];
   sharing: { grants: GrantView[]; vaultIncluded: boolean };
 }
 
@@ -177,6 +180,7 @@ export async function buildFacts(user: AppUser, actor: AuditActor, input: { pati
   const confirmed = new Map<string, FactRow>();
   const unconfirmed = new Map<string, FactRow>();
   const documents: FactsDocument[] = [];
+  const surveys: FactsReport['surveys'] = [];
 
   // 1. wyniki wprowadzone przez placówkę
   const clinicReports = await fhir().search<DiagnosticReport>('DiagnosticReport', { subject: patientRef, _count: '300' });
@@ -247,6 +251,9 @@ export async function buildFacts(user: AppUser, actor: AuditActor, input: { pati
         source: kind === 'after-visit' ? 'clinic' : 'patient',
       });
     }
+    for (const sv of await latestHealthSurveys(patientRef)) {
+      if (grantAllows(grants, sv.ref, 'document')) surveys.push({ ref: sv.ref, title: sv.title, authored: sv.authored, answers: sv.answers });
+    }
     // 3. wgrane, ale jeszcze niezapisane do rekordu — zawsze jako odczyt niepotwierdzony
     for (const it of listIntake({ patientRef }).filter((r) => r.status === 'needs_review' && (r.org_id === orgId || r.source === 'app'))) {
       const ex = it.extracted ? (JSON.parse(it.extracted) as IntakeExtract) : undefined;
@@ -286,6 +293,7 @@ export async function buildFacts(user: AppUser, actor: AuditActor, input: { pati
     results: finalize(confirmed, layout.order),
     unconfirmed: finalize(unconfirmed, layout.order),
     documents,
+    surveys,
     sharing: { grants, vaultIncluded: grants.length > 0 },
   };
   audit(actor, { action: 'R', subtype: 'facts-report', entityRef: input.appointmentId ? `Appointment/${input.appointmentId}` : patientRef, patientRef, detail: { results: report.results.length, unconfirmed: report.unconfirmed.length, vault: grants.length > 0 } });
@@ -348,6 +356,7 @@ export function factsHtml(report: FactsReport, clinicName: string): string {
     ${report.results.length ? rowsTable(report.results, { unconfirmed: false, sources }) : '<p class="muted">Brak potwierdzonych wyników.</p>'}
     ${report.unconfirmed.length ? `<h2>Odczyty niepotwierdzone</h2><p class="small">Odczyt maszynowy, którego pacjent ani personel nie potwierdzili — nie jest faktem; sprawdź w oryginale.</p>${rowsTable(report.unconfirmed, { unconfirmed: true, sources })}` : ''}
     ${docs}
+    ${report.surveys.length ? `<h2>Ankiety zdrowotne pacjenta</h2><p class="small muted">Odpowiedzi pacjenta, przepisane bez zmian i bez oceny.</p>${report.surveys.map((sv) => `<div class="box"><strong>${esc(sv.title)}</strong> <span class="muted">${esc(sv.authored.slice(0, 10))}</span><table>${sv.answers.map((a) => `<tr><td>${esc(a.question)}</td><td>${esc(a.answer)}</td></tr>`).join('')}</table></div>`).join('')}` : ''}
     <h2>Źródła</h2><ol class="small">${sourceList.map((s) => `<li>${esc(s.label)} <span class="muted">${esc(s.ref)}</span></li>`).join('')}</ol>`;
   return documentHtml({
     title: 'Raport faktów przed wizytą',
