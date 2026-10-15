@@ -9,6 +9,14 @@ import { useSession } from '../../lib/session';
 import { space, useColors } from '../../lib/theme';
 import type { CardView, IntakeView } from '../../lib/types';
 
+interface LatestFacts {
+  measurements: { kind: string; effective: string; value?: number; systolic?: number; diastolic?: number; unit: string; source: string; device?: string }[];
+  lastLab?: { date: string; count: number };
+}
+
+const KIND_LABEL: Record<string, string> = { bp: 'Ciśnienie tętnicze', heartRate: 'Tętno', weight: 'Masa ciała', height: 'Wzrost', temperature: 'Temperatura ciała', spo2: 'Saturacja (SpO₂)', glucose: 'Glukoza we krwi' };
+const SOURCE_LABEL: Record<string, string> = { manual: 'wpis ręczny', bluetooth: 'urządzenie Bluetooth', withings: 'Withings', import: 'import z pliku', rpm: 'telemonitoring' };
+
 interface Appointment {
   id: string;
   status: string;
@@ -21,20 +29,21 @@ interface Appointment {
 
 export default function HomeScreen() {
   const { me } = useSession();
-  const { t, dateTime } = useI18n();
+  const { t, date, dateTime } = useI18n();
   const c = useColors();
   const appts = useQuery({ queryKey: ['appointments'], queryFn: () => get<{ items: Appointment[] }>('/api/me/appointments') });
   const intake = useQuery({ queryKey: ['intake'], queryFn: () => get<{ items: IntakeView[] }>('/api/me/intake') });
   const cards = useQuery({ queryKey: ['cards'], queryFn: () => get<{ items: CardView[] }>('/api/me/cards') });
+  const facts = useQuery({ queryKey: ['facts-latest'], queryFn: () => get<LatestFacts>('/api/me/facts/latest') });
   const next = appts.data?.items.filter((a) => ['booked', 'pending', 'arrived'].includes(a.status) && Date.parse(a.start) > Date.now() - 3600_000).sort((a, b) => a.start.localeCompare(b.start))[0];
   const toReview = intake.data?.items.filter((i) => i.status === 'needs_review').length ?? 0;
-  const refreshing = appts.isRefetching || intake.isRefetching || cards.isRefetching;
+  const refreshing = appts.isRefetching || intake.isRefetching || cards.isRefetching || facts.isRefetching;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['left', 'right']}>
       <ScrollView
         contentContainerStyle={{ padding: space(4), gap: space(4), paddingBottom: space(10) }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void Promise.all([appts.refetch(), intake.refetch(), cards.refetch()])} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void Promise.all([appts.refetch(), intake.refetch(), cards.refetch(), facts.refetch()])} />}
       >
         <H1>{t('Dzień dobry, {n}', { n: me?.user?.displayName.split(' ')[0] ?? '' })}</H1>
 
@@ -59,6 +68,29 @@ export default function HomeScreen() {
         {cards.data?.items[0] ? (
           <Card title={t('Ostatnia karta „Po wizycie”')}>
             <Row title={cards.data.items[0].clinic} sub={`${cards.data.items[0].doctor} · ${dateTime(cards.data.items[0].date)}`} onPress={() => router.push(`/card/${cards.data!.items[0].id}`)} />
+          </Card>
+        ) : null}
+
+        {facts.data ? (
+          <Card title={t('Moje dane — ostatnie odczyty')}>
+            {facts.data.measurements.length ? (
+              facts.data.measurements.map((m) => (
+                <Row
+                  key={m.kind}
+                  title={`${t(KIND_LABEL[m.kind] ?? m.kind)}: ${m.kind === 'bp' ? `${m.systolic}/${m.diastolic}` : String(m.value).replace('.', ',')} ${m.unit}`}
+                  sub={`${dateTime(m.effective)} · ${t(SOURCE_LABEL[m.source.split(':')[0]] ?? m.source)}${m.device ? ` (${m.device})` : ''}`}
+                />
+              ))
+            ) : (
+              <P muted>{t('Brak pomiarów.')}</P>
+            )}
+            <P small muted>
+              {facts.data.lastLab ? t('Ostatnie potwierdzone wyniki badań: {d} ({n})', { d: date(facts.data.lastLab.date), n: facts.data.lastLab.count }) : t('Brak potwierdzonych wyników badań.')}
+            </P>
+            <P small muted>
+              {t('Ostatnie zapisane wartości z datą i źródłem. Aplikacja ich nie ocenia.')}
+            </P>
+            <Button title={t('Raport okresowy')} variant="secondary" onPress={() => router.push('/report')} />
           </Card>
         ) : null}
 

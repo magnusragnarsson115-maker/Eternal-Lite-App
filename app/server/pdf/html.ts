@@ -94,3 +94,60 @@ export function lineChartSvg(points: { date: string; value: number }[], opts: { 
     <text x="${padL - 4}" y="${y(min + span * 0.1) + 3}" font-size="8" text-anchor="end" fill="#5b6577">${esc((min + span * 0.1).toFixed(1).replace('.', ','))}</text>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img">${band}${axis}<path d="${path}" fill="none" stroke="#1f4e79" stroke-width="1.6"/>${dots}${labels}</svg>`;
 }
+
+/**
+ * Wykres odczytów w okresie (raport okresowy A4): oś czasu obejmuje cały okres, więc widać też dni bez odczytów.
+ * Bez pasów norm i progów — aplikacja nie ocenia pomiarów. Wartości przy punktach tylko przy niewielkiej liczbie odczytów.
+ */
+export function periodChartSvg(
+  series: { label: string; points: { at: string; value: number }[]; dashed?: boolean }[],
+  opts: { unit: string; start: string; end: string; startLabel: string; endLabel: string; width?: number; height?: number },
+): string {
+  const w = opts.width ?? 640;
+  const h = opts.height ?? 150;
+  const padL = 44;
+  const padR = 12;
+  const padT = 12;
+  const padB = 26;
+  const vals = series.flatMap((s) => s.points.map((p) => p.value));
+  if (!vals.length) return '';
+  let min = Math.min(...vals);
+  let max = Math.max(...vals);
+  if (min === max) {
+    min -= 1;
+    max += 1;
+  }
+  const span = max - min;
+  const lo = min - span * 0.12;
+  const hi = max + span * 0.12;
+  const t0 = Date.parse(opts.start);
+  const t1 = Date.parse(opts.end);
+  const x = (at: string) => padL + ((Date.parse(at) - t0) / Math.max(1, t1 - t0)) * (w - padL - padR);
+  const y = (v: number) => padT + (1 - (v - lo) / (hi - lo)) * (h - padT - padB);
+  const total = series.reduce((n, s) => n + s.points.length, 0);
+  const r = total > 60 ? 1.6 : 2.6;
+  const lines = series
+    .map((s) => {
+      const pts = [...s.points].sort((a, b) => a.at.localeCompare(b.at));
+      const d = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.at).toFixed(1)},${y(p.value).toFixed(1)}`).join(' ');
+      const dots = pts.map((p) => `<circle cx="${x(p.at).toFixed(1)}" cy="${y(p.value).toFixed(1)}" r="${r}" fill="${s.dashed ? '#fff' : '#1f4e79'}" stroke="#1f4e79" stroke-width="1"/>`).join('');
+      const labels =
+        total <= 14
+          ? pts.map((p) => `<text x="${x(p.at).toFixed(1)}" y="${(y(p.value) - 5).toFixed(1)}" font-size="8.5" text-anchor="middle" fill="#14213d">${esc(String(p.value).replace('.', ','))}</text>`).join('')
+          : '';
+      return `<path d="${d}" fill="none" stroke="#1f4e79" stroke-width="1.4"${s.dashed ? ' stroke-dasharray="4 3"' : ''}/>${dots}${labels}`;
+    })
+    .join('');
+  const legend =
+    series.length > 1
+      ? series
+          .map((s, i) => `<g transform="translate(${padL + i * 120},${h - 4})"><line x1="0" y1="-3" x2="16" y2="-3" stroke="#1f4e79" stroke-width="1.4"${s.dashed ? ' stroke-dasharray="4 3"' : ''}/><text x="20" y="0" font-size="8.5" fill="#5b6577">${esc(s.label)}</text></g>`)
+          .join('')
+      : '';
+  const yTick = (v: number) => `<text x="${padL - 4}" y="${(y(v) + 3).toFixed(1)}" font-size="8" text-anchor="end" fill="#5b6577">${esc(String(Math.round(v * 10) / 10).replace('.', ','))}</text><line x1="${padL}" y1="${y(v).toFixed(1)}" x2="${w - padR}" y2="${y(v).toFixed(1)}" stroke="#eef2f7"/>`;
+  const axis = `<line x1="${padL}" y1="${h - padB}" x2="${w - padR}" y2="${h - padB}" stroke="#c9d3e0"/>
+    <text x="4" y="${padT + 2}" font-size="8.5" fill="#5b6577">${esc(opts.unit)}</text>${yTick(min)}${yTick(max)}
+    <text x="${padL}" y="${h - padB + 12}" font-size="8.5" fill="#5b6577">${esc(opts.startLabel)}</text>
+    <text x="${w - padR}" y="${h - padB + 12}" font-size="8.5" text-anchor="end" fill="#5b6577">${esc(opts.endLabel)}</text>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img">${axis}${lines}${legend}</svg>`;
+}

@@ -48,7 +48,7 @@ export async function patientLabFacts(patientRef: string): Promise<LabFact[]> {
       value: o.valueQuantity?.value !== undefined ? `${o.valueQuantity.comparator ?? ''}${o.valueQuantity.value}` : (o.valueString ?? ''),
       valueNum: o.valueQuantity?.comparator ? undefined : o.valueQuantity?.value,
       unit: o.valueQuantity?.unit,
-      range: o.referenceRange?.[0]?.text?.replace(/ \(zakres z dokumentu laboratorium\)$/, ''),
+      range: labRange(o),
       labFlag: o.interpretation?.[0]?.coding?.[0]?.code,
       status: o.status,
       trust: o.meta?.tag?.find((t) => t.system === ETERNAL.trust)?.code ?? (source === 'clinic' ? TRUST.clinic.code : undefined),
@@ -59,6 +59,19 @@ export async function patientLabFacts(patientRef: string): Promise<LabFact[]> {
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
+/** Zakres referencyjny przepisany z dokumentu laboratorium (tekst albo dolna/górna granica) — bez własnych norm. */
+export function labRange(o: Observation): string | undefined {
+  const r = o.referenceRange?.[0];
+  if (!r) return undefined;
+  if (r.text) return r.text.replace(/ \(zakres z dokumentu laboratorium\)$/, '');
+  const lo = r.low?.value;
+  const hi = r.high?.value;
+  if (lo !== undefined && hi !== undefined) return `${lo} – ${hi}`;
+  if (lo !== undefined) return `≥ ${lo}`;
+  if (hi !== undefined) return `≤ ${hi}`;
+  return undefined;
+}
+
 /** Wynik potwierdzony = zapisany przez pacjenta po sprawdzeniu, potwierdzony przez personel albo wprowadzony przez placówkę. */
 export function isConfirmed(f: LabFact): boolean {
   return f.status !== 'preliminary' && f.trust !== TRUST.machineUnconfirmed.code;
@@ -66,8 +79,8 @@ export function isConfirmed(f: LabFact): boolean {
 
 // --- eksport CSV (A2.6) -----------------------------------------------------------------------------------
 
-const KIND_PL: Record<string, string> = { bp: 'ciśnienie', heartRate: 'tętno', weight: 'masa ciała', height: 'wzrost', temperature: 'temperatura', spo2: 'saturacja', glucose: 'glukoza' };
-const SOURCE_PL: Record<string, string> = { manual: 'wpis ręczny', bluetooth: 'urządzenie Bluetooth', withings: 'Withings', import: 'import z pliku', patient: 'dokument przesłany przez pacjenta', clinic: 'placówka' };
+export const KIND_PL: Record<string, string> = { bp: 'ciśnienie', heartRate: 'tętno', weight: 'masa ciała', height: 'wzrost', temperature: 'temperatura', spo2: 'saturacja', glucose: 'glukoza' };
+export const SOURCE_PL: Record<string, string> = { manual: 'wpis ręczny', bluetooth: 'urządzenie Bluetooth', withings: 'Withings', import: 'import z pliku', rpm: 'telemonitoring', patient: 'dokument przesłany przez pacjenta', clinic: 'placówka' };
 
 function cell(v: string | number | undefined): string {
   const s = v === undefined ? '' : typeof v === 'number' ? String(v).replace('.', ',') : v;

@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { Activity, CalendarPlus, ClipboardList, FileText, MessageSquare, Search, Video } from 'lucide-react';
+import { Activity, CalendarPlus, ClipboardList, FileChartColumn, FileText, MessageSquare, Search, Video } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { get } from '../api';
 import { useI18n } from '../i18n';
 import { useSession } from '../session';
 import type { AppointmentView, NotificationRow } from '../types';
 import { Card, LinkButton, Notice, QueryError, Skeleton } from '../ui';
+import { KIND_LABEL, sourceText } from './ReportPage';
 
 interface Dashboard {
   nextAppointment: AppointmentView | null;
@@ -81,6 +82,8 @@ export function HomePage() {
             </Notice>
           )}
 
+          <LatestFactsCard />
+
           <div className="grid-2">
             <Tile to="/rezerwacja" icon={<CalendarPlus size={22} />} title={t('Umów wizytę')} sub={t('Wolne terminy na bieżąco')} />
             <Tile
@@ -139,6 +142,73 @@ export function HomePage() {
         </>
       )}
     </div>
+  );
+}
+
+interface LatestFacts {
+  measurements: { kind: string; effective: string; value?: number; systolic?: number; diastolic?: number; unit: string; source: string; device?: string }[];
+  lastLab?: { date: string; count: number; source: 'patient' | 'clinic' };
+  unconfirmedLabs: number;
+}
+
+/**
+ * Pulpit faktów (A3.1): ostatni odczyt każdego rodzaju z datą i źródłem oraz data ostatnich potwierdzonych wyników.
+ * Bez oceny, kolorów „normy” i trendów — szczegóły i średnie z metodą w raporcie okresowym.
+ */
+function LatestFactsCard() {
+  const { t, fmt } = useI18n();
+  const q = useQuery({ queryKey: ['facts-latest'], queryFn: () => get<LatestFacts>('/api/me/facts/latest') });
+  const d = q.data;
+  if (q.isLoading) return <Skeleton height={110} count={1} />;
+  if (q.isError) return <QueryError error={q.error} retry={() => void q.refetch()} />;
+  if (!d) return null;
+  return (
+    <Card
+      title={t('Moje dane — ostatnie odczyty')}
+      action={
+        <Link to="/raport" className="small">
+          <FileChartColumn size={16} aria-hidden /> {t('Raport okresowy')}
+        </Link>
+      }
+    >
+      {d.measurements.length === 0 ? (
+        <p className="muted" style={{ margin: '0 0 8px' }}>
+          {t('Brak pomiarów.')} <Link to="/pomiary">{t('Dodaj pierwszy pomiar')}</Link>
+        </p>
+      ) : (
+        <dl className="kv facts-kv">
+          {d.measurements.map((m) => (
+            <div key={m.kind} style={{ display: 'contents' }}>
+              <dt>{t(KIND_LABEL[m.kind] ?? m.kind)}</dt>
+              <dd>
+                <strong>
+                  {m.kind === 'bp' ? `${m.systolic}/${m.diastolic}` : fmt.number(m.value)} {m.unit}
+                </strong>
+                <span className="small muted" style={{ display: 'block' }}>
+                  {fmt.dateTime(m.effective)} · {sourceText(m.source, t)}
+                  {m.device ? ` (${m.device})` : ''}
+                </span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      <p className="small" style={{ margin: '8px 0 0' }}>
+        {d.lastLab ? (
+          <>
+            {t('Ostatnie potwierdzone wyniki badań: {d} ({n})', { d: fmt.date(d.lastLab.date), n: d.lastLab.count })} · <Link to="/os-czasu">{t('Oś czasu wyników')}</Link>
+          </>
+        ) : (
+          <span className="muted">{t('Brak potwierdzonych wyników badań.')}</span>
+        )}
+        {d.unconfirmedLabs > 0 && (
+          <span style={{ display: 'block' }}>
+            {t('Do sprawdzenia: {n} odczytów z dokumentów.', { n: d.unconfirmedLabs })} <Link to="/dokumenty">{t('Moje dokumenty')}</Link>
+          </span>
+        )}
+      </p>
+      <p className="small muted" style={{ margin: '6px 0 0' }}>{t('Ostatnie zapisane wartości z datą i źródłem. Aplikacja ich nie ocenia.')}</p>
+    </Card>
   );
 }
 

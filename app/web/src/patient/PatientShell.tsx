@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Bell, CalendarDays, ClipboardCheck, FileText, FolderOpen, Home, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User } from 'lucide-react';
+import { Activity, Bell, CalendarDays, ClipboardCheck, FileChartColumn, FileText, FolderOpen, Home, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { get, msSinceOwnMutation } from '../api';
@@ -96,6 +96,7 @@ export function PatientShell() {
             <NavItem to="/karty" icon={<ClipboardCheck size={20} />} label={t('Karty „Po wizycie”')} />
             <NavItem to="/wiadomosci" icon={<MessageSquare size={20} />} label={t('Wiadomości')} badge={unreadMsg} />
             <NavItem to="/pomiary" icon={<Activity size={20} />} label={t('Pomiary')} />
+            <NavItem to="/raport" icon={<FileChartColumn size={20} />} label={t('Raport okresowy')} />
             <NavItem to="/leki" icon={<Pill size={20} />} label={t('Leki')} />
             <div className="side-sep" />
             <NavItem to="/nfz" icon={<Search size={20} />} label={t('Terminy NFZ')} />
@@ -154,6 +155,7 @@ export function MorePage() {
     ['/karty', <ClipboardCheck size={20} key="k" />, t('Karty „Po wizycie”')],
     ['/udostepnianie', <Share2 size={20} key="u" />, t('Komu udostępniam')],
     ['/pomiary', <Activity size={20} key="a" />, t('Pomiary')],
+    ['/raport', <FileChartColumn size={20} key="r" />, t('Raport okresowy')],
     ['/leki', <Pill size={20} key="b" />, t('Leki')],
     ['/nfz', <Search size={20} key="c" />, t('Terminy NFZ')],
     ['/powiadomienia', <Bell size={20} key="d" />, t('Powiadomienia')],

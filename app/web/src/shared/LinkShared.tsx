@@ -79,6 +79,9 @@ export const SUBTYPE_PL: Record<string, string> = {
   'medication-add': 'Dodanie leku',
   'measurement-import': 'Pomiary zaimportowane z pliku',
   'patient-export-csv': 'Eksport danych (CSV)',
+  'patient-report': 'Raport okresowy',
+  'patient-report-pdf': 'Raport okresowy (PDF)',
+  'patient-facts-latest': 'Pulpit — ostatnie odczyty',
 };
 
 export function CardContent({ card, pdfUrl }: { card: CardView; pdfUrl: string }) {

@@ -27,6 +27,7 @@ lub terapeutycznym, co do zasady nie jest wyrobem medycznym. Kod został zaproje
 | Alert „parametr poza normą” (F3.6) | powiadomienie wyłącznie o **oznaczeniu wydrukowanym przez laboratorium** (H/L) w dokumencie pacjenta — aplikacja nie porównuje wartości z normą |
 | Raport faktów dla lekarza (D3) | tylko wartości potwierdzone, z datą, jednostką, zakresem i oznaczeniem z dokumentu, z odnośnikiem do źródła; bez wniosków, sortowania „nieprawidłowe najpierw” ani wyróżnień |
 | Obliczenia kliniczne (dawki, ryzyko) | brak; lista leków bez sprawdzania interakcji (komunikat w interfejsie) |
+| Statystyki pomiarów domowych w pulpicie i raporcie okresowym (A3.1, A4.1, A4.2) | wyłącznie statystyka opisowa: liczba, najniższa i najwyższa wartość, średnia arytmetyczna z okresu z opisaną metodą, osobno dla rodzaju, jednostki i źródła (bez łączenia urządzeń); bez progów, porównań z normą, trendów „rośnie/spada”, kolorów i wyróżnień; wykres bez pasów norm (`periodReport.ts`, test słów oceniających). ⚠️ uwzględnij w analizie kwalifikacji MDR |
 
 Komunikaty „Aplikacja nie ocenia wyników i nie zastępuje porady lekarza” oraz „w nagłym przypadku dzwoń 112”
 są stałym elementem interfejsu. ⚠️ Dodanie którejkolwiek funkcji z lewej kolumny wymaga ponownej analizy

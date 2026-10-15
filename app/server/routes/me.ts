@@ -21,6 +21,8 @@ import { commitImport, previewImport } from '../services/measurementImport.js';
 import { correctMeasurement, observationVersions } from '../services/observations.js';
 import { exportCsv, measurementsForExport, patientLabFacts } from '../services/patientData.js';
 import { listOrganizations } from '../services/orgs.js';
+import { buildPeriodReport, latestFacts, periodBounds, periodReportHtml } from '../services/periodReport.js';
+import { getClinicSettings } from '../services/directory.js';
 import { patientCanViewRecords } from '../services/records.js';
 import { addContact, cardForSosToken, emergencyCard, getEmergencyInfo, listContacts, removeContact, setEmergencyInfo, triggerSos } from '../services/safety.js';
 import { ORG_TAG_SYSTEM, orgIdsOf, vaultOrgId } from '../tenancy.js';
@@ -170,6 +172,36 @@ export async function meRoutes(app: FastifyInstance): Promise<void> {
       .header('Content-Type', 'text/csv; charset=utf-8')
       .header('Content-Disposition', `attachment; filename="eternal-dane-${new Date().toISOString().slice(0, 10)}.csv"`);
     return exportCsv(measurements, labs, range);
+  });
+
+  // --- pulpit faktów (A3.1) i raport okresowy (A4.1/A4.2) --------------------------------------------------
+  const DateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+  const ReportQuery = z.object({ period: z.enum(['week', 'month', 'quarter', 'custom']).default('week'), anchor: DateStr.optional(), from: DateStr.optional(), to: DateStr.optional() });
+  const buildReport = async (req: FastifyRequest) => {
+    const auth = patient(req);
+    const q = query(req, ReportQuery);
+    const period = periodBounds(q.period, q);
+    return { auth, report: await buildPeriodReport(auth.patientRef, auth.user.display_name, period) };
+  };
+
+  app.get('/api/me/facts/latest', async (req) => {
+    const auth = patient(req);
+    audit(actorOf(req), { action: 'R', subtype: 'patient-facts-latest', patientRef: auth.patientRef });
+    return latestFacts(auth.patientRef);
+  });
+
+  app.get('/api/me/report', async (req) => {
+    const { auth, report } = await buildReport(req);
+    audit(actorOf(req), { action: 'R', subtype: 'patient-report', patientRef: auth.patientRef, detail: { period: report.period.kind, from: report.period.from, to: report.period.to } });
+    return report;
+  });
+
+  app.get('/api/me/report.pdf', async (req, reply) => {
+    const { auth, report } = await buildReport(req);
+    const pdf = await renderPdf(periodReportHtml(report, getClinicSettings().name), { footerLeft: `Raport okresowy · ${report.period.label} · ${report.templateVersion}` });
+    audit(actorOf(req), { action: 'E', subtype: 'patient-report-pdf', patientRef: auth.patientRef, detail: { period: report.period.kind, from: report.period.from, to: report.period.to } });
+    reply.header('Content-Type', 'application/pdf').header('Content-Disposition', `attachment; filename="eternal-raport-${report.period.from}-${report.period.to}.pdf"`);
+    return pdf;
   });
 
   app.get('/api/me/observations/:id/versions', async (req) => {

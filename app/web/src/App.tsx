@@ -8,6 +8,7 @@ import { HomePage } from './patient/HomePage';
 import { MessagesPage, ThreadPage } from './patient/MessagePages';
 import { MorePage, PatientShell } from './patient/PatientShell';
 import { RecordDetailPage, RecordsPage } from './patient/RecordPages';
+import { ReportPage } from './patient/ReportPage';
 import { CardDetailPage, CardsPage, DocumentDetailPage, DocumentsPage, HelpPage, SafetyPage, SharingPage, TimelinePage } from './patient/MvpPages';
 import { lazy, Suspense } from 'react';
 import { hasRole, useSession } from './session';
@@ -105,6 +106,7 @@ export function App() {
         <Route path="dokumenty" element={<DocumentsPage />} />
         <Route path="dokumenty/:id" element={<DocumentDetailPage />} />
         <Route path="os-czasu" element={<TimelinePage />} />
+        <Route path="raport" element={<ReportPage />} />
         <Route path="udostepnianie" element={<SharingPage />} />
         <Route path="karty" element={<CardsPage />} />
         <Route path="karty/:id" element={<CardDetailPage />} />

@@ -16,6 +16,7 @@ import { prepFor, type VisitPrep } from './inbox.js';
 import { type IntakeExtract, KIND_LABEL, listIntake } from './intake.js';
 import { staffOrgId } from './orgs.js';
 import { toAppointmentView } from './scheduling.js';
+import { labRange } from './patientData.js';
 
 /**
  * Raport faktów przed wizytą (D3, DOC-04). Model odczytu tylko z potwierdzonych danych; każda liczba ma
@@ -120,15 +121,7 @@ function obsValue(o: Observation): { value: string; valueNum?: number; unit?: st
 }
 
 function obsRange(o: Observation): string | undefined {
-  const r = o.referenceRange?.[0];
-  if (!r) return undefined;
-  if (r.text) return r.text.replace(/ \(zakres z dokumentu laboratorium\)$/, '');
-  const lo = r.low?.value;
-  const hi = r.high?.value;
-  if (lo !== undefined && hi !== undefined) return `${lo} – ${hi}`;
-  if (lo !== undefined) return `≥ ${lo}`;
-  if (hi !== undefined) return `≤ ${hi}`;
-  return undefined;
+  return labRange(o);
 }
 
 function trustCode(r: { meta?: { tag?: { system?: string; code?: string }[] } }): string {

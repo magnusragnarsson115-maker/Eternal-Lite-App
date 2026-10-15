@@ -25,6 +25,7 @@ export default function MoreScreen() {
       <Card title={t('Zdrowie i powiadomienia')}>
         <Row title={t('Pomiary')} sub={t('Wpisy ręczne i korekta z historią')} onPress={() => router.push('/measurements')} />
         <Row title={t('Oś czasu wyników')} sub={t('Każda wartość z pochodzeniem i wersjami')} onPress={() => router.push('/timeline')} />
+        <Row title={t('Raport okresowy')} sub={t('Tydzień, miesiąc albo kwartał — liczby z metodą, bez oceny')} onPress={() => router.push('/report')} />
         <Row title={t('Powiadomienia')} sub={t('Rodzaje i godziny ciszy')} onPress={() => router.push('/notifications')} />
       </Card>
       <Card title={t('Konto')}>
