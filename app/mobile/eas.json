@@ -17,6 +17,9 @@
       "channel": "preview",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://pilot.eternal.example"
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
     "production": {

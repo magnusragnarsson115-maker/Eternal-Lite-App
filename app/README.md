@@ -29,7 +29,9 @@ natychmiast (Server-Sent Events), bez przeładowania strony.
 
 ### Moduły pilotażu i MVP (plik 12.8)
 
-Pełna mapa 78 funkcji na kod i testy: [`docs/MODULES.md`](docs/MODULES.md). Moduły włącza się bez wdrożenia
+Pełna mapa 78 funkcji na kod i testy: [`docs/MODULES.md`](docs/MODULES.md). Braki względem pliku 12.8 i przejście
+z trybu demo na pracę produkcyjną: [`docs/BRAKI_I_WDROZENIE.md`](docs/BRAKI_I_WDROZENIE.md). Jak zobaczyć aplikację
+i pokazać ją inwestorom (wideo 90 s, instancja pokazowa, scenariusz): [`docs/POKAZ.md`](docs/POKAZ.md). Moduły włącza się bez wdrożenia
 (panel *Organizacja kliniki → Moduły* albo `npm run cli -- set-module`).
 
 | Moduł | Co robi |

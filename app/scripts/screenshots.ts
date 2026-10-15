@@ -27,7 +27,7 @@ async function main() {
   await shot(p, 'p01-logowanie');
   await p.getByLabel('E-mail').fill('pacjent@eternal.local');
   await p.getByLabel('Hasło').fill(PASSWORD);
-  await p.getByRole('button', { name: 'Zaloguj się' }).click();
+  await p.getByRole('button', { name: 'Zaloguj się', exact: true }).click();
   await p.waitForURL(`${BASE}/`);
   await shot(p, 'p02-start', true);
   await p.goto(`${BASE}/rezerwacja`);
@@ -58,7 +58,7 @@ async function main() {
   await shot(s, 's01-logowanie');
   await s.getByLabel('E-mail').fill('anna.nowicka@eternal.local');
   await s.getByLabel('Hasło').fill(PASSWORD);
-  await s.getByRole('button', { name: 'Zaloguj się' }).click();
+  await s.getByRole('button', { name: 'Zaloguj się', exact: true }).click();
   await s.waitForURL(/\/panel\/mfa/);
   await s.getByLabel('Kod z aplikacji').fill(totpCode(TOTP));
   await s.getByRole('button', { name: 'Potwierdź' }).click();
@@ -91,7 +91,7 @@ async function main() {
   await a.goto(`${BASE}/panel/logowanie`);
   await a.getByLabel('E-mail').fill('admin@eternal.local');
   await a.getByLabel('Hasło').fill(PASSWORD);
-  await a.getByRole('button', { name: 'Zaloguj się' }).click();
+  await a.getByRole('button', { name: 'Zaloguj się', exact: true }).click();
   await a.waitForURL(/\/panel\/mfa/);
   await a.waitForTimeout(1000);
   await a.getByLabel('Kod z aplikacji').fill(totpCode(TOTP, Date.now() + 30_000));

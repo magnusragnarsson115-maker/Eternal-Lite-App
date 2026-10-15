@@ -32,7 +32,7 @@ async function main() {
   await p.getByLabel('Hasło').fill(PASSWORD);
   await d.getByLabel('E-mail').pressSequentially('anna.nowicka@eternal.local', { delay: 20 });
   await d.getByLabel('Hasło').fill(PASSWORD);
-  await Promise.all([p.getByRole('button', { name: 'Zaloguj się' }).click(), d.getByRole('button', { name: 'Zaloguj się' }).click()]);
+  await Promise.all([p.getByRole('button', { name: 'Zaloguj się', exact: true }).click(), d.getByRole('button', { name: 'Zaloguj się', exact: true }).click()]);
   await d.waitForURL(/\/panel\/mfa/);
   await d.getByLabel('Kod z aplikacji').pressSequentially(totpCode('JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP'), { delay: 60 });
   await d.getByRole('button', { name: 'Potwierdź' }).click();
