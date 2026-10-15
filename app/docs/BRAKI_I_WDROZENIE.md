@@ -52,6 +52,7 @@ Aktualny stan każdego składnika pokazuje polecenie **`npm run cli -- check --l
 |---|---|---|---|
 | Objaśnienia 73 badań i jednostek (A2.4) | `server/labs/explanations.ts` | lekarz (z numerem PWZ) | `npm run cli -- explanations-review > objasnienia.md` → poprawki → `npm run cli -- approve-explanations "lek. Imię Nazwisko, PWZ …"`; do tego czasu pacjenci ich nie widzą (w demo — z oznaczeniem „projekt”) |
 | Wywiady i wymagane dokumenty w pakietach specjalizacji (M30) | `server/services/packages.ts` | lekarz danej specjalizacji | przegląd pytań i listy dokumentów przed zastosowaniem pakietu w pierwszej poradni; zmiana treści = nowa wersja pakietu |
+| Pytania ankiet: na start, po wynikach, kontrolna, ocena aplikacji (A12.3) | `server/services/surveys.ts` | lekarz (ankiety zdrowotne) + osoba od produktu (ocena aplikacji) | przegląd pytań i reguł „kiedy” (`SURVEY_RULES`); zmiana treści = nowa wersja ankiety, stare odpowiedzi zachowują swoją wersję |
 | Teksty w prostym języku (A23.2) | `web/src/simple-pl.ts`, `mobile/src/simple-pl.ts` | redakcja + test z 3–5 seniorami | test zrozumienia na prawdziwych zadaniach (rezerwacja, wynik, raport) |
 
 ### 2.3. Sprawdzone tylko częściowo (w tym środowisku nie było kont ani urządzeń)
