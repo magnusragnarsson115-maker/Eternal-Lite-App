@@ -558,3 +558,21 @@ export function formatBytes(n?: number): string {
   if (n < 1024 * 1024) return `${Math.round(n / 1024)} kB`;
   return `${(n / 1024 / 1024).toFixed(1)} MB`;
 }
+
+/**
+ * Tekst z wersją w prostym języku (A23.2): w trybie prostego języka pokazuje krótszą wersję i przycisk
+ * „Pokaż pełny opis”; w zwykłym trybie — pełny tekst. `text` to dosłowny tekst źródłowy (jak w t()).
+ */
+export function FullText({ text, vars }: { text: string; vars?: Record<string, string | number> }) {
+  const { t, tFull, hasSimple } = useI18n();
+  const [open, setOpen] = useState(false);
+  if (!hasSimple(text)) return <>{t(text, vars)}</>;
+  return (
+    <>
+      {open ? tFull(text, vars) : t(text, vars)}{' '}
+      <button type="button" className="link-btn" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        {open ? t('Pokaż prostszy opis') : t('Pokaż pełny opis')}
+      </button>
+    </>
+  );
+}

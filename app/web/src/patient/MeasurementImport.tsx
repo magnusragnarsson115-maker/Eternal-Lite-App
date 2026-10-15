@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { post } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
-import { Badge, Button, Modal, Notice, useToast } from '../ui';
+import { Badge, Button, FullText, Modal, Notice, useToast } from '../ui';
 
 /** Import pomiarów z pliku CSV/JSON/FHIR (A1.6): podgląd każdego wiersza przed zapisem, zapis tylko poprawnych. */
 
@@ -137,7 +137,7 @@ export function ImportMeasurementsModal({ open, onClose }: { open: boolean; onCl
     >
       <div className="stack">
         <p className="small muted" style={{ margin: 0 }}>
-          {t('Plik CSV (np. z Excela lub aplikacji ciśnieniomierza), JSON albo eksport FHIR z Eternal. Najpierw zobaczysz każdy wiersz — zapiszemy tylko poprawne. Ponowny import tego samego pliku nie tworzy kopii.')}
+          <FullText text="Plik CSV (np. z Excela lub aplikacji ciśnieniomierza), JSON albo eksport FHIR z Eternal. Najpierw zobaczysz każdy wiersz — zapiszemy tylko poprawne. Ponowny import tego samego pliku nie tworzy kopii." />
         </p>
         <label className="btn secondary" style={{ alignSelf: 'flex-start' }}>
           <FileUp size={18} /> {file ? t('Wybierz inny plik') : t('Wybierz plik')}
@@ -151,7 +151,7 @@ export function ImportMeasurementsModal({ open, onClose }: { open: boolean; onCl
         {!file && (
           <details>
             <summary className="small">{t('Jak przygotować plik CSV')}</summary>
-            <p className="small">{t('Pierwszy wiersz to nagłówki. Wymagane kolumny: data, rodzaj, jednostka oraz wartość (dla ciśnienia: skurczowe i rozkurczowe). Separator: średnik albo przecinek. Przykład:')}</p>
+            <p className="small"><FullText text="Pierwszy wiersz to nagłówki. Wymagane kolumny: data, rodzaj, jednostka oraz wartość (dla ciśnienia: skurczowe i rozkurczowe). Separator: średnik albo przecinek. Przykład:" /></p>
             <pre className="small" style={{ overflowX: 'auto' }}>{EXAMPLE}</pre>
           </details>
         )}

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { BookOpen } from 'lucide-react';
 import { get } from '../api';
 import { useI18n } from '../i18n';
-import { Notice } from '../ui';
+import { FullText, Notice } from '../ui';
 
 /**
  * Objaśnienia badań i jednostek ze słownika (A2.4). Opis mówi, co jest mierzone — nie ocenia wartości.
@@ -54,12 +54,14 @@ export function useExplanations() {
 }
 
 function Footer({ data }: { data: ExplanationsData }) {
-  const { t, fmt } = useI18n();
+  const { fmt } = useI18n();
   return (
     <p className="small muted" style={{ margin: '6px 0 0' }}>
-      {data.approval
-        ? t('Opis ogólny ze słownika ({v}), zatwierdził(a): {by}, {d}. Nie dotyczy Twojego wyniku i go nie ocenia — wynik omawia z Tobą lekarz.', { v: data.version, by: data.approval.by, d: fmt.date(data.approval.at) })
-        : t('Projekt opisu ze słownika ({v}) — czeka na zatwierdzenie przez lekarza. Nie dotyczy Twojego wyniku i go nie ocenia.', { v: data.version })}
+      {data.approval ? (
+        <FullText text="Opis ogólny ze słownika ({v}), zatwierdził(a): {by}, {d}. Nie dotyczy Twojego wyniku i go nie ocenia — wynik omawia z Tobą lekarz." vars={{ v: data.version, by: data.approval.by, d: fmt.date(data.approval.at) }} />
+      ) : (
+        <FullText text="Projekt opisu ze słownika ({v}) — czeka na zatwierdzenie przez lekarza. Nie dotyczy Twojego wyniku i go nie ocenia." vars={{ v: data.version }} />
+      )}
     </p>
   );
 }
@@ -105,7 +107,7 @@ export function ExplanationsPanel({ items }: { items: { name: string; loinc?: st
         <BookOpen size={16} aria-hidden /> {t('Co oznaczają te badania, jednostki i kolumny')}
       </summary>
       <div className="stack" style={{ marginTop: 10 }}>
-        {d.draft && <Notice kind="warn">{t('Projekt opisów — czeka na zatwierdzenie przez lekarza. W instancji pokazowej pokazujemy go z tym oznaczeniem.')}</Notice>}
+        {d.draft && <Notice kind="warn"><FullText text="Projekt opisów — czeka na zatwierdzenie przez lekarza. W instancji pokazowej pokazujemy go z tym oznaczeniem." /></Notice>}
         {rows.length > 0 && (
           <dl className="kv explain-list">
             {rows.map((i) => {

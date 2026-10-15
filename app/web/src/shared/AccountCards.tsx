@@ -1,12 +1,13 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Copy, KeyRound, LogOut, Phone, Plus, Trash2 } from 'lucide-react';
+import { Copy, Eye, KeyRound, LogOut, Phone, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { del, get, post } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import { passkeysSupported, registerPasskey } from '../lib/passkeys';
 import { useSession } from '../session';
-import { Badge, Button, Card, Notice, SelectField, TextArea, TextField, useToast } from '../ui';
+import type { A11yPrefs } from '../lib/a11y';
+import { Badge, Button, Card, FullText, Notice, Segmented, SelectField, Switch, TextArea, TextField, useToast } from '../ui';
 
 /** Karty konta wspólne dla panelu i aplikacji pacjenta: klucze, urządzenia, kody odzyskiwania, telefon, zgłoszenia. */
 
@@ -31,7 +32,7 @@ export function SecurityKeysCard() {
   return (
     <Card title={t('Klucze dostępu i klucze sprzętowe')}>
       <div className="stack">
-        <p className="small muted">{t('Klucz sprzętowy (np. YubiKey) albo klucz dostępu w telefonie może zastąpić kod z aplikacji przy logowaniu.')}</p>
+        <p className="small muted"><FullText text="Klucz sprzętowy (np. YubiKey) albo klucz dostępu w telefonie może zastąpić kod z aplikacji przy logowaniu." /></p>
         {!passkeysSupported() && <Notice kind="warn">{t('Ta przeglądarka nie obsługuje kluczy dostępu.')}</Notice>}
         <ul className="list">
           {q.data?.items.map((k) => (
@@ -147,7 +148,7 @@ export function RecoveryCodesCard() {
   return (
     <Card title={t('Kody odzyskiwania')}>
       <div className="stack">
-        <p className="small muted">{t('Jednorazowe kody na wypadek utraty telefonu z aplikacją uwierzytelniającą. Zapisz je w bezpiecznym miejscu.')}</p>
+        <p className="small muted"><FullText text="Jednorazowe kody na wypadek utraty telefonu z aplikacją uwierzytelniającą. Zapisz je w bezpiecznym miejscu." /></p>
         <p>{t('Pozostało kodów: {n}', { n: q.data?.remaining ?? 0 })}</p>
         {codes && (
           <Notice kind="warn" title={t('Zapisz kody teraz — nie pokażemy ich ponownie')}>
@@ -188,7 +189,7 @@ export function PhoneVerifyCard() {
   return (
     <Card title={t('Numer telefonu')} action={me?.user?.phoneVerified ? <Badge kind="ok">{t('zweryfikowany')}</Badge> : <Badge>{t('niezweryfikowany')}</Badge>}>
       <div className="stack">
-        <p className="small muted">{t('Telefon służy do SMS z linkami od placówki i do przypomnień — SMS nigdy nie zawiera danych o zdrowiu.')}</p>
+        <p className="small muted"><FullText text="Telefon służy do SMS z linkami od placówki i do przypomnień — SMS nigdy nie zawiera danych o zdrowiu." /></p>
         <div className="row" style={{ gap: 8, alignItems: 'flex-end' }}>
           <TextField label={t('Telefon')} inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
           <Button variant="secondary" icon={<Phone size={16} />} loading={send.isPending} disabled={phone.length < 9} onClick={() => send.mutate()}>
@@ -206,5 +207,78 @@ export function PhoneVerifyCard() {
         {(send.isError || verify.isError) && <Notice kind="danger">{errorMessage(send.error ?? verify.error, t)}</Notice>}
       </div>
     </Card>
+  );
+}
+
+/**
+ * Czytelność (A23.2/A23.3): rozmiar tekstu, kontrast, prosty język. Zapis na koncie — to samo ustawienie
+ * działa w przeglądarce i w aplikacji mobilnej. Zmiana widoczna od razu.
+ */
+export function ReadabilityCard() {
+  const { t } = useI18n();
+  const { a11y, saveA11y } = useSession();
+  const [error, setError] = useState('');
+  const save = (p: A11yPrefs) => {
+    setError('');
+    saveA11y(p).catch((e: unknown) => setError(errorMessage(e, t)));
+  };
+  return (
+    <Card title={<h2><Eye size={20} aria-hidden style={{ verticalAlign: '-3px' }} /> {t('Czytelność')}</h2>}>
+      <div className="stack">
+        <div>
+          <p style={{ margin: '0 0 6px', fontWeight: 600 }}>{t('Rozmiar tekstu')}</p>
+          <Segmented
+            label={t('Rozmiar tekstu')}
+            value={String(a11y.textScale) as '100' | '125' | '150' | '200'}
+            onChange={(v) => save({ ...a11y, textScale: Number(v) as A11yPrefs['textScale'] })}
+            options={(['100', '125', '150', '200'] as const).map((v) => ({ value: v, label: `${v}%` }))}
+          />
+        </div>
+        <div>
+          <p style={{ margin: '0 0 6px', fontWeight: 600 }}>{t('Kontrast')}</p>
+          <Segmented
+            label={t('Kontrast')}
+            value={a11y.contrast}
+            onChange={(v) => save({ ...a11y, contrast: v })}
+            options={[
+              { value: 'system', label: t('Jak w systemie') },
+              { value: 'high', label: t('Wysoki') },
+              { value: 'standard', label: t('Standardowy') },
+            ]}
+          />
+        </div>
+        <div className="row-between">
+          <div className="grow">
+            <strong>{t('Prosty język')}</strong>
+            <p className="small muted" style={{ margin: 0 }}>{t('Krótsze zdania w najważniejszych opisach. Pełny opis zawsze pod przyciskiem „Pokaż pełny opis”.')}</p>
+          </div>
+          <Switch checked={a11y.simpleLanguage} onChange={(v) => save({ ...a11y, simpleLanguage: v })} label={t('Prosty język')} />
+        </div>
+        {error && <Notice kind="danger">{error}</Notice>}
+        <p className="small muted" style={{ margin: 0 }}>{t('Ustawienie zapisujemy na Twoim koncie — działa też w aplikacji na telefonie. Powiększenie przeglądarki (Ctrl +) i czytnik ekranu działają niezależnie.')}</p>
+      </div>
+    </Card>
+  );
+}
+
+/** Szybka zmiana rozmiaru tekstu (100 → 125 → 150 → 200%) — także przed zalogowaniem (ekran logowania, link z SMS). */
+export function TextSizeButton() {
+  const { t } = useI18n();
+  const { a11y, saveA11y } = useSession();
+  const order: A11yPrefs['textScale'][] = [100, 125, 150, 200];
+  const next = order[(order.indexOf(a11y.textScale) + 1) % order.length];
+  return (
+    <button
+      type="button"
+      className="btn ghost sm"
+      onClick={() => void saveA11y({ ...a11y, textScale: next }).catch(() => undefined)}
+      aria-label={t('Rozmiar tekstu: {n}%. Zmień na {m}%', { n: a11y.textScale, m: next })}
+      title={t('Rozmiar tekstu')}
+    >
+      <span aria-hidden style={{ fontWeight: 700 }}>
+        A<span style={{ fontSize: '1.25em' }}>A</span>
+      </span>{' '}
+      {a11y.textScale}%
+    </button>
   );
 }

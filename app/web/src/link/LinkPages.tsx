@@ -13,6 +13,7 @@ import type { Me } from '../types';
 import { IntakeReview, IntakeStatusBadge, KIND_PL, type FieldAction } from '../shared/IntakeReview';
 import { AccessLogList, CardContent, RecorderControls } from '../shared/LinkShared';
 import { BrandMark, Button, Card, Checkbox, DemoBanner, Empty, Modal, Notice, Segmented, SelectField, Spinner, TextField, useConfirm } from '../ui';
+import { TextSizeButton } from '../shared/AccountCards';
 
 /** Układ stron pod linkiem: na telefon, bez konta, bez instalowania (D1/DOC-07, D54). */
 export function LinkLayout({ children, clinic, demo }: { children: ReactNode; clinic?: string; demo?: boolean }) {
@@ -29,7 +30,10 @@ export function LinkLayout({ children, clinic, demo }: { children: ReactNode; cl
           <span className="grow small muted" style={{ textAlign: 'center' }}>
             {clinic}
           </span>
-          <Segmented label={t('Język')} value={locale} onChange={setLocale} options={[{ value: 'pl', label: 'PL' }, { value: 'en', label: 'EN' }]} />
+          <div className="btn-row" style={{ flexWrap: 'nowrap' }}>
+            <TextSizeButton />
+            <Segmented label={t('Język')} value={locale} onChange={setLocale} options={[{ value: 'pl', label: 'PL' }, { value: 'en', label: 'EN' }]} />
+          </div>
         </div>
       </header>
       <main id="main" style={{ maxWidth: 720, margin: '0 auto', padding: '20px 16px 64px' }} className="stack-lg">

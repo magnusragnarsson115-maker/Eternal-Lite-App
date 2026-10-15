@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { EN } from './i18n-en';
+import { loadLocalA11y } from './lib/a11y';
+import { SIMPLE } from './simple-pl';
 
 export type Locale = 'pl' | 'en';
 
@@ -25,6 +27,12 @@ interface I18n {
   setLocale: (l: Locale) => void;
   /** Teksty źródłowe są po polsku; słownik EN mapuje polski tekst na angielski. */
   t: (text: string, vars?: Record<string, string | number>) => string;
+  /** Pełna wersja tekstu, także w trybie prostego języka („Pokaż pełny opis”). */
+  tFull: (text: string, vars?: Record<string, string | number>) => string;
+  /** Tryb prostego języka (A23.2): t() zwraca prostszą wersję kluczowych tekstów, jeśli istnieje. */
+  simple: boolean;
+  setSimple: (on: boolean) => void;
+  hasSimple: (text: string) => boolean;
   fmt: {
     date: (iso: string | undefined) => string;
     dateLong: (iso: string | undefined) => string;
@@ -47,6 +55,7 @@ function interpolate(s: string, vars?: Record<string, string | number>): string 
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
+  const [simple, setSimple] = useState<boolean>(() => loadLocalA11y().simpleLanguage);
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
@@ -73,10 +82,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       const d = new Date(iso);
       return Number.isNaN(d.getTime()) ? '—' : f.format(d);
     };
+    const tr = (text: string) => (locale === 'en' ? (EN[text] ?? text) : text);
     return {
       locale,
       setLocale,
-      t: (text, vars) => interpolate(locale === 'en' ? (EN[text] ?? text) : text, vars),
+      t: (text, vars) => interpolate(tr(simple ? (SIMPLE[text] ?? text) : text), vars),
+      tFull: (text, vars) => interpolate(tr(text), vars),
+      simple,
+      setSimple,
+      hasSimple: (text) => simple && text in SIMPLE,
       fmt: {
         date: safe(dDate),
         dateLong: (iso) => {
@@ -99,7 +113,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
         number: (v, digits = 1) => (v === undefined ? '—' : new Intl.NumberFormat(tag, { maximumFractionDigits: digits }).format(v)),
       },
     };
-  }, [locale, setLocale]);
+  }, [locale, setLocale, simple]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

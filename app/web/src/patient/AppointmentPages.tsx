@@ -7,7 +7,7 @@ import { errorCode, errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import type { TeleState } from '../mvp-types';
 import type { AppointmentView, Questionnaire, QuestionnaireItem, ServiceView } from '../types';
-import { Badge, Button, Card, Empty, LinkButton, Modal, Notice, PageHead, QueryError, Skeleton, Spinner, StatusBadge, TextArea, Tabs, useToast } from '../ui';
+import { Badge, Button, Card, Empty, FullText, LinkButton, Modal, Notice, PageHead, QueryError, Skeleton, Spinner, StatusBadge, Tabs, TextArea, useToast } from '../ui';
 
 export function AppointmentsPage() {
   const { t, fmt } = useI18n();
@@ -438,7 +438,7 @@ export function TelePage() {
             allow="camera; microphone; display-capture; autoplay; clipboard-write"
             referrerPolicy="no-referrer"
           />
-          <p className="small muted">{t('Połączenie nie jest nagrywane. Jeśli obraz się nie pojawia, zezwól przeglądarce na dostęp do kamery i mikrofonu.')}</p>
+          <p className="small muted"><FullText text="Połączenie nie jest nagrywane. Jeśli obraz się nie pojawia, zezwól przeglądarce na dostęp do kamery i mikrofonu." /></p>
         </>
       )}
     </div>

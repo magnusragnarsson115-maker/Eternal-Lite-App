@@ -9,7 +9,7 @@ import { ImportMeasurementsModal } from './MeasurementImport';
 import { MedRemindersCard, MeasurementHistoryButton } from './MvpPages';
 import { BLE_PROFILES, bluetoothSupported, readFromDevice, type BleKind, type BleReading } from '../lib/ble';
 import type { MeasurementView, MedicationView, VitalKind } from '../types';
-import { Badge, Button, Card, Combobox, Empty, Modal, Notice, PageHead, QueryError, Segmented, SelectField, Skeleton, Switch, TextField, useConfirm, useToast } from '../ui';
+import { Badge, Button, Card, Combobox, Empty, FullText, Modal, Notice, PageHead, QueryError, Segmented, SelectField, Skeleton, Switch, TextField, useConfirm, useToast } from '../ui';
 import { TrendChart } from '../ui/TrendChart';
 
 const KINDS: { value: VitalKind; label: string; unit: string }[] = [
@@ -230,7 +230,7 @@ export function MeasurementsPage() {
             </table>
           </div>
         )}
-        <p className="small muted" style={{ marginTop: 10 }}>{t('Aplikacja nie ocenia pomiarów. Niepokojące objawy omów z lekarzem; w nagłym przypadku dzwoń 112.')}</p>
+        <p className="small muted" style={{ marginTop: 10 }}><FullText text="Aplikacja nie ocenia pomiarów. Niepokojące objawy omów z lekarzem; w nagłym przypadku dzwoń 112." /></p>
       </Card>
 
       <div className="grid-2">
@@ -248,7 +248,7 @@ export function MeasurementsPage() {
               <p className="small muted">{t('Dla tego rodzaju pomiaru nie ma standardowego profilu Bluetooth — wpisz wynik ręcznie.')}</p>
             )
           ) : (
-            <p className="small muted">{t('Twoja przeglądarka nie obsługuje Web Bluetooth. Użyj Chrome lub Edge na Androidzie albo komputerze.')}</p>
+            <p className="small muted"><FullText text="Twoja przeglądarka nie obsługuje Web Bluetooth. Użyj Chrome lub Edge na Androidzie albo komputerze." /></p>
           )}
         </Card>
         <Card title={<h3>Withings</h3>}>
@@ -423,7 +423,7 @@ export function MedicationsPage() {
   });
   return (
     <div className="stack-lg">
-      <PageHead title={t('Przyjmowane leki')} sub={t('Lista pomoże lekarzowi przygotować się do wizyty. Aplikacja nie sprawdza interakcji ani dawkowania.')} />
+      <PageHead title={t('Przyjmowane leki')} sub=<FullText text="Lista pomoże lekarzowi przygotować się do wizyty. Aplikacja nie sprawdza interakcji ani dawkowania." /> />
       <Card title={<h2>{t('Dodaj lek')}</h2>}>
         <form
           className="stack"

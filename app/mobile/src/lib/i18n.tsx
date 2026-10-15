@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { EN } from '../i18n-en';
+import { SIMPLE } from '../simple-pl';
+import { useA11y } from './a11y';
 
 export type Locale = 'pl' | 'en';
 
@@ -16,12 +18,14 @@ const Ctx = createContext<I18n | null>(null);
 /** Teksty interfejsu po polsku; tłumaczenie EN w src/i18n-en.ts (test kompletności: tests/unit/i18n.test.ts). */
 export function I18nProvider({ children, initial = 'pl' }: { children: ReactNode; initial?: Locale }) {
   const [locale, setLocale] = useState<Locale>(initial);
+  const simple = useA11y().prefs.simpleLanguage;
   const t = useCallback(
     (pl: string, vars?: Record<string, string | number>) => {
-      const s = locale === 'en' ? (EN[pl] ?? pl) : pl;
+      const text = simple ? (SIMPLE[pl] ?? pl) : pl; // A23.2 — prosty język
+      const s = locale === 'en' ? (EN[text] ?? text) : text;
       return vars ? s.replace(/\{(\w+)\}/g, (m, k: string) => (vars[k] !== undefined ? String(vars[k]) : m)) : s;
     },
-    [locale],
+    [locale, simple],
   );
   const value = useMemo<I18n>(() => {
     const tag = locale === 'pl' ? 'pl-PL' : 'en-GB';

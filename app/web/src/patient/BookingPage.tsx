@@ -7,7 +7,7 @@ import { errorCode, errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import { useSession } from '../session';
 import type { AppointmentView, LocationView, PractitionerView, ServiceView, SlotView } from '../types';
-import { Badge, Button, Card, Notice, PageHead, QueryError, Skeleton, TextArea, useToast } from '../ui';
+import { Badge, Button, Card, FullText, Notice, PageHead, QueryError, Skeleton, TextArea, useToast } from '../ui';
 import { SlotPicker } from '../ui/SlotPicker';
 
 interface Catalog {
@@ -210,7 +210,7 @@ export function BookingPage() {
           </p>
           {book.isError && errorCode(book.error) === 'telemedicine_consent_required' ? (
             <Notice kind="warn" title={t('Zgoda na teleporadę')}>
-              <p>{t('Teleporada odbywa się przez połączenie wideo w przeglądarce. Aby kontynuować, potwierdź zgodę na udział w teleporadach (możesz ją wycofać w ustawieniach prywatności).')}</p>
+              <p><FullText text="Teleporada odbywa się przez połączenie wideo w przeglądarce. Aby kontynuować, potwierdź zgodę na udział w teleporadach (możesz ją wycofać w ustawieniach prywatności)." /></p>
               <Button size="sm" onClick={() => grantTele.mutate()} loading={grantTele.isPending}>
                 {t('Wyrażam zgodę i rezerwuję')}
               </Button>

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { get } from '../api';
 import { errorMessage } from '../errors';
 import { addDaysIso, useI18n } from '../i18n';
-import { Badge, Button, Card, Empty, Notice, PageHead, Segmented, Skeleton, TextField } from '../ui';
+import { Badge, Button, Card, Empty, FullText, Notice, PageHead, Segmented, Skeleton, TextField } from '../ui';
 import { TrendChart } from '../ui/TrendChart';
 
 /**
@@ -124,7 +124,7 @@ export function ReportPage() {
     <div className="stack-lg">
       <PageHead
         title={t('Raport okresowy')}
-        sub={t('Twoje pomiary, potwierdzone wyniki badań i wizyty w wybranym okresie — do zapisania jako PDF i pokazania lekarzowi. Raport niczego nie ocenia.')}
+        sub=<FullText text="Twoje pomiary, potwierdzone wyniki badań i wizyty w wybranym okresie — do zapisania jako PDF i pokazania lekarzowi. Raport niczego nie ocenia." />
         back={{ to: '/', label: t('Start') }}
       />
 
@@ -222,7 +222,7 @@ export function ReportPage() {
               <details className="explain" style={{ marginTop: 8 }}>
                 <summary className="small">{t('Jak liczymy')}</summary>
                 <p className="small" style={{ margin: '6px 0 0' }}>
-                  {t('Odczyty grupujemy według rodzaju pomiaru, jednostki i źródła (wpis ręczny, urządzenie, import z pliku) — odczytów z różnych źródeł, urządzeń i jednostek nie łączymy. Dla każdej grupy podajemy liczbę odczytów, najniższą i najwyższą wartość oraz średnią arytmetyczną wszystkich odczytów z okresu (zaokrągloną do 0,1; liczoną przy co najmniej 2 odczytach). Odczyty oznaczone jako rozbieżne (inny odczyt z tej samej minuty) są uwzględnione i wskazane w tabeli. Wyniki badań pochodzą z dokumentów laboratoriów i są pokazane bez przeliczeń. Raport nie porównuje wartości z normami i niczego nie ocenia.')}
+                  <FullText text="Odczyty grupujemy według rodzaju pomiaru, jednostki i źródła (wpis ręczny, urządzenie, import z pliku) — odczytów z różnych źródeł, urządzeń i jednostek nie łączymy. Dla każdej grupy podajemy liczbę odczytów, najniższą i najwyższą wartość oraz średnią arytmetyczną wszystkich odczytów z okresu (zaokrągloną do 0,1; liczoną przy co najmniej 2 odczytach). Odczyty oznaczone jako rozbieżne (inny odczyt z tej samej minuty) są uwzględnione i wskazane w tabeli. Wyniki badań pochodzą z dokumentów laboratoriów i są pokazane bez przeliczeń. Raport nie porównuje wartości z normami i niczego nie ocenia." />
                 </p>
               </details>
             </Card>

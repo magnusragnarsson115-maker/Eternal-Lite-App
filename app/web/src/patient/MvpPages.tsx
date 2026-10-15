@@ -12,7 +12,7 @@ import { TestExplanation } from '../shared/Explanations';
 import { IntakeReview, IntakeStatusBadge, KIND_PL, type FieldAction } from '../shared/IntakeReview';
 import { ReportIncidentCard } from '../shared/AccountCards';
 import { useSession } from '../session';
-import { Badge, Button, Card, Checkbox, Empty, Modal, Notice, PageHead, QueryError, SelectField, Skeleton, Switch, TextArea, TextField, useConfirm, useToast } from '../ui';
+import { Badge, Button, Card, Checkbox, Empty, FullText, Modal, Notice, PageHead, QueryError, SelectField, Skeleton, Switch, TextArea, TextField, useConfirm, useToast } from '../ui';
 import { TrendChart } from '../ui/TrendChart';
 
 // --- P3: dokumenty i odczyt w aplikacji -------------------------------------------------------------
@@ -438,7 +438,7 @@ function NewGrantCard({ preselect, onDone }: { preselect?: string; onDone: () =>
             ))}
           </div>
         )}
-        <p className="small muted">{t('Podstawą udostępnienia jest Twoja wyraźna zgoda; zapisujemy datę i zakres. Możesz ją wycofać w każdej chwili.')}</p>
+        <p className="small muted"><FullText text="Podstawą udostępnienia jest Twoja wyraźna zgoda; zapisujemy datę i zakres. Możesz ją wycofać w każdej chwili." /></p>
         {create.isError && <Notice kind="danger">{errorMessage(create.error, t)}</Notice>}
         <Button icon={<Share2 size={18} />} disabled={!f.orgId || (f.scope === 'selected' && !f.refs.length)} loading={create.isPending} onClick={() => create.mutate()}>
           {t('Udostępnij')}
@@ -631,7 +631,7 @@ export function SafetyPage() {
   return (
     <div className="stack-lg">
       {dialog}
-      <PageHead title={t('SOS i karta ratunkowa')} sub={t('W nagłym zagrożeniu najpierw dzwoń 112. Przycisk SOS dodatkowo powiadamia osoby bliskie SMS-em.')} />
+      <PageHead title={t('SOS i karta ratunkowa')} sub=<FullText text="W nagłym zagrożeniu najpierw dzwoń 112. Przycisk SOS dodatkowo powiadamia osoby bliskie SMS-em." /> />
       <a className="btn danger block" href="tel:112" style={{ fontSize: '1.2rem', minHeight: 64 }} onClick={() => data.contacts.length && sos.mutate()}>
         <Siren size={24} /> {t('SOS — dzwoń 112 i powiadom bliskich')}
       </a>
@@ -711,7 +711,7 @@ export function NotificationPrefsCard() {
   return (
     <Card title={t('Ustawienia powiadomień')}>
       <div className="stack">
-        <p className="small muted">{t('Kolejność: powiadomienie w aplikacji → e-mail → SMS. Treść poza aplikacją nigdy nie zawiera danych o zdrowiu.')}</p>
+        <p className="small muted"><FullText text="Kolejność: powiadomienie w aplikacji → e-mail → SMS. Treść poza aplikacją nigdy nie zawiera danych o zdrowiu." /></p>
         {q.data.kinds.map((k) => (
           <div key={k} className="row-between">
             <span>{t(KIND_LABEL[k] ?? k)}</span>
@@ -878,7 +878,7 @@ export function DeleteDataCard() {
         <span className="grow">
           <strong>{t('Usuń moje dane')}</strong>
           <span className="small muted" style={{ display: 'block' }}>
-            {t('Usuwamy Twoje dokumenty, wpisy i konto. Dokumentacja w placówkach zostaje (20 lat). Otrzymasz potwierdzenie: co usunięto, co zostaje i kiedy znikną kopie.')}
+            <FullText text="Usuwamy Twoje dokumenty, wpisy i konto. Dokumentacja w placówkach zostaje (20 lat). Otrzymasz potwierdzenie: co usunięto, co zostaje i kiedy znikną kopie." />
           </span>
         </span>
         <Button variant="danger-outline" icon={<Trash2 size={18} />} onClick={() => setOpen(true)}>
@@ -962,7 +962,7 @@ export function CrisisModal({ open, onClose }: { open: boolean; onClose: () => v
   return (
     <Modal open={open} onClose={onClose} title={t('Jeśli jest Ci bardzo trudno — nie zostawaj z tym sam(a)')}>
       <div className="stack">
-        <p>{t('Wiadomość do placówki może zostać przeczytana dopiero za kilka dni. Jeśli myślisz o zrobieniu sobie krzywdy, zadzwoń teraz:')}</p>
+        <p><FullText text="Wiadomość do placówki może zostać przeczytana dopiero za kilka dni. Jeśli myślisz o zrobieniu sobie krzywdy, zadzwoń teraz:" /></p>
         <CrisisNumbers />
       </div>
     </Modal>

@@ -8,10 +8,10 @@ import { errorMessage } from '../errors';
 import { useI18n, type Locale } from '../i18n';
 import { currentPushSubscription, disablePush, enablePush, pushSupported } from '../lib/push';
 import { useSession } from '../session';
-import { PhoneVerifyCard, RecoveryCodesCard, SecurityKeysCard, SessionsCard } from '../shared/AccountCards';
+import { PhoneVerifyCard, ReadabilityCard, RecoveryCodesCard, SecurityKeysCard, SessionsCard } from '../shared/AccountCards';
 import { DeleteDataCard, NotificationPrefsCard } from './MvpPages';
 import type { AccessLogEntry, ConsentState, Me, NotificationRow, PatientView } from '../types';
-import { Badge, Button, Card, Empty, Modal, Notice, PageHead, QueryError, Segmented, SelectField, Skeleton, Switch, TextArea, TextField, useConfirm, useToast } from '../ui';
+import { Badge, Button, Card, Empty, FullText, Modal, Notice, PageHead, QueryError, Segmented, SelectField, Skeleton, Switch, TextArea, TextField, useConfirm, useToast } from '../ui';
 
 // --- profil i bezpieczeństwo ------------------------------------------------------------------------
 
@@ -174,6 +174,7 @@ export function ProfilePage() {
         )}
       </Card>
 
+      <ReadabilityCard />
       <PhoneVerifyCard />
       <SecurityKeysCard />
       <RecoveryCodesCard />
@@ -299,7 +300,7 @@ export function PrivacyPage() {
       </Card>
 
       <Card title={t('Kto i kiedy miał dostęp do Twoich danych')} action={<History size={18} aria-hidden />}>
-        <p className="small muted">{t('Każdy wgląd personelu w Twoje dane jest rejestrowany w dzienniku zabezpieczonym przed modyfikacją.')}</p>
+        <p className="small muted"><FullText text="Każdy wgląd personelu w Twoje dane jest rejestrowany w dzienniku zabezpieczonym przed modyfikacją." /></p>
         {log.isLoading && <Skeleton count={3} height={36} />}
         {log.data && log.data.items.length === 0 && <Empty title={t('Brak wpisów')} />}
         {log.data && log.data.items.length > 0 && (
@@ -342,7 +343,7 @@ export function PrivacyPage() {
           <div className="row-between">
             <span className="grow">
               <strong>{t('Pobierz tabelę (CSV)')}</strong>
-              <span className="small muted" style={{ display: 'block' }}>{t('Pomiary i wyniki badań w jednym arkuszu — otworzysz go w Excelu. Pomiary z tego pliku można zaimportować z powrotem.')}</span>
+              <span className="small muted" style={{ display: 'block' }}><FullText text="Pomiary i wyniki badań w jednym arkuszu — otworzysz go w Excelu. Pomiary z tego pliku można zaimportować z powrotem." /></span>
             </span>
             <a className="btn secondary" href="/api/me/export.csv" download>
               <Download size={18} /> {t('Pobierz CSV')}
@@ -519,7 +520,7 @@ export function NfzPage() {
           </ul>
         </div>
       )}
-      <p className="small muted">{t('Źródło: API Terminy Leczenia NFZ. Dane przekazują świadczeniodawcy i mogą być nieaktualne — termin potwierdź telefonicznie.')}</p>
+      <p className="small muted"><FullText text="Źródło: API Terminy Leczenia NFZ. Dane przekazują świadczeniodawcy i mogą być nieaktualne — termin potwierdź telefonicznie." /></p>
     </div>
   );
 }

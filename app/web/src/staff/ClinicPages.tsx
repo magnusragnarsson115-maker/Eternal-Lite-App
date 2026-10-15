@@ -7,7 +7,7 @@ import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import type { IncidentView, ModuleView, TeleState } from '../mvp-types';
 import { hasRole, useSession } from '../session';
-import { ReportIncidentCard, SecurityKeysCard, SessionsCard } from '../shared/AccountCards';
+import { ReadabilityCard, ReportIncidentCard, SecurityKeysCard, SessionsCard } from '../shared/AccountCards';
 import type { AppointmentView } from '../types';
 import { Badge, Button, Card, Checkbox, Empty, Modal, Notice, PageHead, QueryError, SelectField, Skeleton, Switch, Tabs, TextArea, TextField, useConfirm, useToast } from '../ui';
 
@@ -782,6 +782,7 @@ export function StaffAccountPage() {
   return (
     <div className="stack-lg">
       <PageHead title={t('Moje konto')} />
+      <ReadabilityCard />
       <SecurityKeysCard />
       <SessionsCard />
       <ReportIncidentCard staff />

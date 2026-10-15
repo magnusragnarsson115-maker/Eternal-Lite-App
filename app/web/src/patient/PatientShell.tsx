@@ -6,7 +6,7 @@ import { get, msSinceOwnMutation } from '../api';
 import { useI18n } from '../i18n';
 import { useRealtime, type LiveEvent } from '../realtime';
 import { useSession } from '../session';
-import { BrandMark, Button, DemoBanner, Notice, Spinner, useToast } from '../ui';
+import { BrandMark, Button, DemoBanner, FullText, Notice, Spinner, useToast } from '../ui';
 
 const LIVE_MESSAGES: Record<string, string> = {
   'appointment.changed': 'Zaktualizowano Twoje wizyty.',
@@ -116,7 +116,7 @@ export function PatientShell() {
         </main>
       </div>
       <footer className="p-footer">
-        {t('Aplikacja nie ocenia wyników i nie zastępuje porady lekarza.')} {config?.clinic.emergencyInfo && t(config.clinic.emergencyInfo)}
+        <FullText text="Aplikacja nie ocenia wyników i nie zastępuje porady lekarza." /> {config?.clinic.emergencyInfo && t(config.clinic.emergencyInfo)}
       </footer>
       <nav className="tabbar" aria-label={t('Menu główne')}>
         <NavLink to="/" end>

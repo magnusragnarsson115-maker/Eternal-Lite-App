@@ -1,10 +1,11 @@
+import type { A11yPrefs } from './a11y';
 /** Kształty odpowiedzi API (podzbiór typów z web/src/types.ts i web/src/mvp-types.ts). */
 
 export interface Me {
   authenticated: boolean;
   token?: string;
   mfa?: { required: boolean; enrolled: boolean; methods?: { totp: boolean; keys: number; recoveryCodes: number } };
-  user?: { id: string; email: string; displayName: string; roles: string[]; staff: boolean; locale: 'pl' | 'en'; phone?: string; phoneVerified?: boolean };
+  user?: { id: string; email: string; displayName: string; roles: string[]; staff: boolean; locale: 'pl' | 'en'; phone?: string; phoneVerified?: boolean; a11y?: A11yPrefs };
   patient?: { id: string; name: string; birthDate?: string; gender?: string };
 }
 

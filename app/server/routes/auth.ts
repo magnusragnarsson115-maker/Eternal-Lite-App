@@ -24,6 +24,7 @@ import { pwnedCount } from '../integrations/hibp.js';
 import { body } from '../lib/http.js';
 import { authLimiter } from '../lib/ratelimit.js';
 import { badRequest, conflict, forbidden, HttpError, isValidPesel, notFound, nowIso, unauthorized } from '../lib/util.js';
+import { A11ySchema, getA11yPrefs, setA11yPrefs } from '../services/a11y.js';
 import { setConsent } from '../services/consents.js';
 import { getClinicSettings, getPractitioner } from '../services/directory.js';
 import { enqueue } from '../services/notifications.js';
@@ -120,6 +121,7 @@ export async function meResponse(req: FastifyRequest) {
       phone: u.phone ?? undefined,
       phoneVerified: u.phone_verified,
       orgId: u.org_id ?? undefined,
+      a11y: getA11yPrefs(u.id),
     },
     patient,
     practitioner,
@@ -362,6 +364,13 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     authLimiter.check(`verify:${auth.user.id}`);
     if (!auth.user.email_verified) sendVerification(auth.user);
     return { ok: true };
+  });
+
+  // A23.2/A23.3 — rozmiar tekstu, kontrast, prosty język (dla pacjenta i personelu)
+  app.put('/api/auth/a11y', async (req) => {
+    const auth = req.auth;
+    if (!auth) throw unauthorized();
+    return { a11y: setA11yPrefs(auth.user.id, body(req, A11ySchema)) };
   });
 
   app.put('/api/auth/locale', async (req) => {

@@ -132,7 +132,12 @@ wymiany, gdy zostanie opublikowany w aktach wykonawczych.
 Interfejs projektowany pod WCAG 2.1 AA (EN 301 549): kontrast tekstu ≥ 4,5:1, pełna obsługa klawiaturą
 (w tym wykres — strzałki), etykiety pól i komunikaty błędów powiązane `aria-describedby`, regiony `aria-live`
 dla zmian na żywo, link „przejdź do treści”, cele dotykowe ≥ 44 px, `prefers-reduced-motion`, tryb ciemny,
-tabelaryczna alternatywa wykresu. ⚠️ Podmioty publiczne: deklaracja dostępności i audyt (ustawa o dostępności
+tabelaryczna alternatywa wykresu. Ustawienia czytelności zapisane na koncie (A23.2/A23.3, wspólne dla
+przeglądarki i aplikacji mobilnej): rozmiar tekstu 100–200% bez poziomego przewijania (WCAG 1.4.4, 1.4.10 — przy 150%
+i 200% układ jednokolumnowy), wysoki kontrast (czerń/biel, linki podkreślone, obramowania 2 px; także automatycznie
+według `prefers-contrast` / „Zwiększ kontrast” w telefonie), tryb prostego języka dla kluczowych tekstów z przyciskiem
+„Pokaż pełny opis” (test: każde zdanie ≤ 16 słów, zastrzeżenia zachowane). ⚠️ Prosty język wymaga przeglądu
+redakcyjnego (najlepiej testu z udziałem seniorów) przed wdrożeniem. ⚠️ Podmioty publiczne: deklaracja dostępności i audyt (ustawa o dostępności
 cyfrowej stron internetowych i aplikacji mobilnych podmiotów publicznych).
 
 ## 8. Teleporady

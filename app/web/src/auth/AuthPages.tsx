@@ -8,7 +8,8 @@ import { errorCode, errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import { useSession } from '../session';
 import type { Me } from '../types';
-import { BrandMark, Button, Checkbox, DemoBanner, Notice, Segmented, TextField } from '../ui';
+import { BrandMark, Button, Checkbox, DemoBanner, FullText, Notice, Segmented, TextField } from '../ui';
+import { TextSizeButton } from '../shared/AccountCards';
 
 export function landingFor(me: Me | undefined): string {
   if (!me?.authenticated) return '/logowanie';
@@ -67,15 +68,18 @@ function AuthLayout({ children, staff }: { children: ReactNode; staff?: boolean 
                 eternal <em>{staff ? 'Doctor' : 'Pacjent'}</em>
               </span>
             </Link>
-            <Segmented
-              label={t('Język')}
-              value={locale}
-              onChange={setLocale}
-              options={[
-                { value: 'pl', label: 'PL' },
-                { value: 'en', label: 'EN' },
-              ]}
-            />
+            <div className="btn-row" style={{ flexWrap: 'nowrap' }}>
+              <TextSizeButton />
+              <Segmented
+                label={t('Język')}
+                value={locale}
+                onChange={setLocale}
+                options={[
+                  { value: 'pl', label: 'PL' },
+                  { value: 'en', label: 'EN' },
+                ]}
+              />
+            </div>
           </div>
           {children}
           {config?.clinic.emergencyInfo && <p className="small muted" style={{ marginTop: 28 }}>{t(config.clinic.emergencyInfo)}</p>}
@@ -403,7 +407,7 @@ export function RegisterPage() {
           ]}
         />
         {mode === 'code' && (
-          <Notice kind="info">{t('Kod aktywacyjny otrzymasz w rejestracji po okazaniu dokumentu tożsamości. Połączy konto z Twoją kartoteką i od razu da dostęp do wyników.')}</Notice>
+          <Notice kind="info"><FullText text="Kod aktywacyjny otrzymasz w rejestracji po okazaniu dokumentu tożsamości. Połączy konto z Twoją kartoteką i od razu da dostęp do wyników." /></Notice>
         )}
         <fieldset className="stack" style={{ border: 0, padding: 0, margin: 0 }}>
           <legend className="sr-only">{t('Dane osobowe')}</legend>
@@ -485,7 +489,7 @@ export function ForgotPasswordPage() {
     <AuthLayout>
       <h1>{t('Reset hasła')}</h1>
       {m.isSuccess ? (
-        <Notice kind="ok">{t('Jeśli konto istnieje, wysłaliśmy na podany adres link do ustawienia nowego hasła. Link jest ważny 60 minut.')}</Notice>
+        <Notice kind="ok"><FullText text="Jeśli konto istnieje, wysłaliśmy na podany adres link do ustawienia nowego hasła. Link jest ważny 60 minut." /></Notice>
       ) : (
         <form
           className="stack"

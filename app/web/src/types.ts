@@ -1,3 +1,4 @@
+import type { A11yPrefs } from './lib/a11y';
 /** Typy odpowiedzi API (odpowiadają widokom serwera). */
 
 export type Role = 'patient' | 'practitioner' | 'reception' | 'admin';
@@ -73,6 +74,7 @@ export interface Me {
     phone?: string;
     phoneVerified?: boolean;
     orgId?: string;
+    a11y?: A11yPrefs;
   };
   patient?: PatientView;
   practitioner?: PractitionerView;

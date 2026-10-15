@@ -5,7 +5,7 @@ import { get, put } from '../api';
 import { useI18n } from '../i18n';
 import { ExplanationsPanel } from '../shared/Explanations';
 import type { RecordView } from '../types';
-import { Badge, Button, Card, Empty, formatBytes, Notice, PageHead, QueryError, Skeleton } from '../ui';
+import { Badge, Button, Card, Empty, formatBytes, FullText, Notice, PageHead, QueryError, Skeleton } from '../ui';
 
 interface RecordsResponse {
   access: { allowed: boolean; reason?: 'identity_not_verified' | 'consent_missing' };
@@ -25,13 +25,13 @@ export function RecordAccessNotice({ reason }: { reason?: string }) {
   if (reason === 'identity_not_verified') {
     return (
       <Notice kind="warn" title={t('Potwierdź tożsamość w placówce')}>
-        <p>{t('Ze względów bezpieczeństwa wyniki i dokumentacja są dostępne po potwierdzeniu tożsamości. Pokaż dokument tożsamości w rejestracji podczas najbliższej wizyty — dostęp włączy się od razu.')}</p>
+        <p><FullText text="Ze względów bezpieczeństwa wyniki i dokumentacja są dostępne po potwierdzeniu tożsamości. Pokaż dokument tożsamości w rejestracji podczas najbliższej wizyty — dostęp włączy się od razu." /></p>
       </Notice>
     );
   }
   return (
     <Notice kind="info" title={t('Włącz dostęp do wyników w aplikacji')}>
-      <p>{t('Na Twój wniosek placówka będzie udostępniać wyniki badań i dokumenty w aplikacji. Możesz to wyłączyć w każdej chwili w ustawieniach prywatności.')}</p>
+      <p><FullText text="Na Twój wniosek placówka będzie udostępniać wyniki badań i dokumenty w aplikacji. Możesz to wyłączyć w każdej chwili w ustawieniach prywatności." /></p>
       <Button size="sm" onClick={() => grant.mutate()} loading={grant.isPending}>
         {t('Włącz dostęp')}
       </Button>
@@ -75,7 +75,7 @@ export function RecordsPage() {
           </ul>
         </div>
       )}
-      <p className="small muted">{t('Aplikacja nie ocenia wyników. Wartości, zakresy referencyjne i oznaczenia pochodzą z laboratorium. Omów wyniki z lekarzem.')}</p>
+      <p className="small muted"><FullText text="Aplikacja nie ocenia wyników. Wartości, zakresy referencyjne i oznaczenia pochodzą z laboratorium. Omów wyniki z lekarzem." /></p>
     </div>
   );
 }

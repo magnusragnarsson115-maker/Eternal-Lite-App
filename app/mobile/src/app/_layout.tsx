@@ -8,6 +8,7 @@ import { I18nProvider, useI18n } from '../lib/i18n';
 import { getLocale } from '../lib/secure';
 import { SessionProvider, useSession } from '../lib/session';
 import { useColors } from '../lib/theme';
+import { setA11y } from '../lib/a11y';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } });
 
@@ -37,6 +38,9 @@ function Gate() {
   useEffect(() => {
     if (me?.user?.locale) setLocale(me.user.locale);
   }, [me?.user?.locale, setLocale]);
+  useEffect(() => {
+    setA11y(me?.user?.a11y);
+  }, [me?.user?.a11y]);
 
   if (phase === 'loading') {
     return (
@@ -74,6 +78,7 @@ function Gate() {
           <Stack.Screen name="measurements" options={{ title: t('Pomiary') }} />
           <Stack.Screen name="timeline" options={{ title: t('Oś czasu wyników') }} />
           <Stack.Screen name="report" options={{ title: t('Raport okresowy') }} />
+          <Stack.Screen name="readability" options={{ title: t('Czytelność') }} />
           <Stack.Screen name="notifications" options={{ title: t('Powiadomienia') }} />
           <Stack.Screen name="share-new" options={{ title: t('Nowe udostępnienie') }} />
         </Stack.Protected>

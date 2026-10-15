@@ -5,7 +5,7 @@ import { get } from '../api';
 import { useI18n } from '../i18n';
 import { useSession } from '../session';
 import type { AppointmentView, NotificationRow } from '../types';
-import { Card, LinkButton, Notice, QueryError, Skeleton } from '../ui';
+import { Card, FullText, LinkButton, Notice, QueryError, Skeleton } from '../ui';
 import { KIND_LABEL, sourceText } from './ReportPage';
 
 interface Dashboard {
@@ -207,7 +207,7 @@ function LatestFactsCard() {
           </span>
         )}
       </p>
-      <p className="small muted" style={{ margin: '6px 0 0' }}>{t('Ostatnie zapisane wartości z datą i źródłem. Aplikacja ich nie ocenia.')}</p>
+      <p className="small muted" style={{ margin: '6px 0 0' }}><FullText text="Ostatnie zapisane wartości z datą i źródłem. Aplikacja ich nie ocenia." /></p>
     </Card>
   );
 }
