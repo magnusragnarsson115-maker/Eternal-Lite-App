@@ -23,13 +23,14 @@ import { fhir } from '../fhir/index.js';
 import { pwnedCount } from '../integrations/hibp.js';
 import { body } from '../lib/http.js';
 import { authLimiter } from '../lib/ratelimit.js';
-import { badRequest, conflict, forbidden, HttpError, isValidPesel, nowIso, unauthorized } from '../lib/util.js';
+import { badRequest, conflict, forbidden, HttpError, isValidPesel, notFound, nowIso, unauthorized } from '../lib/util.js';
 import { setConsent } from '../services/consents.js';
 import { getClinicSettings, getPractitioner } from '../services/directory.js';
 import { enqueue } from '../services/notifications.js';
 import { createPatient, findPatientByPesel, toPatientView } from '../services/patients.js';
 import type { Patient } from '@medplum/fhirtypes';
 import { credentialsOf, recoveryCodesLeft } from '../auth/webauthn.js';
+import { DEMO_TOTP_SECRET } from '../seed/constants.js';
 
 const lastTotpStep = new Map<string, number>();
 
@@ -64,6 +65,21 @@ function verifyTotpOnce(user: AppUser, code: string): boolean {
   if (step !== undefined && step <= last) return false;
   if (step !== undefined) lastTotpStep.set(user.id, step);
   return true;
+}
+
+/**
+ * Tryb demonstracyjny: kod TOTP dla kont demo (sekret i tak jest publiczny w README i na ekranie logowania).
+ * Zwraca kod z najbliższego kroku czasu, którego konto jeszcze nie użyło (ochrona przed ponownym użyciem zostaje).
+ */
+function demoTotpCode(user: AppUser): string | undefined {
+  if (!config.demoMode || user.totp_secret !== DEMO_TOTP_SECRET) return undefined;
+  const last = lastTotpStep.get(user.id) ?? -1;
+  const now = Date.now();
+  for (const d of [0, 1]) {
+    const step = Math.floor((now + d * 30_000) / 30_000);
+    if (step > last) return totpCode(user.totp_secret, step * 30_000);
+  }
+  return undefined;
 }
 
 export async function meResponse(req: FastifyRequest) {
@@ -231,6 +247,15 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     markMfaPassed(auth);
     audit(actor, { action: 'E', subtype: 'login' });
     return meResponse(req);
+  });
+
+  // tylko DEMO_MODE i konta z sekretem demonstracyjnym — w produkcji 404
+  app.get('/api/auth/mfa/demo-code', async (req) => {
+    const auth = req.auth;
+    if (!auth) throw unauthorized();
+    const code = demoTotpCode(auth.user);
+    if (!config.demoMode || auth.user.totp_secret !== DEMO_TOTP_SECRET) throw notFound();
+    return { code: code ?? null };
   });
 
   app.post('/api/auth/mfa/setup', async (req) => {

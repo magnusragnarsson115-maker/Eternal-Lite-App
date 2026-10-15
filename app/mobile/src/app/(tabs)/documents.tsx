@@ -72,6 +72,8 @@ export default function DocumentsScreen() {
         </Card>
       ) : null}
 
+      <Button title={t('Oś czasu wyników')} variant="secondary" onPress={() => router.push('/timeline')} />
+
       <Card title={t('Moje dokumenty')}>
         {docs.isLoading ? (
           <Loading />

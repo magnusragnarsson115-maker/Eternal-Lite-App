@@ -92,6 +92,26 @@ describe('API end-to-end', () => {
     expect(res.json).toMatchObject({ minimum: expect.stringMatching(/^\d+\.\d+\.\d+$/), latest: expect.any(String) });
   });
 
+  it('tryb demo: kod MFA tylko dla kont z sekretem demonstracyjnym, z ochroną przed ponownym użyciem', async () => {
+    const pw = await hashPassword('Haslo-Personelu-2026');
+    const demo = createUser({ email: 'demo-mfa@test.local', passwordHash: pw, roles: ['reception'], displayName: 'Demo', emailVerified: true });
+    updateUser(demo.id, { totp_secret: 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP', totp_enabled: true });
+    const other = createUser({ email: 'inny-mfa@test.local', passwordHash: pw, roles: ['reception'], displayName: 'Inny', emailVerified: true });
+    updateUser(other.id, { totp_secret: 'KRSXG5CTMVRXEZLUKRSXG5CTMVRXEZLU', totp_enabled: true });
+    const c = new Client(app);
+    await c.req('POST', '/api/auth/login', { email: 'demo-mfa@test.local', password: 'Haslo-Personelu-2026' });
+    const code = (await c.req('GET', '/api/auth/mfa/demo-code')).json.code as string;
+    expect(code).toMatch(/^\d{6}$/);
+    const ok = await c.req('POST', '/api/auth/mfa/verify', { code });
+    expect(ok.json.mfa.required).toBe(false);
+    // ten sam krok czasu jest już zużyty — kolejny kod musi być inny albo żaden
+    const next = (await c.req('GET', '/api/auth/mfa/demo-code')).json.code as string | null;
+    expect(next).not.toBe(code);
+    const o = new Client(app);
+    await o.req('POST', '/api/auth/login', { email: 'inny-mfa@test.local', password: 'Haslo-Personelu-2026' });
+    expect((await o.req('GET', '/api/auth/mfa/demo-code')).status).toBe(404);
+  });
+
   it('rejestracja wymaga zgód obowiązkowych i silnego hasła', async () => {
     const c = new Client(app);
     expect((await c.req('POST', '/api/auth/register', { email: 'x@test.local', password: 'Spokojny-Poranek-42', given: 'A', family: 'B', birthDate: '1990-01-01', consents: { terms: true } })).json.error).toBe('required_consent_missing');

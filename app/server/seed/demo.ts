@@ -25,9 +25,9 @@ import { seedPilot } from './pilot.js';
  * Nie zawierają numerów PESEL ani NPWZ (każdy poprawny numer może należeć do realnej osoby).
  */
 
-export const DEMO_PASSWORD = 'Eternal-Demo-2026';
-/** Stały sekret TOTP kont personelu w trybie demo (wyłącznie dane fikcyjne!). */
-export const DEMO_TOTP_SECRET = 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP';
+import { DEMO_PASSWORD, DEMO_TOTP_SECRET } from './constants.js';
+
+export { DEMO_PASSWORD, DEMO_TOTP_SECRET };
 
 const system: AuditActor = { display: 'seed-demo' };
 

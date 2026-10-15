@@ -62,6 +62,7 @@ export default function HomeScreen() {
           </Card>
         ) : null}
 
+        <Button title={t('Dodaj pomiar (ciśnienie, waga…)')} variant="secondary" onPress={() => router.push('/measurements')} />
         <Button title={t('Ratunek — SOS')} variant="danger" accessibilityHint={t('Połączenie z 112 i powiadomienie osób bliskich')} onPress={() => router.push('/sos')} />
         <Button title={t('Numery pomocowe: 112 · 116 123')} variant="ghost" onPress={() => router.push('/crisis')} />
       </ScrollView>

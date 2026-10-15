@@ -238,12 +238,12 @@ function SurveyCard({ questions, onDone }: { questions: { id: string; pl: string
 
 // --- D0: organizacja kliniki (administrator) ------------------------------------------------------
 
-type OrgTab = 'moduly' | 'konfiguracja' | 'personel' | 'uzycie' | 'incydenty' | 'ai';
+type OrgTab = 'gotowosc' | 'moduly' | 'konfiguracja' | 'personel' | 'uzycie' | 'incydenty' | 'ai';
 
 export function OrgManagePage() {
   const { t } = useI18n();
   const [params, setParams] = useSearchParams();
-  const tab = (params.get('tab') as OrgTab) ?? 'moduly';
+  const tab = (params.get('tab') as OrgTab) ?? 'gotowosc';
   return (
     <div className="stack-lg">
       <PageHead title={t('Organizacja kliniki')} sub={t('Administrator nie ma dostępu do danych klinicznych — tylko do danych operacyjnych.')} />
@@ -252,6 +252,7 @@ export function OrgManagePage() {
         value={tab}
         onChange={(v) => setParams({ tab: v })}
         tabs={[
+          { value: 'gotowosc', label: t('Gotowość do pracy') },
           { value: 'moduly', label: t('Moduły') },
           { value: 'konfiguracja', label: t('Konfiguracja') },
           { value: 'personel', label: t('Zaproszenia personelu') },
@@ -260,12 +261,75 @@ export function OrgManagePage() {
           { value: 'ai', label: t('Rejestr AI') },
         ]}
       />
+      {tab === 'gotowosc' && <ReadinessTab />}
       {tab === 'moduly' && <ModulesTab />}
       {tab === 'konfiguracja' && <ClinicConfigTab />}
       {tab === 'personel' && <StaffInvitesTab />}
       {tab === 'uzycie' && <UsageTab />}
       {tab === 'incydenty' && <IncidentsTab />}
       {tab === 'ai' && <AiRegistryTab />}
+    </div>
+  );
+}
+
+interface ReadinessItem {
+  id: string;
+  group: string;
+  name: string;
+  state: 'ok' | 'demo' | 'missing' | 'warn';
+  detail: string;
+  howTo?: string;
+  live?: { ok: boolean; detail: string; ms: number };
+}
+
+/** Gotowość do pracy: co działa naprawdę, co w trybie demonstracyjnym i co ustawić (to samo co `npm run cli -- check`). */
+function ReadinessTab() {
+  const { t } = useI18n();
+  const [live, setLive] = useState(false);
+  const q = useQuery({ queryKey: ['readiness', live], queryFn: () => get<{ items: ReadinessItem[]; summary: Record<ReadinessItem['state'], number> }>(`/api/admin/readiness${live ? '?live=1' : ''}`) });
+  if (q.isLoading) return <Skeleton count={4} />;
+  if (q.isError) return <QueryError error={q.error} retry={() => void q.refetch()} />;
+  const STATE: Record<ReadinessItem['state'], { kind: 'ok' | 'info' | 'danger' | 'warn'; label: string }> = {
+    ok: { kind: 'ok', label: 'działa' },
+    demo: { kind: 'info', label: 'tryb demo' },
+    missing: { kind: 'danger', label: 'brakuje' },
+    warn: { kind: 'warn', label: 'do decyzji' },
+  };
+  let group = '';
+  const sum = q.data!.summary;
+  return (
+    <div className="stack">
+      <Notice kind="info">
+        {t('Działa: {a} · tryb demo: {b} · brakuje: {c} · do decyzji: {d}', { a: sum.ok, b: sum.demo, c: sum.missing, d: sum.warn })}
+      </Notice>
+      <div className="btn-row">
+        <Button variant="secondary" loading={q.isFetching && live} onClick={() => (live ? void q.refetch() : setLive(true))}>
+          {t('Sprawdź połączenia (bez danych pacjentów)')}
+        </Button>
+      </div>
+      <Card className="card-flush">
+        <ul className="list">
+          {q.data!.items.map((i) => {
+            const head = i.group !== group ? ((group = i.group), <li key={`g-${i.group}`} className="nav-label" style={{ padding: '12px 16px 0' }}>{t(i.group)}</li>) : null;
+            const st = STATE[i.state];
+            return [
+              head,
+              <li key={i.id} className="list-item" style={{ alignItems: 'flex-start' }}>
+                <span className="grow">
+                  <span className="list-title" style={{ display: 'block' }}>
+                    {t(i.name)}
+                  </span>
+                  <span className="list-sub">{i.detail}</span>
+                  {i.live && <span className={`small ${i.live.ok ? '' : 'danger-text'}`} style={{ display: 'block', color: i.live.ok ? 'var(--success)' : 'var(--danger)' }}>{t('Test: {r} — {d} ({ms} ms)', { r: i.live.ok ? 'OK' : t('błąd'), d: i.live.detail, ms: i.live.ms })}</span>}
+                  {i.howTo && <span className="small muted" style={{ display: 'block', marginTop: 4 }}>→ {i.howTo}</span>}
+                </span>
+                <Badge kind={st.kind}>{t(st.label)}</Badge>
+              </li>,
+            ];
+          })}
+        </ul>
+      </Card>
+      <p className="small muted">{t('To samo z wiersza poleceń: npm run cli -- check --live')}</p>
     </div>
   );
 }

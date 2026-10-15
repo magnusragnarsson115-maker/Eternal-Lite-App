@@ -5,6 +5,11 @@ import { closeDatabase } from './db.js';
 
 async function main(): Promise<void> {
   await initCore();
+  // instancja pokazowa (np. dla inwestorów): dane fikcyjne tworzone przy pierwszym starcie, gdy baza jest pusta
+  if (config.demoMode && process.env.DEMO_SEED_ON_START === 'true') {
+    const { seedDemo } = await import('./seed/demo.js');
+    await seedDemo((m) => console.log(m));
+  }
   const app = await buildApp({ logger: true });
   for (const w of productionWarnings()) app.log.warn(w);
   const stopJobs = startJobs((msg, err) => app.log.error({ err }, msg));

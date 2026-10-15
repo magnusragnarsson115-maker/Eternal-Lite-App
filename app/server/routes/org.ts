@@ -1,4 +1,5 @@
 import type { Organization } from '@medplum/fhirtypes';
+import { readiness } from '../services/readiness.js';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { audit } from '../audit.js';
@@ -299,6 +300,14 @@ export async function orgRoutes(app: FastifyInstance): Promise<void> {
   });
 
   // --- teksty: przeznaczenie, instrukcja (wersjonowane), informacja o AI, numery kryzysowe -----------------
+  // gotowość do pracy: co działa naprawdę, co w trybie demo, co ustawić (bez wartości sekretów)
+  app.get('/api/admin/readiness', async (req) => {
+    const auth = requireStaff(req, ['admin']);
+    const { live } = query(req, z.object({ live: z.enum(['0', '1']).optional() }));
+    audit(actorOf(req), { action: 'R', subtype: 'readiness-check', detail: { live: live === '1', user: auth.user.id } });
+    return readiness({ live: live === '1' });
+  });
+
   // kontrolowana dystrybucja aktualizacji aplikacji mobilnej (A18.7); aktualizacje JS — kanały EAS Update z wdrożeniem procentowym
   app.get('/api/public/app-version', async () => ({
     minimum: config.mobile.minVersion,

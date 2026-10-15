@@ -22,6 +22,11 @@ export default function MoreScreen() {
         <Row title={t('Ratunek — SOS')} sub={t('112, osoby bliskie, karta ratunkowa')} onPress={() => router.push('/sos')} />
         <Row title={t('Numery pomocowe')} sub="112 · 116 123 · 800 70 2222 · 116 111" onPress={() => router.push('/crisis')} />
       </Card>
+      <Card title={t('Zdrowie i powiadomienia')}>
+        <Row title={t('Pomiary')} sub={t('Wpisy ręczne i korekta z historią')} onPress={() => router.push('/measurements')} />
+        <Row title={t('Oś czasu wyników')} sub={t('Każda wartość z pochodzeniem i wersjami')} onPress={() => router.push('/timeline')} />
+        <Row title={t('Powiadomienia')} sub={t('Rodzaje i godziny ciszy')} onPress={() => router.push('/notifications')} />
+      </Card>
       <Card title={t('Konto')}>
         <Row title={me?.user?.displayName ?? ''} sub={me?.user?.email} />
         <Row title={t('Bezpieczeństwo konta')} sub={t('Biometria, PIN, logowanie dwuskładnikowe')} onPress={() => router.push('/security')} />

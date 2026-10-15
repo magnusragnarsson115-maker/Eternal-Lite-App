@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { Alert } from 'react-native';
-import { Badge, Button, Card, Empty, Loading, Notice, P, Row, Screen } from '../../components/ui';
+import { Badge, Button, Card, Empty, Loading, Notice, Row, Screen } from '../../components/ui';
 import { del, get } from '../../lib/api';
 import { errorMessage } from '../../lib/errors';
 import { useI18n } from '../../lib/i18n';
@@ -44,9 +45,7 @@ export default function SharingScreen() {
           ))
         )}
         {revoke.isError ? <Notice kind="danger">{errorMessage(revoke.error, t)}</Notice> : null}
-        <P small muted>
-          {t('Nowe udostępnienie (wybór placówki, zakresu i czasu) ustawisz w aplikacji w przeglądarce albo przez link od placówki.')}
-        </P>
+        <Button title={t('Udostępnij placówce lub lekarzowi')} variant="secondary" onPress={() => router.push('/share-new')} />
       </Card>
       <Card title={t('Kto oglądał moje dane')}>
         {log.isLoading ? (

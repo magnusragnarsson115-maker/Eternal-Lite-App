@@ -55,6 +55,16 @@ describe('Organizacja, konto i wideo', () => {
     await fx.clients.admin.req('PUT', '/api/admin/modules/facts', { enabled: true });
   });
 
+  it('gotowość do pracy: administrator widzi stan składników bez wartości sekretów; inni nie mają dostępu', async () => {
+    const r = await fx.clients.admin.req('GET', '/api/admin/readiness');
+    expect(r.status).toBe(200);
+    const ids = r.json.items.map((i: { id: string }) => i.id);
+    expect(ids).toEqual(expect.arrayContaining(['mode', 'ai', 'stt', 'ocr', 'sms', 'email', 'video', 'pdf', 'fhir']));
+    expect(r.json.items.find((i: { id: string }) => i.id === 'mode').state).toBe('demo');
+    expect(JSON.stringify(r.json)).not.toContain('test-audit-key');
+    expect((await fx.clients.doctor.req('GET', '/api/admin/readiness')).status).toBe(403);
+  });
+
   it('incydent: zgłoszenie personelu, termin wg wagi, obsługa i eskalacja', async () => {
     const r = await fx.clients.doctor.req('POST', '/api/incidents', { category: 'privacy', description: 'Wynik innego pacjenta w skrzynce materiałów.' });
     expect(r.json.severity).toBe('high');

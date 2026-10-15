@@ -10,10 +10,15 @@ COPY . .
 RUN npm run build && npm prune --omit=dev
 
 FROM node:22-bookworm-slim
+# Chromium do raportów PDF (raport faktów, notatka Scribe, potwierdzenia) + czcionki z polskimi znakami
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends chromium fonts-dejavu-core fonts-liberation \
+ && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production \
     PORT=3000 \
     DATA_DIR=/data \
-    TRUST_PROXY=true
+    TRUST_PROXY=true \
+    CHROMIUM_PATH=/usr/bin/chromium
 WORKDIR /app
 COPY --from=build /app/package.json ./
 COPY --from=build /app/node_modules ./node_modules

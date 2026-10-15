@@ -92,13 +92,25 @@ export function LoginPage({ staff }: { staff?: boolean }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const login = useMutation({
-    mutationFn: () => post<Me>('/api/auth/login', { email, password }),
+    mutationFn: (cred?: { email: string; password: string }) => post<Me>('/api/auth/login', cred ?? { email, password }),
     onSuccess: (m) => {
       setMe(m);
       nav(landingFor(m), { replace: true });
     },
   });
   if (me?.authenticated && !login.isPending) return <Navigate to={landingFor(me)} replace />;
+  // tryb demonstracyjny: wejście jednym kliknięciem na konta fikcyjne (pokaz dla klinik i inwestorów)
+  const demoAccounts = staff
+    ? [
+        { email: 'anna.nowicka@eternal.local', label: t('Lekarz (interna)') },
+        { email: 'piotr.zielinski@eternal.local', label: t('Lekarz (kardiologia)') },
+        { email: 'recepcja@eternal.local', label: t('Rejestracja') },
+        { email: 'admin@eternal.local', label: t('Administrator') },
+      ]
+    : [
+        { email: 'pacjent@eternal.local', label: t('Pacjentka Anna Kowalska') },
+        { email: 'maria@eternal.local', label: t('Pacjentka Maria (tożsamość niepotwierdzona)') },
+      ];
   const submit = (e: FormEvent) => {
     e.preventDefault();
     login.mutate();
@@ -127,6 +139,13 @@ export function LoginPage({ staff }: { staff?: boolean }) {
         )}
         {config?.demoMode && (
           <Notice kind="info" title={t('Konta demonstracyjne')}>
+            <div className="btn-row" style={{ marginBottom: 8 }}>
+              {demoAccounts.map((a) => (
+                <Button key={a.email} type="button" size="sm" variant="secondary" loading={login.isPending && login.variables?.email === a.email} onClick={() => login.mutate({ email: a.email, password: 'Eternal-Demo-2026' })}>
+                  {a.label}
+                </Button>
+              ))}
+            </div>
             <p className="small" style={{ margin: 0 }}>
               {staff ? 'recepcja@eternal.local · anna.nowicka@eternal.local · admin@eternal.local' : 'pacjent@eternal.local · maria@eternal.local'}
               <br />
@@ -205,6 +224,15 @@ export function MfaPage({ staff }: { staff?: boolean }) {
     },
   });
 
+  const { config } = useSession();
+  const demoCode = useQuery({
+    queryKey: ['mfa-demo-code'],
+    queryFn: () => get<{ code: string | null }>('/api/auth/mfa/demo-code'),
+    enabled: !!config?.demoMode && !!me?.authenticated && !enroll,
+    retry: false,
+    refetchInterval: 10_000,
+  });
+
   useEffect(() => {
     if (enroll && !setup && !startSetup.isPending && me?.authenticated) startSetup.mutate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,6 +279,22 @@ export function MfaPage({ staff }: { staff?: boolean }) {
           autoFocus
           required
         />
+        {demoCode.data && (
+          <Notice kind="info" title={t('Tryb demonstracyjny')}>
+            {demoCode.data.code ? (
+              <div className="row-between" style={{ gap: 8, flexWrap: 'wrap' }}>
+                <span>
+                  {t('Bieżący kod konta demo:')} <strong className="mono">{demoCode.data.code}</strong>
+                </span>
+                <Button type="button" size="sm" variant="secondary" onClick={() => setCode(demoCode.data!.code!)}>
+                  {t('Wpisz kod')}
+                </Button>
+              </div>
+            ) : (
+              t('Kod z tego okresu został już użyty — za chwilę pojawi się następny.')
+            )}
+          </Notice>
+        )}
         <Button type="submit" block loading={verify.isPending} disabled={code.length !== 6} icon={<Smartphone size={18} />}>
           {enroll ? t('Włącz i kontynuuj') : t('Potwierdź')}
         </Button>

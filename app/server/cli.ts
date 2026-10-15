@@ -11,9 +11,13 @@ import { DEMO_PASSWORD, DEMO_TOTP_SECRET, seedDemo } from './seed/demo.js';
 import { generateSynthetic, importSynthea } from './seed/synthetic.js';
 import { listModules, MODULES, setModuleFlag } from './modules.js';
 import { createOrganization, listOrganizations } from './services/orgs.js';
+import { readiness } from './services/readiness.js';
+import { closePdfBrowser } from './pdf/render.js';
 
 const USAGE = `Eternal — narzędzia administracyjne
 
+  npm run cli -- check [--live]                           gotowość do pracy: co działa naprawdę, co w trybie demo, co ustawić
+                                                          (--live: test połączeń bez danych pacjentów)
   npm run cli -- create-org "<nazwa>" [--nip 1234567890]  nowa organizacja (klinika) — dane rozdzielone znacznikiem
   npm run cli -- orgs                                     lista organizacji
   npm run cli -- create-admin <email> "<Imię Nazwisko>" [--org <id>]
@@ -57,6 +61,21 @@ async function main(): Promise<void> {
   }
   await initCore();
   switch (cmd) {
+    case 'check': {
+      const r = await readiness({ live: args.includes('--live') });
+      await closePdfBrowser();
+      const icon = { ok: '✔', demo: 'DEMO', missing: '✘', warn: '!' } as const;
+      let group = '';
+      for (const i of r.items) {
+        if (i.group !== group) console.log(`\n== ${(group = i.group)}`);
+        console.log(`${icon[i.state].padEnd(4)} ${i.name}: ${i.detail}`);
+        if (i.live) console.log(`     test: ${i.live.ok ? 'OK' : 'BŁĄD'} — ${i.live.detail} (${i.live.ms} ms)`);
+        if (i.howTo) console.log(`     → ${i.howTo}`);
+      }
+      console.log(`\nGotowe: ${r.summary.ok} · tryb demo: ${r.summary.demo} · brakuje: ${r.summary.missing} · do decyzji/uwagi: ${r.summary.warn}`);
+      if (r.summary.missing > 0 && !args.includes('--no-fail')) process.exitCode = 2;
+      break;
+    }
     case 'create-org': {
       const [name] = positional(args);
       if (!name) throw new Error('Użycie: create-org "<nazwa>" [--nip 1234567890]');

@@ -1,8 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { Text, View } from 'react-native';
-import { Card, H1, Loading, Notice, P, Screen } from '../../components/ui';
-import { get } from '../../lib/api';
+import { Button, Card, Field, H1, Loading, Notice, P, Screen } from '../../components/ui';
+import { get, post } from '../../lib/api';
+import { errorMessage } from '../../lib/errors';
 import { useI18n } from '../../lib/i18n';
 import { space, useColors } from '../../lib/theme';
 import type { CardView } from '../../lib/types';
@@ -12,6 +14,8 @@ export default function CardDetailScreen() {
   const { t, dateTime } = useI18n();
   const c = useColors();
   const q = useQuery({ queryKey: ['card', id], queryFn: () => get<CardView>(`/api/me/cards/${id}`) });
+  const [sh, setSh] = useState({ open: false, phone: '', label: '', days: 7 });
+  const share = useMutation({ mutationFn: () => post<{ url: string; expiresAt: string }>(`/api/me/cards/${id}/share`, { days: sh.days, phone: sh.phone || undefined, label: sh.label || undefined }) });
   if (!q.data) return <Screen>{q.isLoading ? <Loading /> : <Notice kind="danger">{t('Nie znaleziono.')}</Notice>}</Screen>;
   const k = q.data;
   const list = (title: string, items: string[]) =>
@@ -50,6 +54,21 @@ export default function CardDetailScreen() {
           </P>
         </Card>
       ) : null}
+      <Card title={t('Udostępnij osobie bliskiej')}>
+        {!sh.open ? (
+          <Button title={t('Udostępnij kartę na czas')} variant="secondary" onPress={() => setSh({ ...sh, open: true })} />
+        ) : share.data ? (
+          <Notice kind="ok">{t('Link ważny do {d}. Odczyty zobaczysz w „Kto oglądał moje dane”.', { d: dateTime(share.data.expiresAt) })}</Notice>
+        ) : (
+          <>
+            <Field label={t('Kto (np. córka Ewa)')} value={sh.label} onChangeText={(v) => setSh({ ...sh, label: v })} />
+            <Field label={t('Telefon (SMS z linkiem, opcjonalnie)')} value={sh.phone} onChangeText={(v) => setSh({ ...sh, phone: v })} keyboardType="phone-pad" />
+            <Field label={t('Ważność (dni, 1–30)')} value={String(sh.days)} onChangeText={(v) => setSh({ ...sh, days: Math.max(1, Math.min(30, Number(v.replace(/\D/g, '')) || 1)) })} keyboardType="number-pad" />
+            {share.isError ? <Notice kind="danger">{errorMessage(share.error, t)}</Notice> : null}
+            <Button title={t('Udostępnij')} loading={share.isPending} onPress={() => share.mutate()} />
+          </>
+        )}
+      </Card>
       <P small muted>
         {t('W nagłym zagrożeniu życia dzwoń 112.')}
       </P>

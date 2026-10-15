@@ -71,6 +71,10 @@ function Gate() {
           <Stack.Screen name="devices" options={{ title: t('Zalogowane urządzenia') }} />
           <Stack.Screen name="about" options={{ title: t('Do czego służy aplikacja') }} />
           <Stack.Screen name="delete-data" options={{ title: t('Usuń moje dane') }} />
+          <Stack.Screen name="measurements" options={{ title: t('Pomiary') }} />
+          <Stack.Screen name="timeline" options={{ title: t('Oś czasu wyników') }} />
+          <Stack.Screen name="notifications" options={{ title: t('Powiadomienia') }} />
+          <Stack.Screen name="share-new" options={{ title: t('Nowe udostępnienie') }} />
         </Stack.Protected>
         <Stack.Screen name="crisis" options={{ title: t('Numery pomocowe'), presentation: ready ? 'card' : 'modal' }} />
       </Stack>
