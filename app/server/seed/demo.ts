@@ -231,7 +231,8 @@ export async function seedDemo(log: (m: string) => void = console.log): Promise<
   const freeSlots = async (serviceId: string, practitionerId: string, fromDay: string) => {
     const s = await fhir().search<Slot>('Slot', { 'service-type': `${SERVICE_SYSTEM}|${serviceId}`, status: 'free', start: `ge${zonedToUtc(fromDay, '00:00', tz).toISOString()}`, _sort: 'start' });
     const sch = await ensureSchedule(practitionerId, practitionerId === nowicka.id && serviceId === svc.tele.id ? undefined : loc.id);
-    return s.filter((x) => x.schedule.reference === `Schedule/${sch.id}`);
+    // tylko terminy co najmniej 30 min w przyszłości — seed uruchomiony po południu nie może rezerwować minionych godzin
+    return s.filter((x) => x.schedule.reference === `Schedule/${sch.id}` && Date.parse(x.start) > Date.now() + 30 * 60_000);
   };
   let day = addDays(today, 1);
   while (isoWeekday(day) > 5) day = addDays(day, 1);

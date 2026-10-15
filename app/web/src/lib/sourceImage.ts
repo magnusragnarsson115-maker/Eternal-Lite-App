@@ -5,13 +5,16 @@
  */
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
-let lib: Promise<typeof import('pdfjs-dist')> | undefined;
+// wersja „legacy” — z polyfillami dla starszych przeglądarek (np. starsze telefony seniorów); nowa wersja
+// wymaga funkcji JavaScript dostępnych dopiero w najnowszych przeglądarkach
+type PdfJs = typeof import('pdfjs-dist');
+let lib: Promise<PdfJs> | undefined;
 const docs = new Map<string, Promise<PDFDocumentProxy>>();
 const canvases = new Map<string, Promise<HTMLCanvasElement>>();
 const MAX_CACHED = 12;
 
-function pdfjs(): Promise<typeof import('pdfjs-dist')> {
-  lib ??= Promise.all([import('pdfjs-dist'), import('pdfjs-dist/build/pdf.worker.min.mjs?url')]).then(([m, worker]) => {
+function pdfjs(): Promise<PdfJs> {
+  lib ??= Promise.all([import('pdfjs-dist/legacy/build/pdf.mjs') as Promise<PdfJs>, import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?url')]).then(([m, worker]) => {
     m.GlobalWorkerOptions.workerSrc = worker.default;
     return m;
   });

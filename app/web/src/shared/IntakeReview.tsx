@@ -182,7 +182,7 @@ export function IntakeReview({
               {t('Potwierdź wszystkie pewne ({n})', { n: pendingHigh.length })}
             </Button>
           )}
-          <ul className="obs-list stack" style={{ listStyle: 'none', padding: 0 }}>
+          <ul className="intake-fields stack" style={{ listStyle: 'none', padding: 0 }}>
             {items.map((f) => (
               <FieldRow
                 key={f.id}

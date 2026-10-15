@@ -44,7 +44,8 @@ export function SourceSnippet({ fileUrl, contentType, page, box, text }: { fileU
         ctx.lineWidth = 2;
         ctx.strokeRect(x0 * W - sx - 3, y0 * H - sy - 2, (x1 - x0) * W + 6, (y1 - y0) * H + 4);
         setState('ok');
-      } catch {
+      } catch (err) {
+        console.warn('Nie udało się pokazać fragmentu oryginału', err);
         if (!cancelled) setState('error');
       }
     })();
