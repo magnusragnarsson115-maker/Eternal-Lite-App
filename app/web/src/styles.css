@@ -554,3 +554,9 @@ dialog.modal::backdrop { background: rgba(10, 20, 26, 0.5); }
   .obs-table { display: none; }
   .obs-list { display: block; }
 }
+
+/* objaśnienia ze słownika (A2.4) */
+details.explain summary { cursor: pointer; color: var(--primary); font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+details.explain summary::-webkit-details-marker { display: none; }
+details.explain[open] summary { margin-bottom: 4px; }
+.explain-list dd { font-weight: 400; }

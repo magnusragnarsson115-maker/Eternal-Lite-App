@@ -54,4 +54,12 @@ export const EN_P0: Record<string, string> = {
   'Fragment oryginału, strona {p}: {t}': 'Original excerpt, page {p}: {t}',
   'Ładuję fragment oryginału…': 'Loading the original excerpt…',
   'Fragment oryginału, strona {p} — sprawdź, czy wartość się zgadza.': 'Original excerpt, page {p} — check that the value matches.',
+  // A2.4 objaśnienia ze słownika
+  'Opis ogólny ze słownika ({v}), zatwierdził(a): {by}, {d}. Nie dotyczy Twojego wyniku i go nie ocenia — wynik omawia z Tobą lekarz.': 'General description from the dictionary ({v}), approved by {by}, {d}. It does not refer to your result and does not assess it — your doctor discusses the result with you.',
+  'Projekt opisu ze słownika ({v}) — czeka na zatwierdzenie przez lekarza. Nie dotyczy Twojego wyniku i go nie ocenia.': 'Draft dictionary description ({v}) — awaiting approval by a doctor. It does not refer to your result and does not assess it.',
+  'Co mierzy to badanie?': 'What does this test measure?',
+  'Projekt — czeka na zatwierdzenie przez lekarza.': 'Draft — awaiting approval by a doctor.',
+  'Jednostka': 'Unit',
+  'Co oznaczają te badania, jednostki i kolumny': 'What these tests, units and columns mean',
+  'Projekt opisów — czeka na zatwierdzenie przez lekarza. W instancji pokazowej pokazujemy go z tym oznaczeniem.': 'Draft descriptions — awaiting approval by a doctor. The demo instance shows them with this label.',
 };

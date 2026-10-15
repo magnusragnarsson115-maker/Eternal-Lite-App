@@ -13,6 +13,7 @@ import { listModules, MODULES, setModuleFlag } from './modules.js';
 import { createOrganization, listOrganizations } from './services/orgs.js';
 import { readiness } from './services/readiness.js';
 import { closePdfBrowser } from './pdf/render.js';
+import { approveExplanations, explanationsReviewMarkdown } from './labs/explanations.js';
 
 const USAGE = `Eternal — narzędzia administracyjne
 
@@ -33,6 +34,9 @@ const USAGE = `Eternal — narzędzia administracyjne
   npm run cli -- import-rpl [plik.xml|URL]                import Rejestru Produktów Leczniczych
   npm run cli -- verify-audit                             weryfikacja łańcucha dziennika zdarzeń
   npm run cli -- backup <katalog>                         spójna kopia bazy (VACUUM INTO)
+  npm run cli -- explanations-review                      objaśnienia badań do przeglądu przez lekarza (Markdown na wyjście)
+  npm run cli -- approve-explanations "<lek. Imię Nazwisko, PWZ>"
+                                                          zatwierdzenie bieżącej treści objaśnień (A2.4); po zmianie treści ponownie
 `;
 
 /** Wartość opcji `--nazwa wartość` (albo undefined). */
@@ -153,6 +157,16 @@ Sekret TOTP kont personelu w trybie demo: ${DEMO_TOTP_SECRET} (dodaj w aplikacji
       console.log(`Import RPL z: ${source}`);
       const r = await importRpl(source);
       console.log(`Zaimportowano ${r.imported} produktów leczniczych.`);
+      break;
+    }
+    case 'explanations-review': {
+      console.log(explanationsReviewMarkdown());
+      break;
+    }
+    case 'approve-explanations': {
+      const [by] = positional(args);
+      const a = approveExplanations({ display: `CLI: ${by ?? ''}` }, by ?? '');
+      console.log(`Zatwierdzono objaśnienia ${a.version} (skrót ${a.hash}) — ${a.approvedBy}, ${a.approvedAt}.`);
       break;
     }
     case 'verify-audit': {

@@ -8,6 +8,7 @@ import { useI18n } from '../i18n';
 import { AccessLogList, CardContent } from '../shared/LinkShared';
 import { uploadFile } from '../lib/upload';
 import type { AccessEntry, CardView, GrantView, IntakeView, PublicTexts } from '../mvp-types';
+import { TestExplanation } from '../shared/Explanations';
 import { IntakeReview, IntakeStatusBadge, KIND_PL, type FieldAction } from '../shared/IntakeReview';
 import { ReportIncidentCard } from '../shared/AccountCards';
 import { useSession } from '../session';
@@ -245,6 +246,7 @@ export function TimelinePage() {
         return (
           <Card key={k} title={items[0].name}>
             {numeric.length >= 2 && units.size === 1 && <TrendChart dates={numeric.map((i) => i.date)} series={[{ key: k, label: items[0].name, color: 'var(--chart-line)', values: numeric.map((i) => i.valueNum) }]} unit={numeric[0].unit ?? ''} height={160} />}
+            <TestExplanation loinc={items[0].loinc} unit={items[0].unit} />
             <ul className="list">
               {items.map((i) => (
                 <li key={i.id} className="list-item">

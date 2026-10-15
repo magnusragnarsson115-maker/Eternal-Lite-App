@@ -326,6 +326,11 @@ export const EN: Record<string, string> = {
   'Pomiary zaimportowane z pliku': 'Measurements imported from a file',
   'import z pliku': 'file import',
   'inny odczyt z tej samej minuty': 'another reading from the same minute',
+  'Co mierzy to badanie?': 'What does this test measure?',
+  'Projekt — czeka na zatwierdzenie przez lekarza.': 'Draft — awaiting approval by a doctor.',
+  'Jednostka': 'Unit',
+  'Opis ogólny ze słownika ({v}), zatwierdził(a): {by}. Nie dotyczy Twojego wyniku i go nie ocenia.': 'General description from the dictionary ({v}), approved by {by}. It does not refer to your result and does not assess it.',
+  'Projekt opisu ze słownika ({v}) — czeka na zatwierdzenie przez lekarza. Nie dotyczy Twojego wyniku i go nie ocenia.': 'Draft dictionary description ({v}) — awaiting approval by a doctor. It does not refer to your result and does not assess it.',
   'ten sam odczyt z innego źródła': 'same reading from another source',
   'Eksport danych (CSV)': 'Data export (CSV)',
 };

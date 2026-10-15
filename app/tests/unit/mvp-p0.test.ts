@@ -146,3 +146,47 @@ describe('MVP P0 — dane pacjenta', () => {
     expect(lines[glu.line].text).toContain('Glukoza 101');
   });
 });
+
+describe('MVP P0 — objaśnienia ze słownika (A2.4)', () => {
+  it('każde badanie słownika ma opis i każda jego jednostka ma objaśnienie', async () => {
+    const { LAB_TESTS } = await import('../../server/labs/dictionary.js');
+    const { TEST_TEXT, UNIT_TEXT, unitKey } = await import('../../server/labs/explanations.js');
+    expect(LAB_TESTS.filter((t) => !TEST_TEXT[t.key]).map((t) => t.key)).toEqual([]);
+    const missingUnits = [...new Set(LAB_TESTS.flatMap((t) => t.units))].filter((u) => !UNIT_TEXT[unitKey(u)]);
+    expect(missingUnits).toEqual([]);
+    // zapisy z polskich wydruków trafiają w te same objaśnienia
+    expect(unitKey('µIU/ml')).toBe(unitKey('u[IU]/mL'));
+    expect(unitKey('tys/µl')).toBe(unitKey('10*3/uL'));
+    expect(unitKey('mg/dl')).toBe(unitKey('mg/dL'));
+  });
+
+  it('opisy niczego nie oceniają: bez słów interpretujących wartość, przyczyn i zaleceń', async () => {
+    const { TEST_TEXT, FIELD_TEXT } = await import('../../server/labs/explanations.js');
+    const forbidden = /podwyższon|obniżon|za wysok|za nisk|nieprawidłow|w normie|poza normą|świadcz|wskazuje na|oznacza chorob|choroba|zawał|cukrzyc|nowotw|zaleca|należy|powinien|powinna|niedobór|nadmiar/i;
+    const bad = [...Object.entries(TEST_TEXT), ...Object.entries(FIELD_TEXT)].filter(([, txt]) => forbidden.test(txt));
+    expect(bad).toEqual([]);
+  });
+
+  it('pacjent widzi opisy dopiero po zatwierdzeniu przez lekarza; zmiana treści unieważnia zatwierdzenie', async () => {
+    const { setupCore } = await import('./helpers.js');
+    await setupCore();
+    const ex = await import('../../server/labs/explanations.js');
+    const { config } = await import('../../server/config.js');
+    const { setSetting } = await import('../../server/settings.js');
+    const demo = config.demoMode;
+    (config as { demoMode: boolean }).demoMode = false;
+    try {
+      expect(ex.explanationsView()).toMatchObject({ visible: false, draft: true });
+      expect(() => ex.approveExplanations(system, 'ab')).toThrow();
+      ex.approveExplanations(system, 'lek. Test Testowy, PWZ 1234567');
+      const v = ex.explanationsView();
+      expect(v).toMatchObject({ visible: true, draft: false, approval: { by: 'lek. Test Testowy, PWZ 1234567' } });
+      expect(v.tests['2345-7'].text).toContain('glukozy');
+      // zatwierdzenie innej treści (inny skrót) nie obowiązuje
+      setSetting('lab-explanations-approval', { version: ex.EXPLANATIONS_VERSION, hash: 'inna-tresc', approvedBy: 'x', approvedAt: new Date().toISOString() });
+      expect(ex.explanationsView().visible).toBe(false);
+    } finally {
+      (config as { demoMode: boolean }).demoMode = demo;
+    }
+  });
+});

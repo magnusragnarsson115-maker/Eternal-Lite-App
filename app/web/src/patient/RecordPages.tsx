@@ -3,6 +3,7 @@ import { FileText, FlaskConical, Paperclip, Printer } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { get, put } from '../api';
 import { useI18n } from '../i18n';
+import { ExplanationsPanel } from '../shared/Explanations';
 import type { RecordView } from '../types';
 import { Badge, Button, Card, Empty, formatBytes, Notice, PageHead, QueryError, Skeleton } from '../ui';
 
@@ -138,7 +139,7 @@ export function ObservationTable({ record }: { record: RecordView }) {
   );
 }
 
-export function RecordBody({ record, fileBase }: { record: RecordView; fileBase: string }) {
+export function RecordBody({ record, fileBase, explain }: { record: RecordView; fileBase: string; explain?: boolean }) {
   const { t, fmt } = useI18n();
   return (
     <div className="stack">
@@ -165,6 +166,7 @@ export function RecordBody({ record, fileBase }: { record: RecordView; fileBase:
         )}
       </dl>
       <ObservationTable record={record} />
+      {explain && record.observations?.length ? <ExplanationsPanel items={record.observations} /> : null}
       {record.conclusion && (
         <div>
           <h3>{t('Komentarz lekarza')}</h3>
@@ -201,7 +203,7 @@ export function RecordDetailPage() {
         }
       />
       <Card>
-        <RecordBody record={r} fileBase="/api/me/files" />
+        <RecordBody record={r} fileBase="/api/me/files" explain />
       </Card>
       <Notice kind="info">{t('Aplikacja nie ocenia wyników i nie zastępuje porady lekarza. W razie pytań napisz do placówki.')}</Notice>
       <Link to="/wiadomosci?nowa=wyniki" className="btn secondary no-print" style={{ alignSelf: 'flex-start' }}>

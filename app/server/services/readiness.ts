@@ -4,6 +4,7 @@ import { ocrConfigured } from '../ai/ocr.js';
 import { sttMode } from '../ai/stt.js';
 import { oidcEnabled } from '../auth/oidc.js';
 import { config } from '../config.js';
+import { currentApproval, EXPLANATIONS_VERSION } from '../labs/explanations.js';
 import { fhirSystem } from '../fhir/index.js';
 import { emailConfigured, smsConfigured, verifyEmailTransport } from '../integrations/channels.js';
 import { monitoringEnabled } from '../lib/monitoring.js';
@@ -62,6 +63,15 @@ function items(): ReadinessItem[] {
     state: config.security.auditHmacKey ? 'ok' : config.demoMode ? 'demo' : 'warn',
     detail: config.security.auditHmacKey ? 'AUDIT_HMAC_KEY z konfiguracji' : 'klucz wygenerowany w katalogu danych (audit.key)',
     howTo: config.security.auditHmacKey ? undefined : 'AUDIT_HMAC_KEY (min. 32 losowe znaki) z menedżera sekretów — klucz nie może leżeć obok bazy.',
+  });
+  const expl = currentApproval();
+  add({
+    id: 'explanations',
+    group: 'Treści',
+    name: 'Objaśnienia badań dla pacjentów (A2.4)',
+    state: expl ? 'ok' : 'warn',
+    detail: expl ? `wersja ${EXPLANATIONS_VERSION}, zatwierdził(a): ${expl.approvedBy}, ${expl.approvedAt.slice(0, 10)}` : `wersja ${EXPLANATIONS_VERSION} czeka na zatwierdzenie przez lekarza — pacjenci jej nie widzą${config.demoMode ? ' (w trybie demo widoczna jako projekt)' : ''}`,
+    howTo: expl ? undefined : 'Lekarz przegląda opisy (npm run cli -- explanations-review > objasnienia.md) i zatwierdza: npm run cli -- approve-explanations "lek. Imię Nazwisko, PWZ 0000000"',
   });
   add({
     id: 'security-contact',
