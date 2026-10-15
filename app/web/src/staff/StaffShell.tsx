@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { get } from '../api';
 import { useI18n } from '../i18n';
+import { PREVIEW } from '../lib/preview';
 import { useRealtime, type LiveEvent } from '../realtime';
 import { hasRole, useSession } from '../session';
 import { BrandMark, Button, DemoBanner, Segmented, Spinner, useToast } from '../ui';
@@ -114,10 +115,12 @@ export function StaffShell() {
           <div className="side-foot">
             <div style={{ color: '#fff', fontWeight: 600 }}>{me.user.displayName}</div>
             <div style={{ color: '#9fc1c8', marginBottom: 8 }}>{roleLabel}</div>
-            <div className="row" style={{ gap: 6, fontSize: '0.78rem', color: '#9fc1c8', marginBottom: 10 }}>
-              <span style={{ width: 8, height: 8, borderRadius: 4, background: live.connected ? '#5fd38d' : '#ffb35c' }} aria-hidden />
-              {live.connected ? t('Synchronizacja na żywo') : t('Łączenie…')}
-            </div>
+            {!PREVIEW && (
+              <div className="row" style={{ gap: 6, fontSize: '0.78rem', color: '#9fc1c8', marginBottom: 10 }}>
+                <span style={{ width: 8, height: 8, borderRadius: 4, background: live.connected ? '#5fd38d' : '#ffb35c' }} aria-hidden />
+                {live.connected ? t('Synchronizacja na żywo') : t('Łączenie…')}
+              </div>
+            )}
             <button type="button" className="btn sm" style={{ background: 'rgba(255,255,255,.08)', color: '#fff', width: '100%' }} onClick={() => void logout()}>
               <LogOut size={16} /> {t('Wyloguj')}
             </button>

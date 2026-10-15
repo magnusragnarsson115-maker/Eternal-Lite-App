@@ -9,6 +9,20 @@ w trybie demonstracyjnym — patrz [`BRAKI_I_WDROZENIE.md`](BRAKI_I_WDROZENIE.md
   (rejestracja → pacjentka pod linkiem → raport faktów → Scribe → karta „Po wizycie” → „kto oglądał”).
 - **Zrzuty ekranu**: [`screenshots/`](screenshots/) — spis w [`MODULES.md`](MODULES.md#zrzuty-ekranu-dane-fikcyjne).
 
+## 1a. Podgląd w przeglądarce bez serwera (link, także na telefonie)
+
+Klikalna aplikacja pacjenta i panel placówki na danych fikcyjnych, z kontami pokazowymi (pacjentka Anna, Maria,
+lekarze, rejestracja, administrator). Odpowiedzi API są nagrane z instancji pokazowej, więc podgląd działa jako
+zwykła strona — **tylko do odczytu**: zapis kończy się komunikatem „zmiany nie są zapisywane”, pliki PDF i CSV
+otwierają się w oknie na stronie, wideo nie działa. Czas w podglądzie płynie od chwili nagrania.
+
+Odtworzenie po zmianach w aplikacji (instancja pokazowa uruchomiona jak w punkcie 2):
+
+```bash
+npm run preview:record -- http://localhost:3000   # nagranie → dist/preview-data.json (tylko DEMO_MODE)
+npm run build:preview                             # strona → dist/preview (preview.html + assets + nagranie)
+```
+
 ## 2. Na własnym komputerze (ok. 10 minut)
 
 Wymagania: Node.js 22.13 lub nowszy.

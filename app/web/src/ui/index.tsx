@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n';
+import { PREVIEW } from '../lib/preview';
 import type { AppointmentStatus } from '../types';
 
 // --- przyciski -----------------------------------------------------------------------------------
@@ -537,6 +538,7 @@ export function DemoBanner() {
   return (
     <div className="demo-banner" role="note">
       <strong>{t('DANE FIKCYJNE')}</strong> · {t('Wszystkie osoby, wyniki i terminy w tej instancji są fikcyjne.')}
+      {PREVIEW && <> {t('Podgląd: zmiany nie są zapisywane.')}</>}
     </div>
   );
 }

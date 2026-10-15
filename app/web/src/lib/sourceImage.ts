@@ -13,7 +13,14 @@ const docs = new Map<string, Promise<PDFDocumentProxy>>();
 const canvases = new Map<string, Promise<HTMLCanvasElement>>();
 const MAX_CACHED = 12;
 
-function pdfjs(): Promise<PdfJs> {
+// podgląd bez serwera podmienia adres pliku na lokalny (blob:) z nagranej kopii
+let fileSource: (url: string) => Promise<string> = async (url) => url;
+
+export function setFileSource(fn: (url: string) => Promise<string>): void {
+  fileSource = fn;
+}
+
+export function pdfjs(): Promise<PdfJs> {
   lib ??= Promise.all([import('pdfjs-dist/legacy/build/pdf.mjs') as Promise<PdfJs>, import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?url')]).then(([m, worker]) => {
     m.GlobalWorkerOptions.workerSrc = worker.default;
     return m;
@@ -37,7 +44,10 @@ function remember(key: string, make: () => Promise<HTMLCanvasElement>): Promise<
 export function pdfPage(url: string, pageNo: number): Promise<HTMLCanvasElement> {
   return remember(`${url}#${pageNo}`, async () => {
     const m = await pdfjs();
-    if (!docs.has(url)) docs.set(url, m.getDocument({ url, withCredentials: true }).promise);
+    if (!docs.has(url)) {
+      const src = await fileSource(url);
+      docs.set(url, m.getDocument({ url: src, withCredentials: !src.startsWith('blob:') }).promise);
+    }
     const doc = await docs.get(url)!;
     const page = await doc.getPage(pageNo);
     const viewport = page.getViewport({ scale: 2 });
@@ -53,7 +63,7 @@ export function imagePage(url: string): Promise<HTMLCanvasElement> {
   return remember(url, async () => {
     const img = new Image();
     img.decoding = 'async';
-    img.src = url;
+    img.src = await fileSource(url);
     await img.decode();
     const canvas = document.createElement('canvas');
     canvas.width = img.naturalWidth;

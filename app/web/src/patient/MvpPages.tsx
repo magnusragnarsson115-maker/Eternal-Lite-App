@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bell, Camera, FileText, FileUp, HeartPulse, History, LifeBuoy, Phone, Plus, Share2, ShieldCheck, Siren, Trash2, X } from 'lucide-react';
 import { useRef, useState, type ReactNode } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { del, get, post, put, withProfile } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
@@ -311,7 +311,7 @@ export function SharingPage() {
   const qc = useQueryClient();
   const toast = useToast();
   const { confirm, dialog } = useConfirm();
-  const params = new URLSearchParams(window.location.search);
+  const [params] = useSearchParams();
   const preselect = params.get('dokument');
   const [creating, setCreating] = useState(!!preselect);
   const grants = useQuery({ queryKey: ['grants'], queryFn: () => get<{ items: GrantView[] }>('/api/me/grants') });

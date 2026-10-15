@@ -14,6 +14,7 @@
     "build": "npm run build:web && npm run build:server",
     "build:web": "vite build",
     "build:server": "tsc -p tsconfig.server.json",
+    "build:preview": "vite build -c vite.preview.config.ts && cp dist/preview-data.json dist/preview/",
     "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env dist/server/index.js",
     "cli": "NODE_OPTIONS=--disable-warning=ExperimentalWarning tsx --env-file-if-exists=.env server/cli.ts",
     "seed:demo": "NODE_OPTIONS=--disable-warning=ExperimentalWarning tsx --env-file-if-exists=.env server/cli.ts seed-demo",
@@ -22,6 +23,7 @@
     "test:e2e": "playwright test",
     "screenshots": "tsx scripts/screenshots.ts",
     "screenshots:mvp": "tsx scripts/screenshots-mvp.ts",
+    "preview:record": "tsx scripts/preview-record.ts",
     "icons": "tsx scripts/icons.ts",
     "sbom": "npm sbom --sbom-format cyclonedx --omit dev > sbom.cdx.json && echo Zapisano sbom.cdx.json",
     "audit:deps": "npm audit --omit dev --audit-level high"

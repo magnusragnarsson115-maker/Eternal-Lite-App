@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Trash2, Wind } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { del, get, post } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
@@ -415,7 +416,8 @@ function BreathingTab() {
 
 export function JournalPage() {
   const { t } = useI18n();
-  const [tab, setTab] = useState<Kind>(() => (new URLSearchParams(window.location.search).get('tab') as Kind) || 'mood');
+  const [params] = useSearchParams();
+  const [tab, setTab] = useState<Kind>(() => (params.get('tab') as Kind) || 'mood');
   const [crisis, setCrisis] = useState(false);
   return (
     <div className="stack-lg">

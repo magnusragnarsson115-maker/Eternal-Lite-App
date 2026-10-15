@@ -564,4 +564,9 @@ export const EN_R3: Record<string, string> = {
   'Odhaczenie celu': 'Goal ticked',
   'Zakończenie celu': 'Goal ended',
   'Pokaż codzienne przypomnienia o lekach': 'Show daily medicine reminders',
+  // podgląd bez serwera
+  'To podgląd z danymi fikcyjnymi: zmiany nie są zapisywane. Zapis działa w aplikacji uruchomionej na serwerze.': 'This is a preview with fictional data: changes are not saved. Saving works in the app running on a server.',
+  'Tego widoku nie ma w podglądzie. W aplikacji uruchomionej na serwerze działa normalnie.': 'This view is not part of the preview. It works normally in the app running on a server.',
+  'W podglądzie wejdziesz na konta pokazowe — wybierz jeden z przycisków pod formularzem.': 'The preview opens the demo accounts: choose one of the buttons below the form.',
+  'Podgląd: zmiany nie są zapisywane.': 'Preview: changes are not saved.',
 };
