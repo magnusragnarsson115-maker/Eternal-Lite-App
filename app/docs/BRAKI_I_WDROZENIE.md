@@ -43,7 +43,7 @@ Aktualny stan każdego składnika pokazuje polecenie **`npm run cli -- check --l
 | P3 (pilotaż) | **Wycinek oryginału przy zdjęciach odczytanych przez Mistral OCR** | zrobione dla PDF z warstwą tekstu i dla Google Document AI; Mistral OCR zwraca tekst strony bez współrzędnych wierszy | Do zdjęć wybrać Google Document AI (D51) albo dopasowanie tekstu do obrazu po stronie serwera |
 | D5 (MVP-1) | **Nagrywanie w aplikacji telefonu lekarza** | jest nagrywanie telefonem przez przeglądarkę (kod QR) | Ekran nagrywania w osobnej aplikacji lekarza albo w obecnej aplikacji z rolą personelu |
 | D5 (zapas) | Gotowy Scribe partnera (Corti albo Nabla) jako wyjście awaryjne | A3 traktuje to jako zapas, nie funkcję | Umowa i adapter tylko wtedy, gdy własna notatka nie przejdzie oceny lekarzy |
-| D7, P1 | Rezerwacja, wiadomości i wideo **w aplikacji mobilnej** | są w aplikacji w przeglądarce (PWA) | Ekrany w Expo korzystające z tego samego API |
+| D7, P1 | Rezerwacja, wiadomości i wideo **w aplikacji mobilnej** | są w aplikacji w przeglądarce (PWA); w Expo są już: rodzina, dzienniki, historia zdrowia, raport dla lekarza, plan i kalendarz | Ekrany w Expo korzystające z tego samego API |
 | P1 | Logowanie Apple i Google | według A3 dopiero MLP | Konfiguracja przez OIDC |
 
 ### 2.2a. Treści, które napisałem jako projekt — wymagają zatwierdzenia przez ludzi
@@ -54,6 +54,12 @@ Aktualny stan każdego składnika pokazuje polecenie **`npm run cli -- check --l
 | Wywiady i wymagane dokumenty w pakietach specjalizacji (M30) | `server/services/packages.ts` | lekarz danej specjalizacji | przegląd pytań i listy dokumentów przed zastosowaniem pakietu w pierwszej poradni; zmiana treści = nowa wersja pakietu |
 | Pytania ankiet: na start, po wynikach, kontrolna, ocena aplikacji (A12.3) | `server/services/surveys.ts` | lekarz (ankiety zdrowotne) + osoba od produktu (ocena aplikacji) | przegląd pytań i reguł „kiedy” (`SURVEY_RULES`); zmiana treści = nowa wersja ankiety, stare odpowiedzi zachowują swoją wersję |
 | Teksty w prostym języku (A23.2) | `web/src/simple-pl.ts`, `mobile/src/simple-pl.ts` | redakcja + test z 3–5 seniorami | test zrozumienia na prawdziwych zadaniach (rezerwacja, wynik, raport) |
+| Oświadczenia o podstawie działania w imieniu innej osoby (rodzic, opiekun prawny, upoważnienie) | `server/services/family.ts` (`BASIS_TEXT`, wersja `opiekun/2026-10-1`) | prawnik (prawa pacjenta, KRO) | przegląd treści i zasad: kto może założyć profil dorosłego, jak wygląda przejęcie konta przez pełnoletnie dziecko |
+| Powody i procedura dostępu ratunkowego | `server/services/emergencyAccess.ts` (`REASON_PL`, 60 min, limit 5/dobę) | kierownik medyczny + IOD | procedura przeglądu w placówce, kto ocenia, termin oceny |
+| Dyspozycje i oświadczenie woli — zastrzeżenie | `server/services/healthHistory.ts` (`DIRECTIVE_DISCLAIMER`, `dyspozycje/2026-10-1`) | prawnik | potwierdzenie brzmienia (CRS/Poltransplant, art. 9 upt) |
+| Lista szczepionek i chorób w wywiadzie rodzinnym | `server/services/healthHistory.ts` (`VACCINES`, `FAMILY_CONDITIONS`) | lekarz | **kalendarza PSO (kiedy jakie szczepienie dziecka) celowo nie ma** — wymaga treści zatwierdzonej przez lekarza i aktualizacji co roku z komunikatem GIS |
+| Karty zastosowań AI i opisy trybu zastępczego | `server/services/systemStatus.ts` | osoba odpowiedzialna za AI (A18) + produkt | przegląd przy każdej zmianie modelu lub polecenia |
+| Ćwiczenia oddechowe (wzorce 4-6, 4-4-4-4, 4-7-8) | `web/src/patient/JournalPages.tsx`, `mobile/src/app/journal.tsx` | psycholog | potwierdzenie wzorców i ostrzeżenia o zawrotach głowy |
 
 ### 2.3. Sprawdzone tylko częściowo (w tym środowisku nie było kont ani urządzeń)
 

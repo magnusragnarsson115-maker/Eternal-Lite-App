@@ -61,6 +61,13 @@ przez `/dokument` z udziałem `ekspert-prawno-regulacyjny`; zweryfikuj aktualne 
 | Usunięcie danych (A18.12) | usunięcie sejfu, plików, udostępnień, linków i konta; potwierdzenie (PDF) z listą: co usunięto, co zostaje w placówkach (art. 29 ustawy o prawach pacjenta) i w dzienniku, kiedy dane znikną z kopii |
 | Dane syntetyczne (D5.3) | wyłącznie osoby fikcyjne bez PESEL, każde uruchomienie z celem w dzienniku |
 | Aplikacja mobilna | na telefonie tylko token sesji i skrót PIN-u w Keychain/Keystore (bez kopii zapasowej); brak danych medycznych w pamięci urządzenia; blokada biometrią/PIN-em |
+| Profile rodzinne i dostęp opiekuna (A24.1, A24.2) | podstawa działania w imieniu innej osoby zapisana jako oświadczenie z wersją (`opiekun/2026-10-1`: władza rodzicielska, opiekun prawny, pisemne upoważnienie); władza rodzicielska wygasa z pełnoletnością — dostęp rodzica kończy się automatycznie w dniu 18. urodzin; dorosły z kontem nadaje dostęp sam i odbiera go jednym ruchem; w trybie opiekuna niedostępne: ankiety, SOS, ustawienia konta, usunięcie danych; zgody i udostępnienia dorosłego zmienia tylko on; każdy dostęp opiekuna w dzienniku profilu („… (opiekun)”); profil dziecka widoczny w placówkach rodzica (imię, data urodzenia), dane o zdrowiu w sejfie profilu ⚠️ forma oświadczeń do weryfikacji przez prawnika (art. 9, 26 ustawy o prawach pacjenta; art. 95–98 KRO) |
+| Dostęp ratunkowy (A24.5) | przesłanka: art. 9 ust. 2 lit. c RODO (żywotne interesy, osoba niezdolna do wyrażenia zgody) i art. 26 ust. 3 ustawy o prawach pacjenta; tylko lekarz, 60 min, powód + uzasadnienie, powiadomienie pacjenta, ocena administratora, „nieuzasadniony” → zgłoszenie możliwego naruszenia (art. 33 RODO, 72 h) |
+| Dzienniki nastroju, snu i bólu | dane o zdrowiu psychicznym — w sejfie pacjenta, bez analizy i bez alarmów dla placówki (brak funkcji wyrobu medycznego); numery 116 123 i 112 zawsze na stronie, okno z numerami przy nastroju ≤ 2 albo słowach kryzysowych |
+| Kalendarz w zewnętrznej aplikacji (ICS) | do kalendarza Google/Apple/Outlook trafiają tylko ogólne nazwy („Wizyta (Eternal)”) — bez nazwy usługi, lekarza, szczepionki i leku; prywatny adres można unieważnić; każde pobranie w dzienniku |
+| Dyspozycje i oświadczenie woli (A22.5) | wyłącznie informacja dla bliskich i ratowników; aplikacja mówi wprost, że nie zastępuje sprzeciwu w Centralnym Rejestrze Sprzeciwów, upoważnienia w placówce ani pełnomocnictwa |
+| Raport dla lekarza (SBAR) i plik FHIR | część „A” zawiera tylko dane — oceny dokonuje lekarz; zakres referencyjny wyłącznie z dokumentu laboratorium; test pilnuje braku słów oceniających |
+| Logowanie z nowego urządzenia | powiadomienie i e-mail bez danych o zdrowiu; reguła (urządzenie × sieć), nie profilowanie |
 
 ## 2. RODO (2016/679) i ochrona danych
 
@@ -124,7 +131,11 @@ Elementy techniczne wspierające wymagania zarządzania ryzykiem:
 Rozporządzenie weszło w życie 26 marca 2025 r.; przepisy ogólne stosuje się od 26 marca 2027 r., a wymagania
 dla systemów EHR (zharmonizowane komponenty: interoperacyjność i rejestrowanie zdarzeń) — etapami od 2029 r.
 Projekt jest zgodny z kierunkiem rozporządzenia: dane w FHIR R4, eksport dla pacjenta, dostęp pacjenta do
-własnych danych, rejestr dostępu widoczny dla pacjenta, fasada `/fhir/R4`. ⚠️ Jeżeli produkt będzie
+własnych danych, rejestr dostępu widoczny dla pacjenta, fasada `/fhir/R4`. Raport dla lekarza jest też
+dostępny jako dokument FHIR (Bundle „document” z Composition, LOINC 60591-5 — zbliżony do podsumowania pacjenta),
+a eksport RODO obejmuje cały sejf pacjenta. Prawo sprzeciwu wobec wtórnego wykorzystania (art. 71) — rejestr
+sprzeciwów jest gotowy (zgoda `secondary-use-objection` z historią); Eternal nie udostępnia dziś danych do celów
+wtórnych. ⚠️ Jeżeli produkt będzie
 oferowany jako system EHR, konieczna będzie ocena wymagań zasadniczych (załącznik II) i europejskiego formatu
 wymiany, gdy zostanie opublikowany w aktach wykonawczych.
 
