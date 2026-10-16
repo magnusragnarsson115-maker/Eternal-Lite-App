@@ -24,6 +24,7 @@
     "screenshots": "tsx scripts/screenshots.ts",
     "screenshots:mvp": "tsx scripts/screenshots-mvp.ts",
     "preview:record": "tsx scripts/preview-record.ts",
+    "feature-map": "tsx scripts/feature-map.ts",
     "icons": "tsx scripts/icons.ts",
     "sbom": "npm sbom --sbom-format cyclonedx --omit dev > sbom.cdx.json && echo Zapisano sbom.cdx.json",
     "audit:deps": "npm audit --omit dev --audit-level high"

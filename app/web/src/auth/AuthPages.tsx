@@ -161,6 +161,9 @@ export function LoginPage({ staff }: { staff?: boolean }) {
                 </>
               )}
             </p>
+            <p className="small" style={{ margin: '8px 0 0' }}>
+              <Link to="/moduly">{t('Moduły i funkcje: co działa w aplikacji, a co jest w planie')}</Link>
+            </p>
           </Notice>
         )}
       </form>

@@ -16,6 +16,10 @@ lekarze, rejestracja, administrator). Odpowiedzi API są nagrane z instancji pok
 zwykła strona — **tylko do odczytu**: zapis kończy się komunikatem „zmiany nie są zapisywane”, pliki PDF i CSV
 otwierają się w oknie na stronie, wideo nie działa. Czas w podglądzie płynie od chwili nagrania.
 
+Ekran **„Moduły i funkcje”** (link na ekranie logowania i w menu, tylko w trybie demo) pokazuje wszystkie 42 moduły
+produktowe rejestru i 648 funkcji: co działa i gdzie to otworzyć, co jest w kolejce, czego sam kod nie zrobi i dlaczego.
+Dane pochodzą z [`FUNKCJE_648.md`](FUNKCJE_648.md) — po zmianie klasyfikacji: `npm run feature-map`.
+
 Odtworzenie po zmianach w aplikacji (instancja pokazowa uruchomiona jak w punkcie 2):
 
 ```bash

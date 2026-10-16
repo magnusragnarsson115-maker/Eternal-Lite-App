@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Activity, BookHeart, Bell, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, FolderOpen, Home, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users } from 'lucide-react';
+import { Activity, BookHeart, Bell, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, FolderOpen, Home, LayoutGrid, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users } from 'lucide-react';
 import { useEffect, type ReactNode } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { get, msSinceOwnMutation } from '../api';
@@ -130,6 +130,7 @@ export function PatientShell() {
             {!proxy && <NavItem to="/profil" icon={<User size={20} />} label={t('Profil i bezpieczeństwo')} />}
             {!proxy && <NavItem to="/bezpieczenstwo" icon={<Siren size={20} />} label={t('SOS i karta ratunkowa')} />}
             <NavItem to="/pomoc" icon={<LifeBuoy size={20} />} label={t('Pomoc · 112 · 116 123')} />
+            {config?.demoMode && <NavItem to="/moduly" icon={<LayoutGrid size={20} />} label={t('Moduły i funkcje')} />}
             <div className="side-sep" />
             <button type="button" className="btn ghost" style={{ justifyContent: 'flex-start' }} onClick={() => void logout()}>
               <LogOut size={20} /> {t('Wyloguj')}
@@ -172,7 +173,7 @@ export function PatientShell() {
 
 export function MorePage() {
   const { t } = useI18n();
-  const { me, logout, profile } = useSession();
+  const { me, config, logout, profile } = useSession();
   const own = (x: [string, ReactNode, string]) => (profile ? [] : [x]);
   const items: [string, ReactNode, string][] = [
     ['/pomoc', <LifeBuoy size={20} key="h" />, t('Pomoc · 112 · 116 123')],
@@ -194,6 +195,7 @@ export function MorePage() {
     ['/powiadomienia', <Bell size={20} key="d" />, t('Powiadomienia')],
     ['/prywatnosc', <Shield size={20} key="e" />, t('Prywatność i zgody')],
     ...own(['/profil', <User size={20} key="f" />, t('Profil i bezpieczeństwo')]),
+    ...(config?.demoMode ? ([['/moduly', <LayoutGrid size={20} key="mm" />, t('Moduły i funkcje')]] as [string, ReactNode, string][]) : []),
   ];
   return (
     <div className="stack-lg">

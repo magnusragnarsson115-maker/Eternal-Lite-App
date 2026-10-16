@@ -39,6 +39,7 @@ const MetricsPage = lazy(() => import('./staff/ClinicPages').then((m) => ({ defa
 const OrgManagePage = lazy(() => import('./staff/ClinicPages').then((m) => ({ default: m.OrgManagePage })));
 const StaffAccountPage = lazy(() => import('./staff/ClinicPages').then((m) => ({ default: m.StaffAccountPage })));
 // strony pod linkiem (bez konta) — osobny pakiet, ładowany na telefonie pacjenta
+const ModuleMapPage = lazy(() => import('./shared/ModuleMapPage').then((m) => ({ default: m.ModuleMapPage })));
 const IntakeLinkPage = lazy(() => import('./link/LinkPages').then((m) => ({ default: m.IntakeLinkPage })));
 const CardLinkPage = lazy(() => import('./link/LinkPages').then((m) => ({ default: m.CardLinkPage })));
 const PhoneRecordPage = lazy(() => import('./link/LinkPages').then((m) => ({ default: m.PhoneRecordPage })));
@@ -70,6 +71,7 @@ export function App() {
       <Route path="/nagranie/:token" element={<PhoneRecordPage />} />
       <Route path="/ratunek/:token" element={<SosCardPage />} />
       <Route path="/logowanie/link" element={<MagicLinkPage />} />
+      <Route path="/moduly" element={<ModuleMapPage />} />
 
       <Route path="/panel" element={<StaffShell />}>
         <Route index element={<StaffDashboardPage />} />

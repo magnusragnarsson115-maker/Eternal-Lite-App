@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { BarChart3, Bell, Building2, CalendarDays, CalendarRange, Inbox, LayoutDashboard, LogOut, Menu, MessageSquare, Send, Settings, Share2, UserCog, Users, X } from 'lucide-react';
+import { BarChart3, Bell, Building2, CalendarDays, CalendarRange, Inbox, LayoutDashboard, LayoutGrid, LogOut, Menu, MessageSquare, Send, Settings, Share2, UserCog, Users, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { get } from '../api';
@@ -106,6 +106,11 @@ export function StaffShell() {
             {hasRole(me, 'admin') && (
               <NavLink to="/panel/admin">
                 <Settings size={19} /> {t('Administracja')}
+              </NavLink>
+            )}
+            {config?.demoMode && (
+              <NavLink to="/moduly">
+                <LayoutGrid size={19} /> {t('Moduły i funkcje')}
               </NavLink>
             )}
             <NavLink to="/panel/konto">
