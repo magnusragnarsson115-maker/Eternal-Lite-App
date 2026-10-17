@@ -12,9 +12,11 @@ import { ReportPage } from './patient/ReportPage';
 import { SurveyPage, SurveyResponsePage, SurveysPage } from './patient/SurveyPages';
 import { FamilyPage } from './patient/FamilyPages';
 import { JournalPage } from './patient/JournalPages';
+import { WomenHealthPage } from './patient/WomenHealthPage';
 import { HistoryPage } from './patient/HistoryPages';
 import { DoctorReportPage } from './patient/DoctorReportPage';
 import { HealthCalendarPage, PlanPage } from './patient/PlanPages';
+import { OfflinePage } from './patient/OfflinePages';
 import { AiCardsPage } from './shared/SystemStatus';
 import { CardDetailPage, CardsPage, DocumentDetailPage, DocumentsPage, HelpPage, SafetyPage, SharingPage, TimelinePage } from './patient/MvpPages';
 import { lazy, Suspense } from 'react';
@@ -53,6 +55,9 @@ function AdminOnly({ children }: { children: React.ReactElement }) {
 }
 
 export function App() {
+  const { networkDown } = useSession();
+  // brak połączenia z serwerem przy starcie — kopia z urządzenia i numery alarmowe zamiast ekranu logowania
+  if (networkDown) return <OfflinePage />;
   return (
     <Suspense fallback={<Spinner />}>
     <Routes>
@@ -119,6 +124,7 @@ export function App() {
         <Route path="ankiety" element={<SurveysPage />} />
         <Route path="rodzina" element={<FamilyPage />} />
         <Route path="dzienniki" element={<JournalPage />} />
+        <Route path="zdrowie-kobiety" element={<WomenHealthPage />} />
         <Route path="historia-zdrowia" element={<HistoryPage />} />
         <Route path="dla-lekarza" element={<DoctorReportPage />} />
         <Route path="kalendarz" element={<HealthCalendarPage />} />

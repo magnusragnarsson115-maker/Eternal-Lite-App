@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarPlus, ChevronLeft, ChevronRight, Copy, Target, X } from 'lucide-react';
+import { CalendarPlus, ChevronLeft, ChevronRight, Copy, MapPin, Target, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { del, get, post } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
+import { placeUrl } from '../lib/maps';
 import { type RehabPlan, WEEKDAY_SHORT } from '../staff/RehabPanel';
 import { Button, Card, Checkbox, Empty, Notice, PageHead, QueryError, SelectField, Skeleton, TextField, useToast } from '../ui';
 
@@ -77,7 +78,7 @@ function RehabPlans() {
                     checked={i.done}
                     onChange={(e) => log.mutate({ plan: p.id, activity: i.index, day: p.today.date, done: e.target.checked })}
                     label={`${a.name}${a.dose ? ` — ${a.dose}` : ''}`}
-                    hint={a.instructions}
+                    hint={[a.instructions, a.place].filter(Boolean).join(' · ') || undefined}
                   />
                 );
               })}
@@ -100,6 +101,11 @@ function RehabPlans() {
                       {a.days.map((d) => t(WEEKDAY_SHORT[d - 1])).join(', ')}
                       {a.instructions ? ` · ${a.instructions}` : ''}
                     </span>
+                    {a.place && (
+                      <a className="list-sub" style={{ display: 'block' }} href={placeUrl(a.place)} target="_blank" rel="noopener noreferrer">
+                        <MapPin size={14} aria-hidden /> {a.place}
+                      </a>
+                    )}
                   </span>
                 </li>
               ))}

@@ -19,7 +19,7 @@ export interface RehabPlan {
   end?: string;
   author?: string;
   note?: string;
-  activities: { index: number; name: string; instructions?: string; dose?: string; days: number[] }[];
+  activities: { index: number; name: string; instructions?: string; dose?: string; place?: string; days: number[] }[];
   today: { date: string; items: { index: number; name: string; done: boolean }[] };
   adherence: { last7: { expected: number; done: number }; total: { expected: number; done: number } };
 }
@@ -30,10 +30,11 @@ interface DraftActivity {
   name: string;
   dose: string;
   instructions: string;
+  place: string;
   days: number[];
 }
 
-const empty = (): DraftActivity => ({ name: '', dose: '', instructions: '', days: [1, 3, 5] });
+const empty = (): DraftActivity => ({ name: '', dose: '', instructions: '', place: '', days: [1, 3, 5] });
 
 export function RehabPanel({ patientId }: { patientId: string }) {
   const { t, fmt } = useI18n();
@@ -46,7 +47,7 @@ export function RehabPanel({ patientId }: { patientId: string }) {
   const [note, setNote] = useState('');
   const [acts, setActs] = useState<DraftActivity[]>([empty()]);
   const create = useMutation({
-    mutationFn: () => post(`/api/staff/patients/${patientId}/rehab`, { title, start, end: end || undefined, note: note || undefined, activities: acts.map((a) => ({ name: a.name, dose: a.dose || undefined, instructions: a.instructions || undefined, days: a.days })) }),
+    mutationFn: () => post(`/api/staff/patients/${patientId}/rehab`, { title, start, end: end || undefined, note: note || undefined, activities: acts.map((a) => ({ name: a.name, dose: a.dose || undefined, instructions: a.instructions || undefined, place: a.place || undefined, days: a.days })) }),
     onSuccess: () => {
       toast(t('Plan zapisany — pacjent dostał powiadomienie.'));
       setTitle('');
@@ -79,7 +80,10 @@ export function RehabPanel({ patientId }: { patientId: string }) {
                   <span className="list-title" style={{ display: 'block' }}>
                     {a.name} {a.dose && <span className="small muted">· {a.dose}</span>}
                   </span>
-                  <span className="list-sub">{a.days.map((d) => t(WEEKDAY_SHORT[d - 1])).join(', ')}</span>
+                  <span className="list-sub">
+                    {a.days.map((d) => t(WEEKDAY_SHORT[d - 1])).join(', ')}
+                    {a.place && ` · ${a.place}`}
+                  </span>
                 </span>
               </li>
             ))}
@@ -107,6 +111,7 @@ export function RehabPanel({ patientId }: { patientId: string }) {
                 <TextField label={t('Dawka (np. 3 × 10)')} value={a.dose} onChange={(e) => setAct(i, { dose: e.target.value })} />
               </div>
               <TextArea label={t('Instrukcja dla pacjenta')} rows={2} value={a.instructions} onChange={(e) => setAct(i, { instructions: e.target.value })} />
+              <TextField label={t('Miejsce (opcjonalnie)')} hint={t('Np. „Basen miejski, ul. Sportowa 1, Kraków” — pacjent zobaczy odnośnik do mapy.')} value={a.place} onChange={(e) => setAct(i, { place: e.target.value })} />
               <div className="chips" role="group" aria-label={t('Dni tygodnia')}>
                 {WEEKDAY_SHORT.map((d, k) => {
                   const on = a.days.includes(k + 1);

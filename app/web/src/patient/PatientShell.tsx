@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { Activity, BookHeart, Bell, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, FolderOpen, Home, LayoutGrid, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users } from 'lucide-react';
+import { Activity, BookHeart, Bell, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, Flower2, FolderOpen, Home, LayoutGrid, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users } from 'lucide-react';
 import { useEffect, type ReactNode } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { get, msSinceOwnMutation } from '../api';
 import { useI18n } from '../i18n';
 import { useRealtime, type LiveEvent } from '../realtime';
 import { useSession } from '../session';
+import { OfflineBanner, useOfflineRefresh } from './OfflinePages';
 import { BrandMark, Button, DemoBanner, FullText, Notice, Spinner, useToast } from '../ui';
 import { ProfileSwitcher, ProxyBanner } from './FamilyPages';
 import { StatusBanner } from '../shared/SystemStatus';
@@ -38,6 +39,7 @@ export function PatientShell() {
   const proxy = !!profile;
   const { t } = useI18n();
   const toast = useToast();
+  useOfflineRefresh();
   const location = useLocation();
   const authed = !!me?.authenticated && !me.user?.staff && !me.mfa?.required;
   const badges = useQuery({
@@ -120,6 +122,7 @@ export function PatientShell() {
             {!proxy && <NavItem to="/ankiety" icon={<ClipboardList size={20} />} label={t('Ankiety')} />}
             <NavItem to="/leki" icon={<Pill size={20} />} label={t('Leki')} />
             <NavItem to="/dzienniki" icon={<BookHeart size={20} />} label={t('Dzienniki')} />
+            <NavItem to="/zdrowie-kobiety" icon={<Flower2 size={20} />} label={t('Zdrowie kobiety')} />
             <NavItem to="/historia-zdrowia" icon={<Syringe size={20} />} label={t('Historia zdrowia')} />
             <NavItem to="/plan" icon={<Dumbbell size={20} />} label={t('Plan i cele')} />
             <div className="side-sep" />
@@ -138,6 +141,7 @@ export function PatientShell() {
           </nav>
         </aside>
         <main className="p-main" id="main" tabIndex={-1}>
+          <OfflineBanner />
           <Outlet />
         </main>
       </div>
@@ -188,6 +192,7 @@ export function MorePage() {
     ...own(['/ankiety', <ClipboardList size={20} key="an" />, t('Ankiety')]),
     ['/leki', <Pill size={20} key="b" />, t('Leki')],
     ['/dzienniki', <BookHeart size={20} key="dz" />, t('Dzienniki')],
+    ['/zdrowie-kobiety', <Flower2 size={20} key="zk" />, t('Zdrowie kobiety')],
     ['/historia-zdrowia', <Syringe size={20} key="hz" />, t('Historia zdrowia')],
     ['/plan', <Dumbbell size={20} key="pl" />, t('Plan i cele')],
     ['/kalendarz', <CalendarRange size={20} key="ka" />, t('Kalendarz zdrowia')],

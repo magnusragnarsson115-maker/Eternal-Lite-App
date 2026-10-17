@@ -19,6 +19,11 @@ const KIND_LABEL: Record<string, string> = {
   'record-shared': 'Nowe wyniki i dokumenty od placówki',
   message: 'Wiadomości',
   'med-reminder': 'Przypomnienia o lekach',
+  'med-stock': 'Kończący się zapas leku',
+  'custom-reminder': 'Moje przypomnienia (np. światło, ćwiczenia)',
+  preventive: 'Badania profilaktyczne NFZ',
+  'morning-summary': 'Poranne podsumowanie dnia',
+  'air-alert': 'Jakość powietrza w mojej okolicy (GIOŚ)',
   'lab-flags': 'Oznaczenia laboratorium w moich dokumentach',
 };
 

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Bell, Camera, FileText, FileUp, HeartPulse, History, LifeBuoy, Phone, Plus, Share2, ShieldCheck, Siren, Trash2, X } from 'lucide-react';
+import { Bell, Camera, FileText, FileUp, HeartPulse, History, LifeBuoy, Package, Phone, Plus, Share2, ShieldCheck, Siren, Trash2, X } from 'lucide-react';
 import { useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { del, get, post, put, withProfile } from '../api';
@@ -11,6 +11,7 @@ import type { AccessEntry, CardView, GrantView, IntakeView, PublicTexts } from '
 import { TestExplanation } from '../shared/Explanations';
 import { IntakeReview, IntakeStatusBadge, KIND_PL, type FieldAction } from '../shared/IntakeReview';
 import { ReportIncidentCard } from '../shared/AccountCards';
+import { OfflineCopyCard } from './OfflinePages';
 import { useSession } from '../session';
 import { Badge, Button, Card, Checkbox, Empty, FullText, Modal, Notice, PageHead, QueryError, SelectField, Skeleton, Switch, TextArea, TextField, useConfirm, useToast } from '../ui';
 import { TrendChart } from '../ui/TrendChart';
@@ -687,6 +688,7 @@ export function SafetyPage() {
         </div>
       </Card>
       <CrisisNumbers compact />
+      <OfflineCopyCard />
     </div>
   );
 }
@@ -700,6 +702,11 @@ const KIND_LABEL: Record<string, string> = {
   'record-shared': 'Nowe wyniki i dokumenty od placówki',
   message: 'Wiadomości',
   'med-reminder': 'Przypomnienia o lekach',
+  'med-stock': 'Kończący się zapas leku',
+  'custom-reminder': 'Moje przypomnienia (np. światło, ćwiczenia)',
+  preventive: 'Badania profilaktyczne NFZ',
+  'morning-summary': 'Poranne podsumowanie dnia',
+  'air-alert': 'Jakość powietrza w mojej okolicy (GIOŚ)',
   'lab-flags': 'Oznaczenia laboratorium w moich dokumentach',
 };
 
@@ -745,7 +752,7 @@ export function NotificationPrefsCard() {
 export function MedRemindersCard({ medications }: { medications: { id: string; name: string }[] }) {
   const { t, fmt } = useI18n();
   const qc = useQueryClient();
-  const q = useQuery({ queryKey: ['med-schedules'], queryFn: () => get<{ items: { id: string; label: string; times: string[]; active: boolean; createdBy: string }[]; log: { id: string; label: string; dueAt: string; status: string }[] }>('/api/me/med-schedules') });
+  const q = useQuery({ queryKey: ['med-schedules'], queryFn: () => get<{ items: MedScheduleView[]; log: { id: string; label: string; dueAt: string; status: string }[] }>('/api/me/med-schedules') });
   const [f, setF] = useState({ medicationId: '', times: '08:00' });
   const refresh = () => void qc.invalidateQueries({ queryKey: ['med-schedules'] });
   const add = useMutation({ mutationFn: () => post('/api/me/med-schedules', { medicationId: f.medicationId || undefined, label: f.medicationId ? undefined : t('Lek'), times: f.times.split(',').map((x) => x.trim()) }), onSuccess: refresh });
@@ -782,7 +789,14 @@ export function MedRemindersCard({ medications }: { medications: { id: string; n
                 <span className="list-sub">
                   {s.times.join(', ')} {s.createdBy === 'clinic' && `· ${t('zaproponowane przez lekarza')}`}
                 </span>
+                {s.stock !== undefined && (
+                  <span className={`list-sub ${s.lowStock ? 'text-warn' : ''}`} style={{ display: 'block' }}>
+                    {s.daysLeft !== undefined ? t('Zapas: {n} szt. · na ok. {d} dni', { n: fmt.number(s.stock), d: s.daysLeft }) : t('Zapas: {n} szt.', { n: fmt.number(s.stock) })}
+                    {s.lowStock && ` · ${t('czas uzupełnić')}`}
+                  </span>
+                )}
               </span>
+              <StockButton s={s} onSaved={refresh} />
               <Switch label={s.label} checked={s.active} onChange={(v) => toggle.mutate({ id: s.id, active: v })} />
               <Button size="sm" variant="ghost" icon={<Trash2 size={14} />} aria-label={t('Usuń')} onClick={() => remove.mutate(s.id)} />
             </li>
@@ -805,6 +819,60 @@ export function MedRemindersCard({ medications }: { medications: { id: string; n
         </Button>
       </div>
     </Card>
+  );
+}
+
+interface MedScheduleView {
+  id: string;
+  label: string;
+  times: string[];
+  active: boolean;
+  createdBy: string;
+  stock?: number;
+  perDose: number;
+  daysLeft?: number;
+  lowStock: boolean;
+}
+
+/** A14.3: liczba sztuk w opakowaniu; po każdym „Przyjęty” ubywa jedna dawka. Aplikacja nie zmienia dawkowania. */
+function StockButton({ s, onSaved }: { s: MedScheduleView; onSaved: () => void }) {
+  const { t } = useI18n();
+  const [open, setOpen] = useState(false);
+  const [f, setF] = useState({ stock: s.stock === undefined ? '' : String(s.stock), perDose: String(s.perDose) });
+  const num = (v: string) => Number(v.replace(',', '.'));
+  const save = useMutation({
+    mutationFn: (stock: number | null) => put(`/api/me/med-schedules/${s.id}/stock`, { stock, perDose: num(f.perDose) || undefined }),
+    onSuccess: () => {
+      onSaved();
+      setOpen(false);
+    },
+  });
+  return (
+    <>
+      <Button size="sm" variant="ghost" icon={<Package size={14} />} aria-label={t('Zapas leku')} onClick={() => setOpen(true)} />
+      <Modal open={open} onClose={() => setOpen(false)} title={t('Zapas: {name}', { name: s.label })}>
+        <div className="stack">
+          <p className="small muted" style={{ margin: 0 }}>
+            {t('Wpisz, ile sztuk masz teraz. Po każdym potwierdzeniu „Przyjęty” aplikacja odejmie jedną dawkę i przypomni raz, gdy zapasu zostanie na mniej niż {d} dni.', { d: 7 })}
+          </p>
+          <div className="grid-2">
+            <TextField label={t('Sztuk w zapasie')} inputMode="decimal" value={f.stock} onChange={(e) => setF({ ...f, stock: e.target.value })} />
+            <TextField label={t('Sztuk na jedną dawkę')} inputMode="decimal" value={f.perDose} onChange={(e) => setF({ ...f, perDose: e.target.value })} hint={t('Tak jak zalecił lekarz')} />
+          </div>
+          {save.isError && <Notice kind="danger">{errorMessage(save.error, t)}</Notice>}
+          <div className="btn-row">
+            <Button loading={save.isPending} disabled={f.stock.trim() === '' || Number.isNaN(num(f.stock))} onClick={() => save.mutate(num(f.stock))}>
+              {t('Zapisz')}
+            </Button>
+            {s.stock !== undefined && (
+              <Button variant="ghost" onClick={() => save.mutate(null)}>
+                {t('Nie liczę zapasu')}
+              </Button>
+            )}
+          </div>
+        </div>
+      </Modal>
+    </>
   );
 }
 

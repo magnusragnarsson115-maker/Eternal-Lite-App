@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline/promises';
 import { verifyAuditChain } from './audit.js';
@@ -14,6 +15,9 @@ import { createOrganization, listOrganizations } from './services/orgs.js';
 import { readiness } from './services/readiness.js';
 import { closePdfBrowser } from './pdf/render.js';
 import { approveExplanations, explanationsReviewMarkdown } from './labs/explanations.js';
+import { approvePreventive, preventiveReviewMarkdown } from './content/preventive.js';
+import { importPharmaciesCsv, importRefundCsv } from './integrations/registries.js';
+import { importIcd10Csv } from './services/diagnoses.js';
 
 const USAGE = `Eternal — narzędzia administracyjne
 
@@ -37,6 +41,13 @@ const USAGE = `Eternal — narzędzia administracyjne
   npm run cli -- explanations-review                      objaśnienia badań do przeglądu przez lekarza (Markdown na wyjście)
   npm run cli -- approve-explanations "<lek. Imię Nazwisko, PWZ>"
                                                           zatwierdzenie bieżącej treści objaśnień (A2.4); po zmianie treści ponownie
+  npm run cli -- preventive-review                        programy profilaktyczne NFZ do przeglądu przez lekarza (Markdown)
+  npm run cli -- approve-preventive "<lek. Imię Nazwisko, PWZ>"
+                                                          zatwierdzenie treści programów profilaktycznych (A7.7)
+  npm run cli -- import-icd10 <plik.csv>                  słownik ICD-10 (kolumny: kod, nazwa) do wyboru rozpoznań (A12.6)
+  npm run cli -- import-pharmacies <plik.csv>             Rejestr Aptek — eksport CSV z rejestrymedyczne.ezdrowie.gov.pl (F7.1)
+  npm run cli -- import-refund <plik.csv> [--list A1] [--title "…"] [--valid-from RRRR-MM-DD] [--append]
+                                                          wykaz leków refundowanych z obwieszczenia MZ, arkusz zapisany jako CSV (F7.7)
 `;
 
 /** Wartość opcji `--nazwa wartość` (albo undefined). */
@@ -157,6 +168,37 @@ Sekret TOTP kont personelu w trybie demo: ${DEMO_TOTP_SECRET} (dodaj w aplikacji
       console.log(`Import RPL z: ${source}`);
       const r = await importRpl(source);
       console.log(`Zaimportowano ${r.imported} produktów leczniczych.`);
+      break;
+    }
+    case 'preventive-review': {
+      console.log(preventiveReviewMarkdown());
+      break;
+    }
+    case 'approve-preventive': {
+      const [by] = positional(args);
+      const a = approvePreventive({ display: `CLI: ${by ?? ''}` }, by ?? '');
+      console.log(`Zatwierdzono programy profilaktyczne ${a.version} (skrót ${a.hash}) — ${a.approvedBy}, ${a.approvedAt}.`);
+      break;
+    }
+    case 'import-icd10': {
+      const [file] = positional(args);
+      if (!file) throw new Error('Podaj plik CSV ze słownikiem ICD-10.');
+      const r = importIcd10Csv(fs.readFileSync(file, 'utf8'));
+      console.log(`Zaimportowano ${r.imported} kodów ICD-10 (pominięto ${r.skipped} wierszy).`);
+      break;
+    }
+    case 'import-pharmacies': {
+      const [file] = positional(args);
+      if (!file) throw new Error('Podaj plik CSV z Rejestru Aptek.');
+      const r = importPharmaciesCsv(fs.readFileSync(file, 'utf8'));
+      console.log(`Zaimportowano ${r.imported} aptek (ze współrzędnymi: ${r.withCoordinates}; pominięto ${r.skipped} — m.in. wykreślone i zawieszone).`);
+      break;
+    }
+    case 'import-refund': {
+      const [file] = positional(args);
+      if (!file) throw new Error('Podaj plik CSV z wykazem leków refundowanych.');
+      const r = importRefundCsv(fs.readFileSync(file, 'utf8'), { list: opt(args, 'list'), title: opt(args, 'title'), validFrom: opt(args, 'valid-from'), append: args.includes('--append') });
+      console.log(`Zaimportowano ${r.imported} pozycji wykazu${opt(args, 'list') ? ` ${opt(args, 'list')}` : ''} (pominięto ${r.skipped}).`);
       break;
     }
     case 'explanations-review': {

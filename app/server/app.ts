@@ -18,6 +18,7 @@ import { reportError, SECURITY_POLICY, securityTxt } from './lib/monitoring.js';
 import { adminRoutes } from './routes/admin.js';
 import { authRoutes } from './routes/auth.js';
 import { eventRoutes } from './routes/events.js';
+import { everydayRoutes } from './routes/everyday.js';
 import { familyRoutes } from './routes/family.js';
 import { healthRoutes } from './routes/health.js';
 import { fhirRoutes } from './routes/fhir.js';
@@ -178,6 +179,7 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
   await app.register(patientRoutes);
   await app.register(familyRoutes);
   await app.register(healthRoutes);
+  await app.register(everydayRoutes);
   await app.register(staffRoutes);
   await app.register(adminRoutes);
   await app.register(fhirRoutes);

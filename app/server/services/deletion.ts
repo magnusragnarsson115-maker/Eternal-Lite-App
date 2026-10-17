@@ -97,6 +97,8 @@ async function erasePatientData(actor: AuditActor, patientRef: string): Promise<
   const m = await expungeAll([...obs, ...meds]);
   transaction(db, () => {
     db.prepare('DELETE FROM med_schedule WHERE patient_ref = ?').run(patientRef);
+    db.prepare('DELETE FROM custom_reminder WHERE patient_ref = ?').run(patientRef);
+    db.prepare('DELETE FROM preventive_status WHERE patient_ref = ?').run(patientRef);
     db.prepare('DELETE FROM emergency_contact WHERE patient_ref = ?').run(patientRef);
     db.prepare('DELETE FROM setting WHERE key = ?').run(`emergency:${patientRef}`);
   });

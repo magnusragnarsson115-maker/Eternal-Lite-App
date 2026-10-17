@@ -631,6 +631,83 @@ const MIGRATIONS: string[] = [
     PRIMARY KEY (user_id, device_hash)
   );
   `,
+  // 15 — runda 4: zapas leków (A14.3), własne przypomnienia (F9.11, A7.7), rejestr aptek (F7.1, F7.2),
+  // wykaz leków refundowanych z obwieszczenia MZ (F7.7), stan badań profilaktycznych wpisany przez pacjenta (A7.7), słownik ICD-10 z importu (A12.6)
+  `
+  ALTER TABLE med_schedule ADD COLUMN stock REAL;
+  ALTER TABLE med_schedule ADD COLUMN per_dose REAL NOT NULL DEFAULT 1;
+  ALTER TABLE med_schedule ADD COLUMN low_notified_at TEXT;
+  CREATE TABLE custom_reminder (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    times TEXT NOT NULL,
+    days TEXT NOT NULL,
+    active INTEGER NOT NULL DEFAULT 1,
+    place TEXT,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX custom_reminder_patient ON custom_reminder(patient_ref, active);
+  CREATE TABLE custom_reminder_sent (
+    reminder_id TEXT NOT NULL REFERENCES custom_reminder(id) ON DELETE CASCADE,
+    due_at TEXT NOT NULL,
+    PRIMARY KEY (reminder_id, due_at)
+  );
+  CREATE TABLE pharmacy (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    kind TEXT,
+    street TEXT,
+    postcode TEXT,
+    city TEXT,
+    voivodeship TEXT,
+    phone TEXT,
+    hours TEXT,
+    lat REAL,
+    lon REAL,
+    status TEXT,
+    search_text TEXT NOT NULL
+  );
+  CREATE INDEX pharmacy_city ON pharmacy(city);
+  CREATE TABLE refund_item (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    gtin TEXT,
+    substance TEXT,
+    name TEXT NOT NULL,
+    pack TEXT,
+    limit_group TEXT,
+    retail_price TEXT,
+    limit_amount TEXT,
+    indications TEXT,
+    offlabel TEXT,
+    payment_level TEXT,
+    copay TEXT,
+    list TEXT,
+    search_text TEXT NOT NULL
+  );
+  CREATE INDEX refund_item_gtin ON refund_item(gtin);
+  CREATE TABLE refund_meta (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
+  CREATE TABLE preventive_status (
+    patient_ref TEXT NOT NULL,
+    program TEXT NOT NULL,
+    last_done TEXT,
+    variant TEXT,
+    remind INTEGER NOT NULL DEFAULT 0,
+    notified_for TEXT,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (patient_ref, program)
+  );
+  CREATE TABLE icd10_code (
+    code TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    search_text TEXT NOT NULL
+  );
+  `,
 ];
 
 export type Db = DatabaseSync;

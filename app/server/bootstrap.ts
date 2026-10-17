@@ -12,6 +12,8 @@ import { runMissingDocsSweep } from './services/inbox.js';
 import { purgeRecordings } from './services/scribe.js';
 import { runMonthlyReports } from './services/reports.js';
 import { runMedReminderSweep } from './services/medReminders.js';
+import { runAirAlertSweep } from './services/environment.js';
+import { runCustomReminderSweep, runMorningSweep, runPreventiveSweep } from './services/personalReminders.js';
 
 export async function initCore(): Promise<void> {
   initDatabase(path.join(config.dataDir, 'eternal.sqlite'));
@@ -46,6 +48,10 @@ export function startJobs(log: (msg: string, err?: unknown) => void): () => void
     every(60 * 60_000, 'recording purge', purgeRecordings),
     every(60 * 60_000, 'monthly pilot report', runMonthlyReports),
     every(60_000, 'medication reminders', runMedReminderSweep),
+    every(60_000, 'custom reminders', runCustomReminderSweep),
+    every(60_000, 'morning summary', runMorningSweep),
+    every(60 * 60_000, 'preventive reminders', runPreventiveSweep),
+    every(60 * 60_000, 'air quality alerts', runAirAlertSweep),
     setInterval(() => void runReminderSweep().catch((err) => log('reminder sweep failed', err)), 60_000),
     setInterval(() => void processOutbox().catch((err) => log('outbox failed', err)), 30_000),
     setInterval(() => {

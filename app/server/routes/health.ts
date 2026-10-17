@@ -28,7 +28,30 @@ import {
   setDirective,
   VACCINES,
 } from '../services/healthHistory.js';
-import { addJournalEntry, BREATHING_PATTERNS, JOURNAL_KINDS, listJournal, MOOD_TAGS, PAIN_CHARACTER, PAIN_REGIONS, retractJournalEntry } from '../services/journal.js';
+import { foodByBarcode, searchFood } from '../integrations/openfoodfacts.js';
+import { offlinePack } from '../services/offline.js';
+import {
+  addJournalEntry,
+  ADL_FILLED_BY,
+  ADL_ITEMS,
+  ADL_LEVELS,
+  BREATHING_PATTERNS,
+  CYCLE_FLOW,
+  CYCLE_SYMPTOMS,
+  cycleHistory,
+  FEEDING_SIDES,
+  foodByDay,
+  IADL_ITEMS,
+  JOURNAL_KINDS,
+  listJournal,
+  MEALS,
+  MENOPAUSE_SYMPTOMS,
+  MOOD_TAGS,
+  PAIN_CHARACTER,
+  PAIN_REGIONS,
+  POSTPARTUM_SYMPTOMS,
+  retractJournalEntry,
+} from '../services/journal.js';
 
 /**
  * Funkcje zdrowotne pacjenta dodane w rundzie „aplikacja w całości”: dzienniki (F8.2, F8.14, A21.3, A8.6),
@@ -51,6 +74,43 @@ const JournalSchema = z.discriminatedUnion('kind', [
     note: z.string().max(500).optional(),
   }),
   z.object({ kind: z.literal('breathing'), at: zIso.optional(), minutes: z.number().positive().max(60), pattern: z.enum(BREATHING_PATTERNS) }),
+  z.object({ kind: z.literal('cycle'), date: zDate, flow: z.enum(CYCLE_FLOW), symptoms: z.array(z.enum(CYCLE_SYMPTOMS)).max(8).optional(), note: z.string().max(500).optional() }),
+  z.object({
+    kind: z.literal('postpartum'),
+    at: zIso.optional(),
+    symptoms: z.array(z.enum(POSTPARTUM_SYMPTOMS)).max(8).optional(),
+    feeding: z.object({ side: z.enum(FEEDING_SIDES), minutes: z.number().positive().max(180).optional() }).optional(),
+    note: z.string().max(500).optional(),
+  }),
+  z.object({ kind: z.literal('menopause'), at: zIso.optional(), symptoms: z.partialRecord(z.enum(MENOPAUSE_SYMPTOMS), z.number().int().min(0).max(3)), note: z.string().max(500).optional() }),
+  z.object({
+    kind: z.literal('food'),
+    at: zIso.optional(),
+    meal: z.enum(MEALS),
+    items: z
+      .array(
+        z.object({
+          name: z.string().min(1).max(120),
+          grams: z.number().positive().max(3000),
+          kcal100: z.number().min(0).max(1000).optional(),
+          protein100: z.number().min(0).max(100).optional(),
+          fat100: z.number().min(0).max(100).optional(),
+          carbs100: z.number().min(0).max(100).optional(),
+          barcode: z.string().regex(/^\d{8,14}$/).optional(),
+          source: z.enum(['manual', 'openfoodfacts']).optional(),
+        }),
+      )
+      .min(1)
+      .max(30),
+    note: z.string().max(500).optional(),
+  }),
+  z.object({
+    kind: z.literal('adl'),
+    at: zIso.optional(),
+    answers: z.partialRecord(z.enum([...ADL_ITEMS, ...IADL_ITEMS]), z.enum(ADL_LEVELS)),
+    filledBy: z.enum(ADL_FILLED_BY),
+    note: z.string().max(500).optional(),
+  }),
 ]);
 
 export async function healthRoutes(app: FastifyInstance): Promise<void> {
@@ -65,6 +125,35 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
     const auth = patient(req, 'patient-journal');
     const q = query(req, z.object({ kind: z.enum(JOURNAL_KINDS).optional(), days: z.coerce.number().int().min(1).max(730).default(90) }));
     return { items: await listJournal(auth.patientRef, q.kind, q.days) };
+  });
+
+  // kopia na wypadek braku internetu (A5.12, A24.6, S4.4) — każdy odczyt w dzienniku dostępu
+  app.get('/api/me/offline-pack', async (req, reply) => {
+    const auth = patient(req, 'patient-offline');
+    reply.header('Cache-Control', 'no-store');
+    return offlinePack(actorOf(req), auth.patientRef);
+  });
+
+  // historia cyklu bez prognoz (A21.2) i sumy żywienia dzień po dniu (F11.4, F11.5)
+  app.get('/api/me/journal/overview', async (req) => {
+    const auth = patient(req, 'patient-journal');
+    const q = query(req, z.object({ kind: z.enum(['cycle', 'food']), days: z.coerce.number().int().min(7).max(730).default(365) }));
+    const entries = await listJournal(auth.patientRef, q.kind, q.days);
+    if (q.kind === 'cycle') return { cycle: cycleHistory(entries, new Date().toISOString().slice(0, 10)) };
+    return { days: foodByDay(entries).slice(0, 60) };
+  });
+
+  // Open Food Facts (F11.3): kod kreskowy albo nazwa produktu — bez danych pacjenta
+  app.get('/api/food/product/:barcode', async (req) => {
+    patient(req, 'patient-journal');
+    const { barcode } = params(req, z.object({ barcode: z.string().regex(/^\d{8,14}$/) }));
+    return foodByBarcode(barcode);
+  });
+
+  app.get('/api/food/search', async (req) => {
+    patient(req, 'patient-journal');
+    const q = query(req, z.object({ q: z.string().min(3).max(80) }));
+    return searchFood(q.q);
   });
 
   app.post('/api/me/journal', async (req) => {
@@ -250,7 +339,7 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
   });
 
   // --- plan rehabilitacji z kontrolą wykonania (A22.4) ------------------------------------------------------------------
-  const ActivitySchema = z.object({ name: z.string().max(120), instructions: z.string().max(1000).optional(), dose: z.string().max(80).optional(), days: z.array(z.number().int().min(1).max(7)).min(1).max(7) });
+  const ActivitySchema = z.object({ name: z.string().max(120), instructions: z.string().max(1000).optional(), dose: z.string().max(80).optional(), place: z.string().max(160).optional(), days: z.array(z.number().int().min(1).max(7)).min(1).max(7) });
 
   app.get('/api/me/rehab', async (req) => {
     const auth = patient(req, 'patient-goals');

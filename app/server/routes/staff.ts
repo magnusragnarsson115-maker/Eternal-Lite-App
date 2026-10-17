@@ -9,7 +9,8 @@ import { idFromRef } from '../fhir/repository.js';
 import { teleWindowOpen } from '../integrations/jitsi.js';
 import { admit, doctorEnter, endTele, waitingRoom } from '../services/tele.js';
 import { currentOrgId } from '../tenancy.js';
-import { searchIcd10, searchIcd11, searchLoinc } from '../integrations/terminology.js';
+import { searchIcd11, searchLoinc } from '../integrations/terminology.js';
+import { searchDiagnosisCodes } from '../services/diagnoses.js';
 import { body, IdParams, params, query, zDate, zId, zIso } from '../lib/http.js';
 import { addDays, localDate, zonedToUtc } from '../lib/time.js';
 import { badRequest, conflict, forbidden, notFound } from '../lib/util.js';
@@ -444,7 +445,7 @@ export async function staffRoutes(app: FastifyInstance): Promise<void> {
     const { system } = params(req, z.object({ system: z.enum(['loinc', 'icd10', 'icd11']) }));
     const { q } = query(req, z.object({ q: z.string().max(80) }));
     if (system === 'loinc') return searchLoinc(q);
-    if (system === 'icd10') return searchIcd10(q);
+    if (system === 'icd10') return searchDiagnosisCodes(q);
     return searchIcd11(q);
   });
 

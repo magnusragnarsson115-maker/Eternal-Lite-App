@@ -134,6 +134,11 @@ export const config = {
     nfz: bool('NFZ_API_ENABLED', true),
     nlm: bool('NLM_API_ENABLED', true),
     hibp: bool('HIBP_ENABLED', true),
+    /** Open Food Facts (baza produktów spożywczych, dane otwarte ODbL) — dziennik żywienia F11.3. */
+    openFoodFacts: bool('OFF_API_ENABLED', true),
+    /** GIOŚ — jakość powietrza (API v1) i IMGW — dane synoptyczne; bez klucza (F5.1, F5.2). */
+    gios: bool('GIOS_API_ENABLED', true),
+    imgw: bool('IMGW_API_ENABLED', true),
     timeoutMs: int('PUBLIC_API_TIMEOUT_MS', 8000),
   },
 

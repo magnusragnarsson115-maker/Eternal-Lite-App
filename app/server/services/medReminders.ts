@@ -11,7 +11,13 @@ import { notifyPatient } from './notifications.js';
  * Przypomnienia o lekach (Specyfikacja 10, D7 MVP-1): harmonogram z listy leków pacjenta i godzin, które
  * ustawia pacjent (albo lekarz w porozumieniu z pacjentem), potwierdzenie przyjęcia. Aplikacja nie ustala dawek
  * ani nie sprawdza interakcji. Treść push bez nazwy leku (ekran blokady).
+ *
+ * Zapas opakowania (A14.3): pacjent wpisuje, ile sztuk ma i ile bierze na raz; „przyjęte” zmniejsza zapas, a gdy
+ * zostaje na mniej niż {@link LOW_STOCK_DAYS} dni według jego własnego harmonogramu — jedno przypomnienie
+ * o uzupełnieniu (zwykłe dzielenie, bez porad).
  */
+
+export const LOW_STOCK_DAYS = 7;
 
 export interface MedSchedule {
   id: string;
@@ -21,6 +27,12 @@ export interface MedSchedule {
   days: number[];
   active: boolean;
   createdBy: 'patient' | 'clinic';
+  /** Sztuki w opakowaniu (wpisane przez pacjenta) i liczba sztuk na jedno przyjęcie. */
+  stock?: number;
+  perDose: number;
+  /** Na ile dni starczy zapas przy tym harmonogramie. */
+  daysLeft?: number;
+  lowStock: boolean;
 }
 
 interface ScheduleRow {
@@ -33,18 +45,47 @@ interface ScheduleRow {
   active: number;
   created_by: string | null;
   created_at: string;
+  stock: number | null;
+  per_dose: number | null;
+  low_notified_at: string | null;
+}
+
+/** Dni zapasu: sztuki / (przyjęcia w tygodniu × sztuki na przyjęcie / 7), w dół. */
+export function stockDaysLeft(stock: number, perDose: number, times: number, daysPerWeek: number): number {
+  const perDay = (times * daysPerWeek * perDose) / 7;
+  return perDay > 0 ? Math.floor(stock / perDay) : Infinity;
 }
 
 function toView(r: ScheduleRow): MedSchedule {
+  const times = JSON.parse(r.times) as string[];
+  const days = JSON.parse(r.days) as number[];
+  const perDose = r.per_dose ?? 1;
+  const daysLeft = r.stock === null || r.stock === undefined ? undefined : stockDaysLeft(r.stock, perDose, times.length, days.length);
   return {
     id: r.id,
     medicationId: r.medication_ref?.split('/')[1],
     label: r.label,
-    times: JSON.parse(r.times) as string[],
-    days: JSON.parse(r.days) as number[],
+    times,
+    days,
     active: !!r.active,
     createdBy: r.created_by === 'clinic' ? 'clinic' : 'patient',
+    stock: r.stock ?? undefined,
+    perDose,
+    daysLeft: daysLeft === Infinity ? undefined : daysLeft,
+    lowStock: daysLeft !== undefined && daysLeft < LOW_STOCK_DAYS,
   };
+}
+
+/** Zapas opakowania (A14.3) — wpis pacjenta; uzupełnienie zapasu kasuje znacznik wysłanego przypomnienia. */
+export function setScheduleStock(actor: AuditActor, patientRef: string, id: string, input: { stock: number | null; perDose?: number }): MedSchedule[] {
+  if (input.stock !== null && !(input.stock >= 0 && input.stock <= 10_000)) throw badRequest('invalid_value');
+  if (input.perDose !== undefined && !(input.perDose > 0 && input.perDose <= 20)) throw badRequest('invalid_value');
+  const res = getDb()
+    .prepare('UPDATE med_schedule SET stock = ?, per_dose = COALESCE(?, per_dose), low_notified_at = NULL WHERE id = ? AND patient_ref = ?')
+    .run(input.stock, input.perDose ?? null, id, patientRef);
+  if (!res.changes) throw notFound('schedule_not_found');
+  audit(actor, { action: 'U', subtype: 'med-stock-update', patientRef });
+  return listSchedules(patientRef);
 }
 
 export function listSchedules(patientRef: string): MedSchedule[] {
@@ -115,6 +156,12 @@ export function confirmIntake(actor: AuditActor, patientRef: string, id: string,
     .prepare('UPDATE med_intake SET status = ?, confirmed_at = ? WHERE id = ? AND schedule_id IN (SELECT id FROM med_schedule WHERE patient_ref = ?)')
     .run(status, nowIso(), id, patientRef);
   if (!res.changes) throw notFound('intake_not_found');
+  if (status === 'taken') {
+    // zapas maleje o sztuki na jedno przyjęcie (nie poniżej zera); tylko gdy pacjent prowadzi zapas
+    getDb()
+      .prepare('UPDATE med_schedule SET stock = MAX(0, stock - per_dose) WHERE stock IS NOT NULL AND id = (SELECT schedule_id FROM med_intake WHERE id = ?)')
+      .run(id);
+  }
   audit(actor, { action: 'U', subtype: `med-intake-${status}`, patientRef });
   return listIntakeLog(patientRef);
 }
@@ -152,5 +199,21 @@ export async function runMedReminderSweep(now = new Date()): Promise<number> {
     }
   }
   getDb().prepare("UPDATE med_intake SET status = 'missed' WHERE status = 'due' AND due_at < ?").run(new Date(now.getTime() - 3 * 3_600_000).toISOString());
+  // A14.3 — jedno przypomnienie o kończącym się zapasie (bez nazwy leku poza aplikacją)
+  for (const r of rows) {
+    if (r.stock === null || r.low_notified_at) continue;
+    const v = toView(r);
+    if (!v.lowStock) continue;
+    getDb().prepare('UPDATE med_schedule SET low_notified_at = ? WHERE id = ?').run(now.toISOString(), r.id);
+    await notifyPatient(r.patient_ref, {
+      kind: 'med-stock',
+      title: `Kończy się zapas: ${r.label}`,
+      body: `Według Twojego harmonogramu zostało na ok. ${v.daysLeft} dni. Uzupełnij zapas albo zaktualizuj liczbę sztuk w aplikacji.`,
+      link: '/leki',
+      pushTitle: 'Eternal',
+      pushBody: 'Sprawdź zapas leków w aplikacji.',
+    });
+    sent++;
+  }
   return sent;
 }

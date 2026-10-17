@@ -22,6 +22,8 @@ export interface RehabActivityInput {
   name: string;
   instructions?: string;
   dose?: string;
+  /** Miejsce ćwiczeń (A7.8), np. „Basen miejski, ul. Sportowa 1” — z odnośnikiem do mapy w aplikacji. */
+  place?: string;
   days: number[];
 }
 
@@ -33,7 +35,7 @@ export interface RehabPlanView {
   end?: string;
   author?: string;
   note?: string;
-  activities: { index: number; name: string; instructions?: string; dose?: string; days: number[] }[];
+  activities: { index: number; name: string; instructions?: string; dose?: string; place?: string; days: number[] }[];
   today: { date: string; items: { index: number; name: string; done: boolean }[] };
   adherence: { last7: { expected: number; done: number }; total: { expected: number; done: number } };
 }
@@ -66,6 +68,7 @@ export function toRehabView(p: CarePlan, tz: string, now: Date = new Date()): Re
     name: a.detail?.code?.text ?? '',
     instructions: a.detail?.description,
     dose: a.detail?.extension?.find((e) => e.url === DOSE_EXT)?.valueString,
+    place: a.detail?.location?.display,
     days: toDays(a),
   }));
   const start = p.period?.start ?? today;
@@ -125,6 +128,7 @@ export async function createRehabPlan(
         description: a.instructions?.trim().slice(0, 1000) || undefined,
         scheduledTiming: { repeat: { frequency: 1, period: 1, periodUnit: 'd', dayOfWeek: [...new Set(a.days)].sort().map((d) => DAY_CODES[d - 1]) } },
         extension: a.dose?.trim() ? [{ url: DOSE_EXT, valueString: a.dose.trim().slice(0, 80) }] : undefined,
+        location: a.place?.trim() ? { display: a.place.trim().slice(0, 160) } : undefined,
       },
     })),
     extension: [{ url: 'urn:eternal:ext:template-version', valueString: REHAB_VERSION }],

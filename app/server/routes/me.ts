@@ -15,7 +15,7 @@ import { renderPdf } from '../pdf/render.js';
 import { confirmationHtml, deleteMyData } from '../services/deletion.js';
 import { createGrant, listGrantsForPatient, revokeGrant, type GrantScope } from '../services/grants.js';
 import { getIntake, intakeFile, KIND_LABEL, listIntake, reviewIntake, submitIntake, toIntakeView, uploadIntake, type IntakeContext } from '../services/intake.js';
-import { confirmIntake, createSchedule, deleteSchedule, listIntakeLog, listSchedules, setScheduleActive } from '../services/medReminders.js';
+import { confirmIntake, createSchedule, deleteSchedule, listIntakeLog, listSchedules, setScheduleActive, setScheduleStock } from '../services/medReminders.js';
 import { getNotifyPrefs, NOTIFY_KINDS, savePushSubscription, setNotifyPrefs } from '../services/notifications.js';
 import { commitImport, previewImport } from '../services/measurementImport.js';
 import { correctMeasurement, observationVersions } from '../services/observations.js';
@@ -429,6 +429,13 @@ export async function meRoutes(app: FastifyInstance): Promise<void> {
     const { id } = params(req, z.object({ id: z.string().uuid() }));
     const { active } = body(req, z.object({ active: z.boolean() }));
     return { items: setScheduleActive(actorOf(req), auth.patientRef, id, active) };
+  });
+
+  app.put('/api/me/med-schedules/:id/stock', async (req) => {
+    const auth = patient(req);
+    const { id } = params(req, z.object({ id: z.string().uuid() }));
+    const input = body(req, z.object({ stock: z.number().min(0).max(10_000).nullable(), perDose: z.number().positive().max(20).optional() }));
+    return { items: setScheduleStock(actorOf(req), auth.patientRef, id, input) };
   });
 
   app.delete('/api/me/med-schedules/:id', async (req) => {

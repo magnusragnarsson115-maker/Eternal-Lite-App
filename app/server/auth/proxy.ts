@@ -129,6 +129,11 @@ const PROXY_PREFIXES = [
   '/api/me/doctor-report',
   '/api/me/travel-card',
   '/api/me/fhir-bundle',
+  '/api/food',
+  '/api/me/offline-pack',
+  '/api/me/custom-reminders',
+  '/api/me/day-plan',
+  '/api/me/preventive',
 ];
 
 /** Decyzje osobiste osoby dorosłej (dane profilu, zgody, udostępnienia) zmienia tylko ona — albo opiekun profilu prowadzonego. */

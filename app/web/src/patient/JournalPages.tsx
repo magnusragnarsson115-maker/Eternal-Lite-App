@@ -7,6 +7,7 @@ import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import { Button, Card, Empty, FullText, Notice, PageHead, QueryError, Segmented, Skeleton, Tabs, TextArea, TextField, useToast } from '../ui';
 import { TrendChart } from '../ui/TrendChart';
+import { AdlTab, FoodTab } from './FoodDiary';
 import { CrisisModal, CrisisNumbers } from './MvpPages';
 
 /**
@@ -15,7 +16,26 @@ import { CrisisModal, CrisisNumbers } from './MvpPages';
  * kryzysowe w notatce otwierają okno z numerami (F8.1). Nic nie jest wysyłane do placówki.
  */
 
-type Kind = 'mood' | 'sleep' | 'pain' | 'breathing';
+export type Kind = 'mood' | 'sleep' | 'pain' | 'breathing' | 'cycle' | 'postpartum' | 'menopause' | 'food' | 'adl';
+
+export interface FoodItem {
+  name: string;
+  grams: number;
+  kcal100?: number;
+  protein100?: number;
+  fat100?: number;
+  carbs100?: number;
+  barcode?: string;
+  source?: 'manual' | 'openfoodfacts';
+}
+
+export interface FoodTotals {
+  kcal: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+  incomplete: number;
+}
 
 export interface JournalEntry {
   id: string;
@@ -26,6 +46,11 @@ export interface JournalEntry {
   sleep?: { date: string; bedtime: string; wake: string; hours: number; quality: number; awakenings?: number };
   pain?: { intensity: number; regions: string[]; character: string[] };
   breathing?: { minutes: number; pattern: string };
+  cycle?: { date: string; flow: string; symptoms: string[] };
+  postpartum?: { symptoms: string[]; feeding?: { side: string; minutes?: number } };
+  menopause?: { symptoms: Record<string, number> };
+  food?: { meal: string; items: FoodItem[]; totals: FoodTotals };
+  adl?: { answers: Record<string, string>; filledBy: string };
   note?: string;
 }
 
@@ -77,11 +102,11 @@ const PATTERNS: Record<string, { label: string; phases: [string, number][] }> = 
   calm: { label: 'Spokojny oddech 4-6', phases: [['Wdech', 4], ['Wydech', 6]] },
 };
 
-function useJournal(kind: Kind) {
+export function useJournal(kind: Kind) {
   return useQuery({ queryKey: ['journal', kind], queryFn: () => get<{ items: JournalEntry[] }>(`/api/me/journal?kind=${kind}&days=90`) });
 }
 
-function useAdd(kind: Kind, onCrisis: () => void) {
+export function useAdd(kind: Kind, onCrisis: () => void) {
   const qc = useQueryClient();
   const toast = useToast();
   const { t } = useI18n();
@@ -89,13 +114,14 @@ function useAdd(kind: Kind, onCrisis: () => void) {
     mutationFn: (body: Record<string, unknown>) => post<{ entry: JournalEntry; crisis?: boolean }>('/api/me/journal', { kind, ...body }),
     onSuccess: (r) => {
       void qc.invalidateQueries({ queryKey: ['journal', kind] });
+      void qc.invalidateQueries({ queryKey: ['journal-overview', kind] });
       if (r.crisis) onCrisis();
       else toast(t('Zapisano wpis.'));
     },
   });
 }
 
-function Scale({ from, to, value, onChange, label }: { from: number; to: number; value?: number; onChange: (v: number) => void; label: string }) {
+export function Scale({ from, to, value, onChange, label }: { from: number; to: number; value?: number; onChange: (v: number) => void; label: string }) {
   const values = Array.from({ length: to - from + 1 }, (_, i) => from + i);
   return (
     <div className="scale" role="radiogroup" aria-label={label}>
@@ -108,7 +134,7 @@ function Scale({ from, to, value, onChange, label }: { from: number; to: number;
   );
 }
 
-function ChipToggle({ options, value, onChange, label }: { options: Record<string, string>; value: string[]; onChange: (v: string[]) => void; label: string }) {
+export function ChipToggle({ options, value, onChange, label }: { options: Record<string, string>; value: string[]; onChange: (v: string[]) => void; label: string }) {
   const { t } = useI18n();
   return (
     <div className="chips" role="group" aria-label={label}>
@@ -124,12 +150,15 @@ function ChipToggle({ options, value, onChange, label }: { options: Record<strin
   );
 }
 
-function History({ kind, items, render }: { kind: Kind; items: JournalEntry[]; render: (e: JournalEntry) => string }) {
+export function History({ kind, items, render }: { kind: Kind; items: JournalEntry[]; render: (e: JournalEntry) => string }) {
   const { t, fmt } = useI18n();
   const qc = useQueryClient();
   const remove = useMutation({
     mutationFn: (id: string) => del(`/api/me/journal/${id}`),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ['journal', kind] }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['journal', kind] });
+      void qc.invalidateQueries({ queryKey: ['journal-overview', kind] });
+    },
   });
   if (!items.length) return <Empty title={t('Brak wpisów z ostatnich 90 dni')} />;
   return (
@@ -199,7 +228,7 @@ function MoodTab({ onCrisis }: { onCrisis: () => void }) {
   );
 }
 
-const todayLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+export const todayLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
 
 function SleepTab() {
   const { t, fmt } = useI18n();
@@ -421,7 +450,7 @@ export function JournalPage() {
   const [crisis, setCrisis] = useState(false);
   return (
     <div className="stack-lg">
-      <PageHead title={t('Dzienniki')} sub={t('Samopoczucie, sen, ból i chwila na oddech. Zapisujesz dla siebie — lekarz zobaczy wpisy tylko wtedy, gdy udostępnisz mu dane.')} />
+      <PageHead title={t('Dzienniki')} sub={t('Samopoczucie, sen, ból, oddech, żywienie i czynności dnia. Zapisujesz dla siebie — lekarz zobaczy wpisy tylko wtedy, gdy udostępnisz mu dane.')} />
       <CrisisModal open={crisis} onClose={() => setCrisis(false)} />
       <Tabs
         label={t('Rodzaj dziennika')}
@@ -432,12 +461,16 @@ export function JournalPage() {
           { value: 'sleep', label: t('Sen') },
           { value: 'pain', label: t('Ból') },
           { value: 'breathing', label: t('Oddech') },
+          { value: 'food', label: t('Żywienie') },
+          { value: 'adl', label: t('Czynności dnia') },
         ]}
       />
       {tab === 'mood' && <MoodTab onCrisis={() => setCrisis(true)} />}
       {tab === 'sleep' && <SleepTab />}
       {tab === 'pain' && <PainTab />}
       {tab === 'breathing' && <BreathingTab />}
+      {tab === 'food' && <FoodTab />}
+      {tab === 'adl' && <AdlTab />}
     </div>
   );
 }

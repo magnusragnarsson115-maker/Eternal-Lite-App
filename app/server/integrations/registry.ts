@@ -3,6 +3,8 @@ import { fhir } from '../fhir/index.js';
 import { emailConfigured, smsConfigured, verifyEmailTransport } from './channels.js';
 import { nfzHealth } from './nfz.js';
 import { medicinalProductCount } from './rpl.js';
+import { pharmacyCount, refundCount } from './registries.js';
+import { importedIcd10Count } from '../services/diagnoses.js';
 import { rpmProviders } from './rpm.js';
 import { icd11Configured, searchLoinc } from './terminology.js';
 import { withingsConfigured } from './withings.js';
@@ -53,6 +55,66 @@ function base(): IntegrationInfo[] {
       purpose: 'Słownik leków dopuszczonych do obrotu w Polsce (lista leków pacjenta). Import oficjalnego eksportu XML.',
       config: 'npm run cli -- import-rpl [plik|URL]',
       docs: 'https://rejestrymedyczne.ezdrowie.gov.pl/rpl/search/public',
+    },
+    {
+      id: 'rejestr-aptek',
+      name: 'Rejestr Aptek (CeZ)',
+      category: 'public-data',
+      cost: 'free',
+      status: pharmacyCount().total ? 'active' : 'not-configured',
+      purpose: 'Wyszukiwarka aptek i punktów aptecznych z trasą w mapie (F7.1, F7.2, F7.4). Import eksportu CSV; zapytania pacjentów nie wychodzą poza serwer.',
+      config: 'npm run cli -- import-pharmacies <plik.csv>',
+      docs: 'https://rejestrymedyczne.ezdrowie.gov.pl/ra/search/public',
+    },
+    {
+      id: 'obwieszczenie-refundacyjne',
+      name: 'Wykaz leków refundowanych (obwieszczenie Ministra Zdrowia)',
+      category: 'public-data',
+      cost: 'free',
+      status: refundCount() ? 'active' : 'not-configured',
+      purpose: 'Informacja o refundacji: grupa limitowa, poziom odpłatności, dopłata, zakres wskazań (F7.7). Arkusz z obwieszczenia zapisany jako CSV.',
+      config: 'npm run cli -- import-refund <plik.csv> --list A1 --title "…" --valid-from RRRR-MM-DD',
+      docs: 'https://www.gov.pl/web/zdrowie/obwieszczenia-ministra-zdrowia-lista-lekow-refundowanych',
+    },
+    {
+      id: 'icd10-pl',
+      name: 'Klasyfikacja ICD-10 (wydanie polskie)',
+      category: 'terminology',
+      cost: 'free',
+      status: importedIcd10Count() ? 'active' : 'not-configured',
+      purpose: 'Słownik rozpoznań do wyboru przez lekarza (A12.6). Bez importu — lista najczęstszych kodów wbudowana w aplikację.',
+      config: 'npm run cli -- import-icd10 <plik.csv>',
+      docs: 'https://www.cez.gov.pl/',
+    },
+    {
+      id: 'open-food-facts',
+      name: 'Open Food Facts',
+      category: 'public-data',
+      cost: 'free',
+      status: config.publicApis.openFoodFacts ? 'active' : 'disabled',
+      purpose: 'Skład i wartości odżywcze produktów po kodzie kreskowym lub nazwie (F11.3). Wysyłany jest tylko kod albo nazwa produktu.',
+      config: 'OFF_API_ENABLED',
+      docs: 'https://openfoodfacts.github.io/openfoodfacts-server/api/',
+    },
+    {
+      id: 'gios-air',
+      name: 'GIOŚ — jakość powietrza',
+      category: 'public-data',
+      cost: 'free',
+      status: config.publicApis.gios ? 'active' : 'disabled',
+      purpose: 'Indeks jakości powietrza z najbliższej stacji (F5.1, A3.6). Wysyłany jest tylko numer stacji, bez położenia pacjenta.',
+      config: 'GIOS_API_ENABLED',
+      docs: 'https://powietrze.gios.gov.pl/pjp/content/api',
+    },
+    {
+      id: 'imgw-weather',
+      name: 'IMGW-PIB — dane synoptyczne',
+      category: 'public-data',
+      cost: 'free',
+      status: config.publicApis.imgw ? 'active' : 'disabled',
+      purpose: 'Temperatura, wilgotność, ciśnienie i wiatr ze stacji synoptycznej (F5.2). Tylko informacja, bez porad.',
+      config: 'IMGW_API_ENABLED',
+      docs: 'https://danepubliczne.imgw.pl/',
     },
     {
       id: 'nlm-clinical-tables',

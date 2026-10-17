@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
-import { get, post, put, setApiProfile, setCsrfToken, setOnAuthLost } from './api';
+import { ApiError, get, post, put, setApiProfile, setCsrfToken, setOnAuthLost } from './api';
+import { clearOffline } from './lib/offline';
 import { applyA11y, loadLocalA11y, watchSystemContrast, type A11yPrefs } from './lib/a11y';
 import { setClinicTimezone, useI18n } from './i18n';
 import type { FamilyProfile, FamilyData } from './mvp-types';
@@ -21,6 +22,8 @@ interface Session {
   /** Profil, w którym działa opiekun; undefined — własny. */
   profile: FamilyProfile | undefined;
   switchProfile: (id: string | undefined) => void;
+  /** Serwer nieosiągalny (brak internetu) — aplikacja pokazuje kopię offline (A5.12). */
+  networkDown: boolean;
 }
 
 const PROFILE_KEY = 'eternal.profile';
@@ -126,6 +129,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       setCsrfToken(undefined);
       setApiProfile(undefined);
       setProfileId(undefined);
+      // kopia offline należy do zalogowanej osoby — nie zostaje na urządzeniu po wylogowaniu
+      clearOffline();
       try {
         sessionStorage.removeItem(PROFILE_KEY);
       } catch {
@@ -137,7 +142,22 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [qc]);
 
   return (
-    <Ctx.Provider value={{ me: meQ.data, config: cfgQ.data, loading: meQ.isLoading || cfgQ.isLoading, refresh: () => meQ.refetch(), setMe, logout, a11y, saveA11y, profiles, profile, switchProfile }}>
+    <Ctx.Provider
+      value={{
+        me: meQ.data,
+        config: cfgQ.data,
+        loading: meQ.isLoading || cfgQ.isLoading,
+        refresh: () => meQ.refetch(),
+        setMe,
+        logout,
+        a11y,
+        saveA11y,
+        profiles,
+        profile,
+        switchProfile,
+        networkDown: !meQ.data && meQ.error instanceof ApiError && meQ.error.status === 0,
+      }}
+    >
       {children}
     </Ctx.Provider>
   );

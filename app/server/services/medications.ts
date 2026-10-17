@@ -2,6 +2,7 @@ import type { MedicationStatement } from '@medplum/fhirtypes';
 import { audit, type AuditActor } from '../audit.js';
 import { bus } from '../events.js';
 import { fhir } from '../fhir/index.js';
+import { productAtc } from '../integrations/rpl.js';
 import { badRequest, notFound, nowIso } from '../lib/util.js';
 
 /**
@@ -10,11 +11,14 @@ import { badRequest, notFound, nowIso } from '../lib/util.js';
  */
 
 export const RPL_SYSTEM = 'urn:eternal:rpl-product-id';
+export const ATC_SYSTEM = 'http://www.whocc.no/atc';
 
 export interface MedicationView {
   id: string;
   name: string;
   rplId?: string;
+  /** Kod ATC (klasyfikacja WHO) z Rejestru Produktów Leczniczych — F3.11. */
+  atc?: string;
   dosage?: string;
   since?: string;
   status: MedicationStatement['status'];
@@ -22,10 +26,12 @@ export interface MedicationView {
 }
 
 function toView(m: MedicationStatement): MedicationView {
+  const rplId = m.medicationCodeableConcept?.coding?.find((c) => c.system === RPL_SYSTEM)?.code;
   return {
     id: m.id ?? '',
     name: m.medicationCodeableConcept?.text ?? m.medicationCodeableConcept?.coding?.[0]?.display ?? '',
-    rplId: m.medicationCodeableConcept?.coding?.find((c) => c.system === RPL_SYSTEM)?.code,
+    rplId,
+    atc: m.medicationCodeableConcept?.coding?.find((c) => c.system === ATC_SYSTEM)?.code ?? (rplId ? productAtc(rplId)?.atc : undefined),
     dosage: m.dosage?.[0]?.text,
     since: m.effectivePeriod?.start,
     status: m.status,
@@ -36,6 +42,11 @@ function toView(m: MedicationStatement): MedicationView {
 export async function listMedications(patientRef: string, includeStopped = false): Promise<MedicationView[]> {
   const items = await fhir().search<MedicationStatement>('MedicationStatement', { subject: patientRef, _sort: '-_lastUpdated' });
   return items.map(toView).filter((m) => m.status !== 'entered-in-error' && (includeStopped || m.status === 'active'));
+}
+
+function atcCoding(rplId: string): { system: string; code: string }[] {
+  const atc = productAtc(rplId)?.atc;
+  return atc ? [{ system: ATC_SYSTEM, code: atc }] : [];
 }
 
 export async function addMedication(
@@ -51,7 +62,7 @@ export async function addMedication(
     status: 'active',
     medicationCodeableConcept: {
       text: name,
-      coding: input.rplId ? [{ system: RPL_SYSTEM, code: input.rplId, display: name }] : undefined,
+      coding: input.rplId ? [{ system: RPL_SYSTEM, code: input.rplId, display: name }, ...atcCoding(input.rplId)] : undefined,
     },
     subject: { reference: patientRef },
     informationSource: { reference: patientRef },

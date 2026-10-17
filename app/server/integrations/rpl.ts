@@ -174,3 +174,9 @@ export function searchMedicinalProducts(term: string, limit = 20): MedicinalProd
 export function medicinalProductCount(): number {
   return (getDb().prepare('SELECT COUNT(*) AS n FROM medicinal_product').get() as { n: number }).n;
 }
+
+/** Kod ATC i nazwa powszechna produktu z lokalnej kopii RPL (F3.11) — klasyfikacja WHO, bez oceny leczenia. */
+export function productAtc(id: string): { atc?: string; commonName?: string } | undefined {
+  const r = getDb().prepare('SELECT atc, common_name FROM medicinal_product WHERE id = ?').get(id) as { atc: string | null; common_name: string | null } | undefined;
+  return r ? { atc: r.atc ?? undefined, commonName: r.common_name ?? undefined } : undefined;
+}

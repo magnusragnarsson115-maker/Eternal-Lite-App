@@ -43,10 +43,10 @@ const MAX_ATTEMPTS = 5;
 
 // --- preferencje powiadomień i godziny ciszy (P8: A3.4, A14.2) ------------------------------------------
 
-export const NOTIFY_KINDS = ['appointment-reminder', 'docs-request', 'after-visit-card', 'record-shared', 'message', 'med-reminder', 'lab-flags'] as const;
+export const NOTIFY_KINDS = ['appointment-reminder', 'docs-request', 'after-visit-card', 'record-shared', 'message', 'med-reminder', 'med-stock', 'custom-reminder', 'preventive', 'morning-summary', 'air-alert', 'lab-flags'] as const;
 /** Zawsze dostarczane (bezpieczeństwo konta, SOS) — bez wyłączania i bez godzin ciszy. */
 const ALWAYS = new Set(['security', 'sos']);
-const IGNORE_QUIET = new Set(['security', 'sos', 'med-reminder']);
+const IGNORE_QUIET = new Set(['security', 'sos', 'med-reminder', 'custom-reminder']);
 
 export interface NotifyPrefs {
   disabled: string[];

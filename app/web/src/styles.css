@@ -111,6 +111,7 @@ a { color: var(--primary); text-underline-offset: 2px; }
 a:hover { color: var(--primary-hover); }
 small, .small { font-size: 0.875rem; }
 .muted { color: var(--muted); }
+.text-warn { color: var(--warning); }
 .mono { font-family: var(--mono); font-size: 0.9em; }
 .nowrap { white-space: nowrap; }
 .tabular { font-variant-numeric: tabular-nums; }

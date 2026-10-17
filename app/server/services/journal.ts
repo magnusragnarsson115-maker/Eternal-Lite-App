@@ -9,14 +9,18 @@ import { crisisMentioned } from './safety.js';
 
 /**
  * Dzienniki pacjenta (F8.2/A8.1 nastrój, F8.14/F9.13 sen i sny, A21.3/A22.3 mapa i skala bólu, A8.6 ćwiczenia
- * oddechowe). Zapis tego, co pacjent sam ocenił — bez interpretacji, bez wniosków i bez alarmów dla placówki.
+ * oddechowe, A21.2 cykl, A21.4 połóg i karmienie, A21.5 menopauza, F11.1/F11.4/F11.5 żywienie, A22.2 czynności dnia
+ * codziennego). Zapis tego, co pacjent sam ocenił — bez interpretacji, bez wniosków i bez alarmów dla placówki.
+ * Cykl: bez prognoz (dni płodne i termin następnej miesiączki to już wyrób medyczny). Czynności dnia (Katz, Lawton):
+ * same odpowiedzi, bez sumy punktów — punktację i ocenę robi lekarz. Żywienie: suma kalorii i makroskładników
+ * z wartości z etykiety albo Open Food Facts — zwykłe dodawanie, bez zaleceń.
  * Wpisy leżą w sejfie pacjenta (lekarz widzi je tylko po udostępnieniu). Wyjątek bezpieczeństwa (F8.1): bardzo niski
  * nastrój albo słowa kryzysowe w notatce → aplikacja od razu pokazuje numery pomocy, niczego nie wysyła.
  */
 
 export const JOURNAL_SYSTEM = 'urn:eternal:journal';
 export const JOURNAL_TAG = { system: JOURNAL_SYSTEM, code: 'patient-journal', display: 'Dziennik pacjenta (samoocena)' };
-export const JOURNAL_KINDS = ['mood', 'sleep', 'pain', 'breathing'] as const;
+export const JOURNAL_KINDS = ['mood', 'sleep', 'pain', 'breathing', 'cycle', 'postpartum', 'menopause', 'food', 'adl'] as const;
 export type JournalKind = (typeof JOURNAL_KINDS)[number];
 
 export const MOOD_TAGS = ['work', 'family', 'sleep', 'health', 'movement', 'weather', 'money', 'loneliness'] as const;
@@ -43,19 +47,67 @@ export const PAIN_REGIONS = [
 ] as const;
 export const PAIN_CHARACTER = ['stabbing', 'burning', 'dull', 'throbbing', 'radiating', 'cramping'] as const;
 export const BREATHING_PATTERNS = ['box', '4-7-8', 'calm'] as const;
+export const CYCLE_FLOW = ['none', 'spotting', 'light', 'medium', 'heavy'] as const;
+export const CYCLE_SYMPTOMS = ['cramps', 'headache', 'breast-tenderness', 'bloating', 'acne', 'mood-changes', 'fatigue', 'back-pain'] as const;
+export const POSTPARTUM_SYMPTOMS = ['bleeding', 'breast-pain', 'perineal-pain', 'fatigue', 'low-mood', 'anxiety', 'sleep-problems', 'headache'] as const;
+export const FEEDING_SIDES = ['left', 'right', 'both', 'bottle'] as const;
+export const MENOPAUSE_SYMPTOMS = ['hot-flashes', 'night-sweats', 'sleep-problems', 'mood-changes', 'joint-pain', 'palpitations', 'headache', 'dryness'] as const;
+export const MEALS = ['breakfast', 'second-breakfast', 'lunch', 'dinner', 'snack'] as const;
+/** Katz (ADL) i Lawton (IADL) — pytania bez punktacji. */
+export const ADL_ITEMS = ['bathing', 'dressing', 'toileting', 'transferring', 'continence', 'feeding'] as const;
+export const IADL_ITEMS = ['telephone', 'shopping', 'cooking', 'housekeeping', 'laundry', 'transport', 'medications', 'finances'] as const;
+export const ADL_LEVELS = ['independent', 'assisted', 'unable'] as const;
+export const ADL_FILLED_BY = ['self', 'caregiver', 'together'] as const;
+
+export interface FoodItem {
+  name: string;
+  grams: number;
+  /** wartości na 100 g — z etykiety albo z Open Food Facts */
+  kcal100?: number;
+  protein100?: number;
+  fat100?: number;
+  carbs100?: number;
+  barcode?: string;
+  source?: 'manual' | 'openfoodfacts';
+}
+
+export interface FoodTotals {
+  kcal: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+  /** Pozycje bez wartości odżywczych — suma ich nie obejmuje. */
+  incomplete: number;
+}
 
 const CODE: Record<JournalKind, { code: string; display: string; loinc?: { code: string; display: string } }> = {
   mood: { code: 'mood', display: 'Samopoczucie (samoocena 1–10)' },
   sleep: { code: 'sleep', display: 'Sen (dziennik)', loinc: { code: '93832-4', display: 'Sleep duration' } },
   pain: { code: 'pain', display: 'Ból (samoocena 0–10)', loinc: { code: '72514-3', display: 'Pain severity - 0-10 verbal numeric rating [Score] - Reported' } },
   breathing: { code: 'breathing', display: 'Ćwiczenie oddechowe' },
+  cycle: { code: 'cycle', display: 'Dziennik cyklu (samoobserwacja)', loinc: { code: '49033-4', display: 'Menstrual history' } },
+  postpartum: { code: 'postpartum', display: 'Dziennik połogu i karmienia' },
+  menopause: { code: 'menopause', display: 'Dziennik objawów okołomenopauzalnych' },
+  food: { code: 'food', display: 'Dziennik żywienia', loinc: { code: '9052-2', display: 'Calorie intake total' } },
+  adl: { code: 'adl', display: 'Czynności dnia codziennego (Katz, Lawton) — odpowiedzi bez punktacji' },
 };
 
 export type JournalInput =
   | { kind: 'mood'; at?: string; mood: number; tags?: (typeof MOOD_TAGS)[number][]; note?: string }
   | { kind: 'sleep'; date: string; bedtime: string; wake: string; quality: number; awakenings?: number; note?: string }
   | { kind: 'pain'; at?: string; intensity: number; regions: (typeof PAIN_REGIONS)[number][]; character?: (typeof PAIN_CHARACTER)[number][]; note?: string }
-  | { kind: 'breathing'; at?: string; minutes: number; pattern: (typeof BREATHING_PATTERNS)[number] };
+  | { kind: 'breathing'; at?: string; minutes: number; pattern: (typeof BREATHING_PATTERNS)[number] }
+  | { kind: 'cycle'; date: string; flow: (typeof CYCLE_FLOW)[number]; symptoms?: (typeof CYCLE_SYMPTOMS)[number][]; note?: string }
+  | { kind: 'postpartum'; at?: string; symptoms?: (typeof POSTPARTUM_SYMPTOMS)[number][]; feeding?: { side: (typeof FEEDING_SIDES)[number]; minutes?: number }; note?: string }
+  | { kind: 'menopause'; at?: string; symptoms: Partial<Record<(typeof MENOPAUSE_SYMPTOMS)[number], number>>; note?: string }
+  | { kind: 'food'; at?: string; meal: (typeof MEALS)[number]; items: FoodItem[]; note?: string }
+  | {
+      kind: 'adl';
+      at?: string;
+      answers: Partial<Record<(typeof ADL_ITEMS)[number] | (typeof IADL_ITEMS)[number], (typeof ADL_LEVELS)[number]>>;
+      filledBy: (typeof ADL_FILLED_BY)[number];
+      note?: string;
+    };
 
 export interface JournalEntry {
   id: string;
@@ -66,6 +118,11 @@ export interface JournalEntry {
   sleep?: { date: string; bedtime: string; wake: string; hours: number; quality: number; awakenings?: number };
   pain?: { intensity: number; regions: string[]; character: string[] };
   breathing?: { minutes: number; pattern: string };
+  cycle?: { date: string; flow: string; symptoms: string[] };
+  postpartum?: { symptoms: string[]; feeding?: { side: string; minutes?: number } };
+  menopause?: { symptoms: Record<string, number> };
+  food?: { meal: string; items: FoodItem[]; totals: FoodTotals };
+  adl?: { answers: Record<string, string>; filledBy: string };
   note?: string;
 }
 
@@ -109,7 +166,78 @@ export function toJournalEntry(o: Observation): JournalEntry | undefined {
       };
     case 'breathing':
       return { ...base, breathing: { minutes: o.valueQuantity?.value ?? 0, pattern: compOf(o, 'pattern')[0]?.valueString ?? '' } };
+    case 'cycle':
+      return {
+        ...base,
+        cycle: { date: compOf(o, 'day')[0]?.valueString ?? base.at.slice(0, 10), flow: compOf(o, 'flow')[0]?.valueString ?? 'none', symptoms: compOf(o, 'symptom').map((c) => c.valueString ?? '') },
+      };
+    case 'postpartum': {
+      const side = compOf(o, 'feeding-side')[0]?.valueString;
+      const minutes = compOf(o, 'feeding-minutes')[0]?.valueQuantity?.value;
+      return { ...base, postpartum: { symptoms: compOf(o, 'symptom').map((c) => c.valueString ?? ''), feeding: side ? { side, minutes } : undefined } };
+    }
+    case 'menopause':
+      return { ...base, menopause: { symptoms: Object.fromEntries(compOf(o, 'symptom').map((c) => [c.valueCodeableConcept?.text ?? '', c.valueInteger ?? 0]).filter(([k]) => k)) } };
+    case 'food': {
+      const items = compOf(o, 'item')
+        .map((c) => {
+          try {
+            return JSON.parse(c.valueString ?? '') as FoodItem;
+          } catch {
+            return undefined;
+          }
+        })
+        .filter((x): x is FoodItem => !!x);
+      return { ...base, food: { meal: compOf(o, 'meal')[0]?.valueString ?? '', items, totals: foodTotals(items) } };
+    }
+    case 'adl':
+      return {
+        ...base,
+        adl: { answers: Object.fromEntries(compOf(o, 'activity').map((c) => [c.valueCodeableConcept?.text ?? '', c.valueString ?? '']).filter(([k]) => k)), filledBy: compOf(o, 'filled-by')[0]?.valueString ?? '' },
+      };
   }
+}
+
+const round1 = (x: number) => Math.round(x * 10) / 10;
+
+/** Suma z wartości na 100 g — pozycje bez kalorii liczą się jako „niepełne”, nie jako zero. */
+export function foodTotals(items: FoodItem[]): FoodTotals {
+  const t = { kcal: 0, protein: 0, fat: 0, carbs: 0, incomplete: 0 };
+  for (const i of items) {
+    const f = i.grams / 100;
+    if (i.kcal100 === undefined) t.incomplete += 1;
+    t.kcal += (i.kcal100 ?? 0) * f;
+    t.protein += (i.protein100 ?? 0) * f;
+    t.fat += (i.fat100 ?? 0) * f;
+    t.carbs += (i.carbs100 ?? 0) * f;
+  }
+  return { kcal: Math.round(t.kcal), protein: round1(t.protein), fat: round1(t.fat), carbs: round1(t.carbs), incomplete: t.incomplete };
+}
+
+/** Suma dnia z wpisów żywienia (data lokalna z pola „at” w strefie placówki — tu: pierwsze 10 znaków ISO). */
+export function foodByDay(entries: JournalEntry[]): { date: string; totals: FoodTotals; meals: number }[] {
+  const days = new Map<string, FoodItem[][]>();
+  for (const e of entries) if (e.kind === 'food' && e.food) days.set(e.at.slice(0, 10), [...(days.get(e.at.slice(0, 10)) ?? []), e.food.items]);
+  return [...days.entries()].map(([date, meals]) => ({ date, totals: foodTotals(meals.flat()), meals: meals.length })).sort((a, b) => b.date.localeCompare(a.date));
+}
+
+/**
+ * Historia cyklu z zapisów — bez prognoz: początki miesiączek (pierwszy dzień krwawienia po co najmniej 10 dniach
+ * bez krwawienia), dzień obecnego cyklu i długości poprzednich cykli jako zwykłe różnice dat.
+ */
+export function cycleHistory(entries: JournalEntry[], today: string): { starts: string[]; currentDay?: number; lengths: number[] } {
+  const bleeding = [...new Set(entries.filter((e) => e.kind === 'cycle' && e.cycle && ['light', 'medium', 'heavy'].includes(e.cycle.flow)).map((e) => e.cycle!.date))].sort();
+  const dayNo = (d: string) => Math.round(Date.parse(`${d}T12:00:00Z`) / 86_400_000);
+  const starts: string[] = [];
+  let prev: string | undefined;
+  for (const d of bleeding) {
+    // nowa miesiączka = krwawienie po co najmniej 10 dniach przerwy od poprzedniego dnia z krwawieniem
+    if (!prev || dayNo(d) - dayNo(prev) >= 10) starts.push(d);
+    prev = d;
+  }
+  const lengths = starts.slice(1).map((s, i) => dayNo(s) - dayNo(starts[i]));
+  const last = starts[starts.length - 1];
+  return { starts, currentDay: last && dayNo(today) >= dayNo(last) ? dayNo(today) - dayNo(last) + 1 : undefined, lengths };
 }
 
 function minutesOf(hhmm: string): number {
@@ -202,6 +330,86 @@ function build(patientRef: string, input: JournalInput, now: Date): Observation 
         effectiveDateTime: checkAt(input.at, now),
         valueQuantity: { value: Math.round(input.minutes * 10) / 10, unit: 'min', system: 'http://unitsofmeasure.org', code: 'min' },
         component: [comp('pattern', { valueString: input.pattern })],
+      };
+    }
+    case 'cycle': {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(input.date)) throw badRequest('invalid_date');
+      if (input.date > now.toISOString().slice(0, 10)) throw badRequest('date_in_future');
+      if (!(CYCLE_FLOW as readonly string[]).includes(input.flow)) throw badRequest('invalid_value');
+      const note = cleanNote(input.note, 500);
+      return {
+        ...base,
+        effectiveDateTime: `${input.date}T12:00:00Z`,
+        component: [
+          comp('day', { valueString: input.date }),
+          comp('flow', { valueString: input.flow }),
+          ...[...new Set(input.symptoms ?? [])].filter((x) => (CYCLE_SYMPTOMS as readonly string[]).includes(x)).map((x) => comp('symptom', { valueString: x })),
+        ],
+        note: note ? [{ text: note }] : undefined,
+      };
+    }
+    case 'postpartum': {
+      const symptoms = [...new Set(input.symptoms ?? [])].filter((x) => (POSTPARTUM_SYMPTOMS as readonly string[]).includes(x));
+      const note = cleanNote(input.note, 500);
+      if (input.feeding && !(FEEDING_SIDES as readonly string[]).includes(input.feeding.side)) throw badRequest('invalid_value');
+      if (input.feeding?.minutes !== undefined && !(input.feeding.minutes > 0 && input.feeding.minutes <= 180)) throw badRequest('invalid_value');
+      if (!symptoms.length && !input.feeding && !note) throw badRequest('entry_empty');
+      return {
+        ...base,
+        effectiveDateTime: checkAt(input.at, now),
+        component: [
+          ...symptoms.map((x) => comp('symptom', { valueString: x })),
+          ...(input.feeding ? [comp('feeding-side', { valueString: input.feeding.side })] : []),
+          ...(input.feeding?.minutes !== undefined ? [comp('feeding-minutes', { valueQuantity: { value: input.feeding.minutes, unit: 'min', system: 'http://unitsofmeasure.org', code: 'min' } })] : []),
+        ],
+        note: note ? [{ text: note }] : undefined,
+      };
+    }
+    case 'menopause': {
+      const entries = Object.entries(input.symptoms ?? {}).filter(([k, v]) => (MENOPAUSE_SYMPTOMS as readonly string[]).includes(k) && v !== undefined);
+      for (const [, v] of entries) if (!Number.isInteger(v) || (v as number) < 0 || (v as number) > 3) throw badRequest('invalid_value');
+      const nonZero = entries.filter(([, v]) => (v as number) > 0);
+      const note = cleanNote(input.note, 500);
+      if (!nonZero.length && !note) throw badRequest('entry_empty');
+      return {
+        ...base,
+        effectiveDateTime: checkAt(input.at, now),
+        component: nonZero.map(([k, v]) => comp('symptom', { valueCodeableConcept: { text: k }, valueInteger: v as number })),
+        note: note ? [{ text: note }] : undefined,
+      };
+    }
+    case 'food': {
+      if (!(MEALS as readonly string[]).includes(input.meal)) throw badRequest('invalid_value');
+      if (!input.items.length || input.items.length > 30) throw badRequest('invalid_value');
+      const items: FoodItem[] = input.items.map((i) => {
+        const name = i.name.trim().slice(0, 120);
+        if (!name || !(i.grams > 0 && i.grams <= 3000)) throw badRequest('invalid_value');
+        for (const v of [i.kcal100, i.protein100, i.fat100, i.carbs100]) if (v !== undefined && !(v >= 0 && v <= 1000)) throw badRequest('invalid_value');
+        if (i.barcode !== undefined && !/^\d{8,14}$/.test(i.barcode)) throw badRequest('invalid_value');
+        return { name, grams: round1(i.grams), kcal100: i.kcal100, protein100: i.protein100, fat100: i.fat100, carbs100: i.carbs100, barcode: i.barcode, source: i.source === 'openfoodfacts' ? 'openfoodfacts' : 'manual' };
+      });
+      const totals = foodTotals(items);
+      const note = cleanNote(input.note, 500);
+      return {
+        ...base,
+        effectiveDateTime: checkAt(input.at, now),
+        valueQuantity: { value: totals.kcal, unit: 'kcal', system: 'http://unitsofmeasure.org', code: 'kcal' },
+        component: [comp('meal', { valueString: input.meal }), ...items.map((i) => comp('item', { valueString: JSON.stringify(i) }))],
+        note: note ? [{ text: note }] : undefined,
+      };
+    }
+    case 'adl': {
+      const allowed = [...ADL_ITEMS, ...IADL_ITEMS] as readonly string[];
+      const answers = Object.entries(input.answers ?? {}).filter(([k, v]) => allowed.includes(k) && v !== undefined);
+      if (!answers.length) throw badRequest('entry_empty');
+      for (const [, v] of answers) if (!(ADL_LEVELS as readonly string[]).includes(v as string)) throw badRequest('invalid_value');
+      if (!(ADL_FILLED_BY as readonly string[]).includes(input.filledBy)) throw badRequest('invalid_value');
+      const note = cleanNote(input.note, 500);
+      return {
+        ...base,
+        effectiveDateTime: checkAt(input.at, now),
+        component: [comp('filled-by', { valueString: input.filledBy }), ...answers.map(([k, v]) => comp('activity', { valueCodeableConcept: { text: k }, valueString: v as string }))],
+        note: note ? [{ text: note }] : undefined,
       };
     }
   }

@@ -5,6 +5,9 @@ import { sttMode } from '../ai/stt.js';
 import { oidcEnabled } from '../auth/oidc.js';
 import { config } from '../config.js';
 import { currentApproval, EXPLANATIONS_VERSION } from '../labs/explanations.js';
+import { PREVENTIVE_VERSION, preventiveApproval } from '../content/preventive.js';
+import { pharmacyCount, registryMeta } from '../integrations/registries.js';
+import { ICD10_COMMON, importedIcd10Count } from './diagnoses.js';
 import { fhirSystem } from '../fhir/index.js';
 import { emailConfigured, smsConfigured, verifyEmailTransport } from '../integrations/channels.js';
 import { monitoringEnabled } from '../lib/monitoring.js';
@@ -73,6 +76,42 @@ function items(): ReadinessItem[] {
     state: expl ? 'ok' : 'warn',
     detail: expl ? `wersja ${EXPLANATIONS_VERSION}, zatwierdził(a): ${expl.approvedBy}, ${expl.approvedAt.slice(0, 10)}` : `wersja ${EXPLANATIONS_VERSION} czeka na zatwierdzenie przez lekarza — pacjenci jej nie widzą${config.demoMode ? ' (w trybie demo widoczna jako projekt)' : ''}`,
     howTo: expl ? undefined : 'Lekarz przegląda opisy (npm run cli -- explanations-review > objasnienia.md) i zatwierdza: npm run cli -- approve-explanations "lek. Imię Nazwisko, PWZ 0000000"',
+  });
+  const prev = preventiveApproval();
+  add({
+    id: 'preventive',
+    group: 'Treści',
+    name: 'Programy profilaktyczne NFZ (A7.7)',
+    state: prev ? 'ok' : 'warn',
+    detail: prev ? `wersja ${PREVENTIVE_VERSION}, zatwierdził(a): ${prev.approvedBy}, ${prev.approvedAt.slice(0, 10)}` : `wersja ${PREVENTIVE_VERSION} czeka na zatwierdzenie przez lekarza — pacjenci jej nie widzą${config.demoMode ? ' (w trybie demo widoczna jako projekt)' : ''}`,
+    howTo: prev ? undefined : 'Lekarz przegląda (npm run cli -- preventive-review > profilaktyka.md), sprawdza z pacjent.gov.pl i zatwierdza: npm run cli -- approve-preventive "lek. Imię Nazwisko, PWZ 0000000"',
+  });
+  const icd = importedIcd10Count();
+  add({
+    id: 'icd10',
+    group: 'Treści',
+    name: 'Słownik ICD-10 do rozpoznań (A12.6)',
+    state: icd ? 'ok' : 'warn',
+    detail: icd ? `${icd} kodów z importu` : `lista ${ICD10_COMMON.length} najczęstszych kodów wbudowana w aplikację`,
+    howTo: icd ? undefined : 'Pełny słownik: npm run cli -- import-icd10 <plik.csv> (kolumny: kod, nazwa)',
+  });
+  const ph = pharmacyCount();
+  add({
+    id: 'pharmacies',
+    group: 'Rejestry publiczne',
+    name: 'Rejestr Aptek (F7.1)',
+    state: ph.total ? 'ok' : 'missing',
+    detail: ph.total ? `${ph.total} aptek, ze współrzędnymi: ${ph.withCoordinates}` : 'nie zaimportowano — wyszukiwarka aptek pusta',
+    howTo: ph.total ? undefined : 'Pobierz eksport CSV z rejestrymedyczne.ezdrowie.gov.pl (Rejestr Aptek) i: npm run cli -- import-pharmacies <plik.csv>',
+  });
+  const rf = registryMeta('refund');
+  add({
+    id: 'refund',
+    group: 'Rejestry publiczne',
+    name: 'Wykaz leków refundowanych (F7.7)',
+    state: rf?.count ? 'ok' : 'missing',
+    detail: rf?.count ? `${rf.count} pozycji${rf.title ? ` — ${rf.title}` : ''}${rf.validFrom ? `, od ${rf.validFrom}` : ''}` : 'nie zaimportowano — informacja o refundacji niedostępna',
+    howTo: rf?.count ? 'Po każdym nowym obwieszczeniu (zwykle co 2 miesiące) zaimportuj nowy wykaz.' : 'Arkusze obwieszczenia MZ zapisz jako CSV i: npm run cli -- import-refund <plik.csv> --list A1 --title "Obwieszczenie MZ z …" --valid-from RRRR-MM-DD',
   });
   add({
     id: 'security-contact',
