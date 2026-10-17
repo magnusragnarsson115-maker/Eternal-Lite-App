@@ -44,6 +44,15 @@ const WHERE: Record<string, string> = {
   'D1.2': 'p:/os-czasu', 'D1.3': 'p:/pomiary', 'D1.4': 'p:/prywatnosc', 'D1.5': 'a:/panel/organizacja?tab=gotowosc', 'D1.6': 'b',
   'D2.3': 'd:/panel/skrzynka', 'D4.7': 'p:/os-czasu', 'D5.3': 'b', 'D5.4': 'p:/prywatnosc', 'S4.1': 'p:/wizyty', 'S4.2': 'p:/bezpieczenstwo',
   'S4.5': 'p:/rodzina',
+  // runda 4
+  'A5.12': 'p:/bezpieczenstwo', 'A24.6': 'p:/bezpieczenstwo', 'S4.4': 'p:/bezpieczenstwo', 'F3.11': 'p:/leki', 'F7.1': 'p:/apteki',
+  'F7.2': 'p:/apteki', 'F7.4': 'p:/apteki', 'F7.7': 'p:/apteki?tab=refund', 'A21.2': 'p:/zdrowie-kobiety', 'A21.4': 'p:/zdrowie-kobiety?tab=postpartum',
+  'A21.5': 'p:/zdrowie-kobiety?tab=menopause', 'A22.2': 'p:/dzienniki?tab=adl', 'F11.1': 'p:/dzienniki?tab=food', 'F11.3': 'p:/dzienniki?tab=food',
+  'F11.4': 'p:/dzienniki?tab=food', 'F11.5': 'p:/dzienniki?tab=food', 'A14.3': 'p:/leki', 'A7.7': 'p:/profilaktyka', 'F9.11': 'p:/przypomnienia',
+  'F5.5': 'p:/przypomnienia', 'A11.1': 'p:/powietrze', 'A7.8': 'p:/przypomnienia', 'A12.6': 'd:/panel/pacjenci', 'F5.1': 'p:/powietrze',
+  'F5.2': 'p:/powietrze', 'F5.17': 'p:/powietrze', 'A3.6': 'p:/powietrze', 'F2.1': 'm', 'F2.2': 'm', 'A1.8': 'm', 'F9.1': 'p:/pomiary',
+  'F9.3': 'p:/pomiary', 'F12.1': 'p:/pomiary', 'F2.9': 'p:/pomiary', 'F2.21': 'p:/pomiary', 'F2.19': 'p:/pomiary', 'A17.10': 'p:/',
+  'F13.4': 'p:/dzienniki', 'D4.8': 'p:/historia-zdrowia', 'F16.3': 'p:/historia-zdrowia', 'F16.2': 'p:/historia-zdrowia',
 };
 
 type Status = 'done' | 'new' | 'partial' | 'queue' | 'blocked' | 'unclear';
@@ -96,6 +105,7 @@ function main() {
     if (line.startsWith('## ')) {
       const title = line.slice(3).trim();
       if (title.startsWith('Co mogę zbudować')) section = 'queue';
+      else if (title.startsWith('Runda ')) section = 'post';
       else if (title.startsWith('Czego nie mogę') || title.startsWith('Co jest potrzebne')) section = 'post';
       else if (section === 'list' || title === 'Aplikacja pacjenta — rdzeń') {
         section = 'list';

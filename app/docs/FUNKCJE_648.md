@@ -1,6 +1,6 @@
 # Eternal — wszystkie 648 funkcji: co zrobione, co mogę zrobić, czego nie mogę i dlaczego
 
-Stan na 15.10.2026. Źródło: arkusz `24_REJESTR_648_FUNKCJI` (Eternal 9.0). Kod: katalog `app/` (serwer, przeglądarka, aplikacja mobilna).
+Stan na 17.10.2026 (po rundzie 4). Źródło: arkusz `24_REJESTR_648_FUNKCJI` (Eternal 9.0). Kod: katalog `app/` (serwer, przeglądarka, aplikacja mobilna).
 Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycznego: [`COMPLIANCE.md`](COMPLIANCE.md) §1. Kolejka następnych pakietów, przeszkody i potrzebne decyzje — na końcu pliku.
 
 ## Legenda
@@ -8,7 +8,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | Status | Znaczenie |
 |---|---|
 | ✅ Zrobione | działa w aplikacji, ma testy (wcześniejsze rundy) |
-| 🆕 Zrobione teraz | zbudowane w rundzie „aplikacja w całości” |
+| 🆕 Zrobione teraz | zbudowane w rundzie 4 (kolejka A, pakiety 1–9) |
 | 🟡 Częściowo | działa wersja informacyjna/administracyjna; reszta wymaga powodu z listy „nie mogę” |
 | 🔧 Mogę zrobić | da się zbudować kodem bez certyfikacji, sprzętu i umów — kolejne rundy |
 | ⛔ MDR | nie mogę: interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
@@ -25,10 +25,10 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 | Status | Liczba | Udział |
 |---|---:|---:|
-| ✅ Zrobione | 94 | 15% |
-| 🆕 Zrobione teraz | 35 | 5% |
+| ✅ Zrobione | 129 | 20% |
+| 🆕 Zrobione teraz | 41 | 6% |
 | 🟡 Częściowo | 31 | 5% |
-| 🔧 Mogę zrobić | 89 | 14% |
+| 🔧 Mogę zrobić | 48 | 7% |
 | ⛔ Nie mogę (razem) | 399 | 62% |
 | — w tym ⛔ MDR | 103 | 16% |
 | — w tym ⛔ R&D | 70 | 11% |
@@ -44,27 +44,27 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 | Grupa | Razem | ✅ | 🆕 | 🟡 | 🔧 | ⛔ |
 |---|---:|---:|---:|---:|---:|---:|
-| Aplikacja pacjenta — rdzeń | 125 | 49 | 7 | 9 | 13 | 47 |
-| Lekarz, placówka, leki i badania | 120 | 21 | 4 | 6 | 13 | 76 |
-| Wellness, zdrowie psychiczne, rodzina i senior | 169 | 4 | 20 | 10 | 30 | 105 |
-| Nadzór, dane, bliźniak cyfrowy i genetyka | 87 | 18 | 3 | 6 | 12 | 48 |
+| Aplikacja pacjenta — rdzeń | 125 | 56 | 11 | 9 | 2 | 47 |
+| Lekarz, placówka, leki i badania | 120 | 25 | 6 | 6 | 7 | 76 |
+| Wellness, zdrowie psychiczne, rodzina i senior | 169 | 24 | 20 | 10 | 10 | 105 |
+| Nadzór, dane, bliźniak cyfrowy i genetyka | 87 | 21 | 3 | 6 | 9 | 48 |
 | Społeczność i ekosystem | 71 | 0 | 0 | 0 | 20 | 51 |
-| Urządzenia (Station, Care Pod, implanty) | 76 | 2 | 1 | 0 | 1 | 72 |
+| Urządzenia (Station, Care Pod, implanty) | 76 | 3 | 1 | 0 | 0 | 72 |
 
 ### Według etapu z rejestru
 
 | Etap | Razem | ✅ + 🆕 | 🟡 | 🔧 | ⛔ |
 |---|---:|---:|---:|---:|---:|
-| MVP/MLP | 403 | 119 | 29 | 73 | 182 |
-| MLP→R&D | 43 | 6 | 1 | 11 | 25 |
+| MVP/MLP | 403 | 154 | 29 | 38 | 182 |
+| MLP→R&D | 43 | 7 | 1 | 10 | 25 |
 | R&D/FINAL | 37 | 0 | 0 | 0 | 37 |
 | SF / obserwacja | 33 | 0 | 0 | 0 | 33 |
-| MLP/FINAL | 30 | 2 | 0 | 1 | 27 |
-| FINAL/R&D | 24 | 0 | 0 | 2 | 22 |
-| MLP/R&D | 16 | 0 | 1 | 1 | 14 |
+| MLP/FINAL | 30 | 3 | 0 | 0 | 27 |
+| FINAL/R&D | 24 | 2 | 0 | 0 | 22 |
+| MLP/R&D | 16 | 1 | 1 | 0 | 14 |
 | SF / WSTRZYMANE | 16 | 0 | 0 | 0 | 16 |
 | MLP/FINAL (regulowany) | 14 | 2 | 0 | 0 | 12 |
-| MLP | 12 | 0 | 0 | 1 | 11 |
+| MLP | 12 | 1 | 0 | 0 | 11 |
 | MLP/FINAL (regulowany/R&D) | 8 | 0 | 0 | 0 | 8 |
 | WSTRZYMANE / R&D | 6 | 0 | 0 | 0 | 6 |
 | R&D/WSTRZYMANE | 3 | 0 | 0 | 0 | 3 |
@@ -75,7 +75,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal App Core (88)
 
-✅ 43 · 🆕 2 · 🟡 7 · 🔧 6 · ⛔ 30
+✅ 45 · 🆕 4 · 🟡 7 · 🔧 2 · ⛔ 30
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
@@ -112,7 +112,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | F3.8 | Recepta z P1 (NFZ Online API) | MVP/MLP | P1 | ⛔ Umowa | Platforma P1 (CSIOZ/CeZ) |
 | F3.9 | Karta wypisowa szpitalna | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | F3.10 | Automatyczne oznaczanie diagnoz kodami ICD-10 | MVP/MLP | P1 | ⛔ MDR | automatyczne kodowanie rozpoznań; ręczny wybór kodu przez lekarza — A12.6 |
-| F3.11 | Automatyczne oznaczanie leków kodami ATC | MVP/MLP | P1 | 🔧 Mogę zrobić | kod ATC jest w Rejestrze Produktów Leczniczych — dopisanie do listy leków |
+| F3.11 | Automatyczne oznaczanie leków kodami ATC | MVP/MLP | P1 | 🆕 Zrobione teraz | kod ATC z Rejestru Produktów Leczniczych przy lekach |
 | F3.12 | Przetwarzanie języka z BioMistral 7B (medyczny, otwarty model językowy) | MVP/MLP | P1 | ⛔ R&D | własny model medyczny: trening, walidacja, hosting GPU |
 | F3.13 | Detekcja niekonsistencji (interakcje lekowe w historii) | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F3.14 | Analiza zdjęć znamion (model wykrywania czerniaka) | MLP/FINAL (regulowany) | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
@@ -133,7 +133,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | A1.5 | Normalizacja do FHIR R4 | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A1.6 | Import CSV/JSON (backfill) | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A1.7 | Deduplikacja i wykrywanie anomalii | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
-| A1.8 | Google Fit / Apple Health | MVP/MLP | P1 | 🔧 Mogę zrobić | Apple Health / Health Connect (F2.1/F2.2) |
+| A1.8 | Google Fit / Apple Health | MVP/MLP | P1 | 🆕 Zrobione teraz | Apple Health / Health Connect (F2.1/F2.2) |
 | A1.9 | Synchronizacja z Eternal Station (Bluetooth LE / MQTT) | MVP/MLP | P1 | ⛔ Sprzęt | fizyczne urządzenie — projekt sprzętowy i CE |
 | A1.10 | Przechowywanie danych (lokalnie + chmura) | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A1.20 | Universal Sync — synchronizacja wielu źródeł danych | MVP/MLP | P1 | 🟡 Częściowo | źródła: ręczne, Bluetooth, Withings, import, telemonitoring; bez jednego agregatora |
@@ -150,18 +150,18 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | A3.3 | Monitoring na żywo (strumieniowanie) | MVP/MLP | P1 | 🟡 Częściowo | zmiany na żywo (SSE) i telemonitoring przez partnera; strumień z urządzenia — Station |
 | A3.4 | System powiadomień (FCM/SendGrid) | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A3.5 | Trójkolorowe alerty | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
-| A3.6 | Alerty środowiskowe (pogoda, smog) | MVP/MLP | P1 | 🔧 Mogę zrobić | dane GIOŚ/IMGW, bez porad |
+| A3.6 | Alerty środowiskowe (pogoda, smog) | MVP/MLP | P1 | 🆕 Zrobione teraz | powietrze i pogoda — informacja z datą pomiaru, bez porad |
 | A3.7 | Bio-pogoda — analiza | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | A3.8 | Porównanie do grupy wiekowej | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | A3.9 | Digital Twin 2D/3D (podgląd) | MLP→R&D | P1 | 🔧 Mogę zrobić | podgląd 2D — produkt P4 |
 | A4.1 | Raport tygodniowy PDF | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A4.2 | Raport miesięczny/kwartalny | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
-| A4.3 | Raport SBAR dla lekarza | MVP/MLP | P1 | 🆕 Zrobione teraz | S — słowa pacjenta, A — tylko dane (ocenia lekarz); PDF |
-| A4.4 | Raport jako FHIR Bundle | MVP/MLP | P1 | 🆕 Zrobione teraz | dokument FHIR R4 (Composition, LOINC 60591-5) |
+| A4.3 | Raport SBAR dla lekarza | MVP/MLP | P1 | ✅ Zrobione | S — słowa pacjenta, A — tylko dane (ocenia lekarz); PDF |
+| A4.4 | Raport jako FHIR Bundle | MVP/MLP | P1 | ✅ Zrobione | dokument FHIR R4 (Composition, LOINC 60591-5) |
 | A4.5 | Raport holograficzny | MVP/MLP | P1 | ⛔ SF | wizja / wstrzymane w rejestrze |
 | A14.1 | Eskalacja (rodzina, lekarz, 112) | MVP/MLP | P1 | 🟡 Częściowo | SOS do osób bliskich + 112; automatyczna eskalacja do lekarza — MDR |
 | A14.2 | Inteligentne przypomnienia | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
-| A14.3 | Niski stan suplementów | MLP | P1 | 🔧 Mogę zrobić | licznik opakowań przy przypomnieniach o lekach |
+| A14.3 | Niski stan suplementów | MLP | P1 | 🆕 Zrobione teraz | zapas leku z harmonogramu i jedno przypomnienie o uzupełnieniu |
 | A23.1 | Dostępność podstawowa (A23.3) | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A23.2 | Tryb prostego języka | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A23.3 | Dostępność podstawowa | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
@@ -170,19 +170,19 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal App Core / Eternal Station (25)
 
-✅ 3 · 🆕 0 · 🟡 2 · 🔧 5 · ⛔ 15
+✅ 3 · 🆕 5 · 🟡 2 · 🔧 0 · ⛔ 15
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
-| F2.1 | Natywna integracja Apple HealthKit (iOS) | MVP/MLP | P1/P2 | 🔧 Mogę zrobić | kod natywny (development build EAS); test na telefonie z Apple Health / Health Connect |
-| F2.2 | Google Fit / Health Connect (Android) | MVP/MLP | P1/P2 | 🔧 Mogę zrobić | kod natywny (development build EAS); test na telefonie z Apple Health / Health Connect |
+| F2.1 | Natywna integracja Apple HealthKit (iOS) | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | HealthKit: kroki i sen z fazami (development build EAS) |
+| F2.2 | Google Fit / Health Connect (Android) | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | Health Connect: kroki i sesje snu (development build EAS) |
 | F2.3 | Integracja z API Terra (Garmin, Oura, Fitbit, Whoop, Polar) | MVP/MLP | P1/P2 | ⛔ Umowa | klucz API / umowa partnerska |
 | F2.4 | Mapowanie do zasobu FHIR R4 Observation | MVP/MLP | P1/P2 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | F2.5 | Rozstrzyganie konfliktów (gdy dwa urządzenia mierzą to samo) | MVP/MLP | P1/P2 | 🟡 Częściowo | rozbieżne odczyty oznaczane, bez rozstrzygania (świadomie — A1.7) |
 | F2.6 | Automatyczna synchronizacja co 15 min (w tle) | MVP/MLP | P1/P2 | 🟡 Częściowo | synchronizacja Withings i telemonitoringu; tło co 15 min — po F2.1/F2.2 |
 | F2.7 | Inteligentna waga Bluetooth (Withings, Fitbit Aria, Eufy) | MVP/MLP | P1/P2 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | F2.8 | CGM API (Dexcom G7, Freestyle Libre 3) | MVP/MLP | P1/P2 | ⛔ Umowa | API partnerskie Dexcom / Abbott |
-| F2.9 | Bluetooth pulsoksymetr (Wellue, Masimo MightySat) | MVP/MLP | P1/P2 | 🔧 Mogę zrobić | profil Bluetooth PLX (jak waga i ciśnieniomierz) |
+| F2.9 | Bluetooth pulsoksymetr (Wellue, Masimo MightySat) | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | profil Bluetooth PLX (pomiar jednorazowy i ciągły) |
 | F2.10 | Bluetooth EKG (KardiaMobile, Withings ScanWatch) | MVP/MLP | P1/P2 | ⛔ Umowa | SDK partnerskie; interpretacja EKG — MDR |
 | F2.11 | Natywne Garmin Health API (dane sportowe) | MVP/MLP | P1/P2 | ⛔ Umowa | klucz API / umowa partnerska |
 | F2.12 | Polar Flow API (zmienność rytmu serca) | MVP/MLP | P1/P2 | ⛔ Umowa | klucz API / umowa partnerska |
@@ -192,9 +192,9 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | F2.16 | Natywna integracja z Eternal Implant (Bluetooth LE 5.4) | FINAL/R&D | P1/P2 | ⛔ Sprzęt | fizyczne urządzenie — projekt sprzętowy i CE |
 | F2.17 | Integracja z inteligentną odzieżą (Hexoskin, Athos) | MVP/MLP | P1/P2 | ⛔ Umowa | klucz API / umowa partnerska |
 | F2.18 | Inteligentna toaleta (Toi Labs, Casana Heart Seat) | MVP/MLP | P1/P2 | ⛔ Sprzęt | fizyczne urządzenie — projekt sprzętowy i CE |
-| F2.19 | Inteligentna poduszka / materace (Eight Sleep, Withings Sleep) | MVP/MLP | P1/P2 | 🔧 Mogę zrobić | Withings Sleep przez istniejącą integrację Withings |
+| F2.19 | Inteligentna poduszka / materace (Eight Sleep, Withings Sleep) | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | Withings Sleep przez integrację Withings (czas i fazy snu) |
 | F2.20 | Fork otwartego Gadgetbridge (Xiaomi, Amazfit, Huawei, Honor) | MVP/MLP | P1/P2 | ⛔ Osobny produkt | osobna aplikacja Android (fork Gadgetbridge) |
-| F2.21 | Uniwersalny adapter protokołów (dowolne urządzenie Bluetooth) | MVP/MLP | P1/P2 | 🔧 Mogę zrobić | ogólne profile GATT — rozszerzenie adaptera |
+| F2.21 | Uniwersalny adapter protokołów (dowolne urządzenie Bluetooth) | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | tryb „dowolne urządzenie zgodne ze standardem” (6 profili GATT) |
 | F2.22 | Strumieniowanie z interfejsu mózg–komputer (Neuralink, Synchron Stentrode) | FINAL/R&D | P1/P2 | ⛔ R&D | technologia w fazie badań |
 | F2.23 | Telemetria nanobotów in vivo | SF / obserwacja | P1/P2 | ⛔ SF | wizja / wstrzymane w rejestrze |
 | F2.24 | Sieć kratowa implantów (wymiana P2P między implantami) | FINAL/R&D | P1/P2 | ⛔ R&D | technologia w fazie badań |
@@ -202,11 +202,11 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal Country Layer (5)
 
-✅ 2 · 🆕 0 · 🟡 0 · 🔧 1 · ⛔ 2
+✅ 2 · 🆕 1 · 🟡 0 · 🔧 0 · ⛔ 2
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
-| A11.1 | Wykrywanie lokalizacji (GPS) | MVP/MLP | RDZEŃ / P1 | 🔧 Mogę zrobić | następna runda kodu |
+| A11.1 | Wykrywanie lokalizacji (GPS) | MVP/MLP | RDZEŃ / P1 | 🆕 Zrobione teraz | miasto albo położenie urządzenia zaokrąglone do ok. 1 km |
 | A11.2 | Regionalne nawyki | MVP/MLP | RDZEŃ / P1 | ⛔ Ludzie | treści regionalne — redakcja |
 | A11.3 | Tłumaczenie interfejsu | MVP/MLP | RDZEŃ / P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A11.4 | Standaryzacja jednostek | MVP/MLP | RDZEŃ / P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
@@ -214,29 +214,29 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal ID / Family / Travel (7)
 
-✅ 1 · 🆕 5 · 🟡 0 · 🔧 1 · ⛔ 0
+✅ 6 · 🆕 1 · 🟡 0 · 🔧 0 · ⛔ 0
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
-| A24.1 | Konto rodzinne wieloprofilowe | MVP/MLP | P1 | 🆕 Zrobione teraz | konto z profilami: dziecko, osoba pod opieką, bliscy z kodem |
-| A24.2 | Dostęp zastępczy | MVP/MLP | P1 | 🆕 Zrobione teraz | działanie w imieniu profilu; każdy dostęp w dzienniku tej osoby |
-| A24.3 | Profil dziecka i raporty rodziny (A21.x, A4.2) | MVP/MLP | P1 | 🆕 Zrobione teraz | profil dziecka; raporty i karty w jego imieniu |
+| A24.1 | Konto rodzinne wieloprofilowe | MVP/MLP | P1 | ✅ Zrobione | konto z profilami: dziecko, osoba pod opieką, bliscy z kodem |
+| A24.2 | Dostęp zastępczy | MVP/MLP | P1 | ✅ Zrobione | działanie w imieniu profilu; każdy dostęp w dzienniku tej osoby |
+| A24.3 | Profil dziecka i raporty rodziny (A21.x, A4.2) | MVP/MLP | P1 | ✅ Zrobione | profil dziecka; raporty i karty w jego imieniu |
 | A24.4 | Czasowe udostępnienie lekarzowi | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
-| A24.5 | Dostęp ratunkowy z pełnym logiem | MVP/MLP | P1 | 🆕 Zrobione teraz | 60 min, uzasadnienie, powiadomienie pacjenta, przegląd administratora |
-| A24.6 | Tryb offline aplikacji | MVP/MLP | P1 | 🔧 Mogę zrobić | jak A5.12 |
-| A24.7 | Karta zdrowia na wyjazd zagraniczny | MVP/MLP | P1 | 🆕 Zrobione teraz | PL/EN, 112, EKUZ; PDF do druku |
+| A24.5 | Dostęp ratunkowy z pełnym logiem | MVP/MLP | P1 | ✅ Zrobione | 60 min, uzasadnienie, powiadomienie pacjenta, przegląd administratora |
+| A24.6 | Tryb offline aplikacji | MVP/MLP | P1 | 🆕 Zrobione teraz | jak A5.12 — także dla profilu osoby pod opieką |
+| A24.7 | Karta zdrowia na wyjazd zagraniczny | MVP/MLP | P1 | ✅ Zrobione | PL/EN, 112, EKUZ; PDF do druku |
 
 ## Lekarz, placówka, leki i badania
 
 
 ### Eternal Care Access / Doctor (32)
 
-✅ 12 · 🆕 2 · 🟡 1 · 🔧 1 · ⛔ 16
+✅ 14 · 🆕 1 · 🟡 1 · 🔧 0 · ⛔ 16
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
 | F6.1 | Czat asynchroniczny z lekarzem (tekstowy) | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
-| F6.2 | Automatycznie generowany PDF w formacie SBAR (historia użytkownika) | MVP/MLP | P1 | 🆕 Zrobione teraz | raport SBAR w PDF przygotowany przez pacjenta |
+| F6.2 | Automatycznie generowany PDF w formacie SBAR (historia użytkownika) | MVP/MLP | P1 | ✅ Zrobione | raport SBAR w PDF przygotowany przez pacjenta |
 | F6.3 | Sciaganie wyników + zalaczanie | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | F6.4 | Subskrypcja (49 PLN/mies = 5 czatow) | MVP/MLP | P1 | ⛔ Umowa | operator płatności |
 | F6.5 | Video konsultacja (WebRTC, LiveKit) | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
@@ -265,12 +265,12 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | A5.9 | Pętla zamknięta (ze Station) | MVP/MLP | P1 | ⛔ Sprzęt | fizyczne urządzenie — projekt sprzętowy i CE |
 | A5.10 | Przycisk SOS *(z S4.2)* | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A5.11 | Triaż na urządzeniu *(z S4.3)* | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
-| A5.12 | Tryb offline *(z S4.4)* | MVP/MLP | P1 | 🔧 Mogę zrobić | kopia karty ratunkowej, leków i najbliższych wizyt w telefonie |
-| A5.13 | Panel dla opiekuna *(z S4.5)* | MVP/MLP | P1 | 🆕 Zrobione teraz | panel opiekuna w aplikacji |
+| A5.12 | Tryb offline *(z S4.4)* | MVP/MLP | P1 | 🆕 Zrobione teraz | kopia karty, leków z godzinami, wizyt i telefonu placówki na urządzeniu — po decyzji pacjenta; web i telefon |
+| A5.13 | Panel dla opiekuna *(z S4.5)* | MVP/MLP | P1 | ✅ Zrobione | panel opiekuna w aplikacji |
 
 ### Eternal Doctor / Clinic OS (7)
 
-✅ 4 · 🆕 0 · 🟡 1 · 🔧 1 · ⛔ 1
+✅ 4 · 🆕 1 · 🟡 1 · 🔧 0 · ⛔ 1
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
@@ -279,7 +279,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | A12.3 | Ankiety okresowe | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A12.4 | Zdalny wywiad AI | MVP/MLP | P1 | 🟡 Częściowo | wywiad przed wizytą w formie rozmowy, bez AI (M27) |
 | A12.5 | Auto-dokumentacja | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
-| A12.6 | Kodowanie ICD | MVP/MLP | P1 | 🔧 Mogę zrobić | wybór kodu ICD-10 przez lekarza ze słownika |
+| A12.6 | Kodowanie ICD | MVP/MLP | P1 | 🆕 Zrobione teraz | lekarz wybiera kod ICD-10 ze słownika; zapis jako FHIR Condition |
 | A12.7 | Integracja z systemem gabinetowym | MVP/MLP | P1 | ⛔ Umowa | dostawcy systemów gabinetowych |
 
 ### Eternal Assistant / Doctor (33)
@@ -324,17 +324,17 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal Medication (25)
 
-✅ 2 · 🆕 2 · 🟡 1 · 🔧 4 · ⛔ 16
+✅ 4 · 🆕 4 · 🟡 1 · 🔧 0 · ⛔ 16
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
-| F7.1 | Lista aptek w okolicy (Google Places) | MVP/MLP | P1 | 🔧 Mogę zrobić | publiczny Rejestr Aptek (adres, telefon) — bez Google Places |
-| F7.2 | Godziny otwarcia + telefon | MVP/MLP | P1 | 🔧 Mogę zrobić | publiczny Rejestr Aptek (adres, telefon) — bez Google Places |
+| F7.1 | Lista aptek w okolicy (Google Places) | MVP/MLP | P1 | 🆕 Zrobione teraz | wyszukiwarka aptek z importu Rejestru Aptek; „w pobliżu” ze współrzędnych rejestru |
+| F7.2 | Godziny otwarcia + telefon | MVP/MLP | P1 | 🆕 Zrobione teraz | adres, telefon i godziny z Rejestru Aptek |
 | F7.3 | Wyszukiwarka leku po nazwie | MVP/MLP | P1 | ✅ Zrobione | wyszukiwarka RPL |
-| F7.4 | Mapa z wyznaczaniem trasy (Google Maps) | MVP/MLP | P1 | 🔧 Mogę zrobić | mapa OpenStreetMap z trasą — bez klucza |
+| F7.4 | Mapa z wyznaczaniem trasy (Google Maps) | MVP/MLP | P1 | 🆕 Zrobione teraz | trasa w OpenStreetMap, Google albo Apple Maps — bez wysyłania położenia |
 | F7.5 | Dostępność leku w czasie rzeczywistym | MVP/MLP | P1 | ⛔ Umowa | apteki / serwis dostępności leków |
 | F7.6 | Rezerwacja online (apteki polaczone API) | MVP/MLP | P1 | ⛔ Umowa | apteki / serwis dostępności leków |
-| F7.7 | Porównanie cen (refundacja vs pełna) | MVP/MLP | P1 | 🔧 Mogę zrobić | informacja z obwieszczenia refundacyjnego MZ (dane publiczne) |
+| F7.7 | Porównanie cen (refundacja vs pełna) | MVP/MLP | P1 | 🆕 Zrobione teraz | informacja z obwieszczenia MZ (import CSV): poziom odpłatności, dopłata, wskazania |
 | F7.8 | Substytuty (jeśli lek niedostępny) | FINAL/R&D | P1 | ⛔ MDR | dobór zamiennika = porada farmaceutyczna |
 | F7.9 | Powiadomienie push „lek dostępny w aptece X" | MVP/MLP | P1 | ⛔ Umowa | apteki / serwis dostępności leków |
 | F7.10 | Dostawa dronem (Flytrex, Zipline — pilotaż w Polsce) | MVP/MLP | P1 | ⛔ Sprzęt | fizyczne urządzenie — projekt sprzętowy i CE |
@@ -349,9 +349,9 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | A20.4 | Połóg i karmienie | MVP/MLP | P1 | ⛔ MDR | bezpieczeństwo leków w karmieniu — ocena farmakoterapii |
 | A20.5 | (nazwa w rejestrze nieczytelna — paszport lekowy) | MVP/MLP | P1 | ❔ Do doprecyzowania | pozycja w rejestrze bez czytelnej nazwy |
 | A20.6 | (nazwa w rejestrze nieczytelna: „100–150k”) | MVP/MLP | P1 | ❔ Do doprecyzowania | pozycja w rejestrze bez czytelnej nazwy |
-| A20.7 | Szczepienia | MVP/MLP | P1 | 🆕 Zrobione teraz | szczepienia wykonane i planowane |
+| A20.7 | Szczepienia | MVP/MLP | P1 | ✅ Zrobione | szczepienia wykonane i planowane |
 | A20.8 | Siatki centylowe | MVP/MLP | P1 | ⛔ MDR | siatki centylowe = porównanie z normą (decyzja kwalifikacyjna) |
-| A20.9 | Wywiad rodzinny | MVP/MLP | P1 | 🆕 Zrobione teraz | krewny, choroby, wiek zachorowania — bez oceny ryzyka |
+| A20.9 | Wywiad rodzinny | MVP/MLP | P1 | ✅ Zrobione | krewny, choroby, wiek zachorowania — bez oceny ryzyka |
 | A20.10 | Integracja z e-kartami (szczepień) | MVP/MLP | P1 | ⛔ Umowa | e-karta szczepień w P1 |
 
 ### Eternal Labs (15)
@@ -396,13 +396,13 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal Wellness Composer (66)
 
-✅ 0 · 🆕 1 · 🟡 2 · 🔧 17 · ⛔ 46
+✅ 1 · 🆕 10 · 🟡 2 · 🔧 7 · ⛔ 46
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
-| F9.1 | Śledzenie snu z urządzenia noszonego (M2) | MVP/MLP | P1 | 🔧 Mogę zrobić | przez Apple Health / Health Connect (F2.1/F2.2) albo Withings |
+| F9.1 | Śledzenie snu z urządzenia noszonego (M2) | MVP/MLP | P1 | 🆕 Zrobione teraz | sen z telefonu, zegarka albo Withings Sleep |
 | F9.2 | Wynik snu 0–100 | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
-| F9.3 | Fazy snu (płytki / głęboki / REM) | MVP/MLP | P1 | 🔧 Mogę zrobić | przez Apple Health / Health Connect (F2.1/F2.2) albo Withings |
+| F9.3 | Fazy snu (płytki / głęboki / REM) | MVP/MLP | P1 | 🆕 Zrobione teraz | fazy snu tak, jak policzyło urządzenie — bez oceny |
 | F9.4 | Sugestie 'spij 23:00' | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F9.5 | Inteligentny budzik (budzi w fazie płytkiego snu) | MVP/MLP | P1 | ⛔ Osobny produkt | czujniki telefonu w aplikacji natywnej — badania |
 | F9.6 | Chronobiologia (początek wydzielania melatoniny w słabym świetle — DLMO) | MVP/MLP | P1 | ⛔ R&D | technologia w fazie badań |
@@ -410,7 +410,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | F9.8 | Inteligentna poduszka (Eight Sleep, Withings) | MVP/MLP | P1 | ⛔ Umowa | konto / umowa z zewnętrznym dostawcą |
 | F9.9 | CBT-I (terapia poznawcza bezsenności) | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F9.10 | Biały szum / dudnienia binauralne | MVP/MLP | P1 | 🔧 Mogę zrobić | odtwarzacz dźwięków — treść audio |
-| F9.11 | Przypomnienia o terapii światłem | MVP/MLP | P1 | 🔧 Mogę zrobić | przypomnienia ustawiane przez użytkownika |
+| F9.11 | Przypomnienia o terapii światłem | MVP/MLP | P1 | 🆕 Zrobione teraz | przypomnienia ustawiane przez pacjenta (np. terapia światłem) |
 | F9.12 | Sen dopasowany do genetyki (integracja z M16) | MVP/MLP | P1 | ⛔ R&D | technologia w fazie badań |
 | F9.13 | Dziennik snów + interpretacja | MVP/MLP | P1 | 🟡 Częściowo | dziennik snów bez interpretacji (interpretacja — poza granicą) |
 | F9.14 | Wykrywanie bezdechu sennego (audio + HR) | MLP/FINAL (regulowany) | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
@@ -419,11 +419,11 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | F9.17 | Sterowanie świadomym śnieniem przez interfejs mózg–komputer | SF / obserwacja | P1 | ⛔ SF | wizja / wstrzymane w rejestrze |
 | F9.18 | Nauka we śnie (podczas fazy REM) | SF / obserwacja | P1 | ⛔ SF | wizja / wstrzymane w rejestrze |
 | F9.19 | Wspólne śnienie (Matrix) (4 podzadania) | SF / obserwacja | P1 | ⛔ SF | wizja / wstrzymane w rejestrze |
-| F11.1 | Dziennik żywienia (ręczny) | MVP/MLP | P1 | 🔧 Mogę zrobić | dziennik żywienia, Open Food Facts (dane otwarte) |
+| F11.1 | Dziennik żywienia (ręczny) | MVP/MLP | P1 | 🆕 Zrobione teraz | dziennik posiłków z sumą wartości z etykiet |
 | F11.2 | Rozpoznawanie jedzenia ze zdjęcia (oparte na modelu językowym) | MVP/MLP | P1 | 🔧 Mogę zrobić | wellness (W0); rozpoznanie przez model z rejestru AI — walidacja jakości |
-| F11.3 | Baza Open Food Facts (ponad 1 mln produktów) | MVP/MLP | P1 | 🔧 Mogę zrobić | dziennik żywienia, Open Food Facts (dane otwarte) |
-| F11.4 | Licznik kalorii | MVP/MLP | P1 | 🔧 Mogę zrobić | dziennik żywienia, Open Food Facts (dane otwarte) |
-| F11.5 | Makroskładniki (białko / tłuszcz / węglowodany) | MVP/MLP | P1 | 🔧 Mogę zrobić | dziennik żywienia, Open Food Facts (dane otwarte) |
+| F11.3 | Baza Open Food Facts (ponad 1 mln produktów) | MVP/MLP | P1 | 🆕 Zrobione teraz | kod kreskowy i wyszukiwanie w Open Food Facts |
+| F11.4 | Licznik kalorii | MVP/MLP | P1 | 🆕 Zrobione teraz | sumy kcal i makroskładników dzień po dniu |
+| F11.5 | Makroskładniki (białko / tłuszcz / węglowodany) | MVP/MLP | P1 | 🆕 Zrobione teraz | makroskładniki z etykiet, bez oceny diety |
 | F11.6 | Sugestie generyczne ('jedz więcej warzyw') | MVP/MLP | P1 | 🔧 Mogę zrobić | zalecenia ogólne z zatwierdzonej treści |
 | F11.7 | Personalizacja na bazie badań | MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F11.8 | Plan jadlospisu na tydzien | MVP/MLP | P1 | ⛔ Ludzie | dietetyk |
@@ -439,7 +439,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | F11.18 | Replikator jedzenia | SF / obserwacja | P1 | ⛔ SF | wizja / wstrzymane w rejestrze |
 | F11.19 | Nanosuplementy in vivo | MLP | P1 | ⛔ SF | wizja / wstrzymane w rejestrze |
 | F11.20 | Autonomiczny dietetyk — ogólna sztuczna inteligencja (4 podzadania) | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
-| F12.1 | Śledzenie z urządzenia noszonego (M2) | MVP/MLP | P1 | 🔧 Mogę zrobić | przez Apple Health / Health Connect |
+| F12.1 | Śledzenie z urządzenia noszonego (M2) | MVP/MLP | P1 | 🆕 Zrobione teraz | kroki dziennie z telefonu |
 | F12.2 | Integracja ze Strava (odczyt) | MVP/MLP | P1 | ⛔ Umowa | konto / umowa z zewnętrznym dostawcą |
 | F12.3 | Tygodniowy plan treningowy (generowany przez model językowy) | MVP/MLP | P1 | ⛔ MDR | plan dopasowany do stanu zdrowia = ocena |
 | F12.4 | VO2max + wskaźnik regeneracji | MVP/MLP | P1 | ⛔ MDR | plan dopasowany do stanu zdrowia = ocena |
@@ -462,24 +462,24 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | A7.3 | Plany suplementacyjne (AI) | MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | A7.4 | Sugestie suplementów | MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | A7.5 | Analiza składu posiłków (zdjęcie) | MVP/MLP | P1 | 🔧 Mogę zrobić | jak F11.2 (W0) |
-| A7.6 | Cele i śledzenie postępów | MVP/MLP | P1 | 🆕 Zrobione teraz | cele tygodniowe liczone z danych aplikacji |
-| A7.7 | Przypomnienia profilaktyczne | MVP/MLP | P1 | 🔧 Mogę zrobić | programy profilaktyczne NFZ wg wieku — treść do zatwierdzenia |
-| A7.8 | Geolokalizacja w planach | MVP/MLP | P1 | 🔧 Mogę zrobić | następna runda kodu |
+| A7.6 | Cele i śledzenie postępów | MVP/MLP | P1 | ✅ Zrobione | cele tygodniowe liczone z danych aplikacji |
+| A7.7 | Przypomnienia profilaktyczne | MVP/MLP | P1 | 🆕 Zrobione teraz | programy NFZ wg rocznika; treść do zatwierdzenia przez lekarza (CLI) |
+| A7.8 | Geolokalizacja w planach | MVP/MLP | P1 | 🆕 Zrobione teraz | miejsce w przypomnieniu i w planie ćwiczeń z odnośnikiem do mapy |
 | A7.9 | Plany pooperacyjne / nanotech | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 
 ### Eternal Wellness Composer / Station (21)
 
-✅ 0 · 🆕 2 · 🟡 1 · 🔧 4 · ⛔ 14
+✅ 2 · 🆕 4 · 🟡 1 · 🔧 0 · ⛔ 14
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
-| F5.1 | Pogoda (OpenWeatherMap, bezpłatny plan) | MVP/MLP | P1/P2 | 🔧 Mogę zrobić | publiczne dane IMGW i GIOŚ (bez klucza) |
-| F5.2 | Smog (API Airly, IMGW gov.pl) | MVP/MLP | P1/P2 | 🔧 Mogę zrobić | publiczne dane IMGW i GIOŚ (bez klucza) |
+| F5.1 | Pogoda (OpenWeatherMap, bezpłatny plan) | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | dane synoptyczne IMGW dla stacji wybranej albo miasta |
+| F5.2 | Smog (API Airly, IMGW gov.pl) | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | Polski Indeks Jakości Powietrza GIOŚ z najbliższej stacji |
 | F5.3 | HRV z urządzenia noszonego (Garmin / Oura) | MVP/MLP | P1/P2 | ⛔ Umowa | API urządzeń (Garmin, Oura, Whoop) |
 | F5.4 | Dzienny wynik 0–100 (prosty algorytm) | MVP/MLP | P1/P2 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
-| F5.5 | Poranne powiadomienie push (planer dnia) | MVP/MLP | P1/P2 | 🔧 Mogę zrobić | poranne powiadomienie z kalendarza zdrowia (bez porad) |
-| F5.6 | Integracja z Kalendarzem Google | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | subskrypcja ICS z ogólnymi nazwami (Google, Apple, Outlook) |
-| F5.7 | Integracja z Kalendarzem Apple | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | subskrypcja ICS z ogólnymi nazwami (Google, Apple, Outlook) |
+| F5.5 | Poranne powiadomienie push (planer dnia) | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | poranne podsumowanie dnia; push bez danych o zdrowiu |
+| F5.6 | Integracja z Kalendarzem Google | MVP/MLP | P1/P2 | ✅ Zrobione | subskrypcja ICS z ogólnymi nazwami (Google, Apple, Outlook) |
+| F5.7 | Integracja z Kalendarzem Apple | MVP/MLP | P1/P2 | ✅ Zrobione | subskrypcja ICS z ogólnymi nazwami (Google, Apple, Outlook) |
 | F5.8 | Integracja z urządzeniem śledzącym sen (Oura, Whoop) | MVP/MLP | P1/P2 | ⛔ Umowa | API urządzeń (Garmin, Oura, Whoop) |
 | F5.9 | Ocena punktowa diety (z M11) | MVP/MLP | P1/P2 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F5.10 | Personalizowane sugestie ('trening na 16:00') | MVP/MLP | P1/P2 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
@@ -489,7 +489,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | F5.14 | Predykcja 7-30 dni naprzod | MVP/MLP | P1/P2 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F5.15 | Multi-user planer (rodzina, partner) | MVP/MLP | P1/P2 | 🟡 Częściowo | profile rodzinne + kalendarz każdego profilu |
 | F5.16 | Integracja Eternal Twin (M14) | MVP/MLP | P1/P2 | ⛔ Osobny produkt | produkt P4 Digital Twin |
-| F5.17 | Alerty strefowe (wjeżdżasz w strefę smogu) | MVP/MLP | P1/P2 | 🔧 Mogę zrobić | informacja o jakości powietrza z GIOŚ wg lokalizacji, bez porad |
+| F5.17 | Alerty strefowe (wjeżdżasz w strefę smogu) | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | powiadomienie o przekroczeniu wybranej kategorii GIOŚ |
 | F5.18 | Zegar biorytmu (chronobiologia) | MVP/MLP | P1/P2 | ⛔ R&D | technologia w fazie badań |
 | F5.19 | Osobiste sterowanie mikroklimatem (w pomieszczeniu) | SF / obserwacja | P1/P2 | ⛔ SF | wizja / wstrzymane w rejestrze |
 | F5.20 | Sprzężenie mózg–pogoda przez interfejs mózg–komputer | MVP/MLP | P1/P2 | ⛔ R&D | technologia w fazie badań |
@@ -497,14 +497,14 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal Wellness Composer / Digital Twin (15)
 
-✅ 0 · 🆕 0 · 🟡 1 · 🔧 1 · ⛔ 13
+✅ 0 · 🆕 1 · 🟡 1 · 🔧 0 · ⛔ 13
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
 | F13.1 | Wiek biologiczny algorytm (z HRV+VO2+BMI+ciśnienie) | MLP/R&D | P1/P4 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F13.2 | Trend miesięczny | MLP/R&D | P1/P4 | 🟡 Częściowo | raport okresowy i wykresy trendów |
 | F13.3 | Porównanie z grupą rówieśniczą | MLP/R&D | P1/P4 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
-| F13.4 | Grywalizacja (osiągnięcia, odznaki) | MLP/R&D | P1/P4 | 🔧 Mogę zrobić | odznaki za regularność wpisów (bez ocen zdrowia) |
+| F13.4 | Grywalizacja (osiągnięcia, odznaki) | MLP/R&D | P1/P4 | 🆕 Zrobione teraz | odznaki za regularność — liczone z dni z zapisem, nie z wartości |
 | F13.5 | Wiek epigenetyczny (metylacja DNA) | MLP/R&D | P1/P4 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F13.6 | Długość telomerów | MLP/R&D | P1/P4 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F13.7 | Markery długowieczności (CRP, GlycA, ApoB) | MLP/R&D | P1/P4 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
@@ -519,12 +519,12 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal Mental Health (28)
 
-✅ 4 · 🆕 4 · 🟡 0 · 🔧 1 · ⛔ 19
+✅ 8 · 🆕 0 · 🟡 0 · 🔧 1 · ⛔ 19
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
 | F8.1 | PRZEKIEROWANIE KRYZYSOWE 116 123 (OBOWIĄZKOWE, BEZ MOŻLIWOŚCI NADPISANIA) | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
-| F8.2 | Dziennik nastroju (codziennie, skala 1–10) | MVP/MLP | P1 | 🆕 Zrobione teraz | nastrój 1–10 z czynnikami; numery pomocy przy bardzo niskim |
+| F8.2 | Dziennik nastroju (codziennie, skala 1–10) | MVP/MLP | P1 | ✅ Zrobione | nastrój 1–10 z czynnikami; numery pomocy przy bardzo niskim |
 | F8.3 | Medytacje prowadzone audio (10 bezpłatnych) | MVP/MLP | P1 | 🔧 Mogę zrobić | odtwarzacz zrobię; nagrania — lektor i psycholog |
 | F8.4 | Lista numerow kryzysowych (regionalne) | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | F8.5 | Bezpieczna książka adresowa (zaufana osoba) | MVP/MLP | P1 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
@@ -536,17 +536,17 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | F8.11 | Medytacja w VR (Oculus, Apple Vision Pro) | MVP/MLP | P1 | ⛔ Osobny produkt | aplikacja VR |
 | F8.12 | Neurofeedback (Muse 2/S, Mendi) | MLP/FINAL (regulowany/R&D) | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F8.13 | Terapia wspomagana psychodelikami (po legalizacji w Polsce) | MVP/MLP | P1 | ⛔ Prawo | niedozwolone obecnie prawem |
-| F8.14 | Śledzenie snu + dziennik snów (integracja z M5) | MVP/MLP | P1 | 🆕 Zrobione teraz | dziennik snu i snów, bez interpretacji |
+| F8.14 | Śledzenie snu + dziennik snów (integracja z M5) | MVP/MLP | P1 | ✅ Zrobione | dziennik snu i snów, bez interpretacji |
 | F8.15 | Sesje terapii grupowej w VR | MLP/FINAL (regulowany/R&D) | P1 | ⛔ Ludzie | sieć psychologów |
 | F8.16 | Nanoboty regulacja neuroprzekaznikow | SF / obserwacja | P1 | ⛔ SF | wizja / wstrzymane w rejestrze |
 | F8.17 | Modulacja nastroju przez interfejs mózg–komputer | MLP/FINAL (regulowany/R&D) | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | F8.18 | Zrzut traumy (przeniesienie traumy do cyfrowego bliźniaka) (4 podzadania) | SF / obserwacja | P1 | ⛔ SF | wizja / wstrzymane w rejestrze |
-| A8.1 | Dziennik nastroju | MVP/MLP | P1 | 🆕 Zrobione teraz | nastrój 1–10 z czynnikami; numery pomocy przy bardzo niskim |
+| A8.1 | Dziennik nastroju | MVP/MLP | P1 | ✅ Zrobione | nastrój 1–10 z czynnikami; numery pomocy przy bardzo niskim |
 | A8.2 | Wykrywanie nastroju z urządzeń noszonych | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | A8.3 | Czat z psychologiem | MVP/MLP | P1 | ⛔ Ludzie | psycholodzy i psychiatrzy (wideo działa) |
 | A8.4 | Wideokonsultacja z psychiatrą | MVP/MLP | P1 | ⛔ Ludzie | psycholodzy i psychiatrzy (wideo działa) |
 | A8.5 | Trener AI 24/7 | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
-| A8.6 | Techniki oddechowe / uważność | MVP/MLP | P1 | 🆕 Zrobione teraz | ćwiczenia 4-6, 4-4-4-4, 4-7-8 z animacją |
+| A8.6 | Techniki oddechowe / uważność | MVP/MLP | P1 | ✅ Zrobione | ćwiczenia 4-6, 4-4-4-4, 4-7-8 z animacją |
 | A8.7 | Wykrywanie EEG | MVP/MLP | P1 | ⛔ Sprzęt | urządzenia EEG/TMS — wyroby medyczne |
 | A8.8 | Stymulacja mózgu (TMS) | MVP/MLP | P1 | ⛔ Sprzęt | urządzenia EEG/TMS — wyroby medyczne |
 | A8.9 | BCI dla zdrowia psychicznego | MLP/FINAL (regulowany/R&D) | P1 | ⛔ R&D | technologia w fazie badań |
@@ -554,7 +554,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal App / Personalization Composer (21)
 
-✅ 0 · 🆕 3 · 🟡 3 · 🔧 3 · ⛔ 12
+✅ 3 · 🆕 1 · 🟡 3 · 🔧 2 · ⛔ 12
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
@@ -563,53 +563,53 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | A17.3 | Lustro bliźniaka | MLP→R&D | P1 | ⛔ R&D | technologia w fazie badań |
 | A17.4 | Przypomnienia kontekstowe | MVP/MLP | P1 | 🟡 Częściowo | przypomnienia o lekach, wizytach, ankiety we właściwym momencie; kontekst miejsca — następna runda |
 | A17.5 | Wyprzedzające podpowiedzi | MVP/MLP | P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
-| A17.6 | Łącznik rodzinny | MVP/MLP | P1 | 🆕 Zrobione teraz | kod zaproszenia dla bliskiej osoby; podgląd albo pełny dostęp |
+| A17.6 | Łącznik rodzinny | MVP/MLP | P1 | ✅ Zrobione | kod zaproszenia dla bliskiej osoby; podgląd albo pełny dostęp |
 | A17.7 | Transmisja danych na żywo | MVP/MLP | P1 | 🟡 Częściowo | synchronizacja na żywo (SSE), telemonitoring |
 | A17.8 | (pozycja bez nazwy w rejestrze — „Autonomia / kontekst”) | MVP/MLP | P1 | ❔ Do doprecyzowania | pozycja w rejestrze bez nazwy („**”) |
 | A17.9 | Zbiorczy wynik społeczności | MVP/MLP | P1 | 🔧 Mogę zrobić | zanonimizowane statystyki aktywności — produkt P5 |
-| A17.10 | Interfejs głosowy | MVP/MLP | P1 | 🔧 Mogę zrobić | sterowanie głosem w przeglądarce (Web Speech) |
+| A17.10 | Interfejs głosowy | MVP/MLP | P1 | 🆕 Zrobione teraz | sterowanie głosem w przeglądarce tylko do nawigacji |
 | A17.11 | Integracja z domem inteligentnym | MVP/MLP | P1 | ⛔ Umowa | konto / umowa z zewnętrznym dostawcą |
 | A17.12 | Analiza formy ćwiczeń z kamery | MVP/MLP | P1 | ⛔ R&D | technologia w fazie badań |
-| A17.13 | Kalendarz zdrowotny | MVP/MLP | P1 | 🆕 Zrobione teraz | wizyty, szczepienia, ćwiczenia, leki; subskrypcja ICS |
+| A17.13 | Kalendarz zdrowotny | MVP/MLP | P1 | ✅ Zrobione | wizyty, szczepienia, ćwiczenia, leki; subskrypcja ICS |
 | A17.14 | Zegar epigenetyczny | FINAL/R&D | P1 | ⛔ R&D | technologia w fazie badań |
 | A17.15 | Zegar epigenetyczny | FINAL/R&D | P1 | ⛔ R&D | technologia w fazie badań |
 | A17.16 | Skaner posiłków | MVP/MLP | P1 | 🔧 Mogę zrobić | jak F11.2 (W0) |
 | A17.17 | Doradca zdrowia w podróży | MVP/MLP | P1 | 🟡 Częściowo | karta zdrowia PL/EN; porady szczepień przed podróżą — lekarz medycyny podróży |
-| A17.18 | Kalendarz zdrowotny | MVP/MLP | P1 | 🆕 Zrobione teraz | wizyty, szczepienia, ćwiczenia, leki; subskrypcja ICS |
+| A17.18 | Kalendarz zdrowotny | MVP/MLP | P1 | ✅ Zrobione | wizyty, szczepienia, ćwiczenia, leki; subskrypcja ICS |
 | A17.19 | Wnioski z danych genetycznych | FINAL/R&D | P1 | ⛔ MDR | interpretacja genetyczna |
 | A17.20 | Zegar epigenetyczny | FINAL/R&D | P1 | ⛔ R&D | technologia w fazie badań |
 | A17.21 | Optymalizator rytmu dobowego | MVP/MLP | P1 | ⛔ R&D | technologia w fazie badań |
 
 ### Eternal Women & Family (11)
 
-✅ 0 · 🆕 5 · 🟡 2 · 🔧 3 · ⛔ 1
+✅ 5 · 🆕 3 · 🟡 2 · 🔧 0 · ⛔ 1
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
-| A21.1 | Łącznik rodzinny (A21.11) | MVP/MLP | P1 | 🆕 Zrobione teraz | kod zaproszenia dla drugiego rodzica lub bliskiej osoby |
-| A21.2 | Płodność i planowanie ciąży | MVP/MLP | P1 | 🔧 Mogę zrobić | dziennik cyklu bez prognoz; prognoza płodności = wyrób medyczny |
-| A21.3 | Mapa i skale bólu | MVP/MLP | P1 | 🆕 Zrobione teraz | mapa ciała + skala 0–10 |
-| A21.4 | Połóg i karmienie | MVP/MLP | P1 | 🔧 Mogę zrobić | dziennik objawów i notatki (W0) |
-| A21.5 | Menopauza i okres okołomenopauzalny | MVP/MLP | P1 | 🔧 Mogę zrobić | dziennik objawów i notatki (W0) |
-| A21.6 | Profil dziecka | MVP/MLP | P1 | 🆕 Zrobione teraz | profil dziecka z oświadczeniem rodzica; dostęp wygasa w 18. urodziny |
+| A21.1 | Łącznik rodzinny (A21.11) | MVP/MLP | P1 | ✅ Zrobione | kod zaproszenia dla drugiego rodzica lub bliskiej osoby |
+| A21.2 | Płodność i planowanie ciąży | MVP/MLP | P1 | 🆕 Zrobione teraz | dziennik cyklu z historią, bez prognoz dni płodnych |
+| A21.3 | Mapa i skale bólu | MVP/MLP | P1 | ✅ Zrobione | mapa ciała + skala 0–10 |
+| A21.4 | Połóg i karmienie | MVP/MLP | P1 | 🆕 Zrobione teraz | połóg i karmienie; słowa kryzysowe → numery pomocy |
+| A21.5 | Menopauza i okres okołomenopauzalny | MVP/MLP | P1 | 🆕 Zrobione teraz | objawy okołomenopauzalne 0–3, bez oceny |
+| A21.6 | Profil dziecka | MVP/MLP | P1 | ✅ Zrobione | profil dziecka z oświadczeniem rodzica; dostęp wygasa w 18. urodziny |
 | A21.7 | Kalendarz szczepień dziecka | MVP/MLP | P1 | 🟡 Częściowo | terminy z karty szczepień dziecka; kalendarz PSO — treść zatwierdzona przez lekarza |
 | A21.8 | Siatki centylowe i rozwój | MVP/MLP | P1 | ⛔ MDR | siatki centylowe |
-| A21.9 | Wywiad rodzinny | MVP/MLP | P1 | 🆕 Zrobione teraz | krewny, choroby, wiek zachorowania — bez oceny ryzyka |
+| A21.9 | Wywiad rodzinny | MVP/MLP | P1 | ✅ Zrobione | krewny, choroby, wiek zachorowania — bez oceny ryzyka |
 | A21.10 | Zdrowie rodziny jako całości | MVP/MLP | P1 | 🟡 Częściowo | panel opiekuna dla całej rodziny |
-| A21.11 | Łącznik rodzinny | MVP/MLP | P1 | 🆕 Zrobione teraz | kod zaproszenia dla drugiego rodzica lub bliskiej osoby |
+| A21.11 | Łącznik rodzinny | MVP/MLP | P1 | ✅ Zrobione | kod zaproszenia dla drugiego rodzica lub bliskiej osoby |
 
 ### Eternal Senior / Rehab (7)
 
-✅ 0 · 🆕 5 · 🟡 1 · 🔧 1 · ⛔ 0
+✅ 5 · 🆕 1 · 🟡 1 · 🔧 0 · ⛔ 0
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
-| A22.1 | Konto rodzinne / wieloprofilowe | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | konto z profilami: dziecko, osoba pod opieką, bliscy z kodem |
-| A22.2 | Ocena czynności dnia codziennego | MVP/MLP | P1/P2 | 🔧 Mogę zrobić | skale Katz/Lawton jako ankieta; punktację ocenia lekarz |
-| A22.3 | Mapa i skale bólu | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | mapa ciała + skala 0–10 |
-| A22.4 | Plan rehabilitacji z kontrolą wykonania | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | plan od lekarza, odhaczanie, „x z y” sesji |
-| A22.5 | Oświadczenie woli i dyspozycje medyczne | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | informacyjnie; wybrane dyspozycje na karcie ratunkowej |
-| A22.6 | Panel dla opiekuna rozszerzony | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | panel opiekuna: wizyty, leki dziś, wiadomości |
+| A22.1 | Konto rodzinne / wieloprofilowe | MVP/MLP | P1/P2 | ✅ Zrobione | konto z profilami: dziecko, osoba pod opieką, bliscy z kodem |
+| A22.2 | Ocena czynności dnia codziennego | MVP/MLP | P1/P2 | 🆕 Zrobione teraz | czynności dnia (Katz, Lawton) bez liczenia punktów |
+| A22.3 | Mapa i skale bólu | MVP/MLP | P1/P2 | ✅ Zrobione | mapa ciała + skala 0–10 |
+| A22.4 | Plan rehabilitacji z kontrolą wykonania | MVP/MLP | P1/P2 | ✅ Zrobione | plan od lekarza, odhaczanie, „x z y” sesji |
+| A22.5 | Oświadczenie woli i dyspozycje medyczne | MVP/MLP | P1/P2 | ✅ Zrobione | informacyjnie; wybrane dyspozycje na karcie ratunkowej |
+| A22.6 | Panel dla opiekuna rozszerzony | MVP/MLP | P1/P2 | ✅ Zrobione | panel opiekuna: wizyty, leki dziś, wiadomości |
 | A22.7 | Tryb senioralny | MVP/MLP | P1/P2 | 🟡 Częściowo | duży tekst, kontrast, prosty język; osobny uproszczony układ — następna runda |
 
 ## Nadzór, dane, bliźniak cyfrowy i genetyka
@@ -617,18 +617,18 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal Control Plane (19)
 
-✅ 11 · 🆕 2 · 🟡 4 · 🔧 0 · ⛔ 2
+✅ 13 · 🆕 0 · 🟡 4 · 🔧 0 · ⛔ 2
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
 | A18.1 | Instrukcja w aplikacji, wersjonowana | MVP/MLP | RDZEŃ | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
-| A18.2 | Karta modelu dla użytkownika | MVP/MLP | RDZEŃ | 🆕 Zrobione teraz | karty zastosowań AI dla pacjenta i personelu |
+| A18.2 | Karta modelu dla użytkownika | MVP/MLP | RDZEŃ | ✅ Zrobione | karty zastosowań AI dla pacjenta i personelu |
 | A18.3 | Deklaracja przeznaczenia i ograniczeń — co wyrób NIE robi | MVP/MLP | RDZEŃ | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A18.4 | Zgłaszanie incydentu przez użytkownika | MVP/MLP | RDZEŃ | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A18.5 | Monitoring dryfu modelu | MVP/MLP | RDZEŃ | 🟡 Częściowo | miernik poprawek notatek Scribe; formalny monitoring dryfu — przy produkcji |
 | A18.6 | Rejestr zastosowań AI | MVP/MLP | RDZEŃ | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A18.7 | Kontrolowana dystrybucja aktualizacji | MVP/MLP | RDZEŃ | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
-| A18.8 | Tryb degradacji przy awarii | MVP/MLP | RDZEŃ | 🆕 Zrobione teraz | baner z opisem trybu zastępczego (web i mobile) |
+| A18.8 | Tryb degradacji przy awarii | MVP/MLP | RDZEŃ | ✅ Zrobione | baner z opisem trybu zastępczego (web i mobile) |
 | A18.9 | S8 — usługi regulacyjne | MVP/MLP | RDZEŃ | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A18.10 | Log dostępu | MVP/MLP | RDZEŃ | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
 | A18.11 | Granularne wycofanie zgody | MVP/MLP | RDZEŃ | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
@@ -656,14 +656,14 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal Research Twin (5)
 
-✅ 1 · 🆕 1 · 🟡 0 · 🔧 0 · ⛔ 3
+✅ 2 · 🆕 0 · 🟡 0 · 🔧 0 · ⛔ 3
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
 | D5.1 | Twin populacyjny (kohorty zanonimizowane) | MLP→R&D | P4 | ⛔ R&D | dane populacyjne — podmiot dostępu do danych (EHDS) |
 | D5.2 | Uczenie federacyjne — model uczy się bez wynoszenia danych | MVP/MLP | P4 | ⛔ R&D | dane populacyjne — podmiot dostępu do danych (EHDS) |
 | D5.3 | Generowanie danych syntetycznych | MLP→R&D | P4 | ✅ Zrobione | działa (web, mobile, testy) — dalej pilotaż w placówce |
-| D5.4 | Rejestr zgód na wtórne wykorzystanie danych (EHDS) | MLP→R&D | P4 | 🆕 Zrobione teraz | rejestr sprzeciwów wobec wtórnego wykorzystania |
+| D5.4 | Rejestr zgód na wtórne wykorzystanie danych (EHDS) | MLP→R&D | P4 | ✅ Zrobione | rejestr sprzeciwów wobec wtórnego wykorzystania |
 | D5.6 | Alert epidemiologiczny lokalny | MLP→R&D | P4 | ⛔ R&D | dane populacyjne — podmiot dostępu do danych (EHDS) |
 
 ### Predictive / Specialty Twin (5)
@@ -680,7 +680,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Twin Extensions (15)
 
-✅ 1 · 🆕 0 · 🟡 0 · 🔧 6 · ⛔ 8
+✅ 1 · 🆕 1 · 🟡 0 · 🔧 5 · ⛔ 8
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
@@ -691,7 +691,7 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | D4.5 | Zbiorczy wskaźnik zdrowia z epigenetyką | FINAL/R&D | P4 | ⛔ R&D | technologia w fazie badań |
 | D4.6 | Interaktywne ciało 3D | MLP→R&D | P4 | 🔧 Mogę zrobić | wizualizacja własnych danych — produkt P4 |
 | D4.7 | Oś czasu zdrowia | MLP→R&D | P4 | ✅ Zrobione | oś czasu wyników z wersjami |
-| D4.8 | Drzewo zdrowia rodziny | MLP→R&D | P4 | 🔧 Mogę zrobić | drzewo zdrowia z wywiadu rodzinnego |
+| D4.8 | Drzewo zdrowia rodziny | MLP→R&D | P4 | 🆕 Zrobione teraz | drzewo zdrowia z wywiadu rodzinnego |
 | D4.9 | Kalkulator wpływu stylu życia | MLP→R&D | P4 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | D4.10 | Awatar przyszłego siebie | MLP→R&D | P4 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
 | D4.11 | Testament cyfrowy | MLP→R&D | P4 | 🔧 Mogę zrobić | dyspozycja „co z moimi danymi po śmierci” — treść z prawnikiem |
@@ -734,13 +734,13 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal Genetics / Digital Twin (19)
 
-✅ 0 · 🆕 0 · 🟡 0 · 🔧 2 · ⛔ 17
+✅ 0 · 🆕 2 · 🟡 0 · 🔧 0 · ⛔ 17
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
 | F16.1 | Zamówienie testu (kit do domu) | FINAL/R&D | P1/P4 | ⛔ Umowa | laboratorium genetyczne |
-| F16.2 | Wgrywanie wyników (surowe dane) | FINAL/R&D | P1/P4 | 🔧 Mogę zrobić | tylko przechowanie pliku; interpretacja — IVDR/MDR |
-| F16.3 | Wizualizacja drzewa genealogicznego | FINAL/R&D | P1/P4 | 🔧 Mogę zrobić | drzewo z wywiadu rodzinnego (A20.9) |
+| F16.2 | Wgrywanie wyników (surowe dane) | FINAL/R&D | P1/P4 | 🆕 Zrobione teraz | przechowanie pliku bez odczytu, poza udostępnianiem; interpretacja — IVDR/MDR |
+| F16.3 | Wizualizacja drzewa genealogicznego | FINAL/R&D | P1/P4 | 🆕 Zrobione teraz | drzewo z wywiadu rodzinnego (A20.9) |
 | F16.4 | 100 najważniejszych markerów zdrowia | FINAL/R&D | P1/P4 | ⛔ MDR | interpretacja genetyczna — IVDR/MDR |
 | F16.5 | Lista leków do unikania (PGx) | FINAL/R&D | P1/P4 | ⛔ MDR | interpretacja genetyczna — IVDR/MDR |
 | F16.6 | Pełna interpretacja kliniczna | FINAL/R&D | P1/P4 | ⛔ MDR | interpretacja genetyczna — IVDR/MDR |
@@ -944,15 +944,15 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 
 ### Eternal RPM / Care Pod (5)
 
-✅ 2 · 🆕 1 · 🟡 0 · 🔧 1 · ⛔ 1
+✅ 3 · 🆕 1 · 🟡 0 · 🔧 0 · ⛔ 1
 
 | ID | Funkcja | Etap | Projekt | Status | Faza / co dalej |
 |---|---|---|---|---|---|
 | S4.1 | Wideokonsultacja (LiveKit) | MVP/MLP | P2/P1 | ✅ Zrobione | w aplikacji (urządzenie — P2) |
 | S4.2 | Przycisk SOS | MLP/FINAL | P2/P1 | ✅ Zrobione | w aplikacji (urządzenie — P2) |
 | S4.3 | Triaż AI (na urządzeniu) | MLP/FINAL | P2/P1 | ⛔ MDR | interpretacja danych zdrowotnych — wyrób medyczny (certyfikacja) |
-| S4.4 | Tryb offline | MLP/FINAL | P2/P1 | 🔧 Mogę zrobić | tryb offline aplikacji (A5.12) |
-| S4.5 | Panel opiekuna | MLP/FINAL | P2/P1 | 🆕 Zrobione teraz | panel opiekuna w aplikacji (urządzenie — P2) |
+| S4.4 | Tryb offline | MLP/FINAL | P2/P1 | 🆕 Zrobione teraz | tryb offline aplikacji (A5.12); urządzenie Station — P2 |
+| S4.5 | Panel opiekuna | MLP/FINAL | P2/P1 | ✅ Zrobione | panel opiekuna w aplikacji (urządzenie — P2) |
 
 ### Eternal Bio-Tag (5)
 
@@ -1030,23 +1030,23 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | C5.17 | Samodiagnoza implantu | R&D/FINAL | P3 | ⛔ R&D | kapsuła wszczepialna — badania i certyfikacja |
 | C5.18 | Implanty biodegradowalne | R&D/FINAL | P3 | ⛔ R&D | kapsuła wszczepialna — badania i certyfikacja |
 
-## Co mogę zbudować dalej — 89 funkcji 🔧
+## Runda 4 — zbudowane: 41 funkcji 🆕 (kolejka A, pakiety 1–9)
 
-Kod w tej samej aplikacji, w granicy MDR (bez oceny, prognozy i porady na podstawie danych pacjenta). 18 pakietów w trzech kolejkach.
-
-### A. Bez niczego od właściciela projektu — 41 funkcji (runda 4)
-
-| # | Pakiet | Funkcje | Co powstanie | Czego potrzeba poza kodem |
+| # | Pakiet | Funkcje | Co działa | Co zostaje poza kodem |
 |---|---|---|---|---|
-| 1 | Tryb offline | A5.12, A24.6, S4.4 | kopia karty ratunkowej, leków i najbliższych wizyt w telefonie; działanie bez sieci | nic |
-| 2 | Rejestry publiczne | F3.11, F7.1, F7.2, F7.4, F7.7 | kod ATC przy lekach, apteki z Rejestru Aptek na mapie OpenStreetMap, informacja o refundacji z obwieszczenia MZ | nic (dane publiczne) |
-| 3 | Kolejne dzienniki | A21.2, A21.4, A21.5, A22.2, F11.1, F11.3, F11.4, F11.5 | cykl bez prognoz, połóg, menopauza, skale Katz/Lawton (punktuje lekarz), dziennik żywienia z Open Food Facts | nic |
-| 4 | Przypomnienia i lokalizacja | A14.3, A7.7, F9.11, F5.5, A11.1, A7.8, A12.6 | licznik opakowań, przypomnienia profilaktyczne wg wieku, terapia światłem, poranne podsumowanie dnia, lokalizacja w planach, wybór kodu ICD-10 przez lekarza | lista programów profilaktycznych (A7.7) do zatwierdzenia przez lekarza |
-| 5 | Powietrze i pogoda | F5.1, F5.2, F5.17, A3.6 | dane GIOŚ i IMGW dla miejsca użytkownika — sama informacja, bez porad | nic |
-| 6 | Apple Health / Health Connect | F2.1, F2.2, A1.8, F9.1, F9.3, F12.1 | kroki, sen i fazy snu, tętno z telefonu jako pomiary FHIR | test na fizycznym telefonie (development build EAS) |
-| 7 | Urządzenia Bluetooth | F2.9, F2.21, F2.19 | pulsoksymetr (profil PLX), ogólne profile GATT, Withings Sleep | urządzenie do testu |
-| 8 | Głos i motywacja | A17.10, F13.4 | sterowanie głosem w przeglądarce, odznaki za regularność wpisów (bez ocen zdrowia) | nic |
-| 9 | Drzewo rodziny i plik DNA | D4.8, F16.3, F16.2 | drzewo zdrowia z wywiadu rodzinnego; przechowanie surowego pliku genetycznego bez interpretacji | nic |
+| 1 | Tryb offline | A5.12, A24.6, S4.4 | kopia karty ratunkowej, leków z godzinami, wizyt i telefonu placówki — w przeglądarce i w telefonie, po decyzji pacjenta, usuwana przy wylogowaniu; ekran „Brak połączenia” z numerami alarmowymi | nic |
+| 2 | Rejestry publiczne | F3.11, F7.1, F7.2, F7.4, F7.7 | kod ATC przy lekach, wyszukiwarka aptek „w pobliżu”, trasa w wybranej mapie, informacja z obwieszczenia refundacyjnego | operator importuje pliki: Rejestr Aptek (CSV) i obwieszczenie MZ (arkusze jako CSV) — `npm run cli -- import-pharmacies`, `import-refund` |
+| 3 | Kolejne dzienniki | A21.2, A21.4, A21.5, A22.2, F11.1, F11.3, F11.4, F11.5 | cykl bez prognoz, połóg i karmienie, menopauza, czynności dnia bez punktów, żywienie z Open Food Facts | nic |
+| 4 | Przypomnienia i lokalizacja | A14.3, A7.7, F9.11, F5.5, A11.1, A7.8, A12.6 | zapas leku, profilaktyka NFZ wg rocznika, przypomnienia własne z miejscem, poranny plan dnia, okolica użytkownika, rozpoznania ICD-10 wybierane przez lekarza | lekarz zatwierdza treść programów profilaktycznych (`approve-preventive`); pełny słownik ICD-10 — import pliku |
+| 5 | Powietrze i pogoda | F5.1, F5.2, F5.17, A3.6 | indeks GIOŚ z najbliższej stacji, dane synoptyczne IMGW, powiadomienie o przekroczeniu progu | test z siecią produkcyjną (w środowisku budowy hosty GIOŚ/IMGW były zablokowane — kod według opublikowanego formatu, testy na danych wzorcowych) |
+| 6 | Apple Health / Health Connect | F2.1, F2.2, A1.8, F9.1, F9.3, F12.1 | odczyt kroków i snu z fazami w aplikacji mobilnej, dzienne podsumowania na serwerze, widok w „Pomiarach” | development build EAS i test na fizycznym iPhonie i telefonie z Androidem |
+| 7 | Urządzenia Bluetooth | F2.9, F2.21, F2.19 | pulsoksymetr (PLX jednorazowy i ciągły), glukometr, tryb „dowolne urządzenie zgodne ze standardem”, sen z Withings Sleep | test z fizycznym urządzeniem; konto deweloperskie Withings |
+| 8 | Głos i motywacja | A17.10, F13.4 | sterowanie głosem tylko do nawigacji (z informacją o przetwarzaniu mowy), odznaki za regularność bez ocen zdrowia | nic |
+| 9 | Drzewo rodziny i plik DNA | D4.8, F16.3, F16.2 | drzewo zdrowia z wywiadu rodzinnego; przechowanie surowego pliku genetycznego bez odczytu | nic |
+
+## Co mogę zbudować dalej — 48 funkcji 🔧
+
+Kod w tej samej aplikacji, w granicy MDR (bez oceny, prognozy i porady na podstawie danych pacjenta). 9 pakietów w dwóch kolejkach.
 
 ### B. Po decyzji albo z treścią — 24 funkcje
 
@@ -1067,7 +1067,7 @@ Kod w tej samej aplikacji, w granicy MDR (bez oceny, prognozy i porady na podsta
 | 17 | P5 — społeczność | F15.1–F15.7, F15.10, F15.11, A9.2, A9.3, A9.4, A9.7, X1.2, X1.4, A17.9 | forum, grupy, wyzwania, mentoring, spotkania, wydarzenia na Jitsi, anonimowe statystyki | moderatorzy, regulamin i procedura zgłoszeń treści (DSA) |
 | 18 | P6/P7 — Hub i Forge | A15.1, A16.1, A16.7 | formularz zgłoszeń projektów, katalog OSS i patentów z oceną | decyzja o starcie P6/P7 |
 
-Proponowana kolejność rundy 4: 1 → 2 → 3 → 4 → 5 → 8 → 9, równolegle 6 i 7, gdy będzie telefon i urządzenie do testu.
+Kolejka B rusza po decyzjach z tabeli niżej; kolejka C — po decyzji o starcie produktów P4–P7.
 
 ## Czego nie mogę zrobić — 399 funkcji ⛔ i jak je odblokować
 
@@ -1097,12 +1097,12 @@ Poprawka wobec rejestru: F16.14 (diagnostyka preimplantacyjna, PGT) nie jest zak
 
 | # | Decyzja lub zasób | Odblokowuje |
 |---|---|---|
-| 1 | Zgoda na rundę 4 (pakiety 1–9) | 41 funkcji |
+| 1 | Import rejestrów publicznych na serwerze (Rejestr Aptek, obwieszczenie refundacyjne, słownik ICD-10) i dostęp serwera do api.gios.gov.pl, danepubliczne.imgw.pl, world.openfoodfacts.org | pakiety 2, 4, 5 i 3 w pełnej wersji |
 | 2 | Decyzja kwalifikacyjna MDR: które funkcje zostają poza wyrobem (N0/W0), a które idą ścieżką MED-GATE lub URZĄDZENIE | 103 funkcje MDR; pakiet 10 |
 | 3 | Konta i klucze dostawców (SMS, e-mail, model AI, Withings, Terra) — w sekretach środowiska | wysyłka powiadomień i integracje urządzeń |
 | 4 | Ścieżka P1: placówka lub dostawca oprogramowania z dostępem do środowiska testowego CeZ | e-recepta, e-skierowanie, e-karta szczepień |
-| 5 | Treści do zatwierdzenia przez lekarza (programy profilaktyczne, kalendarz szczepień, higiena snu, lista z BRAKI §2.2a) | pakiety 4 i 12, A21.7 |
+| 5 | Treści do zatwierdzenia przez lekarza (programy profilaktyczne NFZ — gotowe do przeglądu, kalendarz szczepień, higiena snu, lista z BRAKI §2.2a) | A7.7, pakiet 12, A21.7 |
 | 6 | Prawnik: regulamin i polityka prywatności, dostęp bliskich po śmierci, regulamin społeczności (DSA) | pakiety 13 i 17 |
-| 7 | Telefon iOS i Android, konto deweloperskie Apple/Google, pulsoksymetr Bluetooth | pakiety 6 i 7 |
+| 7 | Telefon iOS i Android, konto deweloperskie Apple/Google (development build EAS), pulsoksymetr Bluetooth | test pakietów 6 i 7 na urządzeniach |
 | 8 | Partnerzy: placówka pilotażowa, apteka, laboratorium, sieć lekarzy i psychologów | 55 funkcji „umowa” i 27 „usługa ludzi” |
 | 9 | Doprecyzowanie A17.8, A20.2, A20.5, A20.6 w rejestrze | 4 funkcje |

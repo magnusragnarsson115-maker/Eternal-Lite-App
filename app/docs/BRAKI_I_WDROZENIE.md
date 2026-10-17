@@ -60,6 +60,9 @@ Aktualny stan każdego składnika pokazuje polecenie **`npm run cli -- check --l
 | Lista szczepionek i chorób w wywiadzie rodzinnym | `server/services/healthHistory.ts` (`VACCINES`, `FAMILY_CONDITIONS`) | lekarz | **kalendarza PSO (kiedy jakie szczepienie dziecka) celowo nie ma** — wymaga treści zatwierdzonej przez lekarza i aktualizacji co roku z komunikatem GIS |
 | Karty zastosowań AI i opisy trybu zastępczego | `server/services/systemStatus.ts` | osoba odpowiedzialna za AI (A18) + produkt | przegląd przy każdej zmianie modelu lub polecenia |
 | Ćwiczenia oddechowe (wzorce 4-6, 4-4-4-4, 4-7-8) | `web/src/patient/JournalPages.tsx`, `mobile/src/app/journal.tsx` | psycholog | potwierdzenie wzorców i ostrzeżenia o zawrotach głowy |
+| Programy profilaktyczne NFZ (A7.7): wiek, odstępy, sposób zapisu | `server/content/preventive.ts` (`nfz-profilaktyka/2026-10-1`, zasady sprawdzone 17.10.2026 z pacjent.gov.pl i komunikatami NFZ) | lekarz (z numerem PWZ) | `npm run cli -- preventive-review > profilaktyka.md` → poprawki → `npm run cli -- approve-preventive "lek. Imię Nazwisko, PWZ …"`; do tego czasu pacjenci ich nie widzą (w demo — z oznaczeniem „projekt”); przegląd przy każdej zmianie programów NFZ |
+| Lista najczęstszych rozpoznań ICD-10 po polsku | `server/services/diagnoses.ts` (`ICD10_COMMON`) | lekarz / koder medyczny | porównanie nazw z wydaniem urzędowym albo import pełnego słownika (`import-icd10`), który zastępuje listę |
+| Lista miast z przybliżonymi współrzędnymi | `server/services/personalReminders.ts` (`CITIES`) | produkt | wystarcza do wyboru najbliższej stacji GIOŚ i aptek; rozbudowa o mniejsze miejscowości w razie potrzeby |
 
 ### 2.3. Sprawdzone tylko częściowo (w tym środowisku nie było kont ani urządzeń)
 
@@ -67,6 +70,10 @@ Aktualny stan każdego składnika pokazuje polecenie **`npm run cli -- check --l
 - **Obraz Docker z Chromium** — sieć środowiska blokowała repozytoria Debiana, więc obrazu nie zbudowano; Chromium i PDF sprawdzone poza kontenerem.
 - **Klucze dostępu (WebAuthn)** — bez testu automatycznego (wymaga uwierzytelniacza).
 - **Aplikacja mobilna** — sprawdzona typami i pełnym pakietem JS; biometria, PIN, schowek systemu i push wymagają testu na telefonach.
+- **Runda 4 — usługi publiczne** — GIOŚ, IMGW, Open Food Facts i strona rejestrów CeZ były zablokowane przez politykę sieci środowiska budowy; kod napisany według opublikowanego formatu (dokumentacja i wzorcowe odpowiedzi), testy na danych wzorcowych. Po wdrożeniu: sprawdzić ekran „Powietrze i pogoda” i wyszukiwarkę produktów na serwerze z dostępem do tych hostów.
+- **Runda 4 — Apple Health / Health Connect** — kod natywny przez `@kingstinct/react-native-healthkit` i `react-native-health-connect` (wtyczki Expo w `app.json`, `minSdkVersion 26`); nie działa w Expo Go — wymaga development build EAS i testu na iPhonie i telefonie z Androidem (zgody systemowe, fazy snu z zegarka).
+- **Runda 4 — Bluetooth i Withings Sleep** — parsery sprawdzone testami na ramkach wzorcowych; pulsoksymetr, glukometr (RACP) i Withings Sleep wymagają testu z urządzeniem.
+- **Runda 4 — głos** — Web Speech działa w Chrome/Edge (Safari częściowo); Firefox bez obsługi — przycisk mikrofonu się wtedy nie pokazuje.
 
 ### 2.4. Poza kodem (organizacyjne, z A3)
 
@@ -91,6 +98,7 @@ kwalifikacji (MDR, AI Act) przez `/dokument`, szkolenie personelu z AI (art. 4 A
 | 9 | Pierwsza klinika | `npm run cli -- create-org "Nazwa"`, `create-admin <email> "<Imię>" --org <id>`; w panelu: zaproszenia personelu, wymagane dokumenty, szablony notatek, moduły |
 | 10 | Aplikacja mobilna | konta Apple (99 USD/rok) i Google Play (25 USD), `npx eas-cli@latest init`, build preview → test na telefonach → sklep; na serwerze `MOBILE_*` |
 | 11 | Prawo i bezpieczeństwo przed pierwszymi danymi | ocena skutków, umowy powierzenia, ASVS L1, treści zgód z prawnikiem |
+| 11a | Treści i rejestry rundy 4 | zatwierdzenie programów profilaktycznych (`approve-preventive`); import Rejestru Aptek (`import-pharmacies`), wykazów refundacyjnych (`import-refund`, po każdym obwieszczeniu) i słownika ICD-10 (`import-icd10`); dostęp serwera do `api.gios.gov.pl`, `danepubliczne.imgw.pl`, `world.openfoodfacts.org`; Withings z zakresem `user.activity` |
 | 12 | Kontrola końcowa | `npm run cli -- check --live` — wszystkie pozycje „działa” |
 
 Koszty jednostkowe z pliku 12.8 (A3/A8): SMS ok. 0,17 zł netto; Scribe ok. 0,3–0,5 zł za 15-minutową wizytę;

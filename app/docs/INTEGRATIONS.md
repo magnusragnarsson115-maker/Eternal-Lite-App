@@ -19,8 +19,15 @@ płatne, uzasadnienie, koszty, źródła; stan rynku 10.2026): [`ETERNAL_11_1_WY
 | **NLM Clinical Tables** (LOINC, ICD-10-CM) | bezpłatne, bez klucza | `NLM_API_ENABLED` | ✅ parser, 🌐 | hasło wyszukiwania wpisane przez personel |
 | **WHO ICD-11 API** | bezpłatne po rejestracji | `ICD11_CLIENT_ID/SECRET` | 🌐 | hasło wyszukiwania |
 | **Have I Been Pwned** (hasła) | bezpłatne, bez klucza | `HIBP_ENABLED` | 🌐 | 5 znaków skrótu SHA-1 hasła (k-anonimowość) |
-| **Web Bluetooth (GATT)** | bezpłatne | — | ✅ parsery 5 profili | nic — odczyt w przeglądarce pacjenta |
-| **Withings** | bezpłatne konto deweloperskie | `WITHINGS_CLIENT_ID/SECRET` | ✅ mapowanie, 🌐 OAuth | token OAuth pacjenta; pobierane są pomiary |
+| **Web Bluetooth (GATT)** | bezpłatne | — | ✅ parsery 6 profili (+ PLX ciągły, RACP glukometru) | nic — odczyt w przeglądarce pacjenta |
+| **Rejestr Aptek (CeZ)** | bezpłatny eksport CSV | `npm run cli -- import-pharmacies <plik.csv>` | ✅ import i wyszukiwanie | nic — wyszukiwanie lokalne |
+| **Obwieszczenie refundacyjne MZ** | bezpłatne (arkusze jako CSV) | `npm run cli -- import-refund <plik.csv> --list A1 --title … --valid-from …` | ✅ import i wyszukiwanie | nic — wyszukiwanie lokalne |
+| **Klasyfikacja ICD-10 (wydanie polskie)** | bezpłatny słownik | `npm run cli -- import-icd10 <plik.csv>` | ✅ import, lista wbudowana | nic |
+| **GIOŚ — jakość powietrza (PJP API v1)** | bezpłatne, bez klucza | `GIOS_API_ENABLED` | ✅ format i najbliższa stacja, 🌐 | numer stacji (bez położenia pacjenta) |
+| **IMGW-PIB — dane synoptyczne** | bezpłatne, bez klucza | `IMGW_API_ENABLED` | ✅ format, 🌐 | nic poza zapytaniem o listę stacji |
+| **Open Food Facts** | bezpłatne, bez klucza | `OFF_API_ENABLED` | ✅ format, 🌐 | kod kreskowy albo nazwa produktu |
+| **Apple HealthKit / Health Connect** | bezpłatne (konto deweloperskie) | aplikacja mobilna (development build EAS) | ✅ typy, 🌐 test na telefonie | nic do dostawcy — odczyt na telefonie, wysyłka do naszego serwera |
+| **Withings** | bezpłatne konto deweloperskie | `WITHINGS_CLIENT_ID/SECRET` | ✅ mapowanie pomiarów i snu, 🌐 OAuth | token OAuth pacjenta; pobierane są pomiary i podsumowania snu |
 | **Vitalera / platformy RPM** | umowa partnerska | `RPM_WEBHOOK_SECRETS` | ✅ podpis, mapowanie, deduplikacja | nic — platforma wysyła dane do nas |
 | **Jitsi Meet** | bezpłatne (open source) | `JITSI_DOMAIN`, `JITSI_APP_ID/SECRET` | ✅ JWT i okno czasowe | strumień wideo do serwera Jitsi |
 | **Web Push (VAPID)** | bezpłatne | opcjonalnie `VAPID_*` | — | tytuł i treść powiadomienia bez danych medycznych (przez usługę push przeglądarki) |
@@ -95,7 +102,9 @@ Standardowe profile Bluetooth SIG (bez SDK producentów): Blood Pressure `0x1810
 Weight Scale `0x181D`/`0x2A9D`, Health Thermometer `0x1809`/`0x2A1C`, Pulse Oximeter `0x1822`/`0x2A5E`. Parsery
 IEEE 11073 (SFLOAT/FLOAT, jednostki, znaczniki czasu) w `web/src/lib/ble.ts`. Działa w Chrome i Edge (Android,
 Windows, macOS, ChromeOS); Safari/iOS nie obsługuje Web Bluetooth — tam pomiary wpisuje się ręcznie lub przez Withings.
-Glukometry (profil `0x1808`) wymagają protokołu RACP — do rozbudowy.
+Glukometr (`0x1808`/`0x2A18`): po włączeniu powiadomień aplikacja prosi przez RACP (`0x2A52`, `[0x01, 0x06]`) o ostatni
+zapis; wartość zapisywana w mg/dL. Pulsoksymetry wysyłające tylko pomiar ciągły — `0x2A5F`. Przycisk „Połącz dowolne
+urządzenie” rozpoznaje profil po usłudze GATT.
 
 ## Withings
 
@@ -103,6 +112,29 @@ OAuth 2.0 (`account.withings.com/oauth2_user/authorize2`, `wbsapi.withings.net/v
 `wbsapi.withings.net/measure?action=getmeas` (typy 1, 4, 9, 10, 11, 54, 71; wartość = `value × 10^unit`).
 Adres zwrotny do rejestracji aplikacji: `{PUBLIC_URL}/api/integrations/withings/callback`. Pacjent łączy konto
 w „Pomiary”, import ręczny lub po połączeniu.
+
+Sen (Withings Sleep i zegarki): `wbsapi.withings.net/v2/sleep?action=getsummary` z polami `total_sleep_time`,
+`deepsleepduration`, `lightsleepduration`, `remsleepduration`, `wakeupduration` (sekundy) — wymaga zakresu
+`user.activity`; konta połączone wcześniej trzeba połączyć ponownie.
+
+## Rejestry publiczne (runda 4)
+
+- **Rejestr Aptek** — eksport CSV z rejestrymedyczne.ezdrowie.gov.pl. Kolumny rozpoznawane po synonimach (nazwa,
+  rodzaj, ulica, numer, kod, miejscowość, województwo, telefon, godziny, status, szerokość/długość geograficzna);
+  apteki wykreślone, zawieszone i z cofniętym zezwoleniem są pomijane. Bez współrzędnych działa wyszukiwanie tekstowe.
+- **Obwieszczenie refundacyjne** — plik XLSX z gov.pl zapisany jako CSV po jednym arkuszu (wykazy A1, A2, …);
+  kolumny: substancja czynna, nazwa postać i dawka, zawartość opakowania, kod EAN, grupa limitowa, cena detaliczna,
+  limit finansowania, zakres wskazań, wskazania pozarejestracyjne, poziom odpłatności, dopłata. Import nadpisuje dany
+  wykaz; aktualizuj po każdym obwieszczeniu.
+- **ICD-10** — dowolny CSV z kolumnami „kod” i „nazwa”; bez importu działa wbudowana lista najczęstszych rozpoznań.
+
+## GIOŚ i IMGW (runda 4)
+
+GIOŚ: `api.gios.gov.pl/pjp-api/v1/rest/station/findAll` (strony po 500, pola JSON-LD po polsku, współrzędne
+`WGS84 φ N`/`λ E`) i `aqindex/getIndex/{id}` — kategoria ogólna i dla PM10, PM2.5, O3, NO2, SO2. Lista stacji w pamięci
+podręcznej 24 h, indeks 20 min. IMGW: `danepubliczne.imgw.pl/api/data/synop` — temperatura, wilgotność, ciśnienie,
+wiatr, opad, godzina pomiaru (UTC). Format według dokumentacji i wzorcowych odpowiedzi; w środowisku budowy hosty
+były zablokowane, więc 🌐 test na żywo — po wdrożeniu. W trybie demo bez sieci: dane pokazowe z wyraźnym oznaczeniem.
 
 ## Jitsi Meet
 

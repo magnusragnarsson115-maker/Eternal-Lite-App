@@ -177,6 +177,33 @@ umów z dostawcami. Pełna klasyfikacja wszystkich 648 funkcji (zrobione / mogę
 | F1.12 (część) logowanie z nowego urządzenia | `noteDevice` w `S/auth/sessions.ts`: nowa przeglądarka/aplikacja × sieć → powiadomienie i e-mail bez danych o zdrowiu (reguła, nie model ML) | `control-plane.test.ts` |
 | RODO art. 20 — eksport | eksport FHIR obejmuje teraz cały sejf pacjenta (dzienniki, szczepienia, dyspozycje, cele, wgrane dokumenty) | `health-history.test.ts` |
 
+### Runda 4 — kolejka A (41 funkcji, pakiety 1–9)
+
+Nowe moduły w rejestrze (`S/modules.ts`): `patient-offline`, `patient-reminders`, `patient-preventive`, `public-registries`,
+`air-weather` (pacjent, przełącza operator) i `diagnoses` (placówka). Trasy: `S/routes/everyday.ts`; migracje 15 i 16.
+
+| Pozycje rejestru | Gdzie w kodzie | Testy |
+|---|---|---|
+| A5.12, A24.6, S4.4 kopia na wypadek braku internetu | `S/services/offline.ts` (`/api/me/offline-pack`, `no-store`, odczyt w dzienniku): karta ratunkowa, leki z godzinami, wizyty do 60 dni, kontakt do placówki; web: `W/lib/offline.ts` (zapis w pamięci przeglądarki tylko po decyzji, usuwany przy wylogowaniu, odświeżany co 12 h), `W/patient/OfflinePages.tsx` (ekran „Brak połączenia” z numerami alarmowymi, pasek „Brak internetu”), `web/public/sw.js` (powłoka aplikacji, nigdy `/api`); mobile: `M/lib/offline.ts` (prywatny katalog aplikacji), `M/app/offline.tsx`, czyszczenie w `M/lib/session.tsx` | `everyday.test.ts` |
+| F3.11 kod ATC | `productAtc` w `S/integrations/rpl.ts`; ATC zapisywany przy leku z RPL (`ATC_SYSTEM`) i doczytywany dla starszych wpisów; web: lista leków | `everyday.test.ts` (pośrednio), typy |
+| F7.1, F7.2, F7.4, F7.7 apteki i refundacja | `S/integrations/registries.ts`: import CSV Rejestru Aptek (synonimy kolumn, pomijanie wykreślonych i zawieszonych) i arkuszy obwieszczenia refundacyjnego; wyszukiwanie lokalne (tekst, „w pobliżu” po współrzędnych rejestru); `S/lib/csv.ts`; CLI `import-pharmacies`, `import-refund`; web: `W/patient/EverydayPages.tsx` („Apteki i refundacja”), `W/lib/maps.ts` (trasa w OSM / Google / Apple bez wysyłania położenia) | `everyday.test.ts` |
+| A21.2, A21.4, A21.5 cykl, połóg, menopauza | `S/services/journal.ts` (`cycleHistory` — tylko historia: początki miesiączek i długości cykli, bez prognoz), `W/patient/WomenHealthPage.tsx` | `journal-more.test.ts` |
+| A22.2 czynności dnia (Katz, Lawton) | dziennik `adl` — odpowiedzi i kto wypełnia, bez sumy punktów; `W/patient/FoodDiary.tsx` (`AdlTab`) | `journal-more.test.ts` |
+| F11.1, F11.3–F11.5 żywienie | dziennik `food` z pozycjami i sumą z etykiet (`foodTotals`, `foodByDay`); `S/integrations/openfoodfacts.ts` (kod kreskowy, wyszukiwanie, wysyłany tylko kod lub nazwa); `W/patient/FoodDiary.tsx` | `journal-more.test.ts` |
+| A14.3 zapas leku | `stockDaysLeft`, `setScheduleStock` w `S/services/medReminders.ts`; „Przyjęty” odejmuje dawkę; jedno przypomnienie przy < 7 dniach, push bez nazwy leku | `everyday.test.ts` |
+| A7.7 profilaktyka NFZ | `S/content/preventive.ts` (programy z wersją i skrótem treści, zatwierdzenie przez lekarza — `preventive-review`, `approve-preventive`), `preventiveItems` w `S/services/personalReminders.ts` (rocznik jak w zaproszeniach NFZ, następny termin = data pacjenta + odstęp programu), przypomnienie raz | `everyday.test.ts` |
+| F9.11, A7.8, F5.5 przypomnienia własne, miejsce, poranny plan | `S/services/personalReminders.ts` (przypomnienia z miejscem i mapą, okno 10 min; `dayPlan`, poranne podsumowanie o wybranej godzinie tylko w dni z planem); miejsce ćwiczeń w planie (`CarePlan.activity.detail.location`); web: „Przypomnienia”, plan ćwiczeń | `everyday.test.ts` |
+| A11.1 lokalizacja | `setLocation`: miasto z listy albo położenie zaokrąglone do 0,01° (ok. 1 km), bez historii; ustawienie konta, nie profilu | `everyday.test.ts` |
+| A12.6 kod ICD-10 wybierany przez lekarza | `S/services/diagnoses.ts` (lista najczęstszych rozpoznań po polsku, import pełnego słownika `import-icd10`, NLM ICD-10-CM z oznaczeniem; FHIR Condition z autorem), `W/staff/DiagnosesPanel.tsx` (zakładka „Rozpoznania”) | `everyday.test.ts` |
+| F5.1, F5.2, F5.17, A3.6 powietrze i pogoda | `S/integrations/air.ts` (GIOŚ PJP v1: stacje i indeks, najbliższa stacja liczona na serwerze; IMGW synop), `S/services/environment.ts` (powiadomienie przy przekroczeniu progu, raz na przekroczenie); dane pokazowe tylko w DEMO_MODE z oznaczeniem; web: „Powietrze i pogoda” | `everyday.test.ts` |
+| F2.1, F2.2, A1.8, F9.1, F9.3, F12.1 Apple Health / Health Connect | `S/services/activity.ts` (dzienne podsumowania: kroki LOINC 41950-7, czas snu LOINC 93832-4 z fazami; jeden dzień × źródło = jedna obserwacja); mobile: `M/lib/health.ios.ts` (`@kingstinct/react-native-healthkit`), `M/lib/health.android.ts` (`react-native-health-connect`), `M/app/health-sync.tsx`; web: `W/patient/ActivityCard.tsx` | `devices-more.test.ts` |
+| F2.19 Withings Sleep | `mapSleepSeries`, `fetchSleepSummary` w `S/integrations/withings.ts` (zakres `user.activity`) | `devices-more.test.ts` |
+| F2.9, F2.21 Bluetooth | `W/lib/ble.ts`: PLX ciągły (0x2A5F), glukometr (0x2A18, RACP „ostatni zapis”), tryb „dowolne urządzenie”, `kindForService`; poprawiona precyzja SFLOAT/FLOAT | `ble.test.ts`, `devices-more.test.ts` |
+| A17.10 sterowanie głosem | `W/lib/voice.ts`, `W/patient/VoiceNav.tsx`: Web Speech tylko do nawigacji, informacja o przetwarzaniu mowy przed pierwszym użyciem, `processLocally` gdy dostępne | `devices-more.test.ts` |
+| F13.4 odznaki | `S/services/achievements.ts`: dni z jakimkolwiek zapisem, serie, 8 odznak — bez wartości pomiarów | `devices-more.test.ts` |
+| D4.8, F16.3 drzewo zdrowia rodziny | `W/patient/FamilyTree.tsx` — pokolenia z wywiadu rodzinnego, bez oceny ryzyka | typy |
+| F16.2 plik surowych danych genetycznych | `S/services/genomicFiles.ts` (osobna tabela, ZIP/GZ/tekst rozpoznane bez czytania treści, poza udostępnianiem i raportami, tylko właściciel konta, usuwany z kontem), karta „Plik DNA” | `devices-more.test.ts` |
+
 ### Rdzeń wspólny (R1–R10) i D0
 
 | Nr | Pozycja | Etap | Gdzie w kodzie | Testy |
