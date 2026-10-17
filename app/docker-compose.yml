@@ -1,0 +1,34 @@
+# Uruchomienie: cp .env.example .env  (uzupełnij)  &&  docker compose up -d --build
+# Aplikacja musi działać za reverse proxy z TLS (np. Caddy poniżej) — ciasteczka sesji mają flagę Secure.
+services:
+  eternal:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DATA_DIR: /data
+    volumes:
+      - eternal-data:/data
+    expose:
+      - "3000"
+
+  # Opcjonalny reverse proxy z automatycznym certyfikatem Let's Encrypt.
+  # Ustaw domenę w zmiennej ETERNAL_DOMAIN (np. pacjent.twoja-placowka.pl) i PUBLIC_URL=https://<domena> w .env.
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      ETERNAL_DOMAIN: ${ETERNAL_DOMAIN:-localhost}
+    command: caddy reverse-proxy --from ${ETERNAL_DOMAIN:-localhost} --to eternal:3000
+    volumes:
+      - caddy-data:/data
+    depends_on:
+      - eternal
+
+volumes:
+  eternal-data:
+  caddy-data:
