@@ -1,5 +1,6 @@
 import { EN_SURVEYS } from './i18n-en-surveys';
 import { EN_R3 } from './i18n-en-r3';
+import { EN_R4 } from './i18n-en-r4';
 
 /** Słownik angielski aplikacji mobilnej: tekst polski → tekst angielski (test kompletności: tests/unit/i18n.test.ts). */
 export const EN: Record<string, string> = {
@@ -409,4 +410,4 @@ export const EN: Record<string, string> = {
   'Karta „Po wizycie” (PDF)': 'After-visit card (PDF)',
 };
 
-Object.assign(EN, EN_SURVEYS, EN_R3);
+Object.assign(EN, EN_SURVEYS, EN_R3, EN_R4);

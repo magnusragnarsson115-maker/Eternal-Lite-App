@@ -4,7 +4,7 @@
  * Parsery są czystymi funkcjami (testy jednostkowe w tests/unit/ble.test.ts).
  */
 
-export type BleKind = 'bp' | 'heartRate' | 'weight' | 'temperature' | 'spo2';
+export type BleKind = 'bp' | 'heartRate' | 'weight' | 'temperature' | 'spo2' | 'glucose';
 
 export interface BleReading {
   kind: BleKind;
@@ -22,7 +22,11 @@ export const BLE_PROFILES: Record<BleKind, { service: number; characteristic: nu
   weight: { service: 0x181d, characteristic: 0x2a9d, label: 'Waga' },
   temperature: { service: 0x1809, characteristic: 0x2a1c, label: 'Termometr' },
   spo2: { service: 0x1822, characteristic: 0x2a5e, label: 'Pulsoksymetr' },
+  glucose: { service: 0x1808, characteristic: 0x2a18, label: 'Glukometr' },
 };
+
+/** Charakterystyki zapasowe: pulsoksymetry wysyłające tylko pomiar ciągły (PLX Continuous, 0x2A5F). */
+const FALLBACK: Partial<Record<BleKind, number>> = { spo2: 0x2a5f };
 
 /** IEEE 11073-20601 SFLOAT (16 bit): 12-bitowa mantysa i 4-bitowy wykładnik, oba ze znakiem. */
 export function readSfloat(view: DataView, offset: number): number {
@@ -32,7 +36,7 @@ export function readSfloat(view: DataView, offset: number): number {
   let exponent = raw >> 12;
   if (mantissa >= 0x0800) mantissa -= 0x1000;
   if (exponent >= 0x8) exponent -= 0x10;
-  return round(mantissa * 10 ** exponent);
+  return decimal(mantissa, exponent);
 }
 
 /** IEEE 11073-20601 FLOAT (32 bit): 24-bitowa mantysa i 8-bitowy wykładnik. */
@@ -43,7 +47,12 @@ export function readFloat(view: DataView, offset: number): number {
   if (mantissa === 0x007fffff || mantissa === 0x00800000 || mantissa === 0x007ffffe || mantissa === 0x00800002) return Number.NaN;
   if (mantissa >= 0x00800000) mantissa -= 0x01000000;
   if (exponent >= 0x80) exponent -= 0x100;
-  return round(mantissa * 10 ** exponent);
+  return decimal(mantissa, exponent);
+}
+
+/** mantysa × 10^wykładnik bez szumu zmiennoprzecinkowego — tyle miejsc po przecinku, ile wynika z wykładnika. */
+function decimal(mantissa: number, exponent: number): number {
+  return Number((mantissa * 10 ** exponent).toFixed(Math.min(20, Math.max(0, -exponent))));
 }
 
 function round(v: number): number {
@@ -117,32 +126,70 @@ export function parsePlxSpotCheck(view: DataView): BleReading {
   return { kind: 'spo2', value: spo2, pulse: Number.isFinite(pr) ? Math.round(pr) : undefined, unit: '%', timestamp };
 }
 
+/** PLX Continuous Measurement (0x2A5F): SpO2 i tętno „normal” zawsze na początku, dalsze pola wg flag. */
+export function parsePlxContinuous(view: DataView): BleReading {
+  const spo2 = readSfloat(view, 1);
+  const pr = readSfloat(view, 3);
+  return { kind: 'spo2', value: spo2, pulse: Number.isFinite(pr) ? Math.round(pr) : undefined, unit: '%' };
+}
+
+/**
+ * Glucose Measurement (0x2A18): numer sekwencji, czas, opcjonalne przesunięcie czasu, stężenie (SFLOAT) w kg/L
+ * albo mol/L wg flagi. Zapisujemy w mg/dL, jak pozostałe pomiary glukozy w aplikacji: kg/L × 100 000, a mol/L
+ * przez mmol/L × 18,016 (masa molowa glukozy 180,16 g/mol). Aplikacja zapisuje wartość z urządzenia — nie ocenia jej.
+ */
+export function parseGlucose(view: DataView): BleReading {
+  const flags = view.getUint8(0);
+  let offset = 3; // flagi + numer sekwencji
+  const timestamp = readTimestamp(view, offset);
+  offset += 7;
+  if (flags & 0x01) offset += 2; // przesunięcie czasu
+  if (!(flags & 0x02)) throw new Error('glucose_no_concentration');
+  const raw = readSfloat(view, offset);
+  const molPerL = (flags & 0x04) !== 0;
+  return { kind: 'glucose', value: Math.round(molPerL ? raw * 1000 * 18.016 : raw * 100_000), unit: 'mg/dL', timestamp };
+}
+
 export const PARSERS: Record<BleKind, (v: DataView) => BleReading> = {
   bp: parseBloodPressure,
   heartRate: parseHeartRate,
   weight: parseWeight,
   temperature: parseTemperature,
   spo2: parsePlxSpotCheck,
+  glucose: parseGlucose,
 };
+
+const FALLBACK_PARSERS: Partial<Record<BleKind, (v: DataView) => BleReading>> = { spo2: parsePlxContinuous };
+
+/** Uniwersalny adapter (F2.21): rodzaj pomiaru po numerze usługi GATT (Bluetooth SIG). */
+export function kindForService(uuid: number | string): BleKind | undefined {
+  const n = typeof uuid === 'number' ? uuid : parseInt(uuid.length > 8 ? uuid.slice(4, 8) : uuid, 16);
+  return (Object.entries(BLE_PROFILES) as [BleKind, { service: number }][]).find(([, p]) => p.service === n)?.[0];
+}
 
 // --- połączenie z urządzeniem (API przeglądarki) ------------------------------------------------------
 
 interface BtCharacteristic extends EventTarget {
   value?: DataView;
+  writeValue?(data: BufferSource): Promise<void>;
   startNotifications(): Promise<BtCharacteristic>;
   stopNotifications(): Promise<BtCharacteristic>;
 }
+interface BtService {
+  uuid?: string;
+  getCharacteristic(c: number): Promise<BtCharacteristic>;
+}
+interface BtServer {
+  getPrimaryService(s: number): Promise<BtService>;
+  getPrimaryServices?(): Promise<BtService[]>;
+  disconnect(): void;
+}
 interface BtDevice {
   name?: string;
-  gatt?: {
-    connect(): Promise<{
-      getPrimaryService(s: number): Promise<{ getCharacteristic(c: number): Promise<BtCharacteristic> }>;
-      disconnect(): void;
-    }>;
-  };
+  gatt?: { connect(): Promise<BtServer> };
 }
 interface BtNavigator {
-  bluetooth?: { requestDevice(opts: { filters: { services: number[] }[] }): Promise<BtDevice> };
+  bluetooth?: { requestDevice(opts: { filters: { services: number[] }[]; optionalServices?: number[] }): Promise<BtDevice> };
 }
 
 export function bluetoothSupported(): boolean {
@@ -153,15 +200,40 @@ export function bluetoothSupported(): boolean {
  * Łączy się z urządzeniem i czeka na pierwszy pomiar (urządzenia wysyłają wynik po zakończeniu pomiaru).
  * Zwraca odczyt i nazwę urządzenia. Przerwanie przez użytkownika rzuca błąd NotFoundError.
  */
-export async function readFromDevice(kind: BleKind, timeoutMs = 90_000): Promise<{ reading: BleReading; deviceName: string }> {
+export async function readFromDevice(kind: BleKind | 'any', timeoutMs = 90_000): Promise<{ reading: BleReading; deviceName: string }> {
   const bt = (navigator as unknown as BtNavigator).bluetooth;
   if (!bt) throw new Error('bluetooth_unsupported');
-  const profile = BLE_PROFILES[kind];
-  const device = await bt.requestDevice({ filters: [{ services: [profile.service] }] });
+  const all = Object.values(BLE_PROFILES).map((p) => p.service);
+  // „dowolne urządzenie”: lista urządzeń z którąkolwiek standardową usługą pomiarową
+  const device = await bt.requestDevice(kind === 'any' ? { filters: all.map((s) => ({ services: [s] })), optionalServices: all } : { filters: [{ services: [BLE_PROFILES[kind].service] }] });
   const server = await device.gatt!.connect();
   try {
+    let k: BleKind | undefined = kind === 'any' ? undefined : kind;
+    if (!k) {
+      for (const s of all) {
+        const ok = await server.getPrimaryService(s).then(
+          () => true,
+          () => false,
+        );
+        if (ok) {
+          k = kindForService(s);
+          break;
+        }
+      }
+      if (!k) throw new Error('bluetooth_no_supported_service');
+    }
+    const profile = BLE_PROFILES[k];
     const service = await server.getPrimaryService(profile.service);
-    const ch = await service.getCharacteristic(profile.characteristic);
+    let parse = PARSERS[k];
+    let ch: BtCharacteristic;
+    try {
+      ch = await service.getCharacteristic(profile.characteristic);
+    } catch (err) {
+      const alt = FALLBACK[k];
+      if (!alt) throw err;
+      ch = await service.getCharacteristic(alt);
+      parse = FALLBACK_PARSERS[k]!;
+    }
     const reading = await new Promise<BleReading>((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error('bluetooth_timeout')), timeoutMs);
       ch.addEventListener('characteristicvaluechanged', (ev) => {
@@ -169,12 +241,21 @@ export async function readFromDevice(kind: BleKind, timeoutMs = 90_000): Promise
         if (!value) return;
         clearTimeout(timer);
         try {
-          resolve(PARSERS[kind](value));
+          resolve(parse(value));
         } catch (err) {
           reject(err);
         }
       });
-      ch.startNotifications().catch(reject);
+      ch.startNotifications()
+        .then(async () => {
+          // glukometry wysyłają zapisane pomiary dopiero na prośbę: RACP (0x2A52) „ostatni zapis” [0x01, 0x06]
+          if (k !== 'glucose') return;
+          const racp = await service.getCharacteristic(0x2a52).catch(() => undefined);
+          if (!racp?.writeValue) return;
+          await racp.startNotifications().catch(() => undefined);
+          await racp.writeValue(new Uint8Array([0x01, 0x06])).catch(() => undefined);
+        })
+        .catch(reject);
     });
     await ch.stopNotifications().catch(() => undefined);
     return { reading, deviceName: device.name ?? profile.label };

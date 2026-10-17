@@ -212,6 +212,7 @@ export interface MedicationView {
   id: string;
   name: string;
   rplId?: string;
+  atc?: string;
   dosage?: string;
   since?: string;
   status: string;

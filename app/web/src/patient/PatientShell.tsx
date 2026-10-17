@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Activity, BookHeart, Bell, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, Flower2, FolderOpen, Home, LayoutGrid, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users } from 'lucide-react';
+import { Activity, AlarmClock, BookHeart, Bell, BriefcaseMedical, CalendarCheck, Wind, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, Flower2, FolderOpen, Home, LayoutGrid, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users } from 'lucide-react';
 import { useEffect, type ReactNode } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { get, msSinceOwnMutation } from '../api';
@@ -7,6 +7,7 @@ import { useI18n } from '../i18n';
 import { useRealtime, type LiveEvent } from '../realtime';
 import { useSession } from '../session';
 import { OfflineBanner, useOfflineRefresh } from './OfflinePages';
+import { VoiceNavButton } from './VoiceNav';
 import { BrandMark, Button, DemoBanner, FullText, Notice, Spinner, useToast } from '../ui';
 import { ProfileSwitcher, ProxyBanner } from './FamilyPages';
 import { StatusBanner } from '../shared/SystemStatus';
@@ -88,6 +89,7 @@ export function PatientShell() {
           <span className="grow small muted header-clinic" style={{ textAlign: 'center' }}>
             {config?.clinic.name}
           </span>
+          <VoiceNavButton />
           <ProfileSwitcher />
           <Link to="/powiadomienia" className="btn ghost icon" aria-label={t('Powiadomienia ({n} nieprzeczytanych)', { n: unreadNotif })} style={{ position: 'relative' }}>
             <Bell size={22} />
@@ -125,6 +127,10 @@ export function PatientShell() {
             <NavItem to="/zdrowie-kobiety" icon={<Flower2 size={20} />} label={t('Zdrowie kobiety')} />
             <NavItem to="/historia-zdrowia" icon={<Syringe size={20} />} label={t('Historia zdrowia')} />
             <NavItem to="/plan" icon={<Dumbbell size={20} />} label={t('Plan i cele')} />
+            <NavItem to="/przypomnienia" icon={<AlarmClock size={20} />} label={t('Przypomnienia')} />
+            <NavItem to="/profilaktyka" icon={<CalendarCheck size={20} />} label={t('Profilaktyka NFZ')} />
+            <NavItem to="/apteki" icon={<BriefcaseMedical size={20} />} label={t('Apteki i refundacja')} />
+            {!proxy && <NavItem to="/powietrze" icon={<Wind size={20} />} label={t('Powietrze i pogoda')} />}
             <div className="side-sep" />
             <NavItem to="/rodzina" icon={<Users size={20} />} label={t('Rodzina i opiekunowie')} />
             <NavItem to="/nfz" icon={<Search size={20} />} label={t('Terminy NFZ')} />
@@ -195,6 +201,10 @@ export function MorePage() {
     ['/zdrowie-kobiety', <Flower2 size={20} key="zk" />, t('Zdrowie kobiety')],
     ['/historia-zdrowia', <Syringe size={20} key="hz" />, t('Historia zdrowia')],
     ['/plan', <Dumbbell size={20} key="pl" />, t('Plan i cele')],
+    ['/przypomnienia', <AlarmClock size={20} key="pr" />, t('Przypomnienia')],
+    ['/profilaktyka', <CalendarCheck size={20} key="pf" />, t('Profilaktyka NFZ')],
+    ['/apteki', <BriefcaseMedical size={20} key="ap" />, t('Apteki i refundacja')],
+    ...own(['/powietrze', <Wind size={20} key="pw" />, t('Powietrze i pogoda')]),
     ['/kalendarz', <CalendarRange size={20} key="ka" />, t('Kalendarz zdrowia')],
     ['/nfz', <Search size={20} key="c" />, t('Terminy NFZ')],
     ['/powiadomienia', <Bell size={20} key="d" />, t('Powiadomienia')],

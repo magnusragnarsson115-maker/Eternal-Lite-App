@@ -7,6 +7,7 @@ import * as secure from './secure';
 import type { Me } from './types';
 import { clearDownloads } from './files';
 import { setActiveProfile } from './profile';
+import { clearOffline } from './offline';
 
 /** Blokada po powrocie z tła: po tylu sekundach wymagamy biometrii albo PIN-u. */
 const LOCK_AFTER_SECONDS = 60;
@@ -42,6 +43,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const signOutLocal = useCallback(async () => {
     clearDownloads(); // pobrane PDF z danymi o zdrowiu nie zostają po wylogowaniu
+    clearOffline(); // kopia offline (A5.12) też nie
     setActiveProfile(undefined);
     await secure.wipe();
     setMe(undefined);

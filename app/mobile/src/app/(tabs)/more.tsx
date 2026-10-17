@@ -24,12 +24,14 @@ export default function MoreScreen() {
       <Card title={t('Pomoc i bezpieczeństwo')}>
         {!proxy ? <Row title={t('Ratunek — SOS')} sub={t('112, osoby bliskie, karta ratunkowa')} onPress={() => router.push('/sos')} /> : null}
         <Row title={t('Numery pomocowe')} sub="112 · 116 123 · 800 70 2222 · 116 111" onPress={() => router.push('/crisis')} />
+        {!proxy ? <Row title={t('Kopia bez internetu')} sub={t('Karta ratunkowa, leki, wizyty — w pamięci telefonu')} onPress={() => router.push('/offline')} /> : null}
       </Card>
       <Card title={t('Rodzina')}>
         <Row title={t('Rodzina i opiekunowie')} sub={t('Profile dzieci, zaproszenia, panel opiekuna')} onPress={() => router.push('/family')} />
       </Card>
       <Card title={t('Zdrowie i powiadomienia')}>
         <Row title={t('Pomiary')} sub={t('Wpisy ręczne i korekta z historią')} onPress={() => router.push('/measurements')} />
+        <Row title={t('Kroki i sen z telefonu')} sub={t('Apple Health albo Health Connect — tylko odczyt, po Twojej zgodzie')} onPress={() => router.push('/health-sync')} />
         <Row title={t('Plan i kalendarz')} sub={t('Ćwiczenia od placówki, cele, najbliższe terminy')} onPress={() => router.push('/plan')} />
         <Row title={t('Dzienniki')} sub={t('Nastrój, sen, ból, ćwiczenie oddechowe')} onPress={() => router.push('/journal')} />
         <Row title={t('Historia zdrowia')} sub={t('Szczepienia, choroby w rodzinie, dyspozycje')} onPress={() => router.push('/health-history')} />

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bluetooth, FileUp, Link2, Pill, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { api, del, get, post, put, qs } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
@@ -11,6 +11,7 @@ import { BLE_PROFILES, bluetoothSupported, readFromDevice, type BleKind, type Bl
 import type { MeasurementView, MedicationView, VitalKind } from '../types';
 import { Badge, Button, Card, Combobox, Empty, FullText, Modal, Notice, PageHead, QueryError, Segmented, SelectField, Skeleton, Switch, TextField, useConfirm, useToast } from '../ui';
 import { TrendChart } from '../ui/TrendChart';
+import { ActivityCard } from './ActivityCard';
 
 const KINDS: { value: VitalKind; label: string; unit: string }[] = [
   { value: 'bp', label: 'Ciśnienie', unit: 'mmHg' },
@@ -106,12 +107,12 @@ export function MeasurementsPage() {
   const meta = KINDS.find((k) => k.value === kind)!;
   const bleKind = (kind in BLE_PROFILES ? kind : undefined) as BleKind | undefined;
 
-  const connectBle = async () => {
-    if (!bleKind) return;
+  const connectBle = async (any = false) => {
+    if (!bleKind && !any) return;
     setBleError('');
     setBleBusy(true);
     try {
-      setBleReading(await readFromDevice(bleKind));
+      setBleReading(await readFromDevice(any ? 'any' : bleKind!));
     } catch (err) {
       const e = err as Error;
       if (e.name !== 'NotFoundError') setBleError(e.message === 'bluetooth_timeout' ? t('Nie otrzymano pomiaru. Wykonaj pomiar na urządzeniu po połączeniu.') : t('Nie udało się połączyć z urządzeniem: {m}', { m: e.message }));
@@ -243,6 +244,12 @@ export function MeasurementsPage() {
                   {bleBusy ? t('Czekam na pomiar…') : t('Połącz: {d}', { d: t(BLE_PROFILES[bleKind].label) })}
                 </Button>
                 {bleError && <Notice kind="danger">{bleError}</Notice>}
+                <p className="small muted" style={{ marginBottom: 0 }}>
+                  {t('Inne urządzenie zgodne ze standardem Bluetooth (ciśnieniomierz, waga, termometr, pulsoksymetr, pulsometr, glukometr)?')}{' '}
+                  <button type="button" className="link-btn" disabled={bleBusy} onClick={() => void connectBle(true)}>
+                    {t('Połącz dowolne urządzenie')}
+                  </button>
+                </p>
               </>
             ) : (
               <p className="small muted">{t('Dla tego rodzaju pomiaru nie ma standardowego profilu Bluetooth — wpisz wynik ręcznie.')}</p>
@@ -286,6 +293,7 @@ export function MeasurementsPage() {
           )}
         </Card>
       </div>
+      <ActivityCard />
 
       <AddMeasurementModal open={addOpen} onClose={() => setAddOpen(false)} initialKind={kind} />
       <ImportMeasurementsModal open={importOpen} onClose={() => setImportOpen(false)} />
@@ -470,6 +478,10 @@ export function MedicationsPage() {
                   <span className="list-title" style={{ display: 'block' }}>{m.name}</span>
                   <span className="list-sub">
                     {[m.dosage, m.since ? t('od {d}', { d: m.since }) : '', t('dodano {d}', { d: fmt.date(m.reportedAt) })].filter(Boolean).join(' · ')}
+                  </span>
+                  <span className="list-sub" style={{ display: 'block' }}>
+                    {m.atc && <span className="mono" title={t('Kod ATC (klasyfikacja WHO) z Rejestru Produktów Leczniczych')}>ATC {m.atc} · </span>}
+                    <Link to={`/apteki?tab=refund&q=${encodeURIComponent(m.name.split(',')[0])}`}>{t('Refundacja')}</Link>
                   </span>
                 </span>
                 <Button

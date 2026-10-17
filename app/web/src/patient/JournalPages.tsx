@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Trash2, Wind } from 'lucide-react';
+import { Award, Trash2, Wind } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { del, get, post } from '../api';
@@ -115,6 +115,7 @@ export function useAdd(kind: Kind, onCrisis: () => void) {
     onSuccess: (r) => {
       void qc.invalidateQueries({ queryKey: ['journal', kind] });
       void qc.invalidateQueries({ queryKey: ['journal-overview', kind] });
+      void qc.invalidateQueries({ queryKey: ['achievements'] });
       if (r.crisis) onCrisis();
       else toast(t('Zapisano wpis.'));
     },
@@ -443,6 +444,43 @@ function BreathingTab() {
   );
 }
 
+interface Achievements {
+  activeDays: number;
+  currentStreak: number;
+  longestStreak: number;
+  badges: { key: string; title: string; description: string; earned: boolean; progress: { value: number; target: number } }[];
+}
+
+/** Odznaki za regularność (F13.4): liczone z dni z jakimkolwiek zapisem, nigdy z wartości. */
+function AchievementsCard() {
+  const { t } = useI18n();
+  const q = useQuery({ queryKey: ['achievements'], queryFn: () => get<Achievements>('/api/me/achievements') });
+  if (!q.data) return null;
+  const a = q.data;
+  return (
+    <Card title={t('Regularność')}>
+      <div className="stack">
+        <p style={{ margin: 0 }}>
+          <Award size={18} aria-hidden /> {t('Dni z zapisem: {n} · seria: {s} · najdłuższa seria: {l}', { n: a.activeDays, s: a.currentStreak, l: a.longestStreak })}
+        </p>
+        <details>
+          <summary>{t('Odznaki ({e} z {n})', { e: a.badges.filter((b) => b.earned).length, n: a.badges.length })}</summary>
+          <div className="badge-grid" style={{ marginTop: 10 }}>
+            {a.badges.map((b) => (
+              <div key={b.key} className={b.earned ? 'badge-tile' : 'badge-tile locked'}>
+                <strong>{t(b.title)}</strong>
+                <span className="small muted">{t(b.description)}</span>
+                <progress max={b.progress.target} value={b.progress.value} aria-label={t('{v} z {n}', { v: b.progress.value, n: b.progress.target })} />
+              </div>
+            ))}
+          </div>
+        </details>
+        <p className="small muted" style={{ margin: 0 }}>{t('Liczymy tylko dni, w których coś zapisałeś(-aś) — nie wartości pomiarów ani samopoczucia.')}</p>
+      </div>
+    </Card>
+  );
+}
+
 export function JournalPage() {
   const { t } = useI18n();
   const [params] = useSearchParams();
@@ -452,6 +490,7 @@ export function JournalPage() {
     <div className="stack-lg">
       <PageHead title={t('Dzienniki')} sub={t('Samopoczucie, sen, ból, oddech, żywienie i czynności dnia. Zapisujesz dla siebie — lekarz zobaczy wpisy tylko wtedy, gdy udostępnisz mu dane.')} />
       <CrisisModal open={crisis} onClose={() => setCrisis(false)} />
+      <AchievementsCard />
       <Tabs
         label={t('Rodzaj dziennika')}
         value={tab}

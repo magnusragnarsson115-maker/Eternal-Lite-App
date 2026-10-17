@@ -6,6 +6,7 @@ import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import { useSession } from '../session';
 import { Badge, Button, Card, Checkbox, Empty, Notice, PageHead, QueryError, Segmented, SelectField, Skeleton, Tabs, TextArea, TextField, useToast } from '../ui';
+import { FamilyTree, GenomicFilesCard } from './FamilyTree';
 
 /**
  * Historia zdrowia wpisywana przez pacjenta (A20.7/A21.7 szczepienia i terminy z karty szczepień, A20.9/A21.9 choroby
@@ -268,6 +269,7 @@ function FamilyHistory() {
         )}
         <p className="small muted" style={{ marginBottom: 0 }}>{t('Lekarz zobaczy te informacje, gdy udostępnisz mu dane. Aplikacja nie ocenia ryzyka.')}</p>
       </Card>
+      {q.data!.items.length > 0 && <FamilyTree items={q.data!.items} labels={RELATIONSHIP_LABEL} />}
     </div>
   );
 }
@@ -371,7 +373,7 @@ function Directives() {
 export function HistoryPage() {
   const { t } = useI18n();
   const { profile } = useSession();
-  const [tab, setTab] = useState<'vaccinations' | 'family' | 'directives'>('vaccinations');
+  const [tab, setTab] = useState<'vaccinations' | 'family' | 'directives' | 'genomic'>('vaccinations');
   return (
     <div className="stack-lg">
       <PageHead title={t('Historia zdrowia')} sub={t('Szczepienia, choroby w rodzinie i Twoje dyspozycje. Wpisujesz fakty — aplikacja niczego nie wylicza i nie ocenia.')} />
@@ -383,11 +385,13 @@ export function HistoryPage() {
           { value: 'vaccinations', label: t('Szczepienia') },
           { value: 'family', label: t('Choroby w rodzinie') },
           ...(profile ? [] : [{ value: 'directives' as const, label: t('Moje dyspozycje') }]),
+          ...(profile ? [] : [{ value: 'genomic' as const, label: t('Plik DNA') }]),
         ]}
       />
       {tab === 'vaccinations' && <Vaccinations />}
       {tab === 'family' && <FamilyHistory />}
       {tab === 'directives' && !profile && <Directives />}
+      {tab === 'genomic' && !profile && <GenomicFilesCard />}
     </div>
   );
 }

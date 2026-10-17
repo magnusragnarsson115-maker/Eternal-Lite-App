@@ -34,7 +34,11 @@
       "blockedPermissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.health.READ_STEPS",
+        "android.permission.health.READ_SLEEP"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -65,7 +69,26 @@
           "color": "#0E6F78"
         }
       ],
-      "expo-updates"
+      "expo-updates",
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "Eternal odczytuje z Apple Health tylko kroki i sen — po Twojej zgodzie — aby pokazać je w aplikacji i, jeśli zechcesz, udostępnić lekarzowi. Aplikacja ich nie ocenia.",
+          "NSHealthUpdateUsageDescription": false,
+          "background": false
+        }
+      ],
+      "react-native-health-connect",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "minSdkVersion": 26
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false

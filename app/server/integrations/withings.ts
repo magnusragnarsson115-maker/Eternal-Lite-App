@@ -4,6 +4,7 @@ import { config } from '../config.js';
 import { getDb } from '../db.js';
 import { fetchWithTimeout, HttpError, nowIso } from '../lib/util.js';
 import { addMeasurement, type MeasurementInput } from '../services/observations.js';
+import { importActivity, type ActivityDayInput } from '../services/activity.js';
 
 /**
  * Withings Public Health Data API (bezpłatne konto deweloperskie, OAuth 2.0).
@@ -14,6 +15,7 @@ import { addMeasurement, type MeasurementInput } from '../services/observations.
 const AUTHORIZE = 'https://account.withings.com/oauth2_user/authorize2';
 const TOKEN = 'https://wbsapi.withings.net/v2/oauth2';
 const MEASURE = 'https://wbsapi.withings.net/measure';
+const SLEEP = 'https://wbsapi.withings.net/v2/sleep';
 
 /** Typy pomiarów Withings (meastype). */
 export const MEASTYPE = { weight: 1, height: 4, diastolic: 9, systolic: 10, pulse: 11, spo2: 54, bodyTemp: 71 } as const;
@@ -32,7 +34,8 @@ export function authorizeUrl(userId: string): string {
   const q = new URLSearchParams({
     response_type: 'code',
     client_id: config.withings.clientId,
-    scope: 'user.metrics',
+    // user.activity — podsumowania snu z Withings Sleep (F2.19)
+    scope: 'user.metrics,user.activity',
     redirect_uri: redirectUri(),
     state,
   });
@@ -151,8 +154,57 @@ export async function syncWithings(actor: AuditActor, userId: string, patientRef
     if (!json.body.more) break;
     offset = json.body.offset;
   }
+  // sen (Withings Sleep i zegarki): podsumowanie nocy — błąd tej części nie przerywa importu pomiarów
+  try {
+    const nights = await fetchSleepSummary(token, new Date(since * 1000).toISOString().slice(0, 10), nowIso().slice(0, 10));
+    if (nights.length) {
+      const r = await importActivity(actor, patientRef, { source: 'withings', device: 'Withings', days: nights });
+      imported += r.created + r.updated;
+    }
+  } catch {
+    skipped++;
+  }
   getDb().prepare("UPDATE integration_token SET last_sync_at = ? WHERE provider = 'withings' AND user_id = ?").run(nowIso(), userId);
   return { imported, skipped };
+}
+
+/** Odpowiedź Sleep v2 getsummary: czasy w sekundach → minuty; dzień nocy wg pola date (YYYY-MM-DD). */
+export interface WithingsSleepSeries {
+  date?: string;
+  startdate?: number;
+  enddate?: number;
+  data?: { total_sleep_time?: number; deepsleepduration?: number; lightsleepduration?: number; remsleepduration?: number; wakeupduration?: number };
+}
+
+export function mapSleepSeries(series: WithingsSleepSeries[]): ActivityDayInput[] {
+  const min = (s?: number) => (s === undefined ? undefined : Math.round(s / 60));
+  return series
+    .filter((x) => x.date && x.data?.total_sleep_time !== undefined)
+    .map((x) => ({
+      date: x.date!,
+      sleep: {
+        minutes: min(x.data!.total_sleep_time)!,
+        deep: min(x.data!.deepsleepduration),
+        light: min(x.data!.lightsleepduration),
+        rem: min(x.data!.remsleepduration),
+        awake: min(x.data!.wakeupduration),
+        start: x.startdate ? new Date(x.startdate * 1000).toISOString() : undefined,
+        end: x.enddate ? new Date(x.enddate * 1000).toISOString() : undefined,
+      },
+    }));
+}
+
+async function fetchSleepSummary(token: string, from: string, to: string): Promise<ActivityDayInput[]> {
+  const params = new URLSearchParams({
+    action: 'getsummary',
+    startdateymd: from,
+    enddateymd: to,
+    data_fields: 'total_sleep_time,deepsleepduration,lightsleepduration,remsleepduration,wakeupduration',
+  });
+  const res = await fetchWithTimeout(SLEEP, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/x-www-form-urlencoded' }, body: params });
+  const json = (await res.json()) as { status: number; body?: { series?: WithingsSleepSeries[] } };
+  if (json.status !== 0) throw new HttpError(502, 'withings_api_error', `sleep status ${json.status}`);
+  return mapSleepSeries(json.body?.series ?? []);
 }
 
 export function withingsStatus(userId: string): { connected: boolean; lastSyncAt?: string } {

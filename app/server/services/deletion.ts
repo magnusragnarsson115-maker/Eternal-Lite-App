@@ -10,6 +10,7 @@ import { documentHtml, esc } from '../pdf/html.js';
 import { ORG_TAG_SYSTEM, orgIdsOf, vaultOrgId } from '../tenancy.js';
 import { enqueue } from './notifications.js';
 import { revokeGrant } from './grants.js';
+import { purgeGenomicFiles } from './genomicFiles.js';
 
 /**
  * Usunięcie danych z potwierdzeniem (A18.12, art. 17 RODO): co usunięto, co musi zostać i dlaczego,
@@ -88,7 +89,7 @@ async function erasePatientData(actor: AuditActor, patientRef: string): Promise<
     db.prepare('DELETE FROM binary_owner WHERE binary_id = ?').run(b.binary_id);
   }
   db.prepare('DELETE FROM intake_item WHERE patient_ref = ?').run(patientRef);
-  const n = await expungeAll(own);
+  const n = (await expungeAll(own)) + (await purgeGenomicFiles(patientRef));
   steps.push({ key: 'vault', label: 'Dokumenty i wyniki wgrane przez Ciebie, odczyty, pliki, odpowiedzi w ankietach', status: 'deleted', count: n + intake.length, detail: 'Usunięte trwale, razem z historią wersji.' });
 
   // 3. wpisy z aplikacji: pomiary i lista leków wprowadzone przez pacjenta

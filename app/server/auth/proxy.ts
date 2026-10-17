@@ -134,6 +134,8 @@ const PROXY_PREFIXES = [
   '/api/me/custom-reminders',
   '/api/me/day-plan',
   '/api/me/preventive',
+  '/api/me/achievements',
+  '/api/me/activity',
 ];
 
 /** Decyzje osobiste osoby dorosłej (dane profilu, zgody, udostępnienia) zmienia tylko ona — albo opiekun profilu prowadzonego. */

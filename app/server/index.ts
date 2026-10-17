@@ -10,6 +10,7 @@ async function main(): Promise<void> {
     const { seedDemo } = await import('./seed/demo.js');
     await seedDemo((m) => console.log(m));
   }
+  if (config.demoMode) (await import('./integrations/registries.js')).ensureDemoRegistries();
   const app = await buildApp({ logger: true });
   for (const w of productionWarnings()) app.log.warn(w);
   const stopJobs = startJobs((msg, err) => app.log.error({ err }, msg));

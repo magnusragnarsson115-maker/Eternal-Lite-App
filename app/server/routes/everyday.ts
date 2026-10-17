@@ -4,7 +4,11 @@ import { actorOf, requireClinician, requirePatient, requireUser } from '../auth/
 import { pharmacyCount, refundCount, registryMeta, searchPharmacies, searchRefund } from '../integrations/registries.js';
 import { body, IdParams, params, query, zDate } from '../lib/http.js';
 import { requireModule } from '../modules.js';
+import { achievements } from '../services/achievements.js';
+import { ACTIVITY_SOURCES, importActivity, listActivity } from '../services/activity.js';
 import { environmentView, setAirPrefs } from '../services/environment.js';
+import { deleteGenomicFile, downloadGenomicFile, GENOMIC_NOTICE, listGenomicFiles, uploadGenomicFile } from '../services/genomicFiles.js';
+import { badRequest } from '../lib/util.js';
 import { addDiagnosis, importedIcd10Count, listDiagnoses, searchDiagnosisCodes, setDiagnosisStatus } from '../services/diagnoses.js';
 import {
   CITIES,
@@ -106,6 +110,58 @@ export async function everydayRoutes(app: FastifyInstance): Promise<void> {
     const auth = requirePatient(req, { ownOnly: true });
     clearLocation(actorOf(req), auth.user.id);
     return { location: null };
+  });
+
+  // --- aktywność i sen z urządzeń (F2.1, F2.2, F9.1, F9.3, F12.1, F2.19) — dzienne podsumowania, bez ocen ------------
+  const SleepSchema = z.object({ minutes: z.number().min(0).max(1440), deep: z.number().min(0).max(1440).optional(), light: z.number().min(0).max(1440).optional(), rem: z.number().min(0).max(1440).optional(), awake: z.number().min(0).max(1440).optional(), start: z.string().max(40).optional(), end: z.string().max(40).optional() });
+  app.post('/api/me/activity/import', async (req) => {
+    const auth = patient(req, 'manual-entries');
+    const input = body(req, z.object({ source: z.enum(ACTIVITY_SOURCES), device: z.string().max(80).optional(), days: z.array(z.object({ date: zDate, steps: z.number().int().min(0).max(200_000).optional(), sleep: SleepSchema.optional() })).min(1).max(400) }));
+    return importActivity(actorOf(req), auth.patientRef, input);
+  });
+
+  app.get('/api/me/activity', async (req) => {
+    const auth = patient(req, 'manual-entries');
+    const q = query(req, z.object({ days: z.coerce.number().int().min(1).max(400).default(30) }));
+    return { items: await listActivity(actorOf(req), auth.patientRef, q.days) };
+  });
+
+  // --- odznaki za regularność (F13.4) — liczone z dni z zapisem, nigdy z wartości -------------------------------------
+  app.get('/api/me/achievements', async (req) => {
+    const auth = patient(req, 'patient-journal');
+    return achievements(actorOf(req), auth.patientRef);
+  });
+
+  // --- plik surowych danych genetycznych (F16.2) — tylko przechowanie, tylko właściciel konta -------------------------
+  app.get('/api/me/genomic-files', async (req) => {
+    const auth = requirePatient(req, { ownOnly: true });
+    requireModule('patient-history', { subject: auth.user.id });
+    return { items: listGenomicFiles(actorOf(req), auth.patientRef), notice: GENOMIC_NOTICE };
+  });
+
+  app.post('/api/me/genomic-files', async (req) => {
+    const auth = requirePatient(req, { ownOnly: true });
+    requireModule('patient-history', { subject: auth.user.id });
+    const file = await req.file();
+    if (!file) throw badRequest('file_required');
+    const data = await file.toBuffer();
+    if (file.file.truncated) throw badRequest('file_too_large');
+    const field = (k: string) => (file.fields[k] as { value?: string } | undefined)?.value;
+    return { items: await uploadGenomicFile(actorOf(req), auth.patientRef, { data, filename: file.filename, provider: field('provider'), confirmed: field('confirmed') === 'true' }) };
+  });
+
+  app.get('/api/me/genomic-files/:id/file', async (req, reply) => {
+    const auth = requirePatient(req, { ownOnly: true });
+    const { id } = params(req, IdParams);
+    const f = await downloadGenomicFile(actorOf(req), auth.patientRef, id);
+    reply.header('Content-Type', f.contentType).header('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(f.filename)}`).header('Cache-Control', 'no-store');
+    return f.data;
+  });
+
+  app.delete('/api/me/genomic-files/:id', async (req) => {
+    const auth = requirePatient(req, { ownOnly: true });
+    const { id } = params(req, IdParams);
+    return { items: await deleteGenomicFile(actorOf(req), auth.patientRef, id) };
   });
 
   // --- powietrze i pogoda (konto) ------------------------------------------------------------------------------

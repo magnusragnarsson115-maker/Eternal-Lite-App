@@ -88,6 +88,8 @@ function Gate() {
           <Stack.Screen name="health-history" options={{ title: t('Historia zdrowia') }} />
           <Stack.Screen name="doctor-report" options={{ title: t('Dla lekarza i na wyjazd') }} />
           <Stack.Screen name="plan" options={{ title: t('Plan i kalendarz') }} />
+          <Stack.Screen name="health-sync" options={{ title: t('Kroki i sen z telefonu') }} />
+          <Stack.Screen name="offline" options={{ title: t('Kopia bez internetu') }} />
         </Stack.Protected>
         <Stack.Screen name="crisis" options={{ title: t('Numery pomocowe'), presentation: ready ? 'card' : 'modal' }} />
       </Stack>

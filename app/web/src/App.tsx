@@ -13,6 +13,7 @@ import { SurveyPage, SurveyResponsePage, SurveysPage } from './patient/SurveyPag
 import { FamilyPage } from './patient/FamilyPages';
 import { JournalPage } from './patient/JournalPages';
 import { WomenHealthPage } from './patient/WomenHealthPage';
+import { AirWeatherPage, PharmaciesPage, PreventivePage, RemindersPage } from './patient/EverydayPages';
 import { HistoryPage } from './patient/HistoryPages';
 import { DoctorReportPage } from './patient/DoctorReportPage';
 import { HealthCalendarPage, PlanPage } from './patient/PlanPages';
@@ -129,6 +130,10 @@ export function App() {
         <Route path="dla-lekarza" element={<DoctorReportPage />} />
         <Route path="kalendarz" element={<HealthCalendarPage />} />
         <Route path="plan" element={<PlanPage />} />
+        <Route path="przypomnienia" element={<RemindersPage />} />
+        <Route path="profilaktyka" element={<PreventivePage />} />
+        <Route path="apteki" element={<PharmaciesPage />} />
+        <Route path="powietrze" element={<AirWeatherPage />} />
         <Route path="jak-dziala-ai" element={<AiCardsPage />} />
         <Route path="ankiety/odpowiedzi/:id" element={<SurveyResponsePage />} />
         <Route path="ankiety/:id" element={<SurveyPage />} />

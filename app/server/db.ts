@@ -708,6 +708,22 @@ const MIGRATIONS: string[] = [
     search_text TEXT NOT NULL
   );
   `,
+  // 16 — runda 4: plik surowych danych genetycznych od dostawcy testu (F16.2) — tylko przechowanie, bez odczytu
+  `
+  CREATE TABLE genomic_file (
+    id TEXT PRIMARY KEY,
+    patient_ref TEXT NOT NULL,
+    binary_id TEXT NOT NULL,
+    filename TEXT NOT NULL,
+    content_type TEXT NOT NULL,
+    size INTEGER NOT NULL,
+    sha256 TEXT NOT NULL,
+    provider TEXT,
+    uploaded_by TEXT,
+    uploaded_at TEXT NOT NULL
+  );
+  CREATE INDEX genomic_file_patient ON genomic_file(patient_ref);
+  `,
 ];
 
 export type Db = DatabaseSync;

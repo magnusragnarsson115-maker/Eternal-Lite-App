@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { config } from '../config.js';
 import { getDb, transaction } from '../db.js';
 import { columnIndex, findHeader, normHeader, parseCsvRows, searchText } from '../lib/csv.js';
 import { distanceKm } from '../lib/geo.js';
@@ -306,4 +307,31 @@ function setMeta(key: string, value: RegistryMeta): void {
 export function registryMeta(key: 'pharmacies' | 'refund'): RegistryMeta | undefined {
   const r = getDb().prepare('SELECT value FROM refund_meta WHERE key = ?').get(key) as { value: string } | undefined;
   return r ? (JSON.parse(r.value) as RegistryMeta) : undefined;
+}
+
+// --- dane pokazowe (tylko DEMO_MODE, gdy rejestry są puste; zawsze oznaczone) ------------------------------------
+
+/** Instancja pokazowa bez importu: kilka fikcyjnych aptek i pozycji wykazu z wyraźnym oznaczeniem „dane pokazowe”. */
+export function ensureDemoRegistries(): void {
+  if (!config.demoMode) return;
+  if (!pharmacyCount().total) {
+    importPharmaciesCsv(
+      [
+        'Nazwa apteki;Rodzaj apteki;Ulica;Numer domu;Kod pocztowy;Miejscowość;Województwo;Telefon;Godziny pracy;Status;Szerokość geograficzna;Długość geograficzna',
+        'Apteka Przykładowa „Pod Kasztanem” (dane pokazowe);ogólnodostępna;Marszałkowska;10;00-001;Warszawa;mazowieckie;+48 22 000 00 01;pn–pt 8–20, sob 9–14;aktywna;52.2290;21.0140',
+        'Apteka Przykładowa Centrum (dane pokazowe);ogólnodostępna;Świętokrzyska;5;00-002;Warszawa;mazowieckie;+48 22 000 00 02;całodobowo;aktywna;52.2350;21.0080',
+        'Apteka Przykładowa Rynek (dane pokazowe);ogólnodostępna;Rynek Główny;1;31-042;Kraków;małopolskie;+48 12 000 00 03;pn–sob 8–21;aktywna;50.0617;19.9373',
+      ].join('\n'),
+    );
+  }
+  if (!refundCount()) {
+    importRefundCsv(
+      [
+        'Substancja czynna;Nazwa, postać i dawka leku;Zawartość opakowania;Kod EAN lub inny kod odpowiadający kodowi EAN;Grupa limitowa;Cena detaliczna;Wysokość limitu finansowania;Zakres wskazań objętych refundacją;Zakres wskazań pozarejestracyjnych objętych refundacją;Poziom odpłatności;Wysokość dopłaty świadczeniobiorcy',
+        'Cholecalciferolum;Lek Przykładowy D3 (dane pokazowe), kaps., 2000 j.m.;60 kaps.;05900000000017;Grupa przykładowa;19,90;10,00;Przykładowe wskazanie (dane pokazowe);;30%;12,90',
+        'Amlodipinum;Lek Przykładowy A (dane pokazowe), tabl., 5 mg;30 tabl.;05900000000024;Grupa przykładowa;12,50;10,00;Przykładowe wskazanie (dane pokazowe);;ryczałt;5,70',
+      ].join('\n'),
+      { list: 'A1', title: 'DANE POKAZOWE — nie pochodzą z obwieszczenia Ministra Zdrowia' },
+    );
+  }
 }
