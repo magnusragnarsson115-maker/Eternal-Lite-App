@@ -26,6 +26,7 @@ import { seedPilot } from './pilot.js';
  */
 
 import { DEMO_PASSWORD, DEMO_TOTP_SECRET } from './constants.js';
+import { seedRound4Demo } from './round4.js';
 
 export { DEMO_PASSWORD, DEMO_TOTP_SECRET };
 
@@ -369,5 +370,6 @@ export async function seedDemo(log: (m: string) => void = console.log): Promise<
     log,
   });
 
+  await seedRound4Demo(log);
   log('Dane demonstracyjne utworzone (wszystkie osoby i wyniki są fikcyjne).');
 }

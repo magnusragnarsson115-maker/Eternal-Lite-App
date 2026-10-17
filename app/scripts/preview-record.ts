@@ -18,7 +18,7 @@ const BASE = (process.argv[2] ?? 'http://localhost:3000').replace(/\/$/, '');
 const OUT = process.argv[3] ?? 'dist/preview-data.json';
 const PASSWORD = 'Eternal-Demo-2026';
 const TOTP = 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP';
-const MAX_PAGES = 140;
+const MAX_PAGES = 180;
 const PER_TEMPLATE = 3;
 const MAX_FILE = 1_500_000;
 
@@ -184,7 +184,12 @@ async function patientExtras(page: Page, profile?: string): Promise<void> {
     ...['month', 'quarter'].map((p) => `/api/me/report?period=${p}&anchor=${today}`),
     `/api/me/doctor-report?reason=${encodeURIComponent('Kontrola po zmianie leków')}&days=90`,
     `/api/me/calendar?from=${from}&to=${end.toISOString().slice(0, 10)}&meds=1`,
+    // runda 4: odczyty uruchamiane przyciskami
+    '/api/me/journal/overview?kind=cycle',
+    '/api/me/journal/overview?kind=food&days=30',
+    '/api/me/activity?days=30',
   ];
+  if (!profile) urls.push('/api/registries/pharmacies?near=1', '/api/registries/refund?q=D3', '/api/registries/refund?q=Witamina', '/api/me/environment');
   await pageGet(page, urls, profile);
   if (!profile) {
     const [cat] = (await pageGet(page, ['/api/catalog'])) as [{ services?: { id: string }[] } | null];
@@ -200,6 +205,8 @@ async function staffExtras(page: Page): Promise<string[]> {
     urls.push(`/api/staff/calendar?date=${warsawDay(d)}`);
     for (const filter of ['all', 'missing']) for (const mine of ['true', 'false']) urls.push(`/api/staff/inbox?date=${warsawDay(d)}&filter=${filter}&mine=${mine}`);
   }
+  // runda 4: słownik ICD-10 w panelu lekarza (pole wyszukiwania)
+  for (const q of ['na', 'nad', 'nadc', 'nadci', 'nadciś', 'I1', 'I10', 'as', 'ast', 'astm', 'cu', 'cuk', 'cukr', 'mi', 'mig', 'migr']) urls.push(`/api/staff/diagnosis-codes?q=${encodeURIComponent(q)}`);
   await pageGet(page, urls);
   const found = (await pageGet(page, ['Kowalska', 'Wiśniewski', 'Lewandowska', 'Anna', 'Jan', 'Maria', 'Ko'].map((q) => `/api/staff/patients?q=${encodeURIComponent(q)}`))) as ({ items?: { id: string }[] } | null)[];
   const ids = new Set(found.flatMap((r) => r?.items?.map((i) => i.id) ?? []));
