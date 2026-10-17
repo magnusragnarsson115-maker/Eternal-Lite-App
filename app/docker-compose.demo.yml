@@ -1,0 +1,12 @@
+# Instancja pokazowa (dane fikcyjne) — np. dla inwestorów i klinik:
+#   ETERNAL_DOMAIN=demo.twoja-domena.pl docker compose -f docker-compose.yml -f docker-compose.demo.yml up -d --build
+# Reset danych pokazowych:  docker compose -f docker-compose.yml -f docker-compose.demo.yml down -v  (i ponownie up)
+services:
+  eternal:
+    environment:
+      NODE_ENV: production
+      DEMO_MODE: "true"
+      DEMO_SEED_ON_START: "true"
+      AI_PROVIDER: demo
+      PUBLIC_URL: https://${ETERNAL_DOMAIN:-localhost}
+      HIBP_ENABLED: "false"

@@ -128,3 +128,12 @@ out/                sekcje i dokumenty złożone obu systemów
 manifest.json       jedyny nośnik stanu Systemu 1 (System 2 go nie używa)
 reference.docx      opcjonalny szablon stylów dla pandoc
 ```
+
+## Aplikacja Eternal (`app/`)
+
+Niezależny od generatorów dokumentów projekt aplikacji (Node.js 22 + Fastify + React, FHIR R4).
+Polecenia w katalogu `app/`: `npm run dev`, `npm test` (Vitest), `npm run test:e2e` (Playwright),
+`npm run typecheck`, `npm run seed:demo`. Zasady: aplikacja nie interpretuje wyników ani pomiarów
+(granica MDR — `app/docs/COMPLIANCE.md` §1); każdy dostęp do danych pacjenta przechodzi przez `audit()`;
+treść powiadomień poza aplikacją nie zawiera danych o zdrowiu; teksty interfejsu przez `t()` z tłumaczeniem
+w `web/src/i18n-en.ts` (test kompletności). Formalne dokumenty regulacyjne (DPIA, kwalifikacja MDR) — przez `/dokument`.
