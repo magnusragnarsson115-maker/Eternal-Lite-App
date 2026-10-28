@@ -1,0 +1,714 @@
+<title>EcoChallenge Gmina Brzozowa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Układ: urzędowa „uchwała” po lewej (decyzje w paragrafach), tablica stanu gminy po prawej; łańcuchy przyczyn rozwijane przy każdym wskaźniku */
+:root{
+  --paper:#ECF1ED; --card:#F8FBF9; --ink:#15241D; --muted:#56685F; --line:#C9D4CD;
+  --accent:#0B6B4C; --accent-ink:#FFFFFF; --stamp:#7A3E9D;
+  --good:#1D7A45; --bad:#B42318; --warn:#9A5B00; --barbg:#DCE5DF;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0E1613; --card:#15201B; --ink:#E2EBE5; --muted:#94A79C; --line:#2A3A32;
+  --accent:#4CC08C; --accent-ink:#06130D; --stamp:#C79BE6;
+  --good:#5CC783; --bad:#F2766B; --warn:#E5A645; --barbg:#22302A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E1613; --card:#15201B; --ink:#E2EBE5; --muted:#94A79C; --line:#2A3A32;
+  --accent:#4CC08C; --accent-ink:#06130D; --stamp:#C79BE6;
+  --good:#5CC783; --bad:#F2766B; --warn:#E5A645; --barbg:#22302A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(1.6rem,3.2vw,2.3rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.25rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:700}
+p{margin:0}
+.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* nagłówek */
+.mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;border-bottom:2px solid var(--ink);padding-bottom:14px}
+.mast .sub{color:var(--muted);max-width:62ch;margin-top:6px}
+.yearchip{font-family:var(--f-display);font-weight:700;font-size:2.4rem;line-height:1;letter-spacing:-.02em}
+.yearchip small{display:block;font-family:var(--f-body);font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.world{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.world input,.world select{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:0}
+.world input{width:9.5rem;font-family:var(--f-mono);text-transform:uppercase}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:10px 16px;font-weight:700;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.timeline{display:flex;gap:6px;flex-wrap:wrap}
+.timeline span{font-family:var(--f-mono);font-size:.8rem;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.timeline span.done{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.timeline span.now{border-color:var(--accent);color:var(--accent);font-weight:600}
+
+.grid{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+
+/* uchwała */
+.act{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.act header{display:flex;flex-direction:column;gap:4px;text-align:center;border-bottom:1px solid var(--line);padding-bottom:12px}
+.act header .label{color:var(--stamp)}
+.para{display:grid;grid-template-columns:2.4rem minmax(0,1fr);gap:4px 8px}
+.para .sign{font-family:var(--f-display);font-weight:700;font-size:1.05rem;color:var(--muted)}
+.para .body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.para .hint{font-size:.85rem;color:var(--muted)}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.row output{font-family:var(--f-mono);font-weight:600;min-width:5.5rem}
+input[type=range]{flex:1;min-width:140px;accent-color:var(--accent)}
+.seg{display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg label{flex:1;min-width:4.2rem;text-align:center;padding:6px 8px;cursor:pointer;border-right:1px solid var(--line);font-size:.9rem}
+.seg label:last-child{border-right:0}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--ink);color:var(--paper);font-weight:600}
+.seg label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:-2px}
+.inv{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;align-items:start;padding:8px 0;border-top:1px dashed var(--line)}
+.inv:first-child{border-top:0}
+.inv input{margin-top:5px;accent-color:var(--accent);width:1.05rem;height:1.05rem}
+.inv .cost{font-family:var(--f-mono);font-size:.85rem;white-space:nowrap}
+.inv .desc{grid-column:2/4;font-size:.85rem;color:var(--muted)}
+.inv.builtrow{opacity:.65}
+.chk{display:flex;gap:10px;align-items:flex-start}
+.chk input{margin-top:5px;accent-color:var(--accent);width:1.05rem;height:1.05rem}
+.sumline{display:flex;justify-content:space-between;gap:12px;font-size:.92rem;border-top:1px solid var(--line);padding-top:10px}
+.sumline b{font-family:var(--f-mono)}
+.warnline{font-size:.88rem;color:var(--warn)}
+
+/* wydarzenie */
+.event{border:2px solid var(--ink);border-radius:4px;background:var(--card);padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.event .label{color:var(--bad)}
+.event .opts{display:flex;flex-direction:column;gap:6px}
+.event .opts label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.event .opts input{margin-top:5px;accent-color:var(--accent)}
+
+/* wskaźniki */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.tile{background:var(--card);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile .v{font-family:var(--f-mono);font-size:1.45rem;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.tile .v small{font-size:.75rem;color:var(--muted);font-weight:400;margin-left:4px}
+.tile .meta{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.delta{font-family:var(--f-mono);font-size:.8rem;font-weight:600}
+.delta.good{color:var(--good)} .delta.bad{color:var(--bad)} .delta.flat{color:var(--muted)}
+.why{background:none;border:0;padding:2px 0;color:var(--accent);font-weight:600;font-size:.85rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.tile.sel{box-shadow:inset 0 -3px 0 var(--accent)}
+svg.spark{width:100%;height:26px;display:block}
+@media (min-width:640px) and (max-width:900px){.tiles{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (min-width:1120px){.tiles{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (min-width:640px){.tile .v{font-size:1.25rem}}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.chain{display:flex;flex-direction:column;gap:8px}
+.chain .it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
+.chain .bar{grid-column:1/3;height:6px;background:var(--barbg);border-radius:3px;position:relative;overflow:hidden}
+.chain .bar i{position:absolute;top:0;bottom:0;border-radius:3px}
+.chain .val{font-family:var(--f-mono);font-size:.88rem;text-align:right;font-weight:600;white-space:nowrap}
+.note{font-size:.82rem;color:var(--muted)}
+
+.voices{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.voice{border-left:3px solid var(--ink);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:6px}
+.voice .who{font-weight:700}
+.voice .mood{font-family:var(--f-mono);font-size:.8rem}
+
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.code{font-family:var(--f-mono);color:var(--muted);font-size:.8rem}
+tr.tot td{font-weight:700;border-bottom:2px solid var(--ink)}
+
+details{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:12px 16px}
+details summary{cursor:pointer;font-family:var(--f-display);font-weight:700}
+details[open] summary{margin-bottom:10px}
+details ul,details ol{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:6px;max-width:75ch}
+
+.debrief{display:flex;flex-direction:column;gap:16px}
+.score{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.score div{border-top:3px solid var(--ink);padding-top:8px;display:flex;flex-direction:column;gap:4px}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.charts figure{margin:0;display:flex;flex-direction:column;gap:4px}
+.charts svg{width:100%;height:auto;display:block}
+.charts figcaption{font-size:.85rem;font-weight:600}
+.verdict{font-family:var(--f-display);font-size:1.4rem;font-weight:700}
+footer{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:4px}
+@media (prefers-reduced-motion:no-preference){.tile .v{transition:color .3s}}
+</style>
+
+<div class="wrap" id="app">
+  <section class="mast">
+    <div>
+      <div class="label">EcoChallenge · prototyp MVP · poziom gminy</div>
+      <h1>Gmina Brzozowa</h1>
+      <p class="sub">Jesteście radą gminy. Co roku uchwalacie budżet, a potem patrzycie, co Wasze decyzje zrobiły z cenami, firmami, powietrzem i życiem mieszkańców. Nie ma jednej dobrej odpowiedzi, są tylko kompromisy.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+      <div class="yearchip" id="yearchip"></div>
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </section>
+
+  <section class="world" aria-label="Ustawienia świata gry">
+    <label class="label" for="code">Kod świata</label>
+    <input id="code" maxlength="16" value="KLASA-7B">
+    <label class="label" for="scen">Scenariusz</label>
+    <select id="scen">
+      <option value="paliwo">Szok paliwowy i cła</option>
+      <option value="spokojny">Spokojne lata</option>
+      <option value="losowy">Losowe wydarzenia</option>
+    </select>
+    <button class="btn ghost" id="newgame" type="button">Nowa gra</button>
+    <span class="note">Ten sam kod daje wszystkim drużynom ten sam świat, więc wyniki można porównać.</span>
+  </section>
+
+  <div id="event"></div>
+
+  <div class="grid">
+    <div class="col" id="left"></div>
+    <div class="col" id="right"></div>
+  </div>
+
+  <details id="teacher">
+    <summary>Dla nauczyciela: lekcja 45 minut</summary>
+    <ol>
+      <li><b>5 min.</b> Krótki test wstępny (3 pytania o skutki podwyżki ceny paliwa). Podział na drużyny 3–4-osobowe, jeden kod świata dla całej klasy.</li>
+      <li><b>25 min.</b> Pięć tur, około 5 minut na turę. Drużyna przed głosowaniem zapisuje, czego się spodziewa. Po turze sprawdza przyciskiem „Dlaczego?”, co się stało.</li>
+      <li><b>10 min.</b> Omówienie: drużyny porównują wyniki. Ta sama sytuacja startowa, różne decyzje, różne skutki.</li>
+      <li><b>5 min.</b> Test końcowy (te same pytania) i jedno zdanie: „Najbardziej zaskoczyło nas…”.</li>
+    </ol>
+    <p class="note" style="margin-top:10px">Gra nie ocenia uczniów i nie zbiera danych osobowych. Nic nie jest wysyłane, stan gry zostaje w przeglądarce. Ocenę, jeśli jest potrzebna, wystawia nauczyciel poza grą.</p>
+  </details>
+
+  <details id="model">
+    <summary>Jak liczy model (wszystkie zasady są jawne)</summary>
+    <ul>
+      <li><b>Ceny w sklepach:</b> inflacja bazowa 2,5% rocznie. Każde +10% ceny paliwa ponad trend dodaje 0,6 pkt proc. (transport towarów), cła dodają 1,8 pkt, każde +10% ceny energii dodaje 0,3 pkt.</li>
+      <li><b>Firmy:</b> indeks rośnie o 0,8 rocznie. Każde 5 pkt proc. stawki podatku od nieruchomości powyżej 75% maksimum zabiera 0,6. Strefa aktywności daje +2,5 rocznie, obwodnica +1,2 (obie od roku po budowie). Paliwo, cła i energia obniżają indeks.</li>
+      <li><b>Praca:</b> gdy indeks firm spada poniżej 100, część osób pracujących lokalnie traci pracę (0,8 pkt proc. ryzyka na każdy punkt spadku).</li>
+      <li><b>Dojazdy:</b> każdy mieszkaniec wybiera najtańszą dla siebie opcję: auto (koszt paliwa: 7 l/100 km), autobus (cena biletu + niewygoda rzadkich kursów) albo rower (do 3 km, a ze ścieżkami do 7 km).</li>
+      <li><b>Domowe budżety:</b> dochód minus paliwo, bilet, podatek od nieruchomości (ok. 1,20 zł/m² dla domu, ok. 33 zł/m² dla budynku firmy przy stawce maksymalnej), opłata za odpady, prąd, ogrzewanie i zakupy. Nastroje zależą od tego, czy rodzinie zostaje więcej czy mniej niż oczekiwała, a także od szkoły, powietrza, autobusów i pracy.</li>
+      <li><b>Budżet gminy:</b> dochody (udział w PIT i CIT, podatek od nieruchomości, opłata za odpady, subwencja oświatowa, bilety, dotacje) minus wydatki (oświata, administracja, pomoc społeczna, energia budynków, odbiór odpadów, komunikacja, drogi i kultura, obsługa długu, inwestycje). Gdy zabraknie wolnych środków, gmina musi zaciągnąć kredyt, a Regionalna Izba Obrachunkowa wydaje ostrzeżenie.</li>
+      <li><b>Powietrze i CO₂:</b> stare piece węglowe, ruch samochodów, firmy i budynki gminy. Program wymiany pieców najbardziej poprawia powietrze, autobusy i rowery zmniejszają ruch.</li>
+    </ul>
+    <p class="note" style="margin-top:10px">Gmina Brzozowa jest fikcyjna. Liczby są przybliżone na wzór polskiej gminy miejsko-wiejskiej (ok. 18 tys. mieszkańców) i nie są danymi konkretnej gminy. Kolejna wersja ma używać prawdziwych danych z Banku Danych Lokalnych GUS.</p>
+  </details>
+
+  <footer>
+    <span>Teksty wydarzeń i głosów mieszkańców to szablony przygotowane z pomocą AI i sprawdzone przez człowieka. Liczby w nich wstawia model gry, a nie AI. Postacie i polityka gminy są fikcyjne.</span>
+    <span>EcoChallenge, fundacja (projekt). Prototyp do testów, wersja 0.1.</span>
+  </footer>
+</div>
+
+<script>
+/* ===================== MODEL (deterministyczny) ===================== */
+const YEAR0 = 2026, TURNS = 5;
+
+function hashStr(s){let h=1779033703^s.length;for(let i=0;i<s.length;i++){h=Math.imul(h^s.charCodeAt(i),3432918353);h=h<<13|h>>>19}return h>>>0}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+
+const INV = {
+  pv:       {n:'Panele fotowoltaiczne na budynkach gminy', c:4,  green:true,  d:'Rachunki za prąd w szkołach i urzędzie spadają o 35%, mniej CO₂.'},
+  termo:    {n:'Termomodernizacja szkół',                  c:6,  green:true,  d:'Ocieplone budynki zużywają o 25% mniej energii.'},
+  sciezki:  {n:'Ścieżki rowerowe',                         c:3,  green:true,  d:'Rowerem da się bezpiecznie dojechać do 7 km zamiast 3 km.'},
+  piece:    {n:'Program wymiany starych pieców',           c:3,  green:true,  d:'Dopłaty do wymiany kopciuchów. Część domów przechodzi na czyste ogrzewanie.'},
+  strefa:   {n:'Strefa aktywności gospodarczej',           c:8,  green:false, d:'Uzbrojone działki przyciągają firmy co roku, od roku po budowie.'},
+  obwodnica:{n:'Obwodnica',                                c:10, green:false, d:'Ciężarówki omijają centrum, firmom łatwiej dojechać. Utrzymanie 0,3 mln zł rocznie.'}
+};
+
+const JOBS = {
+  dojazd:  {l:'pracuje w mieście powiatowym', inc:7400, p:.30},
+  lokalna: {l:'pracuje w lokalnej firmie',    inc:5600, p:.26},
+  emeryt:  {l:'jest na emeryturze',           inc:3300, p:.24},
+  firma:   {l:'prowadzi warsztat samochodowy',inc:8600, p:.08},
+  rolnik:  {l:'prowadzi gospodarstwo rolne',  inc:5000, p:.12}
+};
+const FN=['Anna','Maria','Katarzyna','Agnieszka','Ewa','Magdalena','Joanna','Barbara','Zofia','Natalia','Monika','Halina','Krystyna','Julia','Aleksandra'];
+const MN=['Piotr','Krzysztof','Andrzej','Tomasz','Paweł','Marek','Michał','Jan','Stanisław','Grzegorz','Łukasz','Adam','Wojciech','Józef','Kamil'];
+const INITIALS='BCDGJKLMNPRSWZ';
+
+function makeWorld(code, scen){
+  const r = mulberry32(hashStr(code.toUpperCase()+'|'+scen));
+  const v = (x,p=.08)=>x*(1+(r()*2-1)*p);
+  const P = {pop:Math.round(v(18000,.12)/100)*100, pit:v(23), cit:v(1.5), prop:v(9), subw:v(18), dot:v(6), inne:v(9),
+    edu:v(36), adm:v(10.5), soc:v(6), bld:v(2.4), wasteCost:v(7), roads:v(6.5), reserve:v(4,.3), debt:v(8,.3), heatKt:v(28,.1), bizKt:v(14,.1)};
+  const npcs=[];
+  for(let i=0;i<120;i++){
+    let x=r(), job='dojazd', acc=0; for(const k in JOBS){acc+=JOBS[k].p; if(x<acc){job=k;break}}
+    const fem=r()<.5, name=(fem?FN:MN)[Math.floor(r()*15)]+' '+INITIALS[Math.floor(r()*INITIALS.length)]+'.';
+    const age = job==='emeryt'? 66+Math.floor(r()*16) : 24+Math.floor(r()*38);
+    const hh = job==='emeryt'? 1+Math.floor(r()*2) : 1+Math.floor(r()*r()*5)+ (r()<.5?1:0);
+    const km = job==='dojazd'? 14+Math.floor(r()*25) : job==='lokalna'? 1+Math.floor(r()*8) : job==='firma'? 1+Math.floor(r()*3) : 0;
+    npcs.push({i, name, fem, job, age, hh:Math.min(hh,5), km,
+      inc0: JOBS[job].inc*(0.85+r()*0.3)*(job==='emeryt'?1:(0.85+0.1*Math.min(hh,4))),
+      car: r() < (job==='emeryt'?.6:.92), owns: r()<.76, area: 70+Math.floor(r()*80),
+      kids: hh>=3 && job!=='emeryt', village: r()<.18, oldStove: r()<.4,
+      risk:r(), taste:0.75+r()*0.5, join:r()});
+  }
+  let events={};
+  if(scen==='paliwo') events={2:'fuel',3:'tariff',4:'energy'};
+  if(scen==='spokojny') events={3:'investor',4:'eu'};
+  if(scen==='losowy'){ const pool=['fuel','tariff','energy','flood','investor','eu'];
+    for(let i=pool.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}
+    [2,3,4,5].forEach((y,k)=>events[y]=pool[k]); }
+  const W={code:code.toUpperCase(), scen, P, npcs, events, oldInit:npcs.filter(a=>a.oldStove).length};
+  // kalibracja: w roku bazowym budżet ma niewielką nadwyżkę (ok. 1,2 mln zł)
+  const b=step(W,{cpi:1,B:100,debt:P.debt,reserve:P.reserve,built:{},riders:0,investorOn:false},DEFAULT_DEC,0);
+  P.inne += 1.2 - b.balance;
+  return W;
+}
+
+function extFor(W,t){
+  const fuelTrend=6.5*Math.pow(1.02,t), energyTrend=700*Math.pow(1.03,t);
+  let fuel=fuelTrend, energy=energyTrend, tariff=false;
+  for(const y in W.events){const e=W.events[y], yy=+y; if(yy>t) continue;
+    if(e==='fuel') fuel*=1+0.28*Math.pow(.45,t-yy);
+    if(e==='energy') energy*=1+0.3*Math.pow(.6,t-yy);
+    if(e==='tariff') tariff=true;}
+  return {fuel, energy, fuelTrend, energyTrend, tariff, ev:W.events[t]||null};
+}
+
+const DEFAULT_DEC = {rate:75, fee:32, kursy:'srednio', price:80, school:true, inv:[], loan:0, ev:{}};
+const KURSY = {malo:{l:'rzadko',pen:260,cost:1.6,mood:-4}, srednio:{l:'co godzinę',pen:130,cost:3.1,mood:0}, duzo:{l:'co pół godziny',pen:70,cost:4.9,mood:4}};
+
+function step(W, prev, dec, t){
+  const P=W.P, ext=extFor(W,t), why={}, ev=ext.ev, evc=dec.ev||{};
+  const add=(k,l,v)=>{ if(Math.abs(v)<1e-9) return; (why[k]=why[k]||[]).push({l,v}); };
+  const built={...prev.built};
+  const wage=Math.pow(1.045,t), fuelRel=ext.fuel/ext.fuelTrend, enRel=ext.energy/ext.energyTrend;
+  const has=(k,lag=0)=>built[k]!=null && built[k]<=t-lag;
+  dec.inv.forEach(k=>{ if(built[k]==null) built[k]=t; });
+
+  // --- ceny w sklepach
+  let infl=2.5; add('infl','Inflacja bazowa w kraju (założenie modelu)',2.5);
+  const iF=6*(fuelRel-1); infl+=iF; add('infl',`Paliwo ${sg(pct(fuelRel-1))} ponad trend → droższy transport towarów → wyższe ceny na półkach`,iF);
+  if(ext.tariff){infl+=1.8; add('infl','Cła na towary z importu → droższe towary i części w sklepach',1.8)}
+  const iE=3*(enRel-1); infl+=iE; add('infl',`Energia ${sg(pct(enRel-1))} ponad trend → wyższe koszty sklepów i producentów`,iE);
+  if(t===0) infl=2.5;
+  const cpi = t===0 ? 1 : prev.cpi*(1+infl/100);
+
+  // --- firmy
+  let dB=0;
+  if(t>0){
+    dB+=0.8; add('B','Wzrost gospodarczy w kraju (założenie)',0.8);
+    const tx=-(dec.rate-75)*0.12; dB+=tx; add('B',`Podatek od nieruchomości: ${dec.rate}% stawki maksymalnej → koszty firm`,tx);
+    if(has('strefa',1)){dB+=2.5; add('B','Strefa aktywności gospodarczej przyciąga nowe firmy',2.5)}
+    if(has('obwodnica',1)){dB+=1.2; add('B','Obwodnica ułatwia dojazd dostawcom',1.2)}
+    const f=-8*(fuelRel-1); dB+=f; add('B','Droższe paliwo → wyższe koszty transportu firm',f);
+    if(ext.tariff && ev==='tariff'){dB-=2.5; add('B','Cła → droższe części i surowce z importu',-2.5)}
+    const e=-4*(enRel-1); dB+=e; add('B','Droższa energia → wyższe koszty produkcji',e);
+    if(ev==='flood' && evc.repair==='nie'){dB-=2; add('B','Nienaprawione drogi utrudniają dojazd do firm',-2)}
+    if(ev==='investor' && evc.investor==='tak'){const g=7+(has('strefa')?3:0); dB+=g; add('B','Nowy magazyn logistyczny i miejsca pracy',g)}
+    if(dec.kursy==='duzo'){dB+=0.3; add('B','Częste autobusy ułatwiają dojazd pracownikom',0.3)}
+  }
+  const B=prev.B+dB;
+  const unemp = clamp((100-B)*0.008,0,0.3);
+  if(unemp>0) add('unemp',`Indeks firm ${f1(B)} (poniżej 100) → część firm zwalnia`,unemp*100);
+  const investorOn = Object.entries(W.events).some(([y,e])=>e==='investor'&&+y<=t) && (prev.investorOn || (ev==='investor'&&evc.investor==='tak'));
+
+  // --- dojazdy
+  const half = ev==='fuel' && evc.half==='tak';
+  const price = dec.price*(half?.5:1), K=KURSY[dec.kursy];
+  const bikeMax = has('sciezki')?7:3;
+  const scaleHH = (P.pop/2.6)/W.npcs.length;
+  let riders=0, carKm=0, carUsers=0, commuters=0, oldLeft=0;
+  const A = W.npcs.map(a=>{
+    let mode='none';
+    if(a.km>0){ commuters++;
+      const car = a.car ? a.km*2*21*0.07*ext.fuel : 1e9;
+      const bus = price + K.pen*a.taste;
+      const bike = a.km<=bikeMax ? (has('sciezki')?30:70)+a.km*(has('sciezki')?15:30) : 1e9;
+      mode = (car<=bus && car<=bike)?'car':(bus<=bike?'bus':'bike');
+      if(mode==='bus') riders+=scaleHH; if(mode==='car') carUsers++; }
+    const km = (mode==='car'? a.km*2*21:0) + (a.car?250:0);
+    carKm += km;
+    const stoveNew = a.oldStove && has('piece') && a.join<0.6;
+    if(a.oldStove && !stoveNew) oldLeft++;
+    return {a, mode, km, stoveNew};
+  });
+  const pr0=prev.riders||0;
+  if(t>0){ add('riders',`Cena biletu ${price} zł${half?' (połowa dopłacona przez gminę)':''}, kursy ${K.l}`, riders-pr0); }
+
+  // --- emisje i powietrze
+  const trKt = carKm*12*scaleHH*0.17/1e6 + 5 + (investorOn?2:0);
+  const oldFrac = W.oldInit? oldLeft/W.oldInit : 1;
+  const heatKt = P.heatKt*(1-0.3*(1-oldFrac));
+  const bldF = (has('pv')?.65:1)*(has('termo')?.75:1);
+  const bldKt = 2.4*bldF;
+  const bizKt = P.bizKt*B/100 + (investorOn?3:0);
+  const co2 = trKt+heatKt+bldKt+bizKt;
+  const air = clamp(95 - 35*oldFrac - 12*(trKt/15) - 5*B/100 - (investorOn?5:0) + (has('obwodnica')?3:0), 0, 100);
+  if(t>0){
+    const p=prev.parts; add('co2','Transport samochodowy',trKt-p.tr); add('co2','Ogrzewanie domów',heatKt-p.heat); add('co2','Budynki gminy',bldKt-p.bld); add('co2','Firmy',bizKt-p.biz);
+    add('air','Stare piece w domach',-35*(oldFrac-p.oldFrac)); add('air','Ruch samochodów',-12*(trKt-p.tr)/15); add('air','Działalność firm',-5*(B-prev.B)/100);
+    if(investorOn&&!prev.investorOn) add('air','Ciężarówki z magazynu',-5);
+    if(has('obwodnica')&&!(prev.built.obwodnica!=null)) add('air','Obwodnica wyprowadza ruch z centrum',3);
+  }
+
+  // --- domowe budżety
+  const energyRel = ext.energy/700;
+  const recs = A.map(({a,mode,km,stoveNew})=>{
+    const unemployed = (a.job==='lokalna'||a.job==='firma') && a.risk<unemp;
+    let inc = a.job==='emeryt' ? a.inc0*cpi*Math.pow(1.005,t) : a.inc0*wage;
+    if(a.job==='firma') inc*= B/100;
+    if(unemployed) inc = 1700*wage;
+    const items = {
+      dochód: inc,
+      paliwo: km*0.07*ext.fuel + (a.job==='rolnik'?60*ext.fuel:0),
+      bilet: mode==='bus'?price:0,
+      podatki: (a.owns? a.area*1.2*dec.rate/100/12 : 0) + (a.job==='firma'? 280*33*dec.rate/100/12 : 0),
+      odpady: dec.fee*a.hh,
+      energia: 230*Math.sqrt(a.hh)*energyRel + 380*(stoveNew?0.8:1)*Math.sqrt(energyRel),
+      zakupy: 760*a.hh*cpi
+    };
+    const disp = items.dochód - items.paliwo - items.bilet - items.podatki - items.odpady - items.energia - items.zakupy;
+    return {a, mode, unemployed, stoveNew, items, disp};
+  });
+  if(t===0) recs.forEach(r=>r.a.disp0=r.disp);
+  const poorN = recs.filter(r=>r.disp/r.a.hh < 650*cpi).length;
+  const poverty = poorN/recs.length;
+
+  // --- budżet gminy (mln zł)
+  const rv = {
+    pit: P.pit*wage*(0.75+0.25*B/100)*(1-0.5*unemp),
+    cit: P.cit*B/100,
+    prop: P.prop*(dec.rate/75)*(0.45+0.55*B/100) + (investorOn?0.8:0) + (has('strefa',1)?0.5:0),
+    odpady: dec.fee*12*P.pop/1e6,
+    bilety: riders*price*12/1e6,
+    subw: P.subw*Math.pow(1.035,t),
+    dot: P.dot + (ev==='eu' ? dec.inv.filter(k=>INV[k].green).reduce((s,k)=>s+INV[k].c*.5,0) : 0),
+    inne: P.inne*Math.sqrt(wage)
+  };
+  const ex = {
+    edu: P.edu*Math.pow(1.04,t) - (dec.school?0:1.6),
+    adm: P.adm*Math.pow(1.03,t),
+    soc: P.soc*(1+2.5*(poverty-0.08))*Math.pow(1.03,t),
+    bld: P.bld*enRel*Math.pow(1.03,t)*bldF,
+    odpady: P.wasteCost*cpi,
+    trans: K.cost*(0.6+0.4*fuelRel)*Math.sqrt(wage),
+    roads: P.roads*Math.pow(1.03,t) + (has('obwodnica',1)?0.3:0) + (ev==='flood'&&evc.repair!=='nie'?2.5:0),
+    debt: (prev.debt)*0.14,
+    inv: dec.inv.reduce((s,k)=>s+INV[k].c,0)
+  };
+  const revT = Object.values(rv).reduce((s,x)=>s+x,0);
+  const expT = Object.values(ex).reduce((s,x)=>s+x,0);
+  const balance = revT - expT;
+  let reserve = prev.reserve + balance + dec.loan, forced=0;
+  if(reserve<0){forced=-reserve; reserve=0;}
+  const rio = forced>0;
+  const debt = prev.debt*0.92 + dec.loan + forced;
+  const ratio = debt/revT;
+  if(t>0){
+    const pr=prev.rv, pe=prev.ex, L={pit:'Udział w PIT (praca i płace)',cit:'Udział w CIT (zyski firm)',prop:'Podatek od nieruchomości',odpady:'Opłata za odpady',bilety:'Bilety',subw:'Subwencja oświatowa',dot:'Dotacje',inne:'Inne dochody'};
+    for(const k in rv) add('balance',L[k],rv[k]-pr[k]);
+    const LE={edu:'Oświata',adm:'Administracja',soc:'Pomoc społeczna',bld:'Energia w budynkach gminy',odpady:'Odbiór odpadów',trans:'Komunikacja gminna',roads:'Drogi, kultura, sport',debt:'Raty i odsetki kredytów',inv:'Inwestycje'};
+    for(const k in ex) add('balance',LE[k],-(ex[k]-pe[k]));
+    add('ratio','Spłata wcześniejszych kredytów',-(prev.debt*0.08)/revT*100);
+    if(dec.loan) add('ratio','Nowy kredyt w uchwale',dec.loan/revT*100);
+    if(forced) add('ratio','Kredyt wymuszony brakiem pieniędzy',forced/revT*100);
+    add('ratio','Zmiana dochodów gminy',(prev.debt*0.92+dec.loan+forced)*(1/revT-1/prev.revT)*100);
+    add('poverty','Zmiana liczby rodzin z dochodem poniżej 650 zł na osobę po opłatach',(poverty-prev.poverty)*100);
+  }
+
+  // --- nastroje
+  let moodSum=0; const comp={};
+  const cAdd=(k,v)=>comp[k]=(comp[k]||0)+v;
+  recs.forEach(r=>{
+    const a=r.a, expct = a.job==='emeryt'? cpi : wage;
+    const x = (r.disp - a.disp0*expct)/(0.25*a.inc0*wage);
+    const econ = 35*Math.tanh(x);
+    const soft = {
+      'Szkoła w Brzozówce zamknięta': (a.kids&&a.village&&!dec.school)?-15:0,
+      'Częstotliwość autobusów': r.mode==='bus'?K.mood:0,
+      'Jakość powietrza': (air-60)*0.15,
+      'Utrata pracy': r.unemployed?-20:0,
+      'Ostrzeżenie RIO, kłopoty finansowe gminy': rio?-6:0,
+      'Bezpieczne ścieżki rowerowe': r.mode==='bike'&&has('sciezki')?2:0,
+      'Ciężarówki z magazynu': investorOn?-2:0
+    };
+    const s = clamp(50+econ+Object.values(soft).reduce((u,v)=>u+v,0),0,100);
+    r.sat=s; r.econ=econ; r.soft=soft; moodSum+=s;
+  });
+  const mood = moodSum/recs.length;
+  if(t>0){
+    const pa=prev.recs;
+    const econLabels={paliwo:'Wydatki na paliwo',bilet:'Bilety',podatki:'Podatek od nieruchomości',odpady:'Opłata za odpady',energia:'Prąd i ogrzewanie',zakupy:'Ceny w sklepach'};
+    let econRest=0;
+    recs.forEach((r,i)=>{
+      const p=pa[i], dE=r.econ-p.econ;
+      const expct = r.a.job==='emeryt'? cpi/prev.cpi : wage/prev.wage;
+      const parts={'Dochody (płace, emerytury, praca)': (r.items.dochód - p.items.dochód) - (p.disp*(expct-1))};
+      for(const k in econLabels) parts[econLabels[k]] = -(r.items[k]-p.items[k]);
+      const sum=Object.values(parts).reduce((u,v)=>u+v,0);
+      if(Math.abs(sum)>1){ const sc=dE/sum; for(const k in parts) cAdd(k,parts[k]*sc/recs.length); }
+      else econRest+=dE/recs.length;
+      for(const k in r.soft) cAdd(k,(r.soft[k]-p.soft[k])/recs.length);
+    });
+    if(Math.abs(econRest)>.01) cAdd('Drobne zmiany w domowych budżetach',econRest);
+    for(const k in comp) add('mood',k,comp[k]);
+  }
+
+  return {t, year:YEAR0+t, ext, wage, cpi, infl, B, unemp, riders, carShare: commuters? carUsers/commuters:0,
+    co2, parts:{tr:trKt,heat:heatKt,bld:bldKt,biz:bizKt,oldFrac}, air, mood, poverty, rv, ex, revT, expT, balance, reserve, debt, ratio, rio, forced,
+    built, investorOn, recs, dec, why, ev};
+}
+
+function baseState(W){
+  const P=W.P;
+  const pre={cpi:1,B:100,debt:P.debt,reserve:P.reserve,built:{},riders:0,investorOn:false};
+  return step(W, pre, DEFAULT_DEC, 0);
+}
+
+function play(W, decs){
+  const snaps=[baseState(W)];
+  decs.forEach((d,i)=>snaps.push(step(W, snaps[i], d, i+1)));
+  return snaps;
+}
+/* ===================== /MODEL ===================== */
+
+/* ===================== FORMATY I SZABLONY ===================== */
+function nf(x,d=1){return x.toLocaleString('pl-PL',{minimumFractionDigits:d,maximumFractionDigits:d})}
+const f1=x=>nf(x,1), f2=x=>nf(x,2), f0=x=>nf(x,0);
+const pct=x=>nf(x*100,0)+'%';
+const sg=s=>(s.startsWith('-')?'':'+')+s;
+
+const EV = {
+  fuel:{t:'Kryzys na światowym rynku ropy',
+    x:s=>`Ograniczenie wydobycia i napięcia w regionach naftowych podniosły cenę ropy. Na stacji w gminie litr paliwa kosztuje ${f2(s.fuel)} zł zamiast ${f2(s.fuelTrend)} zł. Dojazdy, dostawy do sklepów i praca w polu drożeją.`,
+    c:{k:'half',q:'Czy gmina dopłaci w tym roku połowę ceny biletu miesięcznego?',o:[['tak','Tak, dopłacamy. Bilet tańszy, ale wpływy z biletów spadną.'],['nie','Nie. Mieszkańcy płacą pełną cenę, budżet bez zmian.']]}},
+  tariff:{t:'Nowe cła na towary z importu',
+    x:()=>`Państwo nałożyło cła na część towarów z importu. Budżet państwa zarabia na cłach, ale towary i części z zagranicy drożeją. Sklepy w gminie podnoszą ceny, a lokalne warsztaty płacą więcej za komponenty.`},
+  energy:{t:'Drożeją prąd i gaz',
+    x:s=>`Ceny energii na rynku hurtowym skoczyły. Megawatogodzina kosztuje ok. ${f0(s.energy)} zł. Wyższe rachunki dostaną rodziny, firmy i budynki gminy: szkoły, urząd, oświetlenie.`},
+  flood:{t:'Nawalny deszcz zniszczył drogi',
+    x:()=>`Po ulewie dwie drogi gminne są rozmyte, a przepust pod drogą do Brzozówki się zapadł. Naprawa kosztuje ok. 2,5 mln zł.`,
+    c:{k:'repair',q:'Naprawić drogi od razu?',o:[['tak','Tak, naprawiamy teraz (2,5 mln zł z budżetu).'],['nie','Odkładamy naprawę. Firmy i mieszkańcy jeżdżą objazdami.']]}},
+  investor:{t:'Firma logistyczna chce zbudować magazyn',
+    x:()=>`Inwestor chce postawić duży magazyn przy drodze wojewódzkiej. To nowe miejsca pracy i podatek od nieruchomości, ale też ciężarówki, hałas i gorsze powietrze.`,
+    c:{k:'investor',q:'Czy rada się zgadza?',o:[['tak','Zgadzamy się. Praca i podatki ważniejsze.'],['nie','Odmawiamy. Spokój i powietrze ważniejsze.']]}},
+  eu:{t:'Nabór dotacji UE na zieloną energię',
+    x:()=>`Ruszył nabór dotacji na inwestycje ekologiczne. Jeśli w tym roku gmina zbuduje panele, ociepli szkoły, wytyczy ścieżki rowerowe albo uruchomi wymianę pieców, połowę kosztu pokryje dotacja.`}
+};
+
+const pron=(a,m,f)=>a.fem?f:m;
+function story(r, p, s, prev){
+  const a=r.a, nm=`${a.name}, ${a.age} l.`, job=JOBS[a.job].l;
+  const d=k=>r.items[k]-p.items[k];
+  const lines=[];
+  if(r.unemployed && !p.unemployed) lines.push(a.job==='firma' ? `Warsztat stracił klientów i ${pron(a,'musiał','musiała')} go zamknąć. Rodzina żyje teraz z zasiłku: ${f0(r.items.dochód)} zł miesięcznie.` : `Firma, w której ${pron(a,'pracował','pracowała')}, zwolniła część załogi. Rodzina żyje teraz z zasiłku: ${f0(r.items.dochód)} zł miesięcznie.`);
+  if(a.kids&&a.village&&!s.dec.school&&prev.dec.school!==false) lines.push(`Szkołę w Brzozówce połączono z większą. Dzieci dojeżdżają teraz 9 km gimbusem.`);
+  if(r.mode!==p.mode && r.mode==='bus') lines.push(`${pron(a,'Przesiadł','Przesiadła')} się z auta do autobusu. Bilet kosztuje ${f0(r.items.bilet)} zł, paliwo na ${a.km} km w jedną stronę kosztowałoby ok. ${f0(a.km*2*21*0.07*s.ext.fuel)} zł.`);
+  if(r.mode!==p.mode && r.mode==='bike') lines.push(`Do pracy ma ${a.km} km, więc ${pron(a,'przesiadł','przesiadła')} się na rower.`);
+  if(r.mode!==p.mode && r.mode==='car' && p.mode!=='none') lines.push(`${pron(a,'Wrócił','Wróciła')} do auta, bo autobus przestał się opłacać.`);
+  if(Math.abs(d('paliwo'))>=60) lines.push(`Paliwo kosztuje ${f2(s.ext.fuel)} zł/l. Na paliwo rodzina wydaje ${f0(r.items.paliwo)} zł miesięcznie, o ${f0(Math.abs(d('paliwo')))} zł ${d('paliwo')>0?'więcej':'mniej'} niż rok temu.`);
+  if(a.job==='firma' && Math.abs(d('podatki'))>=20) lines.push(`Podatek od nieruchomości za warsztat wynosi teraz ${f0(r.items.podatki)} zł miesięcznie (${d('podatki')>0?'+':'−'}${f0(Math.abs(d('podatki')))} zł).`);
+  if(Math.abs(d('zakupy'))>=40) lines.push(`Zakupy dla ${a.hh}-osobowego domu kosztują ${f0(r.items.zakupy)} zł miesięcznie, o ${f0(Math.abs(d('zakupy')))} zł ${d('zakupy')>0?'więcej':'mniej'} niż rok temu.`);
+  if(Math.abs(d('energia'))>=40) lines.push(`Rachunki za prąd i ogrzewanie: ${f0(r.items.energia)} zł miesięcznie (${d('energia')>0?'+':'−'}${f0(Math.abs(d('energia')))} zł).`);
+  if(r.stoveNew && !p.stoveNew) lines.push(`Z dopłatą gminy ${pron(a,'wymienił','wymieniła')} stary piec na pompę ciepła. W okolicy mniej czuć dym.`);
+  if(Math.abs(d('odpady'))>=15) lines.push(`Opłata za odpady dla całego domu: ${f0(r.items.odpady)} zł miesięcznie.`);
+  if(!lines.length) lines.push(`W domowym budżecie niewiele się zmieniło. Po wszystkich opłatach zostaje ${f0(r.disp)} zł miesięcznie.`);
+  return {who:nm, job, lines:lines.slice(0,3), sat:r.sat, dsat:r.sat-p.sat};
+}
+function pickStories(s, prev){
+  const idx = s.recs.map((r,i)=>({i, d:Math.abs(r.sat-prev.recs[i].sat)})).sort((x,y)=>y.d-x.d);
+  const out=[], jobs=new Set();
+  for(const {i} of idx){ const r=s.recs[i]; if(jobs.has(r.a.job)) continue; jobs.add(r.a.job); out.push(story(r, prev.recs[i], s, prev)); if(out.length===3) break; }
+  return out;
+}
+
+/* ===================== INTERFEJS ===================== */
+const IND = [
+  {k:'mood',   l:'Nastroje mieszkańców', u:'/100',    d:0, good:1,  v:s=>s.mood},
+  {k:'balance',l:'Wynik budżetu gminy',  u:'mln zł',  d:1, good:1,  v:s=>s.balance},
+  {k:'ratio',  l:'Dług do dochodów',     u:'%',       d:0, good:-1, v:s=>s.ratio*100},
+  {k:'B',      l:'Kondycja lokalnych firm',u:'indeks',d:1, good:1,  v:s=>s.B},
+  {k:'infl',   l:'Wzrost cen w sklepach',u:'% r/r',   d:1, good:-1, v:s=>s.infl},
+  {k:'unemp',  l:'Bezrobocie lokalne',   u:'%',       d:1, good:-1, v:s=>s.unemp*100},
+  {k:'poverty',l:'Rodziny w trudnej sytuacji',u:'%',  d:0, good:-1, v:s=>s.poverty*100},
+  {k:'co2',    l:'Emisje CO₂',           u:'tys. t',  d:1, good:-1, v:s=>s.co2},
+  {k:'air',    l:'Jakość powietrza',     u:'/100',    d:0, good:1,  v:s=>s.air},
+  {k:'riders', l:'Bilety miesięczne',    u:'szt.',    d:0, good:1,  v:s=>s.riders}
+];
+const WHY_UNIT={mood:'pkt',balance:'mln zł',ratio:'pkt proc.',B:'pkt',infl:'pkt proc.',unemp:'pkt proc.',poverty:'pkt proc.',co2:'tys. t',air:'pkt',riders:'szt.'};
+
+let G = {code:'KLASA-7B', scen:'paliwo', decs:[], draft:null, sel:'mood'};
+let W, SN;
+
+function load(){ try{ const j=JSON.parse(localStorage.getItem('ecochallenge-v1')||'null'); if(j&&j.code) G={...G,...j,draft:null}; }catch(e){} }
+function save(){ try{ localStorage.setItem('ecochallenge-v1', JSON.stringify({code:G.code,scen:G.scen,decs:G.decs,sel:G.sel})); }catch(e){} }
+
+function rebuild(){
+  W = makeWorld(G.code, G.scen);
+  SN = play(W, G.decs);
+  if(!G.draft){ const last=G.decs[G.decs.length-1]; G.draft = JSON.parse(JSON.stringify({...DEFAULT_DEC, ...(last||{}), inv:[], loan:0, ev:{}})); }
+}
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function spark(k){
+  const pts=SN.map(s=>IND.find(i=>i.k===k).v(s));
+  if(pts.length<2) return '';
+  const mn=Math.min(...pts), mx=Math.max(...pts), rg=(mx-mn)||1, w=100, h=24;
+  const xy=pts.map((p,i)=>[i*(w/(TURNS)), h-2-(p-mn)/rg*(h-4)]);
+  const d=xy.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
+  const e=xy[xy.length-1];
+  return `<svg class="spark" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="var(--ink)" stroke-width="1.4" vector-effect="non-scaling-stroke"/><circle cx="${e[0]}" cy="${e[1]}" r="2.2" fill="var(--accent)"/></svg>`;
+}
+
+function render(){
+  const s=SN[SN.length-1], t=s.t, done=t>=TURNS, next=t+1;
+  $('#yearchip').innerHTML = done? `<small>koniec kadencji</small>${YEAR0+TURNS}` : `<small>uchwała na rok</small>${YEAR0+next}`;
+  $('#timeline').innerHTML = Array.from({length:TURNS},(_,i)=>{const y=YEAR0+i+1, c=i+1<=t?'done':(i+1===next?'now':''); return `<span class="${c}">${y}</span>`}).join('');
+  $('#code').value=G.code; $('#scen').value=G.scen;
+
+  // wydarzenie
+  const evId = done? null : W.events[next];
+  if(evId){
+    const ext=extFor(W,next), E=EV[evId];
+    const ch = E.c ? `<p><b>${esc(E.c.q)}</b></p><div class="opts" role="radiogroup">${E.c.o.map(([v,l],i)=>`<label><input type="radio" name="ev-${E.c.k}" id="ev-${E.c.k}-${v}" value="${v}" ${(G.draft.ev[E.c.k]||E.c.o[0][0])===v?'checked':''}> <span>${esc(l)}</span></label>`).join('')}</div>` : '';
+    $('#event').innerHTML = `<section class="event" aria-live="polite"><div class="label">Wydarzenie roku ${YEAR0+next}</div><h2>${esc(E.t)}</h2><p>${esc(E.x(ext))}</p>${ch}</section>`;
+    if(E.c && !G.draft.ev[E.c.k]) G.draft.ev[E.c.k]=E.c.o[0][0];
+    document.querySelectorAll(`input[name^="ev-"]`).forEach(el=>el.addEventListener('change',e=>{G.draft.ev[E.c.k]=e.target.value}));
+  } else $('#event').innerHTML='';
+
+  $('#left').innerHTML = done ? debriefLeft() : actHTML(s, next);
+  if(!done) bindAct(s, next);
+  $('#right').innerHTML = stateHTML(s) + (done? debriefRight(): '');
+  document.querySelectorAll('[data-why]').forEach(b=>b.addEventListener('click',()=>{G.sel=b.dataset.why; save(); render(); const w=$('#whypanel'); if(w) w.scrollIntoView({block:'nearest',behavior:'smooth'});}));
+  const again=$('#again'); if(again) again.addEventListener('click',()=>{G.decs=[];G.draft=null;save();rebuild();render();window.scrollTo({top:0,behavior:'smooth'})});
+}
+
+function actHTML(s, next){
+  const d=G.draft, B=s.built;
+  const invRows = Object.entries(INV).map(([k,v])=>{
+    const b=B[k]!=null, eu=W.events[next]==='eu'&&v.green;
+    return `<div class="inv ${b?'builtrow':''}"><input type="checkbox" id="inv-${k}" ${b?'disabled checked':''} ${d.inv.includes(k)?'checked':''}><label for="inv-${k}">${esc(v.n)}</label><span class="cost">${b?'zrealizowano':f1(v.c*(eu?.5:1))+' mln'}${eu&&!b?' <span style="color:var(--good)">−50%</span>':''}</span><span class="desc">${esc(v.d)}</span></div>`}).join('');
+  return `<section class="act" aria-label="Projekt uchwały">
+    <header><span class="label">Projekt</span><h2>Uchwała budżetowa Rady Gminy Brzozowa na rok ${YEAR0+next}</h2><span class="note">Wolne środki na start roku: <b class="num">${f1(s.reserve)} mln zł</b> · dług: <b class="num">${f1(s.debt)} mln zł</b></span></header>
+    <div class="para"><span class="sign">§ 1</span><div class="body"><label for="rate"><b>Podatek od nieruchomości</b></label><div class="row"><input type="range" id="rate" min="50" max="100" step="5" value="${d.rate}"><output id="rate-o">${d.rate}% maks.</output></div><span class="hint">Płacą go właściciele domów (kilka zł miesięcznie) i firmy (setki zł). Wyższa stawka to więcej pieniędzy w budżecie i mniej chętnych firm.</span></div></div>
+    <div class="para"><span class="sign">§ 2</span><div class="body"><label for="fee"><b>Opłata za odpady</b></label><div class="row"><input type="range" id="fee" min="20" max="45" step="1" value="${d.fee}"><output id="fee-o">${d.fee} zł/os.</output></div><span class="hint">Odbiór śmieci kosztuje gminę ok. ${f1(s.ex.odpady)} mln zł rocznie. Opłata miesięczna od każdego mieszkańca.</span></div></div>
+    <div class="para"><span class="sign">§ 3</span><div class="body"><b>Komunikacja gminna</b><span class="label">Kursy</span><div class="seg" role="radiogroup" aria-label="Częstotliwość kursów">${Object.entries(KURSY).map(([k,v])=>`<label><input type="radio" name="kursy" id="kursy-${k}" value="${k}" ${d.kursy===k?'checked':''}>${v.l}</label>`).join('')}</div><span class="label">Bilet miesięczny</span><div class="seg" role="radiogroup" aria-label="Cena biletu">${[0,40,80,120].map(p=>`<label><input type="radio" name="price" id="price-${p}" value="${p}" ${d.price===p?'checked':''}>${p?p+' zł':'darmowy'}</label>`).join('')}</div></div></div>
+    <div class="para"><span class="sign">§ 4</span><div class="body"><div class="chk"><input type="checkbox" id="school" ${d.school?'checked':''}><label for="school"><b>Utrzymać szkołę w Brzozówce</b> (48 uczniów). Połączenie z większą szkołą oszczędza ok. 1,6 mln zł rocznie, ale dzieci dojeżdżają 9 km.</label></div></div></div>
+    <div class="para"><span class="sign">§ 5</span><div class="body"><b>Inwestycje</b>${invRows}</div></div>
+    <div class="para"><span class="sign">§ 6</span><div class="body"><b>Nowy kredyt</b><div class="seg" role="radiogroup" aria-label="Kredyt">${[0,5,10].map(p=>`<label><input type="radio" name="loan" id="loan-${p}" value="${p}" ${d.loan===p?'checked':''}>${p?p+' mln zł':'bez kredytu'}</label>`).join('')}</div><span class="hint">Kredyt spłaca się latami: co rok ok. 14% długu idzie na raty i odsetki.</span></div></div>
+    <div class="sumline"><span>Inwestycje w tym roku</span><b id="invsum"></b></div>
+    <p class="warnline" id="invwarn"></p>
+    <button class="btn" id="go" type="button">Przyjmij uchwałę i zobacz skutki</button>
+  </section>`;
+}
+
+function bindAct(s, next){
+  const d=G.draft;
+  const upd=()=>{
+    const eu=W.events[next]==='eu';
+    const sum=d.inv.reduce((u,k)=>u+INV[k].c*(eu&&INV[k].green?.5:1),0);
+    $('#invsum').textContent=f1(sum)+' mln zł';
+    const room=s.reserve+d.loan;
+    $('#invwarn').textContent = sum>room ? `Inwestycje przekraczają wolne środki i kredyt (${f1(room)} mln zł). Jeśli budżet roku nie da nadwyżki, zabraknie pieniędzy, a RIO wyda ostrzeżenie.` : '';
+  };
+  $('#rate').addEventListener('input',e=>{d.rate=+e.target.value;$('#rate-o').textContent=d.rate+'% maks.'});
+  $('#fee').addEventListener('input',e=>{d.fee=+e.target.value;$('#fee-o').textContent=d.fee+' zł/os.'});
+  document.querySelectorAll('input[name=kursy]').forEach(el=>el.addEventListener('change',e=>d.kursy=e.target.value));
+  document.querySelectorAll('input[name=price]').forEach(el=>el.addEventListener('change',e=>d.price=+e.target.value));
+  document.querySelectorAll('input[name=loan]').forEach(el=>el.addEventListener('change',e=>{d.loan=+e.target.value;upd()}));
+  $('#school').addEventListener('change',e=>d.school=e.target.checked);
+  Object.keys(INV).forEach(k=>{const el=$('#inv-'+k); if(!el.disabled) el.addEventListener('change',e=>{ d.inv=e.target.checked?[...d.inv,k]:d.inv.filter(x=>x!==k); upd(); })});
+  upd();
+  $('#go').addEventListener('click',()=>{
+    G.decs.push(JSON.parse(JSON.stringify(d)));
+    G.draft=null; save(); rebuild(); render();
+    $('#right').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+}
+
+function stateHTML(s){
+  const prev=SN[SN.length-2];
+  const head = s.t===0 ? `<h2>Stan wyjściowy gminy (${s.year})</h2><p class="note">Ustalcie w drużynie, co chcecie poprawić, i przyjmijcie pierwszą uchwałę. Po każdym roku sprawdźcie przyciskiem „Dlaczego?”, skąd wzięła się zmiana.</p>`
+    : `<h2>Skutki uchwały: rok ${s.year}</h2>${s.rio?`<p class="warnline"><b>Regionalna Izba Obrachunkowa:</b> zabrakło ${f1(s.forced)} mln zł. Gmina musiała zaciągnąć kredyt, którego nie planowała.</p>`:''}`;
+  const tiles = IND.map(i=>{
+    const v=i.v(s); let dl='';
+    if(prev){const dv=v-i.v(prev); const cls=Math.abs(dv)<Math.pow(10,-i.d)/2?'flat':((dv>0)===(i.good>0)?'good':'bad'); dl=`<span class="delta ${cls}">${dv>=0?'▲':'▼'} ${nf(Math.abs(dv),i.d)}</span>`}
+    return `<div class="tile ${G.sel===i.k&&prev?'sel':''}"><span class="label">${i.l}</span><span class="v">${nf(v,i.d)}<small>${i.u}</small></span>${spark(i.k)}<div class="meta">${dl||'<span></span>'}${prev?`<button class="why" type="button" data-why="${i.k}">Dlaczego?</button>`:''}</div></div>`}).join('');
+  let whyP='', voices='', budget='';
+  if(prev){
+    const ind=IND.find(i=>i.k===G.sel)||IND[0];
+    const list=(s.why[ind.k]||[]).filter(x=>Math.abs(x.v)>0.005).sort((a,b)=>Math.abs(b.v)-Math.abs(a.v));
+    const mx=Math.max(...list.map(x=>Math.abs(x.v)),1e-9);
+    const dp = ind.k==='riders'?0:(ind.k==='balance'||ind.k==='co2'?2:1);
+    whyP = `<section class="panel" id="whypanel" aria-live="polite"><div><span class="label">Łańcuch przyczyn · ${s.year}</span><h3>Dlaczego zmienił się wskaźnik „${ind.l}”?</h3></div><div class="chain">${list.length?list.map(x=>{const pos=x.v>0, good=(pos===(ind.good>0)); const w=Math.abs(x.v)/mx*50; return `<div class="it"><span>${esc(x.l)}</span><span class="val" style="color:var(--${good?'good':'bad'})">${x.v>0?'+':'−'}${nf(Math.abs(x.v),dp)} ${WHY_UNIT[ind.k]}</span><span class="bar"><i style="left:${pos?50:50-w}%;width:${w}%;background:var(--${good?'good':'bad'})"></i></span></div>`}).join(''):'<p class="note">W tym roku nic istotnego nie zmieniło tego wskaźnika.</p>'}</div><p class="note">Zielony pasek poprawia wskaźnik, czerwony go pogarsza. Środek paska oznacza brak zmiany. Wartości pochodzą z jawnych zasad modelu (rozwiń „Jak liczy model” na dole strony).</p></section>`;
+    const st=pickStories(s, prev);
+    voices = `<section class="panel"><div><span class="label">Głosy mieszkańców · ${s.year}</span><h3>Jak decyzje odczuły konkretne domy</h3></div><div class="voices">${st.map(v=>`<div class="voice"><span class="who">${esc(v.who)}</span><span class="note">${esc(v.job)}</span>${v.lines.map(l=>`<p>${esc(l)}</p>`).join('')}<span class="mood" style="color:var(--${v.dsat>=0?'good':'bad'})">zadowolenie ${f0(v.sat)}/100 (${v.dsat>=0?'+':'−'}${f0(Math.abs(v.dsat))})</span></div>`).join('')}</div><p class="note">Każda z 120 postaci reprezentuje ok. ${f0(W.P.pop/2.6/120)} gospodarstw domowych. Szablony tekstów przygotowano z pomocą AI i sprawdzono; liczby wstawia model.</p></section>`;
+  }
+  const R=[['756','Udział w PIT',s.rv.pit],['756','Udział w CIT',s.rv.cit],['756','Podatek od nieruchomości',s.rv.prop],['900','Opłata za odpady',s.rv.odpady],['758','Subwencja oświatowa',s.rv.subw],['600','Bilety komunikacji gminnej',s.rv.bilety],['—','Dotacje',s.rv.dot],['—','Inne dochody',s.rv.inne]];
+  const E=[['801','Oświata',s.ex.edu],['750','Administracja',s.ex.adm],['852','Pomoc społeczna',s.ex.soc],['900','Odbiór odpadów',s.ex.odpady],['600','Komunikacja gminna',s.ex.trans],['600/921','Drogi, kultura, sport',s.ex.roads],['—','Energia w budynkach gminy',s.ex.bld],['757','Raty i odsetki',s.ex.debt],['—','Inwestycje',s.ex.inv]];
+  budget = `<details class="panel" style="padding:12px 16px"><summary>Budżet gminy ${s.year} (mln zł, z działami klasyfikacji budżetowej)</summary><div class="scroll"><table><thead><tr><th>Dział</th><th>Dochody</th><th class="n">mln zł</th></tr></thead><tbody>${R.map(r=>`<tr><td class="code">${r[0]}</td><td>${r[1]}</td><td class="n">${f2(r[2])}</td></tr>`).join('')}<tr class="tot"><td></td><td>Razem dochody</td><td class="n">${f2(s.revT)}</td></tr></tbody></table><table style="margin-top:12px"><thead><tr><th>Dział</th><th>Wydatki</th><th class="n">mln zł</th></tr></thead><tbody>${E.map(r=>`<tr><td class="code">${r[0]}</td><td>${r[1]}</td><td class="n">${f2(r[2])}</td></tr>`).join('')}<tr class="tot"><td></td><td>Razem wydatki</td><td class="n">${f2(s.expT)}</td></tr><tr><td></td><td>Wynik (dochody − wydatki)</td><td class="n">${f2(s.balance)}</td></tr><tr><td></td><td>Nowy kredyt</td><td class="n">${f2(s.dec.loan+(s.forced||0))}</td></tr></tbody></table></div><p class="note" style="margin-top:8px">Paliwo ${f2(s.ext.fuel)} zł/l · energia ${f0(s.ext.energy)} zł/MWh · ${f0(W.P.pop)} mieszkańców.</p></details>`;
+  return `<section style="display:flex;flex-direction:column;gap:6px">${head}</section><div class="tiles">${tiles}</div>${whyP}${voices}${budget}`;
+}
+
+function verdict(s){
+  if(s.mood>=56) return 'Mieszkańcy dają Wam drugą kadencję.';
+  if(s.mood>=46) return 'Wybory rozstrzygną się w drugiej turze. Gmina jest podzielona.';
+  return 'Mieszkańcy są niezadowoleni. Większość chce zmiany władzy.';
+}
+function debriefLeft(){
+  const s=SN[SN.length-1], s0=SN[0];
+  const dim=[
+    ['Finanse', `Dług ${f0(s0.ratio*100)}% → ${f0(s.ratio*100)}% dochodów · ostrzeżenia RIO: ${SN.filter(x=>x.rio).length}`, s.ratio<=s0.ratio+0.1 && !SN.some(x=>x.rio)],
+    ['Gospodarka', `Indeks firm ${f1(s0.B)} → ${f1(s.B)}`, s.B>=s0.B],
+    ['Społeczeństwo', `Nastroje ${f0(s0.mood)} → ${f0(s.mood)}, trudna sytuacja ${f0(s0.poverty*100)}% → ${f0(s.poverty*100)}%`, s.mood>=s0.mood-2],
+    ['Środowisko', `CO₂ ${f1(s0.co2)} → ${f1(s.co2)} tys. t, powietrze ${f0(s0.air)} → ${f0(s.air)}`, s.co2<s0.co2 || s.air>s0.air+5]
+  ];
+  return `<section class="act debrief"><header><span class="label">Koniec kadencji ${YEAR0+1}–${YEAR0+TURNS}</span><h2>Bilans rady gminy</h2></header>
+    <p class="verdict">${verdict(s)}</p>
+    <div class="score">${dim.map(x=>`<div><span class="label">${x[0]}</span><span>${x[1]}</span><b style="color:var(--${x[2]?'good':'bad'})">${x[2]?'udało się utrzymać lub poprawić':'pogorszenie'}</b></div>`).join('')}</div>
+    <p class="note">Prawie nikt nie poprawia wszystkich czterech obszarów naraz. Każda decyzja coś daje i coś kosztuje.</p>
+    <div><h3>Pytania do omówienia</h3><ol style="margin:8px 0 0;padding-left:1.2rem;display:flex;flex-direction:column;gap:6px">
+      <li>Która decyzja dała skutek, którego się nie spodziewaliście? Prześledźcie go przyciskiem „Dlaczego?”.</li>
+      <li>Kto w gminie zyskał na Waszych decyzjach, a kto stracił? Czy to było sprawiedliwe?</li>
+      <li>Co zrobiliście, gdy przyszło wydarzenie z zewnątrz? Czy dało się na nie przygotować wcześniej?</li>
+      <li>Porównajcie się z drużyną, która miała ten sam kod świata. Co zrobiła inaczej?</li>
+    </ol></div>
+    <button class="btn" id="again" type="button">Zagraj jeszcze raz w tym samym świecie</button></section>`;
+}
+function debriefRight(){
+  const ks=['mood','B','co2','air','ratio','infl'];
+  const ch=ks.map(k=>{
+    const ind=IND.find(i=>i.k===k), pts=SN.map(s=>ind.v(s));
+    const mn=Math.min(...pts), mx=Math.max(...pts), pad=Math.max((mx-mn)*0.15,Math.pow(10,-ind.d)*2), lo=mn-pad, hi=mx+pad;
+    const X=i=>34+i*(186/TURNS), Y=v=>10+(hi-v)/(hi-lo)*80;
+    const d=pts.map((p,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(p).toFixed(1)).join(' ');
+    const area=d+` L${X(TURNS)} 90 L${X(0)} 90 Z`;
+    return `<figure><figcaption>${ind.l} (${ind.u})</figcaption><svg viewBox="0 0 230 110" role="img" aria-label="${ind.l} w latach ${YEAR0}–${YEAR0+TURNS}">
+      <line x1="34" y1="90" x2="220" y2="90" stroke="var(--line)"/><line x1="34" y1="10" x2="220" y2="10" stroke="var(--line)" stroke-dasharray="2 3"/>
+      <text x="30" y="14" text-anchor="end" font-size="9" fill="var(--muted)" font-family="JetBrains Mono, monospace">${nf(hi,ind.d)}</text>
+      <text x="30" y="92" text-anchor="end" font-size="9" fill="var(--muted)" font-family="JetBrains Mono, monospace">${nf(lo,ind.d)}</text>
+      <path d="${area}" fill="var(--accent)" fill-opacity=".12"/><path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2"/>
+      ${pts.map((p,i)=>`<circle cx="${X(i)}" cy="${Y(p)}" r="${i===TURNS?3.5:2}" fill="${i===TURNS?'var(--accent)':'var(--card)'}" stroke="var(--accent)"/>`).join('')}
+      <text x="${X(0)}" y="104" text-anchor="middle" font-size="9" fill="var(--muted)">${YEAR0}</text><text x="${X(TURNS)}" y="104" text-anchor="middle" font-size="9" fill="var(--muted)">${YEAR0+TURNS}</text>
+    </svg></figure>`}).join('');
+  return `<section class="panel"><div><span class="label">Pięć lat w liczbach</span><h3>Jak zmieniała się gmina</h3></div><div class="charts">${ch}</div></section>`;
+}
+
+/* start */
+function start(data){
+  load();
+  if(data && data.code){G.code=data.code;G.scen=data.scen;G.decs=data.decs||[];}
+  $('#newgame').addEventListener('click',()=>{
+    const c=($('#code').value||'KLASA').trim().toUpperCase().replace(/[^A-Z0-9-]/g,'').slice(0,16)||'KLASA';
+    G={...G, code:c, scen:$('#scen').value, decs:[], draft:null}; save(); rebuild(); render();
+  });
+  rebuild(); render();
+}
+window.claude?.hot?.snapshot?.(()=>({code:G.code,scen:G.scen,decs:G.decs}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
