@@ -11,6 +11,7 @@ import type { AppointmentView, ConsentState, MeasurementView, MedicationView, Pa
 import { Badge, Button, Card, Checkbox, Combobox, Empty, Modal, Notice, PageHead, QueryError, SelectField, Skeleton, StatusBadge, Switch, Tabs, TextArea, TextField, useToast } from '../ui';
 import { RehabPanel } from './RehabPanel';
 import { DiagnosesPanel } from './DiagnosesPanel';
+import { SnapshotPanel, TimelinePanel } from './SnapshotPanel';
 import { SlotPicker } from '../ui/SlotPicker';
 import { TrendChart } from '../ui/TrendChart';
 import { AppointmentModal, BookSlotModal } from './CalendarPage';
@@ -162,7 +163,7 @@ interface ClinicalData {
   questionnaires: { id: string; authored: string; answers: { question: string; answer: string }[]; appointmentId: string }[];
 }
 
-type Tab = 'data' | 'appointments' | 'records' | 'measurements' | 'medications' | 'questionnaires' | 'rehab' | 'diagnoses' | 'messages' | 'consents';
+type Tab = 'snapshot' | 'timeline' | 'data' | 'appointments' | 'records' | 'measurements' | 'medications' | 'questionnaires' | 'rehab' | 'diagnoses' | 'messages' | 'consents';
 
 export function PatientDetailPage() {
   const { id = '' } = useParams();
@@ -171,7 +172,7 @@ export function PatientDetailPage() {
   const qc = useQueryClient();
   const toast = useToast();
   const clinician = hasRole(me, 'practitioner');
-  const [tab, setTab] = useState<Tab>('data');
+  const [tab, setTab] = useState<Tab>(clinician ? 'snapshot' : 'data');
   const [editOpen, setEditOpen] = useState(false);
   const [verifyOpen, setVerifyOpen] = useState(false);
   const [method, setMethod] = useState('id-card');
@@ -211,6 +212,12 @@ export function PatientDetailPage() {
   const upcoming = appointments.filter((a) => ['booked', 'arrived'].includes(a.status) && Date.parse(a.end) > Date.now());
 
   const tabs: { value: Tab; label: string }[] = [
+    ...(clinician
+      ? ([
+          { value: 'snapshot', label: t('Snapshot') },
+          { value: 'timeline', label: t('Oś czasu') },
+        ] as { value: Tab; label: string }[])
+      : []),
     { value: 'data', label: t('Dane') },
     { value: 'appointments', label: `${t('Wizyty')} (${appointments.length})` },
     ...(clinician
@@ -255,6 +262,8 @@ export function PatientDetailPage() {
       />
       <Tabs label={t('Karta pacjenta')} value={tab} onChange={setTab} tabs={tabs} />
 
+      {tab === 'snapshot' && clinician && <SnapshotPanel patientId={id} patientName={p.name} />}
+      {tab === 'timeline' && clinician && <TimelinePanel patientId={id} />}
       {tab === 'data' && (
         <div className="grid-2">
           <Card title={t('Dane osobowe i kontaktowe')} action={<Button size="sm" variant="secondary" onClick={() => setEditOpen(true)}>{t('Edytuj')}</Button>}>

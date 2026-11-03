@@ -224,7 +224,13 @@ export interface ScribeView {
   summarySentAt?: string;
   cardRef?: string;
   createdAt: string;
+  participants?: { role: ScribeRole; name?: string; speaker?: string }[];
+  sectionState?: Record<string, { state: 'pending' | 'accepted' | 'corrected' | 'rejected'; by?: string; at?: string }>;
+  mediaKind?: 'audio' | 'video';
+  transcriptEdits?: number;
 }
+
+export type ScribeRole = 'lekarz' | 'pacjent' | 'opiekun' | 'tłumacz' | 'pielęgniarka' | 'inny';
 
 export interface ScribeConfig {
   templates: { id: string; name: string; version: string; sections: { key: string; title: string }[] }[];

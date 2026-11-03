@@ -8,6 +8,7 @@ import type { AppointmentView, NotificationRow } from '../types';
 import { Card, FullText, LinkButton, Notice, QueryError, Skeleton } from '../ui';
 import { KIND_LABEL, sourceText } from './ReportPage';
 import { SurveyInvite } from './SurveyPages';
+import { HomeAvatarCard } from './Round5Pages';
 
 interface Dashboard {
   nextAppointment: AppointmentView | null;
@@ -33,6 +34,7 @@ export function HomePage() {
         <p className="muted">{profile ? t('Wszystko na tej stronie dotyczy tej osoby.') : t('Co chcesz dziś zrobić?')}</p>
       </div>
 
+      {!profile && <HomeAvatarCard />}
       {q.isLoading && <Skeleton height={120} count={2} />}
       {q.isError && <QueryError error={q.error} retry={() => void q.refetch()} />}
       {q.data && (

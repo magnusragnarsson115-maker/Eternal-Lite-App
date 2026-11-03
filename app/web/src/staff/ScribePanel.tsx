@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle2, ClipboardCopy, Download, FilePenLine, History, Mic, Plus, Send, Smartphone, Sparkles, Trash2, UserCheck } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Check, CheckCircle2, ClipboardCopy, Download, FilePenLine, History, Mic, Pencil, Play, Plus, RotateCcw, Send, Smartphone, Sparkles, Trash2, UserCheck, Users, Video, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { del, get, post, put, qs } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import { RecorderControls } from '../shared/LinkShared';
 import { useRecorder } from '../lib/recorder';
 import { uploadFile } from '../lib/upload';
-import type { CardDoc, NoteDoc, ScribeConfig, ScribeView } from '../mvp-types';
+import type { CardDoc, NoteDoc, ScribeConfig, ScribeRole, ScribeView } from '../mvp-types';
 import { Badge, Button, Card, Checkbox, Modal, Notice, SelectField, Skeleton, Spinner, TextArea, TextField, useConfirm, useToast } from '../ui';
 
 /** D5 — Eternal Scribe: zgoda → nagranie → szkic ze źródłami → zatwierdzenie → PDF i pola do systemu; karta „Po wizycie”. */
@@ -54,8 +54,13 @@ function StartSession({ cfg, patientId, appointmentId, onStarted }: { cfg: Scrib
   const { t } = useI18n();
   const [templateId, setTemplateId] = useState(cfg.templates[0]?.id ?? 'general');
   const [consent, setConsent] = useState(false);
+  const [video, setVideo] = useState(false);
   const [note, setNote] = useState('');
-  const start = useMutation({ mutationFn: () => post<ScribeView>('/api/staff/scribe', { patientId, appointmentId, templateId, consent: true, consentNote: note || undefined }), onSuccess: onStarted });
+  const [people, setPeople] = useState<{ role: ScribeRole; name?: string }[]>([{ role: 'lekarz' }, { role: 'pacjent' }]);
+  const start = useMutation({
+    mutationFn: () => post<ScribeView>('/api/staff/scribe', { patientId, appointmentId, templateId, consent: true, consentNote: note || undefined, consentVideo: video, participants: people.map((p) => ({ role: p.role, name: p.name || undefined, speaker: p.role })) }),
+    onSuccess: onStarted,
+  });
   const limitReached = cfg.usage.limit > 0 && cfg.usage.used >= cfg.usage.limit;
   return (
     <Card title={t('Nowa notatka z wizyty')}>
@@ -68,7 +73,15 @@ function StartSession({ cfg, patientId, appointmentId, onStarted }: { cfg: Scrib
           ))}
         </SelectField>
         <Checkbox checked={consent} onChange={(e) => setConsent(e.target.checked)} label={t('Pacjent zgodził się na nagranie rozmowy')} hint={t('Zgoda zostanie zapisana w dokumentacji z datą i godziną.')} />
+        <Checkbox
+          checked={video}
+          disabled={!consent}
+          onChange={(e) => setVideo(e.target.checked)}
+          label={t('Pacjent zgodził się także na nagranie obrazu (kamera)')}
+          hint={t('Obraz służy wyłącznie dokumentacji wizyty — aplikacja nie analizuje twarzy, mimiki ani skóry. Bez tej zgody nagrywany jest tylko dźwięk.')}
+        />
         <TextField label={t('Uwagi do zgody (opcjonalnie)')} value={note} onChange={(e) => setNote(e.target.value)} />
+        <ParticipantsEditor value={people} onChange={setPeople} />
         {limitReached && <Notice kind="warn">{t('Osiągnięto miesięczny limit wizyt Scribe w licencji.')}</Notice>}
         {start.isError && <Notice kind="danger">{errorMessage(start.error, t)}</Notice>}
         <Button disabled={!consent || limitReached} loading={start.isPending} icon={<Mic size={18} />} onClick={() => start.mutate()}>
@@ -83,7 +96,11 @@ function StartSession({ cfg, patientId, appointmentId, onStarted }: { cfg: Scrib
 function SessionView({ s, onChange }: { s: ScribeView; onChange: () => void }) {
   const { t, fmt } = useI18n();
   const { confirm, dialog } = useConfirm();
-  const rec = useRecorder();
+  const rec = useRecorder({ video: s.mediaKind === 'video' });
+  const preview = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    if (preview.current) preview.current.srcObject = rec.state === 'recording' || rec.state === 'paused' ? rec.stream.current : null;
+  }, [rec.state, rec.stream]);
   const [phone, setPhone] = useState<{ url: string; qr: string } | null>(null);
   const upload = useMutation({ mutationFn: (b: Blob) => uploadFile<ScribeView>(`/api/staff/scribe/${s.id}/audio`, b, 'wizyta.webm', { seconds: String(rec.seconds) }), onSuccess: onChange });
   const phoneLink = useMutation({ mutationFn: () => post<{ url: string; qr: string }>(`/api/staff/scribe/${s.id}/phone-link`), onSuccess: setPhone });
@@ -110,6 +127,14 @@ function SessionView({ s, onChange }: { s: ScribeView; onChange: () => void }) {
         <div className="stack">
           <p className="small muted">{t('Zgoda pacjenta zapisana: {d}', { d: fmt.dateTime(s.consentAt) })}</p>
           {s.status === 'failed' && <Notice kind="warn" title={t('Nie udało się przygotować szkicu')}>{t('Kod: {c}. Możesz napisać notatkę bez nagrania (tryb ograniczony).', { c: s.error ?? '' })}</Notice>}
+          {s.mediaKind === 'video' && s.status === 'consented' && (
+            <div className="stack-sm center">
+              <Badge kind="info">
+                <Video size={13} aria-hidden /> {t('nagranie z obrazem — za zgodą pacjenta, bez analizy obrazu')}
+              </Badge>
+              <video ref={preview} className="rec-preview" muted autoPlay playsInline aria-label={t('Podgląd kamery')} />
+            </div>
+          )}
           {s.status === 'consented' && <RecorderControls rec={rec} sending={upload.isPending} onSend={(b) => upload.mutate(b)} />}
           {upload.isError && <Notice kind="danger">{errorMessage(upload.error, t)}</Notice>}
           <div className="btn-row" style={{ justifyContent: 'center' }}>
@@ -178,6 +203,27 @@ function DraftEditor({ s, onChange, cancelBtn }: { s: ScribeView; onChange: () =
     if (!dirty) setNote(s.note!);
   }, [s.note, dirty]);
   const segText = (id: string) => s.transcript?.segments.find((x) => x.id === id);
+  const media = useRef<HTMLMediaElement | null>(null);
+  const [fmtOpen, setFmtOpen] = useState(false);
+  const section = useMutation({
+    mutationFn: ({ key, action }: { key: string; action: 'accept' | 'reject' | 'reset' | 'regenerate' }) =>
+      action === 'regenerate' ? post<ScribeView>(`/api/staff/scribe/${s.id}/sections/${key}/regenerate`) : post<ScribeView>(`/api/staff/scribe/${s.id}/sections/${key}`, { action }),
+    onSuccess: (v) => {
+      setDirty(false);
+      setNote(v.note!);
+      onChange();
+    },
+    onError: (e) => toast(errorMessage(e, t), 'error'),
+  });
+  const seek = (id: string) => {
+    setSeg(id);
+    const x = segText(id);
+    if (media.current && x?.start !== undefined) {
+      media.current.currentTime = x.start;
+      void media.current.play().catch(() => undefined);
+    }
+    document.getElementById(`seg-${id}`)?.scrollIntoView({ block: 'nearest' });
+  };
   const payload = () => ({ sections: note.sections.map((sec) => ({ key: sec.key, paragraphs: sec.paragraphs.map((p) => ({ id: p.id, text: p.text, sources: p.sources })) })) });
   const save = useMutation({
     mutationFn: () => put<ScribeView>(`/api/staff/scribe/${s.id}/note`, payload()),
@@ -215,8 +261,11 @@ function DraftEditor({ s, onChange, cancelBtn }: { s: ScribeView; onChange: () =
         <div className="grid-2" style={{ alignItems: 'flex-start' }}>
           <div className="stack">
             {note.sections.map((sec, si) => (
-              <div key={sec.key} className="stack" style={{ gap: 6 }}>
-                <h3 style={{ margin: 0 }}>{sec.title}</h3>
+              <div key={sec.key} className={`stack note-section ${s.sectionState?.[sec.key]?.state ?? 'pending'}`} style={{ gap: 6 }}>
+                <div className="row-between" style={{ gap: 6, flexWrap: 'wrap' }}>
+                  <h3 style={{ margin: 0 }}>{sec.title}</h3>
+                  <SectionActions state={s.sectionState?.[sec.key]?.state} busy={section.isPending || dirty} onAction={(action) => section.mutate({ key: sec.key, action })} />
+                </div>
                 {sec.paragraphs.length === 0 && <p className="small muted">{t('Brak treści w rozmowie.')}</p>}
                 {sec.paragraphs.map((p, pi) => (
                   <div key={`${p.id}-${pi}`} style={{ background: p.problems?.length ? 'var(--warning-soft)' : undefined, padding: p.problems?.length ? 8 : 0, borderRadius: 8 }}>
@@ -226,8 +275,9 @@ function DraftEditor({ s, onChange, cancelBtn }: { s: ScribeView; onChange: () =
                         <Badge>{t('dopisane przez lekarza')}</Badge>
                       ) : (
                         p.sources.map((id) => (
-                          <button key={id} type="button" className="badge info" onClick={() => setSeg(id)} title={segText(id)?.text}>
+                          <button key={id} type="button" className="badge info" onClick={() => seek(id)} title={segText(id)?.text}>
                             {id}
+                            {segText(id)?.start !== undefined ? ` · ${clockOf(segText(id)!.start!)}` : ''}
                           </button>
                         ))
                       )}
@@ -245,24 +295,17 @@ function DraftEditor({ s, onChange, cancelBtn }: { s: ScribeView; onChange: () =
               </div>
             ))}
           </div>
-          {s.transcript && (
-            <div className="card" style={{ padding: 12, maxHeight: 640, overflow: 'auto' }}>
-              <strong>{t('Transkrypcja')}</strong>
-              <p className="small muted">{t('Fragmenty S# — kliknij odnośnik przy akapicie, aby zobaczyć źródło.')}</p>
-              <ol style={{ listStyle: 'none', padding: 0, margin: 0 }} className="small">
-                {s.transcript.segments.map((x) => (
-                  <li key={x.id} id={`seg-${x.id}`} style={{ padding: '4px 6px', borderRadius: 6, background: seg === x.id ? 'var(--primary-soft)' : undefined }}>
-                    <strong>{x.id}</strong> {x.speaker && <span className="muted">[{x.speaker}]</span>} {x.text}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
+          {s.transcript && <TranscriptPanel s={s} selected={seg} onSeek={seek} mediaRef={media} onChange={onChange} />}
         </div>
+        <p className="small muted">{t('AI przygotowuje — lekarz zatwierdza. Dokumentacją staje się wyłącznie zatwierdzona wersja; sekcje odrzucone nie trafiają do dokumentacji.')}</p>
         {(save.isError || approve.isError) && <Notice kind="danger">{errorMessage(save.error ?? approve.error, t)}</Notice>}
+        <FormatsModal id={s.id} open={fmtOpen} onClose={() => setFmtOpen(false)} />
         <div className="btn-row">
           <Button variant="secondary" disabled={!dirty} loading={save.isPending} onClick={() => save.mutate()}>
             {t('Zapisz zmiany')}
+          </Button>
+          <Button variant="ghost" onClick={() => setFmtOpen(true)}>
+            {t('Podgląd formatów')}
           </Button>
           <Button
             icon={<CheckCircle2 size={18} />}
@@ -285,6 +328,7 @@ function ApprovedNote({ s, onChange }: { s: ScribeView; onChange: () => void }) 
   const [ehr, setEhr] = useState(false);
   const [versions, setVersions] = useState(false);
   const [amending, setAmending] = useState(false);
+  const [formats, setFormats] = useState(false);
   const exp = useQuery({ queryKey: ['scribe-ehr', s.id], queryFn: () => get<{ layout: string; fields: { field: string; text: string }[] }>(`/api/staff/scribe/${s.id}/export`), enabled: ehr });
   const ver = useQuery({ queryKey: ['scribe-versions', s.id], queryFn: () => get<{ items: { versionId?: string; lastUpdated?: string; status: string; author?: string; reason?: string; sections: { title?: string; html: string }[] }[] }>(`/api/staff/scribe/${s.id}/versions`), enabled: versions });
   return (
@@ -318,11 +362,15 @@ function ApprovedNote({ s, onChange }: { s: ScribeView; onChange: () => void }) 
           <Button variant="secondary" icon={<History size={16} />} onClick={() => setVersions(true)}>
             {t('Historia wersji')}
           </Button>
+          <Button variant="secondary" onClick={() => setFormats(true)}>
+            {t('Formaty: SOAP, wypis, FHIR…')}
+          </Button>
           <Button variant="ghost" icon={<FilePenLine size={16} />} onClick={() => setAmending(true)}>
             {t('Popraw notatkę')}
           </Button>
         </div>
       </div>
+      <FormatsModal id={s.id} open={formats} onClose={() => setFormats(false)} />
       <Modal open={ehr} onClose={() => setEhr(false)} title={t('Pola do systemu gabinetowego')} wide>
         {exp.data ? (
           <div className="stack">
@@ -510,6 +558,260 @@ function AuthorizedShare({ id, onClose }: { id: string; onClose: () => void }) {
           </Button>
         </div>
       )}
+    </Modal>
+  );
+}
+
+function clockOf(sec: number): string {
+  const m = Math.floor(sec / 60);
+  return `${String(m).padStart(2, '0')}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
+}
+
+const ROLES: ScribeRole[] = ['lekarz', 'pacjent', 'opiekun', 'tłumacz', 'pielęgniarka', 'inny'];
+
+function useRoleLabel() {
+  const { t } = useI18n();
+  return (r: ScribeRole) => ({ lekarz: t('lekarz'), pacjent: t('pacjent'), opiekun: t('opiekun'), tłumacz: t('tłumacz'), pielęgniarka: t('pielęgniarka'), inny: t('inna osoba') })[r];
+}
+
+/** Uczestnicy rozmowy (A12.1) — role i opcjonalnie imiona; rola służy też jako etykieta mówcy w transkrypcji. */
+function ParticipantsEditor({ value, onChange }: { value: { role: ScribeRole; name?: string }[]; onChange: (v: { role: ScribeRole; name?: string }[]) => void }) {
+  const { t } = useI18n();
+  const label = useRoleLabel();
+  return (
+    <fieldset className="fieldset">
+      <legend className="small">
+        <Users size={14} aria-hidden /> {t('Uczestnicy rozmowy')}
+      </legend>
+      <div className="stack-sm">
+        {value.map((p, i) => (
+          <div key={i} className="row" style={{ gap: 6 }}>
+            <select className="select sm" aria-label={t('Rola uczestnika')} value={p.role} onChange={(e) => onChange(value.map((x, j) => (j === i ? { ...x, role: e.target.value as ScribeRole } : x)))}>
+              {ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {label(r)}
+                </option>
+              ))}
+            </select>
+            <input className="input sm" aria-label={t('Imię (opcjonalnie)')} placeholder={t('Imię (opcjonalnie)')} value={p.name ?? ''} maxLength={80} onChange={(e) => onChange(value.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
+            {value.length > 1 && (
+              <button type="button" className="icon-btn" title={t('Usuń')} onClick={() => onChange(value.filter((_, j) => j !== i))}>
+                <X size={14} aria-hidden />
+                <span className="sr-only">{t('Usuń')}</span>
+              </button>
+            )}
+          </div>
+        ))}
+        {value.length < 8 && (
+          <button type="button" className="link-btn" onClick={() => onChange([...value, { role: 'opiekun' }])}>
+            + {t('dodaj uczestnika')}
+          </button>
+        )}
+      </div>
+    </fieldset>
+  );
+}
+
+function SectionActions({ state, busy, onAction }: { state?: string; busy: boolean; onAction: (a: 'accept' | 'reject' | 'reset' | 'regenerate') => void }) {
+  const { t } = useI18n();
+  return (
+    <div className="row section-actions" style={{ gap: 4 }}>
+      {state === 'accepted' && <Badge kind="ok">{t('zaakceptowana')}</Badge>}
+      {state === 'corrected' && <Badge kind="info">{t('poprawiona')}</Badge>}
+      {state === 'rejected' && <Badge kind="warn">{t('odrzucona — poza dokumentacją')}</Badge>}
+      {state !== 'accepted' && (
+        <button type="button" className="icon-btn" disabled={busy} title={t('Akceptuj sekcję')} onClick={() => onAction('accept')}>
+          <Check size={15} aria-hidden />
+          <span className="sr-only">{t('Akceptuj sekcję')}</span>
+        </button>
+      )}
+      {state !== 'rejected' && (
+        <button type="button" className="icon-btn" disabled={busy} title={t('Odrzuć sekcję')} onClick={() => onAction('reject')}>
+          <X size={15} aria-hidden />
+          <span className="sr-only">{t('Odrzuć sekcję')}</span>
+        </button>
+      )}
+      <button type="button" className="icon-btn" disabled={busy} title={t('Przygotuj sekcję ponownie z rozmowy')} onClick={() => onAction('regenerate')}>
+        <Sparkles size={15} aria-hidden />
+        <span className="sr-only">{t('Przygotuj sekcję ponownie z rozmowy')}</span>
+      </button>
+      {state && state !== 'pending' && (
+        <button type="button" className="icon-btn" disabled={busy} title={t('Cofnij decyzję')} onClick={() => onAction('reset')}>
+          <RotateCcw size={15} aria-hidden />
+          <span className="sr-only">{t('Cofnij decyzję')}</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Transkrypcja (A12.2): mówcy, znaczniki czasu, odsłuch fragmentu po kliknięciu, poprawka tekstu lub mówcy
+ * (każda poprawka zapisana: przed → po, kto, kiedy). Obraz z wizyty tylko gdy była na niego zgoda.
+ */
+function TranscriptPanel({ s, selected, onSeek, mediaRef, onChange }: { s: ScribeView; selected: string | null; onSeek: (id: string) => void; mediaRef: React.MutableRefObject<HTMLMediaElement | null>; onChange: () => void }) {
+  const { t, fmt } = useI18n();
+  const toast = useToast();
+  const label = useRoleLabel();
+  const [editing, setEditing] = useState<{ id: string; text: string; speaker?: string } | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const edits = useQuery({ queryKey: ['transcript-edits', s.id, s.transcriptEdits], queryFn: () => get<{ items: { segmentId: string; before?: string; after?: string; beforeSpeaker?: string; afterSpeaker?: string; by?: string; at: string }[] }>(`/api/staff/scribe/${s.id}/transcript-edits`), enabled: historyOpen });
+  const save = useMutation({
+    mutationFn: (e: { id: string; text: string; speaker?: string }) => put<ScribeView>(`/api/staff/scribe/${s.id}/transcript/${e.id}`, { text: e.text, speaker: e.speaker }),
+    onSuccess: () => {
+      setEditing(null);
+      onChange();
+    },
+    onError: (e) => toast(errorMessage(e, t), 'error'),
+  });
+  const speakers = [...new Set([...(s.participants ?? []).map((p) => p.speaker ?? p.role), ...s.transcript!.segments.map((x) => x.speaker).filter((x): x is string => !!x)])];
+  const speakerName = (sp?: string) => {
+    if (!sp) return '';
+    const p = (s.participants ?? []).find((x) => (x.speaker ?? x.role) === sp);
+    return p ? `${label(p.role)}${p.name ? ` (${p.name})` : ''}` : sp;
+  };
+  const src = `/api/staff/scribe/${s.id}/audio`;
+  return (
+    <div className="card transcript" style={{ padding: 12, maxHeight: 720, overflow: 'auto' }}>
+      <div className="row-between">
+        <strong>{t('Transkrypcja')}</strong>
+        {s.transcriptEdits ? (
+          <button type="button" className="link-btn small" onClick={() => setHistoryOpen(true)}>
+            {t('poprawki: {n}', { n: s.transcriptEdits })}
+          </button>
+        ) : null}
+      </div>
+      {s.audio.present &&
+        (s.mediaKind === 'video' ? (
+          <video ref={(el) => { mediaRef.current = el; }} src={src} controls preload="metadata" className="rec-player" aria-label={t('Nagranie wizyty')} />
+        ) : (
+          <audio ref={(el) => { mediaRef.current = el; }} src={src} controls preload="metadata" className="rec-player" aria-label={t('Nagranie wizyty')} />
+        ))}
+      {(s.participants ?? []).length > 0 && (
+        <p className="small muted">
+          {t('Uczestnicy')}: {(s.participants ?? []).map((p) => `${label(p.role)}${p.name ? ` ${p.name}` : ''}`).join(', ')}
+        </p>
+      )}
+      <p className="small muted">{t('Kliknij zdanie, aby odsłuchać fragment. Ołówek — poprawka tekstu lub mówcy.')}</p>
+      <ol className="segments small">
+        {s.transcript!.segments.map((x) => (
+          <li key={x.id} id={`seg-${x.id}`} className={selected === x.id ? 'on' : ''}>
+            {editing?.id === x.id ? (
+              <div className="stack-sm">
+                <select className="select sm" aria-label={t('Mówca')} value={editing.speaker ?? ''} onChange={(e) => setEditing({ ...editing, speaker: e.target.value || undefined })}>
+                  <option value="">{t('(bez mówcy)')}</option>
+                  {speakers.map((sp) => (
+                    <option key={sp} value={sp}>
+                      {speakerName(sp)}
+                    </option>
+                  ))}
+                </select>
+                <textarea className="textarea" rows={3} value={editing.text} onChange={(e) => setEditing({ ...editing, text: e.target.value })} aria-label={t('Tekst fragmentu')} />
+                <div className="btn-row">
+                  <Button size="sm" loading={save.isPending} onClick={() => save.mutate(editing)}>
+                    {t('Zapisz poprawkę')}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditing(null)}>
+                    {t('Anuluj')}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="seg-row">
+                <button type="button" className="seg-play" onClick={() => onSeek(x.id)} title={t('Odsłuchaj fragment')}>
+                  <Play size={12} aria-hidden />
+                  <span className="tabular">{x.start !== undefined ? clockOf(x.start) : x.id}</span>
+                </button>
+                <span className="grow">
+                  <strong>{x.id}</strong> {x.speaker && <span className="muted">[{speakerName(x.speaker)}]</span>} {x.text}
+                </span>
+                <button type="button" className="icon-btn" title={t('Popraw fragment')} onClick={() => setEditing({ id: x.id, text: x.text, speaker: x.speaker })}>
+                  <Pencil size={13} aria-hidden />
+                  <span className="sr-only">{t('Popraw fragment')}</span>
+                </button>
+              </div>
+            )}
+          </li>
+        ))}
+      </ol>
+      <Modal open={historyOpen} onClose={() => setHistoryOpen(false)} title={t('Poprawki transkrypcji')}>
+        <ul className="plain stack-sm">
+          {(edits.data?.items ?? []).map((e, i) => (
+            <li key={i} className="small">
+              <strong>{e.segmentId}</strong> · {e.by} · <span className="muted">{fmt.dateTime(e.at)}</span>
+              {e.before !== e.after && (
+                <div>
+                  <span className="mono muted">„{e.before}”</span> → <span className="mono">„{e.after}”</span>
+                </div>
+              )}
+              {e.beforeSpeaker !== e.afterSpeaker && (
+                <div>
+                  {t('mówca')}: {e.beforeSpeaker ?? '—'} → {e.afterSpeaker ?? '—'}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      </Modal>
+    </div>
+  );
+}
+
+type FormatId = 'clinical' | 'soap' | 'discharge' | 'summary' | 'ehr' | 'fhir';
+
+/** Ta sama treść w różnych formatach (A12.5): SOAP, notatka kliniczna, wypis, podsumowanie, pola HIS/EHR/EDM, FHIR. */
+function FormatsModal({ id, open, onClose }: { id: string; open: boolean; onClose: () => void }) {
+  const { t } = useI18n();
+  const toast = useToast();
+  const [fmtId, setFmtId] = useState<FormatId>('soap');
+  const q = useQuery({
+    queryKey: ['scribe-format', id, fmtId],
+    queryFn: () => get<{ format: FormatId; title: string; approved: boolean; sections: { title: string; text: string }[]; fhir?: unknown }>(`/api/staff/scribe/${id}/format/${fmtId}`),
+    enabled: open,
+  });
+  const names: Record<FormatId, string> = {
+    clinical: t('Notatka kliniczna'),
+    soap: 'SOAP',
+    discharge: t('Karta informacyjna (wypis)'),
+    summary: t('Podsumowanie wizyty dla pacjenta'),
+    ehr: t('Pola HIS/EHR/EDM'),
+    fhir: 'FHIR (EDM)',
+  };
+  const copy = (text: string) => void navigator.clipboard?.writeText(text).then(() => toast(t('Skopiowano.')));
+  return (
+    <Modal open={open} onClose={onClose} title={t('Formaty notatki')} wide>
+      <div className="stack">
+        <div className="chip-row" role="group" aria-label={t('Format')}>
+          {(Object.keys(names) as FormatId[]).map((f) => (
+            <button key={f} type="button" className={`filter-chip ${fmtId === f ? 'on' : ''}`} aria-pressed={fmtId === f} onClick={() => setFmtId(f)}>
+              {names[f]}
+            </button>
+          ))}
+        </div>
+        {q.data && !q.data.approved && <Notice kind="warn">{t('Szkic — niezatwierdzony. Dokumentacją staje się dopiero zatwierdzona wersja.')}</Notice>}
+        {q.isLoading ? (
+          <Skeleton count={3} height={40} />
+        ) : q.data?.fhir ? (
+          <div className="stack-sm">
+            <Button size="sm" variant="secondary" icon={<ClipboardCopy size={14} />} onClick={() => copy(JSON.stringify(q.data!.fhir, null, 2))}>
+              {t('Kopiuj JSON')}
+            </Button>
+            <pre className="code-block">{JSON.stringify(q.data.fhir, null, 2)}</pre>
+          </div>
+        ) : (
+          (q.data?.sections ?? []).map((x) => (
+            <div key={x.title} className="card" style={{ padding: 12 }}>
+              <div className="row-between">
+                <strong>{x.title}</strong>
+                <Button size="sm" variant="ghost" icon={<ClipboardCopy size={14} />} onClick={() => copy(x.text)}>
+                  {t('Kopiuj')}
+                </Button>
+              </div>
+              <p style={{ whiteSpace: 'pre-wrap', margin: '6px 0 0' }}>{x.text || '—'}</p>
+            </div>
+          ))
+        )}
+      </div>
     </Modal>
   );
 }

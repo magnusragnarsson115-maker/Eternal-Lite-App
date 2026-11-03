@@ -55,14 +55,14 @@ export function StaffShell() {
             <Link to="/panel" className="brand" onClick={() => setOpen(false)}>
               <BrandMark />
               <span className="brand-name">
-                eternal <em>Doctor</em>
+                eternal <em>Klinika</em>
               </span>
             </Link>
             {open && <Button variant="ghost" size="sm" aria-label={t('Zamknij menu')} icon={<X size={18} color="#fff" />} onClick={() => setOpen(false)} />}
           </div>
           <nav onClick={() => setOpen(false)}>
             <NavLink to="/panel" end>
-              <LayoutDashboard size={19} /> {t('Pulpit')}
+              <LayoutDashboard size={19} /> {t('Kolejka pacjentów')}
             </NavLink>
             {on('inbox') && hasRole(me, 'practitioner', 'reception') && (
               <NavLink to="/panel/skrzynka">

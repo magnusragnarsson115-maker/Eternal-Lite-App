@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/** Nagrywanie dźwięku w przeglądarce (MediaRecorder) — mikrofon komputera albo telefonu. */
-export function useRecorder() {
+/**
+ * Nagrywanie w przeglądarce (MediaRecorder) — mikrofon komputera albo telefonu. Obraz z kamery (opcja `video`)
+ * wyłącznie za odrębną zgodą pacjenta; nagranie służy dokumentacji, nie jest analizowane.
+ */
+export function useRecorder(opts: { video?: boolean } = {}) {
+  const video = !!opts.video;
   const [state, setState] = useState<'idle' | 'recording' | 'paused' | 'stopped' | 'denied' | 'unsupported'>(() =>
     typeof window !== 'undefined' && 'MediaRecorder' in window && !!navigator.mediaDevices && 'getUserMedia' in navigator.mediaDevices ? 'idle' : 'unsupported',
   );
@@ -19,17 +23,18 @@ export function useRecorder() {
 
   const start = useCallback(async () => {
     try {
-      stream.current = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      stream.current = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: video ? { width: { ideal: 640 }, height: { ideal: 480 } } : false });
     } catch {
       setState('denied');
       return;
     }
-    const type = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'].find((m) => MediaRecorder.isTypeSupported(m));
-    const r = new MediaRecorder(stream.current, type ? { mimeType: type, audioBitsPerSecond: 32_000 } : undefined);
+    const types = video ? ['video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'] : ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'];
+    const type = types.find((m) => MediaRecorder.isTypeSupported(m));
+    const r = new MediaRecorder(stream.current, type ? { mimeType: type, audioBitsPerSecond: 32_000, ...(video ? { videoBitsPerSecond: 500_000 } : {}) } : undefined);
     chunks.current = [];
     r.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
     r.onstop = () => {
-      setBlob(new Blob(chunks.current, { type: r.mimeType || 'audio/webm' }));
+      setBlob(new Blob(chunks.current, { type: r.mimeType || (video ? 'video/webm' : 'audio/webm') }));
       stopTracks();
     };
     r.start(1000);
@@ -38,7 +43,7 @@ export function useRecorder() {
     setBlob(null);
     setState('recording');
     timer.current = setInterval(() => setSeconds((s) => s + 1), 1000);
-  }, []);
+  }, [video]);
 
   const pause = useCallback(() => {
     if (rec.current?.state === 'recording') {
@@ -73,7 +78,7 @@ export function useRecorder() {
     [],
   );
 
-  return { state, seconds, blob, start, pause, stop, reset };
+  return { state, seconds, blob, start, pause, stop, reset, stream };
 }
 
 export function clock(s: number): string {

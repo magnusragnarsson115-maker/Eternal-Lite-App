@@ -18,6 +18,7 @@ import { HistoryPage } from './patient/HistoryPages';
 import { DoctorReportPage } from './patient/DoctorReportPage';
 import { HealthCalendarPage, PlanPage } from './patient/PlanPages';
 import { OfflinePage } from './patient/OfflinePages';
+import { EternalIdCardPage, EternalIdPage, InterviewChatPage, InterviewListPage, MyHealthPage } from './patient/Round5Pages';
 import { AiCardsPage } from './shared/SystemStatus';
 import { CardDetailPage, CardsPage, DocumentDetailPage, DocumentsPage, HelpPage, SafetyPage, SharingPage, TimelinePage } from './patient/MvpPages';
 import { lazy, Suspense, useEffect } from 'react';
@@ -27,6 +28,7 @@ import { Spinner } from './ui';
 // Panel placówki ładowany osobno — aplikacja pacjenta na telefonie nie pobiera jego kodu.
 const StaffShell = lazy(() => import('./staff/StaffShell').then((m) => ({ default: m.StaffShell })));
 const StaffDashboardPage = lazy(() => import('./staff/DashboardPage').then((m) => ({ default: m.StaffDashboardPage })));
+const WorkspacePage = lazy(() => import('./staff/WorkspacePage').then((m) => ({ default: m.WorkspacePage })));
 const CalendarPage = lazy(() => import('./staff/CalendarPage').then((m) => ({ default: m.CalendarPage })));
 const PatientsPage = lazy(() => import('./staff/PatientPages').then((m) => ({ default: m.PatientsPage })));
 const PatientDetailPage = lazy(() => import('./staff/PatientPages').then((m) => ({ default: m.PatientDetailPage })));
@@ -86,11 +88,13 @@ export function App() {
       <Route path="/k/:token" element={<CardLinkPage />} />
       <Route path="/nagranie/:token" element={<PhoneRecordPage />} />
       <Route path="/ratunek/:token" element={<SosCardPage />} />
+      <Route path="/id/:token" element={<EternalIdCardPage />} />
       <Route path="/logowanie/link" element={<MagicLinkPage />} />
       <Route path="/moduly" element={<ModuleMapPage />} />
 
       <Route path="/panel" element={<StaffShell />}>
-        <Route index element={<StaffDashboardPage />} />
+        <Route index element={<WorkspacePage />} />
+        <Route path="pulpit" element={<StaffDashboardPage />} />
         <Route path="kalendarz" element={<CalendarPage />} />
         <Route path="pacjenci" element={<PatientsPage />} />
         <Route path="pacjenci/:id" element={<PatientDetailPage />} />
@@ -141,6 +145,10 @@ export function App() {
         <Route path="kalendarz" element={<HealthCalendarPage />} />
         <Route path="plan" element={<PlanPage />} />
         <Route path="przypomnienia" element={<RemindersPage />} />
+        <Route path="moje-zdrowie" element={<MyHealthPage />} />
+        <Route path="wywiad" element={<InterviewListPage />} />
+        <Route path="wywiad/:id" element={<InterviewChatPage />} />
+        <Route path="eternal-id" element={<EternalIdPage />} />
         <Route path="profilaktyka" element={<PreventivePage />} />
         <Route path="apteki" element={<PharmaciesPage />} />
         <Route path="powietrze" element={<AirWeatherPage />} />

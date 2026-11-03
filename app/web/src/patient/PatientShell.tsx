@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Activity, AlarmClock, BookHeart, Bell, BriefcaseMedical, CalendarCheck, Wind, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, Flower2, FolderOpen, Home, LayoutGrid, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users } from 'lucide-react';
+import { Activity, AlarmClock, BookHeart, Bell, BriefcaseMedical, CalendarCheck, Wind, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, Flower2, FolderOpen, Home, LayoutGrid, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users , Sparkles, MessageCircleQuestion, Fingerprint } from 'lucide-react';
 import { useEffect, type ReactNode } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { get, msSinceOwnMutation } from '../api';
@@ -112,6 +112,7 @@ export function PatientShell() {
         <aside className="p-side" aria-label={t('Menu główne')}>
           <nav>
             <NavItem to="/" end icon={<Home size={20} />} label={t('Start')} />
+            <NavItem to="/moje-zdrowie" icon={<Sparkles size={20} />} label={t('Moje zdrowie')} />
             <NavItem to="/wizyty" icon={<CalendarDays size={20} />} label={t('Wizyty')} />
             <NavItem to="/kalendarz" icon={<CalendarRange size={20} />} label={t('Kalendarz zdrowia')} />
             <NavItem to="/wyniki" icon={<FileText size={20} />} label={t('Wyniki od placówki')} />
@@ -132,6 +133,8 @@ export function PatientShell() {
             <NavItem to="/apteki" icon={<BriefcaseMedical size={20} />} label={t('Apteki i refundacja')} />
             {!proxy && <NavItem to="/powietrze" icon={<Wind size={20} />} label={t('Powietrze i pogoda')} />}
             <div className="side-sep" />
+            <NavItem to="/wywiad" icon={<MessageCircleQuestion size={20} />} label={t('Wywiad przed wizytą')} />
+            {!proxy && <NavItem to="/eternal-id" icon={<Fingerprint size={20} />} label={t('Eternal ID')} />}
             <NavItem to="/rodzina" icon={<Users size={20} />} label={t('Rodzina i opiekunowie')} />
             <NavItem to="/nfz" icon={<Search size={20} />} label={t('Terminy NFZ')} />
             <NavItem to="/udostepnianie" icon={<Share2 size={20} />} label={t('Komu udostępniam')} />
@@ -186,6 +189,9 @@ export function MorePage() {
   const { me, config, logout, profile } = useSession();
   const own = (x: [string, ReactNode, string]) => (profile ? [] : [x]);
   const items: [string, ReactNode, string][] = [
+    ['/moje-zdrowie', <Sparkles size={20} key="mz" />, t('Moje zdrowie')],
+    ['/wywiad', <MessageCircleQuestion size={20} key="wy" />, t('Wywiad przed wizytą')],
+    ...own(['/eternal-id', <Fingerprint size={20} key="ei" />, t('Eternal ID')]),
     ['/pomoc', <LifeBuoy size={20} key="h" />, t('Pomoc · 112 · 116 123')],
     ['/rodzina', <Users size={20} key="ro" />, t('Rodzina i opiekunowie')],
     ...own(['/bezpieczenstwo', <Siren size={20} key="s" />, t('SOS i karta ratunkowa')]),

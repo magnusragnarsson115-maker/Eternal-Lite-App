@@ -12,6 +12,7 @@ import { NOTE_FORMATS } from '../scribe/templates.js';
 import { cardForIdToken, createIdLink, getInsurance, listIdLinks, nfcText, revokeIdLink, setInsurance, setNfcChoice } from '../services/eternalId.js';
 import { activeGrantsFor } from '../services/grants.js';
 import { listCorrections, listIntake, mappingCorrectionsCsv } from '../services/intake.js';
+import { qrSvg } from '../services/invites.js';
 import { answerInterview, availableInterviews, backInterview, getInterview, interviewsForStaff, listInterviews, startInterview } from '../services/interview.js';
 import { staffOrgId } from '../services/orgs.js';
 import { createDocument, registerUpload } from '../services/records.js';
@@ -391,7 +392,8 @@ export async function workspaceRoutes(app: FastifyInstance): Promise<void> {
     const auth = requirePatient(req, { ownOnly: true });
     requireModule('eternal-id', { subject: auth.user.id });
     const input = body(req, z.object({ days: z.number().int().min(1).max(730), label: z.string().max(60).optional() }));
-    return createIdLink(actorOf(req), auth.patientRef, input);
+    const created = createIdLink(actorOf(req), auth.patientRef, input);
+    return { ...created, qr: await qrSvg(created.url) };
   });
 
   app.delete('/api/me/eternal-id/links/:id', async (req) => {
