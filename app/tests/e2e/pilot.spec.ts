@@ -132,10 +132,10 @@ test('Scribe: zgoda → nagranie → szkic ze źródłami → zatwierdzenie → 
   await doctor.getByRole('button', { name: 'Zakończ' }).click();
   await doctor.getByRole('button', { name: 'Wyślij do szkicu notatki' }).click();
 
-  // szkic: akapity z odnośnikami do fragmentów rozmowy (S#), oznaczenie AI
+  // szkic: akapity z odnośnikami do fragmentów rozmowy (S# · mm:ss), oznaczenie AI
   await expect(doctor.getByText('Szkic notatki')).toBeVisible({ timeout: 30_000 });
   await expect(doctor.getByText('Transkrypcja')).toBeVisible();
-  await expect(doctor.locator('button.badge', { hasText: /^S\d+$/ }).first()).toBeVisible();
+  await expect(doctor.locator('button.badge', { hasText: /^S\d+( · \d{2}:\d{2})?$/ }).first()).toBeVisible();
   await doctor.getByRole('button', { name: 'Zatwierdź notatkę' }).click();
   const confirmBtn = doctor.getByRole('dialog').getByRole('button', { name: 'Zatwierdź' });
   if (await confirmBtn.isVisible().catch(() => false)) await confirmBtn.click();
