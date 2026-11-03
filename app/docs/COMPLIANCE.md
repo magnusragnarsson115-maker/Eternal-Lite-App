@@ -38,6 +38,12 @@ lub terapeutycznym, co do zasady nie jest wyrobem medycznym. Kod został zaproje
 | Interpretacja danych genetycznych (F16.4–F16.10) | plik surowych danych tylko przechowywany (F16.2) — aplikacja nie otwiera go i nie czyta; interpretacja wariantów = wyrób do diagnostyki in vitro (IVDR) |
 | Odznaki „za lepsze wyniki” (F13.4) | odznaki liczą wyłącznie dni z zapisem, nigdy wartości |
 | Statystyki pomiarów domowych w pulpicie i raporcie okresowym (A3.1, A4.1, A4.2) | wyłącznie statystyka opisowa: liczba, najniższa i najwyższa wartość, średnia arytmetyczna z okresu z opisaną metodą, osobno dla rodzaju, jednostki i źródła (bez łączenia urządzeń); bez progów, porównań z normą, trendów „rośnie/spada”, kolorów i wyróżnień; wykres bez pasów norm (`periodReport.ts`, test słów oceniających). ⚠️ uwzględnij w analizie kwalifikacji MDR |
+| Pilność kliniczna w kolejce lekarza (runda 5) | kolejka porządkowana terminem i czasem zdarzenia; „pilne” nadaje wyłącznie personel, z autorem i godziną w historii sprawy; pozycje z faktów organizacyjnych (wizyta, wiadomość, dokument, wynik, liczba odczytów z telemonitoringu, szkic notatki) — bez ocen wartości (`workspace.ts`) |
+| Avatar 3D kolorowany „stanem zdrowia” | avatar pokazuje, **gdzie i kiedy są dane** w dokumentacji; kolor = świeżość i liczba danych w barwie panelu, bez czerwieni/zieleni; poziom rośnie z kompletnością dokumentacji, nie z wartościami (`avatarFor` w `snapshot.ts`); anatomia z badań obrazowych — tylko w licencjonowanej, certyfikowanej przeglądarce placówki uruchamianej linkiem |
+| „Co się zmieniło” z oceną zmian i progami | arytmetyka: poprzednia → obecna wartość, różnica, nowe wpisy; brak słów „lepiej/gorzej”; wyróżnienie pomiarów wyłącznie według **filtra wyświetlania wpisanego przez lekarza dla siebie** — bez domyślnych progów i bez powiadomień (`whatChanged`, test słów oceniających) |
+| Strzałki ↑/↓ przy wynikach w Medical Snapshot | wyłącznie z oznaczenia wydrukowanego przez laboratorium (H/L), w barwie informacyjnej, z podpisem „oznaczenie laboratorium” |
+| Analiza obrazu z kamery, mimiki, skóry (A12.1) | nagranie obrazu tylko za **odrębną zgodą** jako dokumentacja (bez analizy); zdjęcia zmian skórnych zapisywane jako dokument „Dokumentacja fotograficzna” z okolicą ciała, bez analizy — ocenę opisuje lekarz. Analiza = wyrób medyczny i system AI wysokiego ryzyka |
+| Wywiad AI dobierający pytania (A12.4, A5.5) | domyślnie: drzewa pytań z rozgałęzieniami **zatwierdzane przez lekarza** (wersja + skrót treści, CLI/panel), podsumowanie przepisuje odpowiedzi (objawy zgłoszone i zaprzeczone, „nie wiem”) bez punktacji; psychiatria bez skal sumowanych (`content/interviews.ts`). Silnik Infermedica (wyrób klasy IIb dostawcy) — **zablokowany**, dopóki administrator nie zapisze referencji oceny zgodności MDR produktu (certyfikat dostawcy nie obejmuje integratora); wtedy pytania i triaż pokazywane bez zmian z oznaczeniem źródła (`integrations/infermedica.ts`) |
 
 Komunikaty „Aplikacja nie ocenia wyników i nie zastępuje porady lekarza” oraz „w nagłym przypadku dzwoń 112”
 są stałym elementem interfejsu. ⚠️ Dodanie którejkolwiek funkcji z lewej kolumny wymaga ponownej analizy
@@ -84,6 +90,18 @@ przez `/dokument` z udziałem `ekspert-prawno-regulacyjny`; zweryfikuj aktualne 
 | Dyspozycje i oświadczenie woli (A22.5) | wyłącznie informacja dla bliskich i ratowników; aplikacja mówi wprost, że nie zastępuje sprzeciwu w Centralnym Rejestrze Sprzeciwów, upoważnienia w placówce ani pełnomocnictwa |
 | Raport dla lekarza (SBAR) i plik FHIR | część „A” zawiera tylko dane — oceny dokonuje lekarz; zakres referencyjny wyłącznie z dokumentu laboratorium; test pilnuje braku słów oceniających |
 | Logowanie z nowego urządzenia | powiadomienie i e-mail bez danych o zdrowiu; reguła (urządzenie × sieć), nie profilowanie |
+
+### Runda 5 — ochrona danych w integracjach przez API
+
+| Obszar | Realizacja |
+|---|---|
+| Validic Inform | identyfikator u Validic = skrót identyfikatora rekordu (bez imienia, PESEL, e-maila); pacjent sam łączy konta producentów na stronie Validic; umowa powierzenia z Validic przed produkcją |
+| ZnanyLekarz / Docplanner | rezerwacja z ZnanyLekarz tworzy pacjenta z tożsamością **niepotwierdzoną** (dostęp do wyników dopiero po weryfikacji w placówce); data urodzenia z PESEL, gdy brak w rezerwacji; bez daty — rezerwacja pominięta do uzupełnienia |
+| Infermedica | do dostawcy tylko płeć, wiek, objawy i odpowiedzi; losowy `Interview-Id`; wymagana umowa powierzenia; silnik zablokowany do czasu oceny zgodności MDR |
+| ElevenLabs Scribe v2 Medical | rezydencja danych UE (`api.eu.residency.elevenlabs.io`), tryb zerowej retencji (`ELEVENLABS_ZERO_RETENTION=on`, plan firmowy); słownik terminów zawiera tylko nazwy leków i badań |
+| Amazon Textract | region Frankfurt (`eu-central-1`), podpis SigV4 po stronie serwera; plik nie trafia do S3 (wywołanie synchroniczne) |
+| Eternal ID i chip NFC | na chipie wyłącznie pola wybrane przez pacjenta (domyślnie imię, rok urodzenia, uczulenia, kontakt), ≤ 380 B; link odwoływalny, z terminem, każde otwarcie w dzienniku dostępu pacjenta |
+| Rejestr poprawek odczytu | eksport dla słownika mapowania bez pacjenta i osoby, tekst źródłowy po usunięciu identyfikatorów, data bez godziny (`mappingCorrectionsCsv`) |
 
 ## 2. RODO (2016/679) i ochrona danych
 

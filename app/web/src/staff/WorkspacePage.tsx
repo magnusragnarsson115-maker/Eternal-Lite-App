@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarDays, Check, ChevronDown, CircleDashed, Flag, History, Inbox, MessageSquare, Plus, Video } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { get, post, put, qs } from '../api';
 import { errorMessage } from '../errors';
@@ -242,6 +242,15 @@ export function WorkspacePage() {
   const [newTask, setNewTask] = useState(false);
   const q = useQuery({ queryKey: ['workspace', scope], queryFn: () => get<Queue>(`/api/staff/workspace${qs({ scope })}`), refetchInterval: 60_000 });
   const owners = useQuery({ queryKey: ['case-owners'], queryFn: () => get<{ items: { userId: string; name: string; role: string }[] }>('/api/staff/case-owners'), staleTime: 300_000 });
+  // pierwsze otwarcie: pierwsza niepusta zakładka (dziś → pilne → wymaga reakcji → braki → nowi → kontrola)
+  const [picked, setPicked] = useState(false);
+  useEffect(() => {
+    if (picked || !q.data) return;
+    const c = q.data.counts;
+    const first = (['today', 'urgent', 'action', 'missing', 'new', 'followup'] as Bucket[]).find((b) => c[b] > 0);
+    setBucket(first ?? 'all');
+    setPicked(true);
+  }, [q.data, picked]);
   const done = () => void qc.invalidateQueries({ queryKey: ['workspace'] });
   const update = useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: Record<string, unknown> }) => put<CaseView>(`/api/staff/cases/${id}`, patch),

@@ -29,8 +29,8 @@ interface Recorded {
   b64?: string;
 }
 
-const PATIENT_ROUTES = ['/', '/wizyty', '/rezerwacja', '/wyniki', '/dokumenty', '/os-czasu', '/raport', '/pomiary', '/leki', '/wiadomosci', '/kalendarz', '/dzienniki', '/historia-zdrowia', '/plan', '/dla-lekarza', '/rodzina', '/ankiety', '/udostepnianie', '/karty', '/bezpieczenstwo', '/pomoc', '/prywatnosc', '/profil', '/powiadomienia', '/nfz', '/wiecej', '/jak-dziala-ai'];
-const STAFF_ROUTES = ['/panel', '/panel/kalendarz', '/panel/skrzynka', '/panel/pacjenci', '/panel/wiadomosci', '/panel/grafik', '/panel/udostepnienia', '/panel/mierniki', '/panel/wysylka', '/panel/powiadomienia', '/panel/admin', '/panel/organizacja', '/panel/konto'];
+const PATIENT_ROUTES = ['/', '/wizyty', '/rezerwacja', '/wyniki', '/dokumenty', '/os-czasu', '/raport', '/pomiary', '/leki', '/wiadomosci', '/kalendarz', '/dzienniki', '/historia-zdrowia', '/plan', '/dla-lekarza', '/rodzina', '/ankiety', '/udostepnianie', '/karty', '/bezpieczenstwo', '/pomoc', '/prywatnosc', '/profil', '/powiadomienia', '/nfz', '/wiecej', '/jak-dziala-ai', '/moje-zdrowie', '/wywiad', '/eternal-id', '/przypomnienia', '/profilaktyka', '/apteki', '/powietrze'];
+const STAFF_ROUTES = ['/panel', '/panel/pulpit', '/panel/kalendarz', '/panel/skrzynka', '/panel/pacjenci', '/panel/wiadomosci', '/panel/grafik', '/panel/udostepnienia', '/panel/mierniki', '/panel/wysylka', '/panel/powiadomienia', '/panel/admin', '/panel/organizacja', '/panel/konto'];
 const NEVER = [/\/wyloguj/, /\/logowanie/, /\/mfa/, /\/teleporada$/, /\/nagranie\//];
 
 const PERSONAS: { id: string; email: string; staff: boolean }[] = [

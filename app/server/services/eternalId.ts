@@ -97,7 +97,7 @@ export async function nfcText(userId: string, patientRef: string): Promise<{ tex
   const lines: string[] = [`ETERNAL ID ${eternalIdFor(patientRef)}`];
   if (choice.name) lines.push(card.name);
   if (choice.birthYear && card.birthDate) lines.push(`ur./born ${card.birthDate.slice(0, 4)}`);
-  if (choice.allergies) lines.push(`Uczulenia/Allergies: ${card.allergies === undefined ? '?' : card.allergies || 'brak/none'}`);
+  if (choice.allergies) lines.push(`Uczulenia/Allergies: ${card.allergies === undefined ? 'nie podano/not provided' : card.allergies || 'brak/none'}`);
   if (choice.conditions && card.conditions.length) lines.push(`Choroby/Conditions: ${card.conditions.map((c) => c.en).join(', ')}`);
   if (choice.medications && card.medications.length) lines.push(`Leki/Meds: ${card.medications.join('; ')}`);
   if (choice.contact && card.contacts[0]) lines.push(`ICE: ${card.contacts[0].name} ${card.contacts[0].phone}`);

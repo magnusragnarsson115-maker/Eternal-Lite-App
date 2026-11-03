@@ -1,4 +1,4 @@
-import type { Condition, DocumentReference, Observation, Patient, Provenance } from '@medplum/fhirtypes';
+import type { Condition, DocumentReference, Observation, Patient, Provenance, QuestionnaireResponse } from '@medplum/fhirtypes';
 import { audit, type AuditActor } from '../audit.js';
 import type { AppUser } from '../auth/users.js';
 import { getDb } from '../db.js';
@@ -170,13 +170,23 @@ export async function collectForPatient(actor: AuditActor, patientRef: string): 
     rows.set(k.key, row);
   }
   let allergies: PatientData['allergies'] = { reported: 'unknown' };
-  for (const sv of surveys) {
-    const a = allergiesFrom(sv.answers, sv.title, sv.authored.slice(0, 10));
+  // najnowsze odpowiedzi pacjenta: wywiady przed wizytą, potem ankieta zdrowotna
+  const responses = await fhirSystem().search<QuestionnaireResponse>('QuestionnaireResponse', { subject: patientRef, _sort: '-authored', _count: '20' }).catch(() => [] as QuestionnaireResponse[]);
+  for (const r of responses) {
+    const a = allergiesFrom(readableAnswers(r), 'wywiad przed wizytą', r.authored?.slice(0, 10));
     if (a) {
       allergies = a;
       break;
     }
   }
+  if (allergies.reported === 'unknown')
+    for (const sv of surveys) {
+      const a = allergiesFrom(sv.answers, sv.title, sv.authored.slice(0, 10));
+      if (a) {
+        allergies = a;
+        break;
+      }
+    }
   return {
     patientRef,
     name: patientName(patient),

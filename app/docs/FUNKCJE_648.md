@@ -1030,6 +1030,19 @@ Mapa funkcji na pliki i testy: [`MODULES.md`](MODULES.md). Granica wyrobu medycz
 | C5.17 | Samodiagnoza implantu | R&D/FINAL | P3 | ⛔ R&D | kapsuła wszczepialna — badania i certyfikacja |
 | C5.18 | Implanty biodegradowalne | R&D/FINAL | P3 | ⛔ R&D | kapsuła wszczepialna — badania i certyfikacja |
 
+## Runda 5 — zbudowane 🆕 (Eternal Klinika, Medical Snapshot, panel pacjenta, partnerzy przez API)
+
+| # | Pakiet | Funkcje | Co działa | Co zostaje poza kodem |
+|---|---|---|---|---|
+| 1 | Kolorystyka | — | osobne palety panelu pacjenta i lekarza (jasny, ciemny, wysoki kontrast), aplikacja mobilna w palecie pacjenta | nic |
+| 2 | Eternal Klinika — kolejka i sprawy | A5.1 | kolejka z wizyt, wiadomości, dokumentów, wyników, telemonitoringu, szkiców i zadań; statusy spraw z historią, właściciel, „pilne” od personelu; kompletność danych | nic |
+| 3 | Medical Snapshot, oś czasu, „Co się zmieniło” | A5.2, A5.3 | sekcje rozwijane, drążenie wartości do źródła, oś czasu z filtrami, różnice od ostatniej wizyty, filtr wyświetlania lekarza | nic |
+| 4 | Avatar 3D i Eternal ID | A5.3, A24.6 | avatar „gdzie i kiedy są dane” rosnący z kompletnością; Eternal ID z QR, chipem NFC (tekst offline) i ubezpieczeniem | test zapisu NFC na telefonie z Androidem |
+| 5 | Odczyt dokumentów — rejestr poprawek | A2.3, A2.5 | oryginał obok odczytu, każda poprawka z autorem i czasem, widoczna u pacjenta i lekarza; eksport do słownika mapowania | nic |
+| 6 | Nagranie, transkrypcja, Scribe | A12.1, A12.2, A12.5 | uczestnicy, obraz za odrębną zgodą, znaczniki czasu, odsłuch fragmentu, poprawki, 11 sekcji, decyzje na sekcjach, formaty SOAP / wypis / FHIR | analiza obrazu — świadomie poza produktem (MDR, AI Act) |
+| 7 | Wywiady przed wizytą | A12.3, A12.4, A5.5 | rozmowa z rozgałęzieniami zatwierdzanymi przez lekarza (4 drzewa); podsumowanie z objawami zaprzeczonymi; silnik Infermedica po ocenie zgodności | lekarz zatwierdza drzewa pytań; ocena zgodności MDR przed odblokowaniem Infermedica |
+| 8 | Partnerzy przez API | F2.x, F3.x, D5 | Amazon Textract, ElevenLabs Scribe v2 Medical, Validic Inform, ZnanyLekarz, przeglądarka 3D badań | konta i umowy u dostawców; test z kontem próbnym każdego |
+
 ## Runda 4 — zbudowane: 41 funkcji 🆕 (kolejka A, pakiety 1–9)
 
 | # | Pakiet | Funkcje | Co działa | Co zostaje poza kodem |

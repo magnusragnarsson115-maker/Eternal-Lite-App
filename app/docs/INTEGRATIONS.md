@@ -136,6 +136,30 @@ podręcznej 24 h, indeks 20 min. IMGW: `danepubliczne.imgw.pl/api/data/synop` �
 wiatr, opad, godzina pomiaru (UTC). Format według dokumentacji i wzorcowych odpowiedzi; w środowisku budowy hosty
 były zablokowane, więc 🌐 test na żywo — po wdrożeniu. W trybie demo bez sieci: dane pokazowe z wyraźnym oznaczeniem.
 
+## Partnerzy przez API — runda 5 (bez osadzanych widżetów)
+
+Wszystkie klucze tylko w zmiennych środowiska serwera (nigdy w przeglądarce ani w aplikacji mobilnej). Stan każdej integracji:
+panel administratora → Integracje oraz `npm run cli -- readiness`.
+
+| Usługa | Co robi w Eternal | Zmienne | Koszt / dostęp (stan z listopada 2026, sprawdź przed umową) |
+|---|---|---|---|
+| **Amazon Textract** | OCR zdjęć i jednostronicowych skanów (DetectDocumentText), linie z położeniem do podświetlenia w oryginale; PDF z warstwą tekstu nadal czytany lokalnie (0 zł) | `OCR_PROVIDER=textract`, `AWS_REGION=eu-central-1`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (opcjonalnie `AWS_SESSION_TOKEN`) | darmowy pakiet nowych kont AWS: 1000 stron/mies. przez 3 miesiące; potem ok. 1,5 USD / 1000 stron (DetectDocumentText) |
+| **ElevenLabs Scribe v2 Medical** | transkrypcja wizyty: mówcy (liczba z listy uczestników), znaczniki czasu słów, model medyczny | `STT_PROVIDER=elevenlabs`, `ELEVENLABS_API_KEY`, `ELEVENLABS_STT_MODEL=scribe_v2_medical`, `ELEVENLABS_KEYTERMS=on|off` (słownik leków i badań — dodatkowo płatny), `ELEVENLABS_ZERO_RETENTION=on|off` (plan firmowy) | cena jak Scribe v2; konto z kredytami (plan darmowy z małym limitem do testów); rezydencja UE |
+| **Własny serwer Whisper** (bez kosztu licencji) | ta sama ścieżka co OpenAI STT — dowolny serwer zgodny z API OpenAI (np. faster-whisper) | `STT_PROVIDER=openai`, `OPENAI_BASE_URL=https://…/v1`, `OPENAI_API_KEY`, `OPENAI_STT_MODEL` | tylko koszt serwera (GPU zalecane); bez rozpoznawania mówców |
+| **Validic Inform (REST v2)** | pacjent łączy urządzenia na stronie Validic Marketplace (link z API); Eternal pobiera pomiary, sen i kroki (`/organizations/{org}/users/{uid}/measurements|summaries|sleep`, zakres ≤ 31 dni), co 6 h w tle | `VALIDIC_ORG_ID`, `VALIDIC_TOKEN`, `VALIDIC_BASE_URL` | wersja próbna dla deweloperów; produkcja — umowa |
+| **Docplanner / ZnanyLekarz (Integrations API v3)** | wolne terminy z kalendarza Eternal → ZnanyLekarz (`replaceSlots`), rezerwacje i odwołania → wizyty; mapowanie lekarzy, adresów i usług w panelu administratora; co 10 min w tle | `DOCPLANNER_CLIENT_ID`, `DOCPLANNER_CLIENT_SECRET`, `DOCPLANNER_DOMAIN` (domyślnie `https://www.znanylekarz.pl`) | klucze API tylko dla klientów Docplanner (panel → Integracje), bez dodatkowej opłaty za API według opisu dostawcy |
+| **Infermedica Engine API v3** | wywiad z pytaniami silnika (`/parse`, `/diagnosis`) i triażem (`/triage`); w Eternal **zablokowany**, dopóki administrator nie zapisze referencji oceny zgodności MDR produktu | `INFERMEDICA_APP_ID`, `INFERMEDICA_APP_KEY`, `INFERMEDICA_BASE_URL`, `INFERMEDICA_MODEL` (opcjonalnie) | konto próbne do 2000 wywołań (zatwierdzane ręcznie), potem plan płatny; wyrób medyczny klasy IIb dostawcy |
+| **Przeglądarka 3D badań obrazowych** (np. Avatar Medical Vision) | przycisk „Anatomia 3D z badań” w karcie pacjenta otwiera licencjonowaną przeglądarkę placówki | `IMAGING_VIEWER_URL` (szablon z `{patientId}` albo `{eternalId}`), `IMAGING_VIEWER_NAME` | licencja placówki; wyrób medyczny (CE/FDA) — Eternal tylko uruchamia link |
+| **Vitalera** | bez zmian: webhook FHIR z podpisem HMAC (sekcja wyżej) | `RPM_WEBHOOK_SECRETS` | umowa partnerska |
+
+Uwagi:
+- W środowisku budowy strony dostawców (validic, docplanner, infermedica, elevenlabs, vitalera) były zablokowane w ustawieniach sieci —
+  adaptery napisano według opublikowanych opisów API, a testy (`tests/unit/partners.test.ts`) sprawdzają zapytania i mapowanie na
+  podstawionych odpowiedziach. Przed produkcją: test z kontem próbnym każdego dostawcy.
+- Podpis AWS SigV4 (`server/lib/sigv4.ts`) jest sprawdzony oficjalnym wektorem testowym AWS.
+- Pola rezerwacji ZnanyLekarz (`start_at`, `patient`, `address_service`) i rekordów Validic (`metrics[]` z `type/unit/value`) mapowane
+  są ostrożnie — nieznane pola są pomijane, a nie zgadywane.
+
 ## Jitsi Meet
 
 Własna instancja (zalecane): `JITSI_DOMAIN`, a przy uwierzytelnianiu tokenami — `JITSI_APP_ID` i `JITSI_APP_SECRET`

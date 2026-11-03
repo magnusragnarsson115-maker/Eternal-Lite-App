@@ -204,6 +204,26 @@ Nowe moduły w rejestrze (`S/modules.ts`): `patient-offline`, `patient-reminders
 | D4.8, F16.3 drzewo zdrowia rodziny | `W/patient/FamilyTree.tsx` — pokolenia z wywiadu rodzinnego, bez oceny ryzyka | typy |
 | F16.2 plik surowych danych genetycznych | `S/services/genomicFiles.ts` (osobna tabela, ZIP/GZ/tekst rozpoznane bez czytania treści, poza udostępnianiem i raportami, tylko właściciel konta, usuwany z kontem), karta „Plik DNA” | `devices-more.test.ts` |
 
+### Runda 5 — Eternal Klinika, Medical Snapshot, panel pacjenta, partnerzy przez API
+
+Nowe moduły: `workspace`, `medical-snapshot` (placówka), `patient-avatar`, `interviews`, `eternal-id` (pacjent). Trasy: `S/routes/workspace.ts`,
+`S/routes/partners.ts`; migracja 17 (sprawy z historią, rejestr poprawek odczytu, poprawki transkrypcji, uczestnicy i stan sekcji Scribe, wywiad czatowy, linki Eternal ID).
+Kolorystyka: osobne palety panelu pacjenta i panelu lekarza (`html[data-panel]` w `W/styles.css`, WCAG AA, wysoki kontrast ma pierwszeństwo), aplikacja mobilna w palecie pacjenta.
+
+| Pozycje | Gdzie w kodzie | Testy |
+|---|---|---|
+| Kolejka lekarza i sprawy (dziś, nowi, kontrola, pilne, wymaga reakcji, braki danych; status, właściciel, historia; kompletność: wywiad, wyniki, zgoda, leki, pomiary) | `S/services/workspace.ts`, `W/staff/WorkspacePage.tsx` (ekran główny panelu) | `workspace.test.ts` |
+| A5.2 Medical Snapshot z drążeniem do źródła (data → laboratorium → dokument → poprzednie wartości → kto potwierdził → poprawki) | `S/services/snapshot.ts` (`collectForStaff`, `buildSnapshot`, `resultDetail`), `W/shared/HealthViews.tsx`, `W/staff/SnapshotPanel.tsx` | `workspace.test.ts` |
+| Oś czasu z filtrami, „Co się zmieniło” od ostatniej wizyty, filtr wyświetlania lekarza | `buildTimeline`, `whatChanged`, `setDisplayFilter` w `snapshot.ts` | `workspace.test.ts` |
+| Avatar 3D (gdzie i kiedy są dane; poziom z kompletności; iskierki za nowe dane u pacjenta) | `avatarFor` w `snapshot.ts`, `W/shared/Avatar3D.tsx` (three.js ładowany osobno, lista obszarów jako alternatywa dostępna) | `workspace.test.ts` |
+| A2 rejestr poprawek odczytu (automatyczny → poprawka → kto → kiedy), widoczny u pacjenta i lekarza, eksport dla mapowania | `logCorrections`, `listCorrections`, `mappingCorrectionsCsv` w `S/services/intake.ts` | `workspace.test.ts` |
+| A12.1–A12.2 nagranie (uczestnicy, obraz za odrębną zgodą), transkrypcja ze znacznikami czasu, odsłuch fragmentu, poprawki z historią | `S/services/scribe.ts` (`setParticipants`, `editSegment`, `transcriptEdits`), `W/lib/recorder.ts`, `W/staff/ScribePanel.tsx` (`TranscriptPanel`) | `workspace.test.ts`, `scribe.test.ts` |
+| A12.5 pełna struktura (11 sekcji), akceptuj / popraw / odrzuć / przygotuj ponownie, formaty SOAP, notatka kliniczna, wypis, podsumowanie, pola EHR, FHIR | `S/scribe/templates.ts` (`full`, `NOTE_FORMATS`), `sectionAction`, `regenerateSection`, `formatNote` | `workspace.test.ts` |
+| A12.3–A12.4, A5.5 wywiad czatowy z rozgałęzieniami (pierwsza wizyta, kardiologia, diabetologia, psychiatria) | `S/content/interviews.ts`, `S/services/interview.ts`, `W/patient/Round5Pages.tsx` | `workspace.test.ts` |
+| Eternal ID, QR, chip NFC, ubezpieczenie za granicą | `S/services/eternalId.ts`, `W/patient/Round5Pages.tsx` (`EternalIdPage`, `EternalIdCardPage` pod `/id/:token`) | `workspace.test.ts` |
+| Dokumentacja fotograficzna za zgodą (bez analizy) | `POST /api/staff/patients/:id/photos` → dokument „photo” (`records.ts`) | `workspace.test.ts` |
+| Partnerzy przez API: Amazon Textract, ElevenLabs Scribe v2 Medical, Validic Inform, Docplanner/ZnanyLekarz, Infermedica (zablokowany bez oceny zgodności), przeglądarka 3D badań | `S/ai/ocr.ts` + `S/lib/sigv4.ts`, `S/ai/stt.ts`, `S/integrations/validic.ts`, `S/integrations/docplanner.ts`, `S/integrations/infermedica.ts`, `S/routes/partners.ts`, `W/staff/PartnersPanel.tsx` | `partners.test.ts` |
+
 ### Rdzeń wspólny (R1–R10) i D0
 
 | Nr | Pozycja | Etap | Gdzie w kodzie | Testy |

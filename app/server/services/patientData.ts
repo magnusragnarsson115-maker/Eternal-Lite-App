@@ -40,7 +40,7 @@ export async function patientLabFacts(patientRef: string): Promise<LabFact[]> {
   }
   return [...own.map((o) => ({ o, source: 'patient' as const })), ...clinic.map((o) => ({ o, source: 'clinic' as const }))]
     .filter(({ o }) => !['entered-in-error', 'cancelled'].includes(o.status))
-    .filter(({ o }) => !o.category?.some((c) => c.coding?.some((cd) => cd.code === 'vital-signs')))
+    .filter(({ o }) => !o.category?.some((c) => c.coding?.some((cd) => cd.code === 'vital-signs' || cd.code === 'activity')))
     .filter(({ o }) => !isJournal(o)) // dzienniki pacjenta to samoocena, nie wyniki badań
     .map(({ o, source }) => ({
       id: o.id,

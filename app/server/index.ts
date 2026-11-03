@@ -13,6 +13,7 @@ async function main(): Promise<void> {
   if (config.demoMode) {
     (await import('./integrations/registries.js')).ensureDemoRegistries();
     await (await import('./seed/round4.js')).seedRound4Demo((m) => console.log(m));
+    await (await import('./seed/round5.js')).seedRound5Demo((m) => console.log(m));
   }
   const app = await buildApp({ logger: true });
   for (const w of productionWarnings()) app.log.warn(w);

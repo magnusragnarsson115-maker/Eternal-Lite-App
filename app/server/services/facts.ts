@@ -215,6 +215,7 @@ export async function buildFacts(user: AppUser, actor: AuditActor, input: { pati
     for (const o of vObs) {
       if (['entered-in-error', 'cancelled'].includes(o.status)) continue;
       if (isJournal(o)) continue; // dzienniki — osobne zestawienie, nie wyniki badań
+      if (o.category?.some((c) => c.coding?.some((cd) => cd.code === 'activity' || cd.code === 'vital-signs'))) continue; // kroki, sen, pomiary — nie wyniki badań
       const docRef = o.derivedFrom?.[0]?.reference ?? '';
       if (!grantAllows(grants, docRef, 'result')) continue;
       const doc = docById.get(docRef);
