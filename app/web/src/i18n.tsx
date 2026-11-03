@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { EN } from './i18n-en';
 import { loadLocalA11y } from './lib/a11y';
 import { SIMPLE } from './simple-pl';
@@ -56,6 +56,11 @@ function interpolate(s: string, vars?: Record<string, string | number>): string 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
   const [simple, setSimple] = useState<boolean>(() => loadLocalA11y().simpleLanguage);
+
+  // język strony (WCAG 3.1.1) także przy pierwszym wczytaniu — np. przeglądarka po angielsku bez zapisanego wyboru
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);

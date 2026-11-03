@@ -16,6 +16,12 @@ lekarze, rejestracja, administrator). Odpowiedzi API są nagrane z instancji pok
 zwykła strona — **tylko do odczytu**: zapis kończy się komunikatem „zmiany nie są zapisywane”, pliki PDF i CSV
 otwierają się w oknie na stronie, wideo nie działa. Czas w podglądzie płynie od chwili nagrania.
 
+**Przewodnik** (przycisk w prawym dolnym rogu, otwiera się sam przy pierwszym wejściu) opisuje aplikację i prowadzi
+po najważniejszych ekranach: kolejka lekarza, Medical Snapshot z pochodzeniem wyników, oś czasu i „Co się zmieniło”,
+Scribe z transkrypcją i notatką w 11 sekcjach, „Moje zdrowie” z avatarem 3D, wywiad czatowy, Eternal ID, integracje
+przez API. „Pokaż” przełącza konto pokazowe i otwiera ekran bez logowania. Karty pacjenta, „Moje zdrowie” i
+administracja przyjmują `?tab=` (np. `/panel/pacjenci/<id>?tab=timeline`, `/panel/admin?tab=integrations`).
+
 Ekran **„Moduły i funkcje”** (link na ekranie logowania i w menu, tylko w trybie demo) pokazuje wszystkie 42 moduły
 produktowe rejestru i 648 funkcji: co działa i gdzie to otworzyć, co jest w kolejce, czego sam kod nie zrobi i dlaczego.
 Dane pochodzą z [`FUNKCJE_648.md`](FUNKCJE_648.md) — po zmianie klasyfikacji: `npm run feature-map`.

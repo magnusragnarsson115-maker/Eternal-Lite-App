@@ -90,7 +90,10 @@ export function ModuleMapPage() {
   const [filter, setFilter] = useState<Filter>('all');
   const [q, setQ] = useState('');
   // wejście z innego ekranu (np. z dołu formularza logowania) — strona zaczyna się od góry
-  useEffect(() => window.scrollTo(0, 0), []);
+  // nawiasy klamrowe: nowsze przeglądarki zwracają z metod przewijania obietnicę, której React nie może użyć jako sprzątania
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const STATUS_LABEL: Record<Status, string> = {
     done: t('Działa'),

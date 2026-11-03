@@ -204,6 +204,12 @@ function shiftClock(recordedAt: string): void {
   window.Date = Shifted;
 }
 
+/** Przełączenie konta pokazowego bez logowania (przewodnik po podglądzie). */
+export function setPreviewPersona(id: string | null): void {
+  persona = id && data.personas[id] ? id : null;
+  writeState(persona);
+}
+
 export function installShim(d: PreviewData): void {
   data = d;
   const saved = readState();

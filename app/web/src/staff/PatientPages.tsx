@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BadgeCheck, CalendarPlus, FilePlus2, FileText, FlaskConical, KeyRound, MessageSquarePlus, Paperclip, Plus, Search, Trash2, UserPlus } from 'lucide-react';
-import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api, get, post, put, qs } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
@@ -163,7 +163,8 @@ interface ClinicalData {
   questionnaires: { id: string; authored: string; answers: { question: string; answer: string }[]; appointmentId: string }[];
 }
 
-type Tab = 'snapshot' | 'timeline' | 'data' | 'appointments' | 'records' | 'measurements' | 'medications' | 'questionnaires' | 'rehab' | 'diagnoses' | 'messages' | 'consents';
+const TAB_IDS = ['snapshot', 'timeline', 'data', 'appointments', 'records', 'measurements', 'medications', 'questionnaires', 'rehab', 'diagnoses', 'messages', 'consents'] as const;
+type Tab = (typeof TAB_IDS)[number];
 
 export function PatientDetailPage() {
   const { id = '' } = useParams();
@@ -172,7 +173,15 @@ export function PatientDetailPage() {
   const qc = useQueryClient();
   const toast = useToast();
   const clinician = hasRole(me, 'practitioner');
-  const [tab, setTab] = useState<Tab>(clinician ? 'snapshot' : 'data');
+  // ?tab= — link wprost do zakładki karty (np. oś czasu)
+  const [params] = useSearchParams();
+  const linked = TAB_IDS.find((x) => x === params.get('tab'));
+  const [tab, setTab] = useState<Tab>(linked ?? (clinician ? 'snapshot' : 'data'));
+  // ponowne przejście pod ten sam adres (nowy klucz lokalizacji) też otwiera wskazaną zakładkę
+  const { key: locKey } = useLocation();
+  useEffect(() => {
+    if (linked) setTab(linked);
+  }, [linked, locKey]);
   const [editOpen, setEditOpen] = useState(false);
   const [verifyOpen, setVerifyOpen] = useState(false);
   const [method, setMethod] = useState('id-card');

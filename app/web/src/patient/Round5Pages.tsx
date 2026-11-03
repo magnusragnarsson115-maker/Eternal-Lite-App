@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Fingerprint, MessageCircleQuestion, Nfc, Phone, QrCode, Send, ShieldCheck, Sparkles, Trash2 } from 'lucide-react';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { del, get, post, put, qs } from '../api';
 import { errorCode, errorMessage } from '../errors';
 import { useI18n } from '../i18n';
@@ -31,7 +31,14 @@ interface Correction {
 
 export function MyHealthPage() {
   const { t, fmt } = useI18n();
-  const [tab, setTab] = useState<'overview' | 'timeline'>('overview');
+  const [params] = useSearchParams();
+  const linked = params.get('tab') === 'timeline' ? 'timeline' : params.get('tab') === 'overview' ? 'overview' : null;
+  const [tab, setTab] = useState<'overview' | 'timeline'>(linked ?? 'overview');
+  // ponowne przejście pod ten sam adres (nowy klucz lokalizacji) też otwiera wskazaną zakładkę
+  const { key: locKey } = useLocation();
+  useEffect(() => {
+    if (linked) setTab(linked);
+  }, [linked, locKey]);
   const [region, setRegion] = useState<string | undefined>();
   const [detail, setDetail] = useState<string | null>(null);
   const q = useQuery({ queryKey: ['my-health'], queryFn: () => get<SnapshotResponse>('/api/me/health-snapshot') });
@@ -330,7 +337,9 @@ export function InterviewChatPage() {
     onError: (e) => toast(errorMessage(e, t), 'error'),
   });
   const back = useMutation({ mutationFn: () => post<IvView>(`/api/me/interviews/${id}/back`), onSuccess: (v) => qc.setQueryData(['interview', id], v) });
-  useEffect(() => end.current?.scrollIntoView({ block: 'end', behavior: 'smooth' }), [q.data?.transcript.length, q.data?.status]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }, [q.data?.transcript.length, q.data?.status]);
   if (q.isLoading) return <Skeleton count={3} />;
   if (q.isError) return <QueryError error={q.error} />;
   const v = q.data!;

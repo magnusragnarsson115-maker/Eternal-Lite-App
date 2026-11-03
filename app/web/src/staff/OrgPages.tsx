@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarPlus, CheckCircle2, CircleAlert, CircleDashed, Lock, MessagesSquare, ShieldCheck, Trash2, UserPlus } from 'lucide-react';
-import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { get, post, put, qs } from '../api';
 import { errorMessage } from '../errors';
 import { addDaysIso, clinicDate, useI18n } from '../i18n';
@@ -270,11 +270,19 @@ export function OutboxPage() {
 
 // --- administracja ---------------------------------------------------------------------------------------
 
-type AdminTab = 'settings' | 'users' | 'services' | 'integrations' | 'audit' | 'requests';
+const ADMIN_TABS = ['settings', 'users', 'services', 'integrations', 'audit', 'requests'] as const;
+type AdminTab = (typeof ADMIN_TABS)[number];
 
 export function AdminPage() {
   const { t } = useI18n();
-  const [tab, setTab] = useState<AdminTab>('settings');
+  const [params] = useSearchParams();
+  const linked = ADMIN_TABS.find((x) => x === params.get('tab'));
+  const [tab, setTab] = useState<AdminTab>(linked ?? 'settings');
+  // ponowne przejście pod ten sam adres (nowy klucz lokalizacji) też otwiera wskazaną zakładkę
+  const { key: locKey } = useLocation();
+  useEffect(() => {
+    if (linked) setTab(linked);
+  }, [linked, locKey]);
   return (
     <div className="stack-lg">
       <PageHead title={t('Administracja')} />

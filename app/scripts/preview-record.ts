@@ -210,8 +210,55 @@ async function staffExtras(page: Page): Promise<string[]> {
   await pageGet(page, urls);
   const found = (await pageGet(page, ['Kowalska', 'Wiśniewski', 'Lewandowska', 'Anna', 'Jan', 'Maria', 'Ko'].map((q) => `/api/staff/patients?q=${encodeURIComponent(q)}`))) as ({ items?: { id: string }[] } | null)[];
   const ids = new Set(found.flatMap((r) => r?.items?.map((i) => i.id) ?? []));
-  await page.waitForTimeout(500);
+  await round5StaffExtras(page, [...ids]);
   return [...ids].map((id) => `/panel/pacjenci/${id}`);
+}
+
+/** Runda 5: okna szczegółów (wynik → źródło, historia sprawy), filtry osi czasu, Scribe — otwierane przyciskami. */
+const TIMELINE_CATS = ['meds', 'tests', 'symptoms', 'visits', 'measurements', 'hospital', 'documents', 'diagnoses'];
+const NOTE_FORMATS = ['clinical', 'soap', 'discharge', 'summary', 'ehr', 'fhir'];
+
+type Snap = { snapshot?: { results?: { latest?: { key: string }[]; flagged?: { key: string }[] } } } | null;
+
+function resultKeys(s: Snap): string[] {
+  const r = s?.snapshot?.results;
+  return [...new Set([...(r?.latest ?? []), ...(r?.flagged ?? [])].map((x) => x.key))];
+}
+type Items = { items?: { id: string }[] } | null;
+
+async function round5StaffExtras(page: Page, patientIds: string[]): Promise<void> {
+  const ws = (await pageGet(page, ['/api/staff/workspace?scope=all', '/api/staff/workspace?scope=mine'])) as ({ items?: { case?: { id: string } }[] } | null)[];
+  const caseIds = new Set(ws.flatMap((w) => (w?.items ?? []).flatMap((i) => (i.case ? [i.case.id] : []))));
+  const snaps = (await pageGet(page, patientIds.map((id) => `/api/staff/patients/${id}/snapshot`))) as Snap[];
+  const urls: string[] = [];
+  patientIds.forEach((id, i) => {
+    for (const k of resultKeys(snaps[i])) urls.push(`/api/staff/patients/${id}/snapshot/result?key=${encodeURIComponent(k)}`);
+    urls.push(`/api/staff/patients/${id}/corrections`, `/api/staff/patients/${id}/photos`, `/api/staff/patients/${id}/interviews`);
+    for (const c of TIMELINE_CATS) urls.push(`/api/staff/patients/${id}/health-timeline?categories=${c}`);
+  });
+  await pageGet(page, urls);
+  const lists = (await pageGet(page, patientIds.flatMap((id) => [`/api/staff/cases?patientId=${id}`, `/api/staff/cases?includeClosed=1&patientId=${id}`]))) as Items[];
+  for (const l of lists) for (const c of l?.items ?? []) caseIds.add(c.id);
+  await pageGet(page, [...caseIds].map((id) => `/api/staff/cases/${id}`));
+  const scribe = (await pageGet(page, patientIds.map((id) => `/api/staff/scribe?patientId=${id}`))) as Items[];
+  const sessions = scribe.flatMap((l) => (l?.items ?? []).map((x) => x.id));
+  await pageGet(
+    page,
+    sessions.flatMap((id) => [`/api/staff/scribe/${id}`, `/api/staff/scribe/${id}/transcript-edits`, `/api/staff/scribe/${id}/versions`, `/api/staff/scribe/${id}/export`, ...NOTE_FORMATS.map((f) => `/api/staff/scribe/${id}/format/${f}`)]),
+  );
+  await page.waitForTimeout(500);
+}
+
+async function round5PatientExtras(page: Page): Promise<void> {
+  const [snap, ivs] = (await pageGet(page, ['/api/me/health-snapshot', '/api/me/interviews'])) as [Snap, Record<string, unknown> | null];
+  const urls = resultKeys(snap).map((k) => `/api/me/health-snapshot/result?key=${encodeURIComponent(k)}`);
+  urls.push('/api/me/corrections', ...TIMELINE_CATS.map((c) => `/api/me/health-timeline?categories=${c}`));
+  for (const [k, v] of Object.entries(ivs ?? {})) {
+    if (k === 'available' || !Array.isArray(v)) continue;
+    for (const x of v as { id?: string }[]) if (x?.id) urls.push(`/api/me/interviews/${x.id}`);
+  }
+  await pageGet(page, urls);
+  await page.waitForTimeout(500);
 }
 
 async function fetchFiles(ctx: BrowserContext, files: Set<string>, routes: Record<string, Recorded>): Promise<void> {
@@ -257,6 +304,7 @@ async function main() {
       for (const f of await crawl(page, await staffExtras(page), inScope)) files.add(f);
     } else {
       await patientExtras(page);
+      await round5PatientExtras(page);
     }
     if (p.id === 'patient') {
       // profil dziecka / osoby pod opieką (A24.2): te same ekrany w imieniu tej osoby
