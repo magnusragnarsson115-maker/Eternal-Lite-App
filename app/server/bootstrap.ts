@@ -14,6 +14,9 @@ import { runMonthlyReports } from './services/reports.js';
 import { runMedReminderSweep } from './services/medReminders.js';
 import { runAirAlertSweep } from './services/environment.js';
 import { runCustomReminderSweep, runMorningSweep, runPreventiveSweep } from './services/personalReminders.js';
+import { runValidicSweep } from './integrations/validic.js';
+import { runDocplannerSweep } from './integrations/docplanner.js';
+import { listOrganizations } from './services/orgs.js';
 
 export async function initCore(): Promise<void> {
   initDatabase(path.join(config.dataDir, 'eternal.sqlite'));
@@ -52,6 +55,8 @@ export function startJobs(log: (msg: string, err?: unknown) => void): () => void
     every(60_000, 'morning summary', runMorningSweep),
     every(60 * 60_000, 'preventive reminders', runPreventiveSweep),
     every(60 * 60_000, 'air quality alerts', runAirAlertSweep),
+    every(6 * 60 * 60_000, 'validic sync', runValidicSweep),
+    every(10 * 60_000, 'docplanner sync', async () => runDocplannerSweep((await listOrganizations()).map((o) => o.id))),
     setInterval(() => void runReminderSweep().catch((err) => log('reminder sweep failed', err)), 60_000),
     setInterval(() => void processOutbox().catch((err) => log('outbox failed', err)), 30_000),
     setInterval(() => {

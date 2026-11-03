@@ -20,6 +20,7 @@ import { authRoutes } from './routes/auth.js';
 import { eventRoutes } from './routes/events.js';
 import { everydayRoutes } from './routes/everyday.js';
 import { workspaceRoutes } from './routes/workspace.js';
+import { partnerRoutes } from './routes/partners.js';
 import { familyRoutes } from './routes/family.js';
 import { healthRoutes } from './routes/health.js';
 import { fhirRoutes } from './routes/fhir.js';
@@ -182,6 +183,7 @@ export async function buildApp(opts: { logger?: boolean } = {}): Promise<Fastify
   await app.register(healthRoutes);
   await app.register(everydayRoutes);
   await app.register(workspaceRoutes);
+  await app.register(partnerRoutes);
   await app.register(staffRoutes);
   await app.register(adminRoutes);
   await app.register(fhirRoutes);

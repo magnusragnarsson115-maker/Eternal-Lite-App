@@ -9,6 +9,7 @@ import { useSession } from '../session';
 import type { LocationView, PractitionerView, ServiceView, ThreadView } from '../types';
 import { Badge, Button, Card, Checkbox, Empty, Modal, Notice, PageHead, QueryError, SelectField, Skeleton, Tabs, TextArea, TextField, useToast } from '../ui';
 import { ThreadConversation } from '../ui/ThreadView';
+import { PartnersPanel } from './PartnersPanel';
 
 // --- wiadomości --------------------------------------------------------------------------------------
 
@@ -649,6 +650,7 @@ function IntegrationsTab() {
           </Card>
         ))}
       </div>
+      <PartnersPanel />
     </div>
   );
 }

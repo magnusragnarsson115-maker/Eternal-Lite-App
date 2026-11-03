@@ -117,6 +117,30 @@ export const config = {
     release: str('ICD11_RELEASE', '2025-01'),
   },
 
+  /** Validic Inform REST API v2 (agregator urządzeń) — konto organizacji Validic. */
+  validic: {
+    orgId: str('VALIDIC_ORG_ID'),
+    token: str('VALIDIC_TOKEN'),
+    baseUrl: str('VALIDIC_BASE_URL', 'https://api.v2.validic.com'),
+  },
+  /** Docplanner / ZnanyLekarz Integrations API v3 — synchronizacja terminów i rezerwacji (klienci Docplanner). */
+  docplanner: {
+    domain: str('DOCPLANNER_DOMAIN', 'https://www.znanylekarz.pl'),
+    clientId: str('DOCPLANNER_CLIENT_ID'),
+    clientSecret: str('DOCPLANNER_CLIENT_SECRET'),
+  },
+  /** Infermedica Engine API v3 — wyłącznie po udokumentowanej ocenie zgodności MDR produktu (patrz COMPLIANCE §1). */
+  infermedica: {
+    appId: str('INFERMEDICA_APP_ID'),
+    appKey: str('INFERMEDICA_APP_KEY'),
+    baseUrl: str('INFERMEDICA_BASE_URL', 'https://api.infermedica.com/v3'),
+    model: str('INFERMEDICA_MODEL'),
+  },
+  /** Licencjonowana przeglądarka 3D badań obrazowych placówki (np. anatomia z CT/MR) — uruchamiana linkiem. */
+  imagingViewer: {
+    url: str('IMAGING_VIEWER_URL'),
+    name: str('IMAGING_VIEWER_NAME', 'przeglądarka 3D'),
+  },
   /** Sekrety webhooków platform RPM, format: "vitalera:sekret,inna:sekret2". */
   rpmWebhookSecrets: Object.fromEntries(
     str('RPM_WEBHOOK_SECRETS')
@@ -166,13 +190,20 @@ export const config = {
 
   /** Odczyt dokumentów (decyzja D51: Mistral OCR 4 albo Google Document AI — wybór testem). */
   ocr: {
-    provider: str('OCR_PROVIDER') as '' | 'mistral' | 'google',
+    provider: str('OCR_PROVIDER') as '' | 'mistral' | 'google' | 'textract',
     mistralModel: str('MISTRAL_OCR_MODEL', 'mistral-ocr-latest'),
     google: {
       credentialsFile: str('GOOGLE_APPLICATION_CREDENTIALS'),
       projectId: str('GOOGLE_DOCAI_PROJECT'),
       location: str('GOOGLE_DOCAI_LOCATION', 'eu'),
       processorId: str('GOOGLE_DOCAI_PROCESSOR'),
+    },
+    /** Amazon Textract (DetectDocumentText) — region UE (Frankfurt); darmowy pakiet AWS: 1000 stron/mies. przez 3 miesiące. */
+    textract: {
+      region: str('AWS_REGION', 'eu-central-1'),
+      accessKeyId: str('AWS_ACCESS_KEY_ID'),
+      secretAccessKey: str('AWS_SECRET_ACCESS_KEY'),
+      sessionToken: str('AWS_SESSION_TOKEN'),
     },
   },
 
@@ -182,7 +213,11 @@ export const config = {
     elevenlabs: {
       apiKey: str('ELEVENLABS_API_KEY'),
       baseUrl: str('ELEVENLABS_BASE_URL', 'https://api.eu.residency.elevenlabs.io'),
-      model: str('ELEVENLABS_STT_MODEL', 'scribe_v2'),
+      // Scribe v2 Medical (GA 2026): model kliniczny, ta sama cena co scribe_v2; słownik terminów — dodatkowo płatny
+      model: str('ELEVENLABS_STT_MODEL', 'scribe_v2_medical'),
+      keyterms: str('ELEVENLABS_KEYTERMS', 'off') === 'on',
+      /** Tryb zerowej retencji (enable_logging=false) — dostępny w planach firmowych ElevenLabs. */
+      zeroRetention: str('ELEVENLABS_ZERO_RETENTION', 'off') === 'on',
     },
     azure: { key: str('AZURE_SPEECH_KEY'), region: str('AZURE_SPEECH_REGION', 'westeurope') },
     openai: {

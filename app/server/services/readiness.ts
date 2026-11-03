@@ -14,6 +14,9 @@ import { monitoringEnabled } from '../lib/monitoring.js';
 import { sbomFile, sbomSummary } from '../lib/sbom.js';
 import { pdfAvailable, renderPdf } from '../pdf/render.js';
 import { z } from 'zod';
+import { docplannerConfigured } from '../integrations/docplanner.js';
+import { infermedicaConfigured, regulatoryAck } from '../integrations/infermedica.js';
+import { validicConfigured } from '../integrations/validic.js';
 
 /**
  * Gotowość do pracy: dla każdego składnika — czy działa naprawdę, czy w trybie demonstracyjnym, czy jest wyłączony,
@@ -183,7 +186,7 @@ function items(): ReadinessItem[] {
     name: 'Mowa na tekst (Scribe)',
     state: stt === 'service' ? 'ok' : stt === 'demo' ? 'demo' : 'missing',
     detail: stt === 'service' ? `${config.stt.provider}` : stt === 'demo' ? 'tryb demo: zamiast nagrania używana jest przykładowa rozmowa' : 'wyłączona — Scribe tylko w trybie „notatka bez nagrania”',
-    howTo: stt === 'service' ? undefined : 'Decyzja D48 (test 20 nagrań): STT_PROVIDER=elevenlabs + ELEVENLABS_API_KEY (rezydencja UE) albo azure + AZURE_SPEECH_KEY albo openai + OPENAI_API_KEY (projekt z rezydencją UE).',
+    howTo: stt === 'service' ? undefined : 'Decyzja D48 (test 20 nagrań): STT_PROVIDER=elevenlabs + ELEVENLABS_API_KEY (rezydencja UE, model scribe_v2_medical; ELEVENLABS_KEYTERMS=on — słownik leków i badań, dodatkowo płatny; ELEVENLABS_ZERO_RETENTION=on — plan firmowy) albo azure + AZURE_SPEECH_KEY albo openai + OPENAI_API_KEY (projekt z rezydencją UE). Bez kosztu: własny serwer Whisper zgodny z API OpenAI (STT_PROVIDER=openai, OPENAI_BASE_URL=adres serwera).',
   });
   const ocr = ocrConfigured();
   add({
@@ -192,7 +195,7 @@ function items(): ReadinessItem[] {
     name: 'Odczyt zdjęć i skanów (OCR)',
     state: ocr ? 'ok' : 'warn',
     detail: ocr ? `${config.ocr.provider}` : 'PDF z warstwą tekstu (portale laboratoriów) działa bez dostawcy; zdjęcia i skany — nieodczytane (lekarz zobaczy oryginał)',
-    howTo: ocr ? undefined : 'Decyzja D51 (test 100 wyników): OCR_PROVIDER=mistral + MISTRAL_API_KEY albo OCR_PROVIDER=google + GOOGLE_DOCAI_* (region eu).',
+    howTo: ocr ? undefined : 'Decyzja D51 (test 100 wyników): OCR_PROVIDER=mistral + MISTRAL_API_KEY, OCR_PROVIDER=google + GOOGLE_DOCAI_* (region eu) albo OCR_PROVIDER=textract + AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY (AWS_REGION=eu-central-1; darmowy pakiet 1000 stron/mies. przez 3 miesiące).',
   });
   add({
     id: 'pdf',
@@ -254,6 +257,40 @@ function items(): ReadinessItem[] {
     state: config.mobile.iosStoreUrl || config.mobile.androidStoreUrl ? 'ok' : 'warn',
     detail: `najniższa obsługiwana ${config.mobile.minVersion}, najnowsza ${config.mobile.latestVersion}; sklepy: ${yes(config.mobile.iosStoreUrl)} (iOS), ${yes(config.mobile.androidStoreUrl)} (Android)`,
     howTo: config.mobile.iosStoreUrl || config.mobile.androidStoreUrl ? undefined : 'Po publikacji w sklepach: MOBILE_IOS_STORE_URL, MOBILE_ANDROID_STORE_URL; w mobile/app.json — extra.eas.projectId (push).',
+  });
+
+  // --- partnerzy przez API (runda 5) ---
+  add({
+    id: 'validic',
+    group: 'Partnerzy (API)',
+    name: 'Urządzenia pacjenta przez Validic Inform',
+    state: validicConfigured() ? 'ok' : 'warn',
+    detail: validicConfigured() ? `organizacja ${config.validic.orgId}` : 'niepołączone — pomiary z Withings, Bluetooth, Apple Health i Health Connect działają bez Validic',
+    howTo: validicConfigured() ? undefined : 'Konto organizacji Validic (wersja próbna dla deweloperów, potem umowa): VALIDIC_ORG_ID, VALIDIC_TOKEN.',
+  });
+  add({
+    id: 'docplanner',
+    group: 'Partnerzy (API)',
+    name: 'ZnanyLekarz / Docplanner — terminy i rezerwacje',
+    state: docplannerConfigured() ? 'ok' : 'warn',
+    detail: docplannerConfigured() ? config.docplanner.domain : 'niepołączone — rezerwacje tylko w Eternal',
+    howTo: docplannerConfigured() ? undefined : 'Klucze API z panelu Docplanner (dla klientów Docplanner): DOCPLANNER_CLIENT_ID, DOCPLANNER_CLIENT_SECRET; potem mapowanie lekarzy i usług w panelu administratora.',
+  });
+  add({
+    id: 'infermedica',
+    group: 'Partnerzy (API)',
+    name: 'Wywiad objawowy Infermedica (wyrób medyczny)',
+    state: infermedicaConfigured() && regulatoryAck() ? 'ok' : 'warn',
+    detail: !infermedicaConfigured() ? 'wyłączony — działa wywiad z pytaniami zatwierdzonymi przez lekarza' : regulatoryAck() ? `ocena zgodności: ${regulatoryAck()!.reference}` : 'klucze ustawione, ale silnik zablokowany do czasu wpisania oceny zgodności MDR produktu',
+    howTo: infermedicaConfigured() && regulatoryAck() ? undefined : 'INFERMEDICA_APP_ID, INFERMEDICA_APP_KEY (wersja próbna: do 2000 wywołań) oraz w panelu administratora referencja oceny zgodności MDR produktu z silnikiem i umowa powierzenia danych.',
+  });
+  add({
+    id: 'imaging-viewer',
+    group: 'Partnerzy (API)',
+    name: 'Przeglądarka 3D badań obrazowych',
+    state: config.imagingViewer.url ? 'ok' : 'warn',
+    detail: config.imagingViewer.url ? config.imagingViewer.name : 'brak — avatar w aplikacji pokazuje tylko, gdzie są dane (nie anatomię z badań)',
+    howTo: config.imagingViewer.url ? undefined : 'Licencjonowana przeglądarka placówki (certyfikowana do anatomii 3D z CT/MR): IMAGING_VIEWER_URL z {patientId} albo {eternalId}, IMAGING_VIEWER_NAME.',
   });
   return out;
 }

@@ -176,13 +176,21 @@ interface IvView {
   createdAt: string;
   completedAt?: string;
   notice: string;
+  engine?: 'tree' | 'infermedica';
+  engineResult?: { triageLevel: string; label: string; serious: string[]; source: string };
 }
 
 export function InterviewListPage() {
   const { t, fmt } = useI18n();
   const nav = useNavigate();
   const toast = useToast();
-  const q = useQuery({ queryKey: ['interviews'], queryFn: () => get<{ available: { id: string; title: string; description: string; approved: boolean }[]; items: IvView[] }>('/api/me/interviews') });
+  const q = useQuery({ queryKey: ['interviews'], queryFn: () => get<{ available: { id: string; title: string; description: string; approved: boolean }[]; items: IvView[]; engine?: { available: boolean } }>('/api/me/interviews') });
+  const [symptoms, setSymptoms] = useState('');
+  const engine = useMutation({
+    mutationFn: () => post<IvView>('/api/me/interviews/engine', { text: symptoms, appointmentId: appt || undefined }),
+    onSuccess: (v) => nav(`/wywiad/${v.id}`),
+    onError: (e) => toast(errorMessage(e, t), 'error'),
+  });
   const appts = useQuery({ queryKey: ['appointments'], queryFn: () => get<{ items: AppointmentView[] }>('/api/me/appointments') });
   const [appt, setAppt] = useState('');
   const start = useMutation({
@@ -206,6 +214,17 @@ export function InterviewListPage() {
             </option>
           ))}
         </SelectField>
+      )}
+      {q.data!.engine?.available && (
+        <Card title={t('Asystent objawów (Infermedica)')}>
+          <p className="small muted">{t('Opisz własnymi słowami, co Ci dolega. Kolejne pytania dobiera certyfikowany wyrób medyczny Infermedica; na końcu zobaczysz jego zalecenie, gdzie się zgłosić. To nie jest rozpoznanie.')}</p>
+          <TextField label={t('Co Ci dolega?')} value={symptoms} onChange={(e) => setSymptoms(e.target.value)} maxLength={2000} />
+          <div className="btn-row" style={{ marginTop: 8 }}>
+            <Button size="sm" disabled={symptoms.trim().length < 3} loading={engine.isPending} onClick={() => engine.mutate()}>
+              {t('Rozpocznij')}
+            </Button>
+          </div>
+        </Card>
       )}
       <div className="grid-2">
         {q.data!.available.map((x) => (
@@ -343,6 +362,20 @@ export function InterviewChatPage() {
         )}
         <div ref={end} />
       </div>
+      {v.engineResult && (
+        <Notice kind={/emergency/.test(v.engineResult.triageLevel) ? 'danger' : 'info'} title={t('Zalecenie wyrobu medycznego Infermedica')}>
+          <p style={{ margin: 0 }}>
+            <strong>{t(v.engineResult.label)}</strong>
+          </p>
+          {v.engineResult.serious.length > 0 && <p className="small" style={{ margin: '6px 0 0' }}>{t('Objawy, które wymagają uwagi')}: {v.engineResult.serious.join(', ')}</p>}
+          <p className="small muted" style={{ margin: '6px 0 0' }}>{v.engineResult.source}</p>
+          {/emergency/.test(v.engineResult.triageLevel) && (
+            <a className="btn danger" href="tel:112" style={{ marginTop: 8 }}>
+              <Phone size={18} /> 112
+            </a>
+          )}
+        </Notice>
+      )}
       {v.status === 'completed' && sum && (
         <Card title={t('Podsumowanie dla lekarza')}>
           <ul className="plain stack-sm">

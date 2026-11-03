@@ -1,4 +1,5 @@
-import type { Composition, Consent, DocumentReference, Patient } from '@medplum/fhirtypes';
+import type { Composition, Consent, DocumentReference, MedicationStatement, Patient } from '@medplum/fhirtypes';
+import { LAB_TESTS } from '../labs/dictionary.js';
 import { redactIdentifiers } from '../lib/redact.js';
 import { audit, type AuditActor } from '../audit.js';
 import { aiMode, runAiTask } from '../ai/gateway.js';
@@ -422,7 +423,8 @@ export async function processSession(id: string): Promise<void> {
     let transcript: Transcript;
     try {
       const audio = await fhirSystem().readBinary(row.audio_binary_id);
-      transcript = await transcribe(audio.data, row.audio_content_type ?? audio.contentType);
+      const participants = row.participants ? (JSON.parse(row.participants) as Participant[]) : [];
+      transcript = await transcribe(audio.data, row.audio_content_type ?? audio.contentType, { speakers: participants.length || 2, keyterms: await scribeKeyterms(row.patient_ref) });
     } catch (err) {
       save(id, { status: 'failed', error: err instanceof AiError ? `stt_${err.code}` : 'stt_failed' });
       publish(row);
@@ -829,6 +831,19 @@ export function scribeCapabilities() {
 }
 
 // --- runda 5: uczestnicy, poprawki transkrypcji, akcje na sekcjach, formaty ------------------------------------
+
+/**
+ * Słownik terminów dla rozpoznawania mowy (Scribe v2 Medical, „keyterms”): leki z listy pacjenta i nazwy badań
+ * ze słownika laboratoriów. Bez danych identyfikujących — tylko nazwy leków i badań.
+ */
+export async function scribeKeyterms(patientRef: string): Promise<string[]> {
+  const meds = await fhir()
+    .search<MedicationStatement>('MedicationStatement', { subject: patientRef, status: 'active', _count: '50' })
+    .catch(() => [] as MedicationStatement[]);
+  const medNames = meds.map((m) => (m.medicationCodeableConcept?.text ?? '').split(/\s+\d/)[0].trim()).filter((x) => x.length >= 3);
+  const labs = LAB_TESTS.map((t) => t.pl).filter((x) => x.length <= 50);
+  return [...new Set([...medNames, ...labs])].slice(0, 100);
+}
 
 function cleanParticipants(list: Participant[]): Participant[] {
   if (list.length > 8) throw badRequest('too_many');

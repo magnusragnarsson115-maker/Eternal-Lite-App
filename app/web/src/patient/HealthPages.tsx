@@ -11,7 +11,7 @@ import { BLE_PROFILES, bluetoothSupported, readFromDevice, type BleKind, type Bl
 import type { MeasurementView, MedicationView, VitalKind } from '../types';
 import { Badge, Button, Card, Combobox, Empty, FullText, Modal, Notice, PageHead, QueryError, Segmented, SelectField, Skeleton, Switch, TextField, useConfirm, useToast } from '../ui';
 import { TrendChart } from '../ui/TrendChart';
-import { ActivityCard } from './ActivityCard';
+import { ActivityCard, ValidicCard } from './ActivityCard';
 
 const KINDS: { value: VitalKind; label: string; unit: string }[] = [
   { value: 'bp', label: 'Ciśnienie', unit: 'mmHg' },
@@ -294,6 +294,7 @@ export function MeasurementsPage() {
         </Card>
       </div>
       <ActivityCard />
+      <ValidicCard />
 
       <AddMeasurementModal open={addOpen} onClose={() => setAddOpen(false)} initialKind={kind} />
       <ImportMeasurementsModal open={importOpen} onClose={() => setImportOpen(false)} />

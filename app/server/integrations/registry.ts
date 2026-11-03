@@ -8,6 +8,10 @@ import { importedIcd10Count } from '../services/diagnoses.js';
 import { rpmProviders } from './rpm.js';
 import { icd11Configured, searchLoinc } from './terminology.js';
 import { withingsConfigured } from './withings.js';
+import { validicConfigured } from './validic.js';
+import { docplannerConfigured } from './docplanner.js';
+import { infermedicaConfigured, regulatoryAck } from './infermedica.js';
+import { ocrConfigured } from '../ai/ocr.js';
 
 export type IntegrationStatus = 'active' | 'not-configured' | 'disabled' | 'requires-agreement' | 'requires-certification';
 export type IntegrationCost = 'free' | 'free-registration' | 'paid' | 'partner';
@@ -175,6 +179,66 @@ function base(): IntegrationInfo[] {
       purpose: 'Odbiór pomiarów zdalnego monitorowania jako FHIR Observation, podpis HMAC. Vitalera udostępnia API po umowie partnerskiej.',
       config: `RPM_WEBHOOK_SECRETS="vitalera:…" (aktywni dostawcy: ${rpmProviders().join(', ') || 'brak'})`,
       docs: 'https://vitalera.io',
+    },
+    {
+      id: 'validic-inform',
+      name: 'Validic Inform (REST API v2)',
+      category: 'devices',
+      cost: 'partner',
+      status: validicConfigured() ? 'active' : 'requires-agreement',
+      purpose: 'Jeden dostęp do setek urządzeń i aplikacji zdrowotnych: pacjent łączy konta na stronie Validic Marketplace, aplikacja pobiera pomiary, sen i kroki przez API (bez widżetów). Identyfikator u Validic bez danych osobowych.',
+      config: 'VALIDIC_ORG_ID, VALIDIC_TOKEN (wersja próbna dla deweloperów, potem umowa)',
+      docs: 'https://helpdocs.validic.com/docs/inform-rest-api',
+    },
+    {
+      id: 'docplanner',
+      name: 'Docplanner / ZnanyLekarz — Integrations API v3',
+      category: 'telemedicine',
+      cost: 'partner',
+      status: docplannerConfigured() ? 'active' : 'requires-agreement',
+      purpose: 'Dwukierunkowa synchronizacja: wolne terminy z kalendarza Eternal do ZnanyLekarz, rezerwacje i odwołania z ZnanyLekarz jako wizyty. Zamiast widżetu rezerwacji na stronie.',
+      config: 'DOCPLANNER_CLIENT_ID, DOCPLANNER_CLIENT_SECRET (DOCPLANNER_DOMAIN, domyślnie znanylekarz.pl); mapowanie w panelu administratora',
+      docs: 'https://integrations.docplanner.com/docs/',
+    },
+    {
+      id: 'infermedica',
+      name: 'Infermedica Engine API v3 (wywiad objawowy, triaż)',
+      category: 'telemedicine',
+      cost: 'paid',
+      status: !infermedicaConfigured() ? 'not-configured' : regulatoryAck() ? 'active' : 'requires-certification',
+      purpose: 'Dynamicznie dobierane pytania i triaż. Wyrób medyczny klasy IIb (MDR) dostawcy — jego certyfikat nie obejmuje produktu integrującego, dlatego silnik działa dopiero po wpisaniu oceny zgodności MDR produktu.',
+      config: 'INFERMEDICA_APP_ID, INFERMEDICA_APP_KEY (próba: 2000 wywołań), INFERMEDICA_MODEL (opcjonalnie); referencja oceny zgodności w panelu',
+      docs: 'https://developer.infermedica.com/docs/v3/quickstart',
+    },
+    {
+      id: 'elevenlabs-scribe',
+      name: 'ElevenLabs Scribe v2 Medical (mowa na tekst)',
+      category: 'telemedicine',
+      cost: 'paid',
+      status: config.stt.provider === 'elevenlabs' && config.stt.elevenlabs.apiKey ? 'active' : 'not-configured',
+      purpose: 'Transkrypcja wizyty z rozpoznawaniem mówców i znacznikami czasu, model medyczny; słownik terminów (leki, badania) opcjonalnie; rezydencja danych w UE, tryb zerowej retencji w planach firmowych.',
+      config: 'STT_PROVIDER=elevenlabs, ELEVENLABS_API_KEY, ELEVENLABS_STT_MODEL=scribe_v2_medical, ELEVENLABS_KEYTERMS=on|off, ELEVENLABS_ZERO_RETENTION=on|off',
+      docs: 'https://elevenlabs.io/docs/capabilities/speech-to-text',
+    },
+    {
+      id: 'aws-textract',
+      name: 'Amazon Textract (odczyt zdjęć i skanów)',
+      category: 'public-data',
+      cost: 'paid',
+      status: config.ocr.provider === 'textract' && ocrConfigured() ? 'active' : 'not-configured',
+      purpose: 'OCR zdjęć wyników i jednostronicowych skanów (DetectDocumentText) w regionie Frankfurt; linie z położeniem do podświetlenia w oryginale. Darmowy pakiet AWS: 1000 stron miesięcznie przez 3 miesiące.',
+      config: 'OCR_PROVIDER=textract, AWS_REGION=eu-central-1, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY',
+      docs: 'https://aws.amazon.com/textract/pricing/',
+    },
+    {
+      id: 'imaging-viewer',
+      name: 'Przeglądarka 3D badań obrazowych (licencja placówki)',
+      category: 'telemedicine',
+      cost: 'partner',
+      status: config.imagingViewer.url ? 'active' : 'not-configured',
+      purpose: 'Uruchomienie z karty pacjenta licencjonowanej przeglądarki anatomii 3D z CT/MR (wyrób medyczny, np. z integracją z systemem szpitalnym). Link z identyfikatorem rekordu, bez PESEL.',
+      config: 'IMAGING_VIEWER_URL (z {patientId} albo {eternalId}), IMAGING_VIEWER_NAME',
+      docs: 'https://www.avatarmedical.ai',
     },
     {
       id: 'jitsi',

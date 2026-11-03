@@ -3,16 +3,17 @@ import { importPKCS8, SignJWT } from 'jose';
 import { config } from '../config.js';
 import { fetchWithTimeout } from '../lib/util.js';
 import type { DocLine } from '../labs/parser.js';
+import { signRequest } from '../lib/sigv4.js';
 import { AiError } from './types.js';
 
 /**
  * Odczyt dokumentów (moduł R5 / P3).
  * 1. PDF z warstwą tekstową (większość wyników z portali laboratoriów) — odczyt lokalny, bez wysyłania pliku (0 zł).
- * 2. Zdjęcie albo skan — usługa odczytu wybrana testem D51: Mistral OCR albo Google Document AI (region UE).
+ * 2. Zdjęcie albo skan — usługa odczytu wybrana testem D51: Mistral OCR, Google Document AI albo Amazon Textract (region UE).
  */
 
 export interface OcrResult {
-  provider: 'pdf-text' | 'mistral' | 'google';
+  provider: 'pdf-text' | 'mistral' | 'google' | 'textract';
   lines: DocLine[];
   pages: number;
 }
@@ -20,6 +21,7 @@ export interface OcrResult {
 export function ocrConfigured(): boolean {
   if (config.ocr.provider === 'mistral') return !!config.ai.mistralApiKey;
   if (config.ocr.provider === 'google') return !!(config.ocr.google.credentialsFile && config.ocr.google.projectId && config.ocr.google.processorId);
+  if (config.ocr.provider === 'textract') return !!(config.ocr.textract.accessKeyId && config.ocr.textract.secretAccessKey);
   return false;
 }
 
@@ -198,6 +200,64 @@ async function googleOcr(data: Buffer, contentType: string): Promise<OcrResult> 
   return { provider: 'google', lines, pages: pages.length };
 }
 
+// --- Amazon Textract ---------------------------------------------------------------------------------
+
+interface TextractBlock {
+  BlockType?: string;
+  Text?: string;
+  Page?: number;
+  Geometry?: { BoundingBox?: { Left?: number; Top?: number; Width?: number; Height?: number } };
+}
+
+/** Linie z odpowiedzi DetectDocumentText → DocLine (strona, tekst, prostokąt 0–1 do podświetlenia w oryginale). */
+export function textractLines(blocks: TextractBlock[]): { lines: DocLine[]; pages: number } {
+  const lines: DocLine[] = [];
+  let pages = 0;
+  for (const b of blocks) {
+    if (b.BlockType === 'PAGE') pages++;
+    if (b.BlockType !== 'LINE' || !b.Text?.trim()) continue;
+    const bb = b.Geometry?.BoundingBox;
+    const box: [number, number, number, number] | undefined =
+      bb && bb.Left !== undefined && bb.Top !== undefined ? [round4(bb.Left), round4(bb.Top), round4(bb.Left + (bb.Width ?? 0)), round4(bb.Top + (bb.Height ?? 0))] : undefined;
+    lines.push({ page: b.Page ?? 1, text: b.Text.replace(/\s+/g, ' ').trim(), box });
+  }
+  return { lines, pages: Math.max(pages, 1) };
+}
+
+/**
+ * Wywołanie synchroniczne (JPEG, PNG, jednostronicowy PDF/TIFF, do 10 MB). Wielostronicowe skany PDF wymagają
+ * trybu asynchronicznego z S3 — wtedy zwracamy błąd i lekarz widzi oryginał (PDF z warstwą tekstu czytamy lokalnie).
+ */
+async function textractOcr(data: Buffer, contentType: string): Promise<OcrResult> {
+  const c = config.ocr.textract;
+  if (data.length > 10 * 1024 * 1024) throw new AiError('bad_request', 'Textract: plik > 10 MB');
+  const host = `textract.${c.region}.amazonaws.com`;
+  const body = JSON.stringify({ Document: { Bytes: data.toString('base64') } });
+  const headers = signRequest({
+    method: 'POST',
+    host,
+    region: c.region,
+    service: 'textract',
+    headers: { 'content-type': 'application/x-amz-json-1.1', 'x-amz-target': 'Textract.DetectDocumentText' },
+    body,
+    credentials: { accessKeyId: c.accessKeyId, secretAccessKey: c.secretAccessKey, sessionToken: c.sessionToken || undefined },
+  });
+  const res = await fetchWithTimeout(`https://${host}/`, { method: 'POST', headers, body }, config.ai.timeoutMs).catch((err: Error) => {
+    throw new AiError('provider_unreachable', err.message);
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { __type?: string };
+    const type = (err.__type ?? '').split('#').pop() ?? '';
+    if (res.status === 400 && /UnsupportedDocument|BadDocument|DocumentTooLarge/.test(type)) throw new AiError('bad_request', `Textract ${type} (${contentType})`);
+    if (res.status === 400 && /Throttling|ProvisionedThroughput/.test(type)) throw new AiError('rate_limited', `Textract ${type}`);
+    if (res.status === 403 || /AccessDenied|UnrecognizedClient|InvalidSignature/.test(type)) throw new AiError('auth', `Textract ${res.status} ${type}`);
+    throw new AiError(res.status === 429 ? 'rate_limited' : 'provider_error', `Textract ${res.status} ${type}`);
+  }
+  const json = (await res.json()) as { Blocks?: TextractBlock[] };
+  const { lines, pages } = textractLines(json.Blocks ?? []);
+  return { provider: 'textract', lines, pages };
+}
+
 /** Odczyt dokumentu: najpierw lokalna warstwa tekstowa PDF, potem skonfigurowana usługa. */
 export async function readDocument(data: Buffer, contentType: string): Promise<OcrResult> {
   if (contentType === 'application/pdf') {
@@ -205,5 +265,6 @@ export async function readDocument(data: Buffer, contentType: string): Promise<O
     if (local) return local;
   }
   if (!ocrConfigured()) throw new AiError('not_configured', 'OCR provider not configured');
+  if (config.ocr.provider === 'textract') return textractOcr(data, contentType);
   return config.ocr.provider === 'google' ? googleOcr(data, contentType) : mistralOcr(data, contentType);
 }

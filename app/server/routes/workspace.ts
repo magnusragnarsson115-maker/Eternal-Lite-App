@@ -13,7 +13,7 @@ import { cardForIdToken, createIdLink, getInsurance, listIdLinks, nfcText, revok
 import { activeGrantsFor } from '../services/grants.js';
 import { listCorrections, listIntake, mappingCorrectionsCsv } from '../services/intake.js';
 import { qrSvg } from '../services/invites.js';
-import { answerInterview, availableInterviews, backInterview, getInterview, interviewsForStaff, listInterviews, startInterview } from '../services/interview.js';
+import { answerInterview, availableInterviews, backInterview, engineStatus, getInterview, interviewsForStaff, listInterviews, startInterview } from '../services/interview.js';
 import { staffOrgId } from '../services/orgs.js';
 import { createDocument, registerUpload } from '../services/records.js';
 import { getAppointment, toAppointmentView } from '../services/scheduling.js';
@@ -337,7 +337,7 @@ export async function workspaceRoutes(app: FastifyInstance): Promise<void> {
   // --- pacjent: wywiad czatowy ---------------------------------------------------------------------------------------
   app.get('/api/me/interviews', async (req) => {
     const auth = patient(req, 'interviews');
-    return { available: availableInterviews(), items: listInterviews(auth.patientRef) };
+    return { available: availableInterviews(), items: listInterviews(auth.patientRef), engine: engineStatus() };
   });
 
   app.post('/api/me/interviews', async (req) => {

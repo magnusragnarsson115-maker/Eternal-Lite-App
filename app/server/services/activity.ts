@@ -14,9 +14,9 @@ import { ORG_TAG_SYSTEM, vaultOrgId, withOrgTags } from '../tenancy.js';
  * Jeden dzień × rodzaj × źródło = jedna obserwacja (ponowny import nadpisuje ją, zamiast dublować).
  */
 
-export const ACTIVITY_SOURCES = ['healthkit', 'health-connect', 'withings', 'manual'] as const;
+export const ACTIVITY_SOURCES = ['healthkit', 'health-connect', 'withings', 'validic', 'manual'] as const;
 export type ActivitySource = (typeof ACTIVITY_SOURCES)[number];
-export const SOURCE_LABEL: Record<ActivitySource, string> = { healthkit: 'Apple Health', 'health-connect': 'Health Connect', withings: 'Withings', manual: 'wpis ręczny' };
+export const SOURCE_LABEL: Record<ActivitySource, string> = { healthkit: 'Apple Health', 'health-connect': 'Health Connect', withings: 'Withings', validic: 'Validic', manual: 'wpis ręczny' };
 
 const STEPS = { system: LOINC, code: '41950-7', display: 'Number of steps in 24 hour Measured' };
 const SLEEP = { system: LOINC, code: '93832-4', display: 'Sleep duration' };

@@ -8,6 +8,21 @@ import { fhirSystem } from '../fhir/index.js';
 import { badRequest, conflict, forbidden, newId, notFound, nowIso } from '../lib/util.js';
 import { orgIdsOf, vaultOrgId, withOrgTags } from '../tenancy.js';
 import { activeGrantsFor } from './grants.js';
+import type { Patient } from '@medplum/fhirtypes';
+import {
+  answerToEvidence,
+  diagnosis,
+  engineAvailable,
+  type EngineQuestion,
+  type Evidence,
+  newInterviewId,
+  parseText,
+  questionToNode,
+  regulatoryAck,
+  type Sex,
+  triage,
+  TRIAGE_PL,
+} from '../integrations/infermedica.js';
 
 /**
  * Wywiad czatowy przed wizytą (A12.4, A5.5). Silnik deterministyczny: bieżące pytanie → odpowiedź → następne pytanie
@@ -67,6 +82,24 @@ export interface InterviewView {
   createdAt: string;
   completedAt?: string;
   notice: string;
+  engine: 'tree' | 'infermedica';
+  /** Wynik triażu wyrobu medycznego Infermedica — tylko w trybie silnika, z oznaczeniem źródła. */
+  engineResult?: { triageLevel: string; label: string; serious: string[]; source: string };
+}
+
+export const ENGINE_TREE = 'infermedica';
+const ENGINE_VERSION = 'infermedica-engine-api-v3';
+const ENGINE_MAX_QUESTIONS = 30;
+
+interface EngineState {
+  sex: Sex;
+  age: number;
+  interviewId: string;
+  evidence: Evidence[];
+  labels: Record<string, string>;
+  current?: EngineQuestion;
+  steps: { question: EngineQuestion; answer: string; added: number }[];
+  result?: InterviewView['engineResult'];
 }
 
 const NOTICE = 'Odpowiedzi przeczyta lekarz — aplikacja ich nie ocenia. To nie jest zgłoszenie nagłego stanu: w nagłym zagrożeniu dzwoń 112.';
@@ -171,7 +204,30 @@ export function summarize(tree: IvTree, answers: Record<string, AnswerValue | nu
   return s;
 }
 
+function engineView(r: Row): InterviewView {
+  const st = JSON.parse(r.answers) as EngineState;
+  const ack = regulatoryAck();
+  return {
+    id: r.id,
+    treeId: r.tree_id,
+    title: 'Wywiad objawowy (silnik Infermedica)',
+    version: r.tree_version,
+    approved: !!ack,
+    status: r.status,
+    appointmentId: r.appointment_id ?? undefined,
+    transcript: st.steps.map((x, i) => ({ nodeId: `q${i + 1}`, question: x.question.text, answer: x.answer })),
+    current: r.status === 'in_progress' && st.current ? questionToNode(st.current, st.steps.length + 1) : undefined,
+    summary: r.summary ? (JSON.parse(r.summary) as InterviewSummary) : undefined,
+    createdAt: r.created_at,
+    completedAt: r.completed_at ?? undefined,
+    notice: 'Pytania dobiera i wynik triażu podaje wyrób medyczny Infermedica (klasa IIb wg MDR). To nie jest rozpoznanie. W nagłym zagrożeniu dzwoń 112.',
+    engine: 'infermedica',
+    engineResult: st.result,
+  };
+}
+
 function toView(r: Row): InterviewView {
+  if (r.tree_id === ENGINE_TREE) return engineView(r);
   const tree = interviewTree(r.tree_id);
   const answers = JSON.parse(r.answers) as Record<string, AnswerValue | null>;
   const path = JSON.parse(r.path) as string[];
@@ -196,6 +252,7 @@ function toView(r: Row): InterviewView {
     createdAt: r.created_at,
     completedAt: r.completed_at ?? undefined,
     notice: NOTICE,
+    engine: 'tree',
   };
 }
 
@@ -240,6 +297,7 @@ export function listInterviews(patientRef: string): InterviewView[] {
 export async function answerInterview(actor: AuditActor, patientRef: string, id: string, input: { nodeId: string; value: AnswerValue | null }): Promise<InterviewView> {
   const r = own(patientRef, id);
   if (r.status !== 'in_progress') throw conflict('interview_completed');
+  if (r.tree_id === ENGINE_TREE) return answerEngine(actor, r, input);
   const tree = interviewTree(r.tree_id);
   if (tree.version !== r.tree_version) throw conflict('interview_version_changed');
   const path = JSON.parse(r.path) as string[];
@@ -258,10 +316,17 @@ export async function answerInterview(actor: AuditActor, patientRef: string, id:
   // koniec — podsumowanie i zapis odpowiedzi jako QuestionnaireResponse (widoczny dla placówki tylko przy wizycie u niej)
   const summary = summarize(tree, answers, path);
   const view = toView({ ...r, answers: JSON.stringify(answers), path: JSON.stringify(path), status: 'completed' });
+  return complete(actor, r, view, summary, JSON.stringify(answers), `urn:eternal:interview:${tree.id}|${tree.version}`, path.length);
+}
+
+async function complete(actor: AuditActor, r: Row, view: InterviewView, summary: InterviewSummary, answersJson: string, questionnaire: string, answered: number): Promise<InterviewView> {
+  const patientRef = r.patient_ref;
+  const id = r.id;
+  const now = nowIso();
   const qr: QuestionnaireResponse = {
     resourceType: 'QuestionnaireResponse',
     status: 'completed',
-    questionnaire: `urn:eternal:interview:${tree.id}|${tree.version}`,
+    questionnaire,
     subject: { reference: patientRef },
     author: { reference: patientRef },
     source: { reference: patientRef },
@@ -275,8 +340,8 @@ export async function answerInterview(actor: AuditActor, patientRef: string, id:
   const saved = await fhirSystem().create<QuestionnaireResponse>(withOrgTags(qr, [r.org_id ?? vaultOrgId(patientRef)]));
   getDb()
     .prepare("UPDATE interview_session SET answers = ?, status = 'completed', summary = ?, response_ref = ?, completed_at = ?, updated_at = ? WHERE id = ?")
-    .run(JSON.stringify(answers), JSON.stringify(summary), `QuestionnaireResponse/${saved.id}`, now, now, id);
-  audit(actor, { action: 'C', subtype: 'interview-complete', entityRef: `QuestionnaireResponse/${saved.id}`, patientRef, detail: { interview: id, tree: tree.id, answers: path.length } });
+    .run(answersJson, JSON.stringify(summary), `QuestionnaireResponse/${saved.id}`, now, now, id);
+  audit(actor, { action: 'C', subtype: 'interview-complete', entityRef: `QuestionnaireResponse/${saved.id}`, patientRef, detail: { interview: id, tree: r.tree_id, answers: answered } });
   bus.publish({ type: 'questionnaire.changed', patientRef, resourceRef: r.appointment_id ? `Appointment/${r.appointment_id}` : undefined, orgIds: r.org_id ? [r.org_id] : undefined });
   return toView(rowById(id)!);
 }
@@ -285,6 +350,16 @@ export async function answerInterview(actor: AuditActor, patientRef: string, id:
 export function backInterview(actor: AuditActor, patientRef: string, id: string): InterviewView {
   const r = own(patientRef, id);
   if (r.status !== 'in_progress') throw conflict('interview_completed');
+  if (r.tree_id === ENGINE_TREE) {
+    const st = JSON.parse(r.answers) as EngineState;
+    const last = st.steps.pop();
+    if (last) {
+      st.evidence.splice(st.evidence.length - last.added, last.added);
+      st.current = last.question;
+      getDb().prepare('UPDATE interview_session SET answers = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(st), nowIso(), id);
+    }
+    return toView(rowById(id)!);
+  }
   const path = JSON.parse(r.path) as string[];
   if (path.length < 2) return toView(r);
   const answers = JSON.parse(r.answers) as Record<string, AnswerValue | null>;
@@ -304,4 +379,94 @@ export function interviewsForStaff(actor: AuditActor, orgId: string, patientId: 
   );
   audit(actor, { action: 'R', subtype: 'interview-staff-read', patientRef, detail: { count: rows.length } });
   return rows.map(toView);
+}
+
+// --- tryb silnika Infermedica (wyrób medyczny dostawcy; dostępny tylko po ocenie zgodności — integrations/infermedica.ts)
+
+function ageOf(birthDate: string | undefined, now = new Date()): number | undefined {
+  if (!birthDate) return undefined;
+  const b = new Date(`${birthDate}T00:00:00Z`);
+  let a = now.getUTCFullYear() - b.getUTCFullYear();
+  if (now.getUTCMonth() < b.getUTCMonth() || (now.getUTCMonth() === b.getUTCMonth() && now.getUTCDate() < b.getUTCDate())) a--;
+  return a;
+}
+
+export function engineStatus(): { available: boolean } {
+  return { available: engineAvailable() };
+}
+
+export async function startEngineInterview(actor: AuditActor, patientRef: string, input: { text: string; sex?: Sex; age?: number; appointmentId?: string }): Promise<InterviewView> {
+  if (!engineAvailable()) throw conflict('engine_not_available');
+  const p = await fhirSystem().read<Patient>('Patient', patientRef.split('/')[1]);
+  const sex = input.sex ?? (p.gender === 'male' || p.gender === 'female' ? p.gender : undefined);
+  const age = input.age ?? ageOf(p.birthDate);
+  if (!sex) throw badRequest('sex_required');
+  if (!age || age < 1 || age > 130) throw badRequest('age_required');
+  let orgId: string | null = null;
+  if (input.appointmentId) {
+    const appt = await fhirSystem().readOptional<Appointment>('Appointment', input.appointmentId);
+    if (!appt || !appt.participant.some((x) => x.actor?.reference === patientRef)) throw forbidden('not_your_appointment');
+    orgId = orgIdsOf(appt)[0] ?? null;
+  }
+  const interviewId = newInterviewId();
+  const parsed = await parseText(input.text, sex, age, interviewId);
+  if (!parsed.evidence.length) throw badRequest('no_symptoms_recognized');
+  const d = await diagnosis(sex, age, parsed.evidence, interviewId);
+  const st: EngineState = { sex, age, interviewId, evidence: parsed.evidence, labels: parsed.labels, current: d.question, steps: [] };
+  const id = newId();
+  const now = nowIso();
+  getDb()
+    .prepare('INSERT INTO interview_session (id, patient_ref, org_id, appointment_id, tree_id, tree_version, answers, path, status, created_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    .run(id, patientRef, orgId, input.appointmentId ?? null, ENGINE_TREE, ENGINE_VERSION, JSON.stringify(st), '[]', 'in_progress', actor.userId ?? null, now, now);
+  audit(actor, { action: 'C', subtype: 'interview-start', patientRef, detail: { interview: id, tree: ENGINE_TREE, initial: parsed.evidence.length } });
+  const row = rowById(id)!;
+  if (!d.question || d.should_stop) return finishEngine(actor, row, st);
+  return toView(row);
+}
+
+function engineSummary(st: EngineState): InterviewSummary {
+  const label = (id: string) => st.labels[id] ?? id;
+  return {
+    reason: st.evidence.filter((e) => e.source === 'initial' && e.choice_id === 'present').map((e) => label(e.id)),
+    symptoms: st.evidence.filter((e) => e.source !== 'initial' && e.choice_id === 'present').map((e) => label(e.id)),
+    negatives: st.evidence.filter((e) => e.choice_id === 'absent').map((e) => label(e.id)),
+    unsure: st.evidence.filter((e) => e.choice_id === 'unknown').map((e) => label(e.id)),
+    meds: [],
+    conditions: [],
+    allergies: [],
+    risk: [],
+    issues: [],
+    other: [],
+  };
+}
+
+async function finishEngine(actor: AuditActor, r: Row, st: EngineState): Promise<InterviewView> {
+  const t = await triage(st.sex, st.age, st.evidence, st.interviewId);
+  st.current = undefined;
+  st.result = {
+    triageLevel: t.triage_level,
+    label: TRIAGE_PL[t.triage_level] ?? t.triage_level,
+    serious: (t.serious ?? []).map((x) => x.common_name ?? x.name),
+    source: 'Infermedica Engine API (wyrób medyczny klasy IIb wg MDR)',
+  };
+  const summary = engineSummary(st);
+  const view = engineView({ ...r, answers: JSON.stringify(st), status: 'completed', summary: JSON.stringify(summary) });
+  return complete(actor, r, view, summary, JSON.stringify(st), `urn:eternal:interview:${ENGINE_TREE}|${ENGINE_VERSION}`, st.steps.length);
+}
+
+async function answerEngine(actor: AuditActor, r: Row, input: { nodeId: string; value: AnswerValue | null }): Promise<InterviewView> {
+  const st = JSON.parse(r.answers) as EngineState;
+  if (!st.current || input.nodeId !== `q${st.steps.length + 1}`) throw conflict('interview_not_current_question');
+  if (input.value === null || typeof input.value === 'number') throw badRequest('answer_required');
+  const added = answerToEvidence(st.current, input.value);
+  for (const it of st.current.items) st.labels[it.id] = it.name;
+  const node = questionToNode(st.current, st.steps.length + 1);
+  const answerLabel = Array.isArray(input.value) ? input.value.map((v) => node.options.find((o) => o.value === v)?.label ?? v).join(', ') || '—' : (node.options.find((o) => o.value === input.value)?.label ?? String(input.value));
+  st.steps.push({ question: st.current, answer: answerLabel, added: added.length });
+  st.evidence.push(...added);
+  const d = await diagnosis(st.sex, st.age, st.evidence, st.interviewId);
+  if (!d.question || d.should_stop || st.steps.length >= ENGINE_MAX_QUESTIONS) return finishEngine(actor, r, st);
+  st.current = d.question;
+  getDb().prepare('UPDATE interview_session SET answers = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(st), nowIso(), r.id);
+  return toView(rowById(r.id)!);
 }

@@ -65,17 +65,20 @@ async function check(res: Response, name: string): Promise<void> {
   throw new AiError('provider_error', `${name} ${res.status}`);
 }
 
-async function elevenlabs(data: Buffer, contentType: string): Promise<Transcript> {
+async function elevenlabs(data: Buffer, contentType: string, opts: TranscribeOptions): Promise<Transcript> {
   const s = config.stt.elevenlabs;
   const form = new FormData();
   form.set('model_id', s.model);
   form.set('language_code', 'pol');
   form.set('diarize', 'true');
-  form.set('num_speakers', '2');
+  form.set('num_speakers', String(Math.min(8, Math.max(1, opts.speakers ?? 2))));
+  // słownik terminów medycznych (leki, badania) — tylko gdy włączony, bo jest dodatkowo płatny
+  if (s.keyterms) for (const term of (opts.keyterms ?? []).slice(0, 100)) form.append('keyterms', term.slice(0, 50));
   form.set('tag_audio_events', 'false');
   form.set('timestamps_granularity', 'word');
   form.set('file', audioFile(data, contentType), `wizyta.${extFor(contentType)}`);
-  const res = await fetchWithTimeout(`${s.baseUrl.replace(/\/$/, '')}/v1/speech-to-text`, { method: 'POST', headers: { 'xi-api-key': s.apiKey }, body: form }, 600_000).catch(
+  const url = `${s.baseUrl.replace(/\/$/, '')}/v1/speech-to-text${s.zeroRetention ? '?enable_logging=false' : ''}`;
+  const res = await fetchWithTimeout(url, { method: 'POST', headers: { 'xi-api-key': s.apiKey }, body: form }, 600_000).catch(
     (err: Error) => {
       throw new AiError('provider_unreachable', err.message);
     },
@@ -180,13 +183,19 @@ export function demoTranscript(): Transcript {
   };
 }
 
-export async function transcribe(data: Buffer, contentType: string): Promise<Transcript> {
+/** Opcje rozpoznania: liczba uczestników rozmowy (z listy w sesji) i słownik terminów (nazwy leków i badań). */
+export interface TranscribeOptions {
+  speakers?: number;
+  keyterms?: string[];
+}
+
+export async function transcribe(data: Buffer, contentType: string, opts: TranscribeOptions = {}): Promise<Transcript> {
   const mode = sttMode();
   if (mode === 'off') throw new AiError('not_configured', 'STT provider not configured');
   if (mode === 'demo') return demoTranscript();
   switch (config.stt.provider) {
     case 'elevenlabs':
-      return elevenlabs(data, contentType);
+      return elevenlabs(data, contentType, opts);
     case 'azure':
       return azure(data, contentType);
     case 'openai':
