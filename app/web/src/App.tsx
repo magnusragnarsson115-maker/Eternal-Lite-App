@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { ChangePasswordPage, ForgotPasswordPage, LoginPage, MfaPage, RegisterPage, ResetPasswordPage, VerifyEmailPage } from './auth/AuthPages';
 import { NfzPage, NotificationsPage, PrivacyPage, ProfilePage } from './patient/AccountPages';
 import { AppointmentDetailPage, AppointmentsPage, QuestionnairePage, TelePage } from './patient/AppointmentPages';
@@ -20,7 +20,7 @@ import { HealthCalendarPage, PlanPage } from './patient/PlanPages';
 import { OfflinePage } from './patient/OfflinePages';
 import { AiCardsPage } from './shared/SystemStatus';
 import { CardDetailPage, CardsPage, DocumentDetailPage, DocumentsPage, HelpPage, SafetyPage, SharingPage, TimelinePage } from './patient/MvpPages';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { hasRole, useSession } from './session';
 import { Spinner } from './ui';
 
@@ -55,8 +55,18 @@ function AdminOnly({ children }: { children: React.ReactElement }) {
   return hasRole(me, 'admin') ? children : <Navigate to="/panel" replace />;
 }
 
+/** Kolorystyka paneli (runda 5): panel lekarza pod /panel, panel pacjenta — reszta aplikacji. */
+function usePanelPalette(): void {
+  const { pathname } = useLocation();
+  const panel = pathname.startsWith('/panel') ? 'staff' : 'patient';
+  useEffect(() => {
+    document.documentElement.dataset.panel = panel;
+  }, [panel]);
+}
+
 export function App() {
   const { networkDown } = useSession();
+  usePanelPalette();
   // brak połączenia z serwerem przy starcie — kopia z urządzenia i numery alarmowe zamiast ekranu logowania
   if (networkDown) return <OfflinePage />;
   return (

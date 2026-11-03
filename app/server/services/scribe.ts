@@ -16,7 +16,7 @@ import { type ProvenanceAgent, recordProvenance } from '../fhir/provenance.js';
 import { formatLocal } from '../lib/time.js';
 import { badRequest, conflict, forbidden, HttpError, newId, notFound, nowIso } from '../lib/util.js';
 import { documentHtml, esc } from '../pdf/html.js';
-import { EHR_FIELDS, getTemplate, type NoteTemplate } from '../scribe/templates.js';
+import { DISCHARGE_LAYOUT, EHR_FIELDS, getTemplate, NOTE_FORMAT_PL, type NoteFormat, type NoteTemplate, SOAP_OF } from '../scribe/templates.js';
 import { orgTag, runInScope, vaultOrgId } from '../tenancy.js';
 import { getClinicSettings, getPractitioner } from './directory.js';
 import { notifyPatient, enqueue } from './notifications.js';
@@ -96,8 +96,25 @@ interface Row {
   ai_model: string | null;
   prompt_version: string | null;
   template_version: string | null;
+  participants: string | null;
+  section_state: string | null;
+  media_kind: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export const PARTICIPANT_ROLES = ['lekarz', 'pacjent', 'opiekun', 'tłumacz', 'pielęgniarka', 'inny'] as const;
+export interface Participant {
+  role: (typeof PARTICIPANT_ROLES)[number];
+  name?: string;
+  /** Etykieta mówcy z rozpoznania mowy (np. speaker_0), przypisana przez lekarza. */
+  speaker?: string;
+}
+export type SectionState = 'pending' | 'accepted' | 'corrected' | 'rejected';
+export interface SectionStateEntry {
+  state: SectionState;
+  by?: string;
+  at?: string;
 }
 
 export interface ScribeView {
@@ -124,6 +141,11 @@ export interface ScribeView {
   summarySentAt?: string;
   cardRef?: string;
   createdAt: string;
+  participants: Participant[];
+  sectionState: Record<string, SectionStateEntry>;
+  /** audio — samo nagranie głosu; video — za odrębną zgodą, wyłącznie dokumentacja (bez analizy obrazu). */
+  mediaKind: 'audio' | 'video';
+  transcriptEdits: number;
 }
 
 // --- dostęp ------------------------------------------------------------------------------------------
@@ -183,6 +205,10 @@ export function toScribeView(row: Row, opts: { full: boolean }): ScribeView {
     summarySentAt: row.summary_sent_at ?? undefined,
     cardRef: row.card_ref ?? undefined,
     createdAt: row.created_at,
+    participants: row.participants ? (JSON.parse(row.participants) as Participant[]) : [],
+    sectionState: row.section_state ? (JSON.parse(row.section_state) as Record<string, SectionStateEntry>) : {},
+    mediaKind: row.media_kind === 'video' ? 'video' : 'audio',
+    transcriptEdits: (getDb().prepare('SELECT COUNT(*) AS n FROM transcript_edit WHERE session_id = ?').get(row.id) as { n: number }).n,
   };
 }
 
@@ -208,7 +234,11 @@ export function listSessions(user: AppUser, filter: { appointmentId?: string; pa
 
 // --- przebieg --------------------------------------------------------------------------------------------
 
-export async function startSession(user: AppUser, actor: AuditActor, input: { patientId: string; appointmentId?: string; templateId: string; consent: true; consentNote?: string }): Promise<ScribeView> {
+export async function startSession(
+  user: AppUser,
+  actor: AuditActor,
+  input: { patientId: string; appointmentId?: string; templateId: string; consent: true; consentNote?: string; consentVideo?: boolean; participants?: Participant[] },
+): Promise<ScribeView> {
   const orgId = staffOrgId(user);
   if (!orgId) throw forbidden('no_organization');
   const settings = getClinicSettings(orgId);
@@ -227,7 +257,10 @@ export async function startSession(user: AppUser, actor: AuditActor, input: { pa
     resourceType: 'Consent',
     status: 'active',
     scope: { coding: [{ system: CONSENT_SCOPE, code: 'patient-privacy' }] },
-    category: [{ coding: [{ system: ETERNAL.consentType, code: 'visit-recording', display: 'Zgoda na nagranie rozmowy (Eternal Scribe)' }] }],
+    category: [
+      { coding: [{ system: ETERNAL.consentType, code: 'visit-recording', display: 'Zgoda na nagranie rozmowy (Eternal Scribe)' }] },
+      ...(input.consentVideo ? [{ coding: [{ system: ETERNAL.consentType, code: 'visit-video-recording', display: 'Zgoda na nagranie obrazu z wizyty (dokumentacja, bez analizy obrazu)' }] }] : []),
+    ],
     patient: { reference: patientRef },
     dateTime: now,
     performer: [{ reference: patientRef }],
@@ -239,10 +272,24 @@ export async function startSession(user: AppUser, actor: AuditActor, input: { pa
   const id = newId();
   getDb()
     .prepare(
-      `INSERT INTO scribe_session (id, org_id, appointment_id, patient_ref, practitioner_user_id, template_id, consent_at, consent_note, status, created_at, updated_at, template_version)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'consented', ?, ?, ?)`,
+      `INSERT INTO scribe_session (id, org_id, appointment_id, patient_ref, practitioner_user_id, template_id, consent_at, consent_note, status, created_at, updated_at, template_version, participants, media_kind)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'consented', ?, ?, ?, ?, ?)`,
     )
-    .run(id, orgId, input.appointmentId ?? null, patientRef, user.id, input.templateId, now, input.consentNote ?? null, now, now, getTemplate(input.templateId).version);
+    .run(
+      id,
+      orgId,
+      input.appointmentId ?? null,
+      patientRef,
+      user.id,
+      input.templateId,
+      now,
+      input.consentNote ?? null,
+      now,
+      now,
+      getTemplate(input.templateId).version,
+      JSON.stringify(cleanParticipants(input.participants ?? [{ role: 'lekarz', name: user.display_name }, { role: 'pacjent' }])),
+      input.consentVideo ? 'video' : 'audio',
+    );
   audit(actor, { action: 'C', subtype: 'scribe-start', entityRef: `Consent/${consent.id}`, patientRef, detail: { session: id, template: input.templateId } });
   recordMetric(orgId, 'scribe_session', { userId: user.id, appointmentId: input.appointmentId });
   const row = rowById(id)!;
@@ -256,9 +303,11 @@ export async function uploadAudio(row: Row, actor: AuditActor, file: { data: Buf
   if (!['consented', 'failed'].includes(row.status)) throw conflict('scribe_audio_already_uploaded');
   const type = file.contentType.split(';')[0].trim().toLowerCase();
   if (!AUDIO_TYPES.includes(type)) throw badRequest('unsupported_audio_type');
+  // obraz tylko za odrębną zgodą; bez niej plik wideo przechowujemy jako dźwięk (odtwarzanie bez obrazu)
   if (file.data.length < 1000) throw badRequest('audio_too_short');
-  const stored = await fhirSystem().saveBinary(file.data, type === 'video/webm' ? 'audio/webm' : type, `wizyta-${row.id}`);
-  save(row.id, { audio_binary_id: stored.id, audio_content_type: type, audio_seconds: durationSec ?? null, status: 'processing', recorded_at: nowIso(), error: null });
+  const video = type.startsWith('video/') && row.media_kind === 'video';
+  const stored = await fhirSystem().saveBinary(file.data, type === 'video/webm' && !video ? 'audio/webm' : type, `wizyta-${row.id}`);
+  save(row.id, { audio_binary_id: stored.id, audio_content_type: type === 'video/webm' && !video ? 'audio/webm' : type, audio_seconds: durationSec ?? null, status: 'processing', recorded_at: nowIso(), error: null });
   audit(actor, { action: 'C', subtype: 'scribe-audio', patientRef: row.patient_ref, detail: { session: row.id, bytes: file.data.length, seconds: durationSec } });
   publish(row);
   setImmediate(() => void runInScope({ orgId: row.org_id }, () => processSession(row.id)));
@@ -268,7 +317,10 @@ export async function uploadAudio(row: Row, actor: AuditActor, file: { data: Buf
 /** Szkic bez modelu (tryb demonstracyjny): akapity to dosłowne fragmenty rozmowy przypisane do sekcji słowami kluczowymi. */
 export function demoNote(tpl: NoteTemplate, t: Transcript): ScribeNote {
   const rules: [string, RegExp][] = [
+    ['alergie', /(uczulen|alergi)/i],
+    ['historia', /(choruj|chorob[aęy] przewlek|przebył|operacj|nadciśnienie od lat)/i],
     ['rozpoznanie', /rozpozna/i],
+    ['plan', /\bzlecam\b/i],
     ['leki', /\b(leki|lek |przyjmuj|witamin|tabletk|jednostek|mg\b)/i],
     ['pomiary', /(zmierzy|ciśnieni|tętno|saturac|temperatur)/i],
     ['wyniki', /(wynik|cholesterol|glukoz|morfolog|kreatynin|tsh)/i],
@@ -276,16 +328,37 @@ export function demoNote(tpl: NoteTemplate, t: Transcript): ScribeNote {
     ['kontrola', /(kontrol|112|jeśli pojawi|zgłosić się|wizyta kontrolna)/i],
     ['zalecenia', /(proszę|zlecam|zalecam|należy|zapisuj)/i],
   ];
-  const soap: Record<string, string> = { wywiad: 'S', leki: 'S', rozwoj: 'S', badanie: 'O', pomiary: 'O', wyniki: 'O', rozpoznanie: 'A', zalecenia: 'P', kontrola: 'P' };
-  const sbar: Record<string, string> = { wywiad: 'sytuacja', leki: 'tlo', rozwoj: 'tlo', badanie: 'tlo', pomiary: 'tlo', wyniki: 'tlo', rozpoznanie: 'ocena', zalecenia: 'zalecenie', kontrola: 'zalecenie' };
+  const soap: Record<string, string> = { wywiad: 'S', leki: 'S', rozwoj: 'S', alergie: 'S', historia: 'S', badanie: 'O', pomiary: 'O', wyniki: 'O', rozpoznanie: 'A', zalecenia: 'P', kontrola: 'P', plan: 'P' };
+  // pełna struktura (11 sekcji): pierwsza wypowiedź pacjenta to powód wizyty, kolejne — objawy
+  const full: Record<string, string> = { pomiary: 'obserwacje', badanie: 'obserwacje', wyniki: 'obserwacje', rozpoznanie: 'ocena', zalecenia: 'zalecenia' };
+  const sbar: Record<string, string> = { plan: 'zalecenie', alergie: 'tlo', historia: 'tlo', wywiad: 'sytuacja', leki: 'tlo', rozwoj: 'tlo', badanie: 'tlo', pomiary: 'tlo', wyniki: 'tlo', rozpoznanie: 'ocena', zalecenia: 'zalecenie', kontrola: 'zalecenie' };
   const keys = new Set(tpl.sections.map((s) => s.key));
   const target = (k: string) =>
-    keys.has(k) ? k : keys.has(soap[k] ?? '') ? soap[k] : keys.has(sbar[k] ?? '') ? sbar[k] : k === 'pomiary' && keys.has('badanie') ? 'badanie' : k === 'leki' && keys.has('wywiad') ? 'wywiad' : undefined;
+    keys.has(k)
+      ? k
+      : keys.has(full[k] ?? '')
+        ? full[k]
+        : keys.has(soap[k] ?? '')
+          ? soap[k]
+          : keys.has(sbar[k] ?? '')
+            ? sbar[k]
+            : k === 'pomiary' && keys.has('badanie')
+              ? 'badanie'
+              : (k === 'leki' || k === 'alergie' || k === 'historia') && keys.has('wywiad')
+                ? 'wywiad'
+                : k === 'plan' && keys.has('zalecenia')
+                  ? 'zalecenia'
+                  : undefined;
+  let firstPatient = true;
   const buckets = new Map<string, { text: string; sources: string[] }[]>();
   for (const seg of t.segments) {
     const isDoctor = seg.speaker === 'lekarz' || seg.speaker === 'speaker_0' || seg.speaker === 'speaker_1';
     if (/\?\s*$/.test(seg.text)) continue; // pytania lekarza nie są treścią notatki
     let key = rules.find(([, re]) => re.test(seg.text))?.[0];
+    if (!isDoctor && seg.speaker === 'pacjent' && keys.has('powod') && firstPatient && !/^(dzień dobry|dobrze, dziękuję|dziękuję)/i.test(seg.text)) {
+      key = 'powod';
+      firstPatient = false;
+    } else if (!key && !isDoctor && keys.has('objawy')) key = 'objawy';
     if (!key && !isDoctor) key = 'wywiad';
     if (!key && seg.speaker === 'pacjent') key = 'wywiad';
     const k = key ? target(key) : undefined;
@@ -440,8 +513,12 @@ const NoteEdit = (note: NoteDoc, incoming: { key: string; paragraphs: { id?: str
 export function saveNote(row: Row, actor: AuditActor, sections: { key: string; paragraphs: { id?: string; text: string; sources?: string[] }[] }[]): ScribeView {
   if (row.status !== 'draft' || !row.note) throw conflict('scribe_not_editable');
   const transcript = row.transcript ? (JSON.parse(row.transcript) as Transcript) : undefined;
-  const note = validateNote(NoteEdit(JSON.parse(row.note) as NoteDoc, sections), transcript);
-  save(row.id, { note: JSON.stringify(note) });
+  const prev = JSON.parse(row.note) as NoteDoc;
+  const note = validateNote(NoteEdit(prev, sections), transcript);
+  const states = row.section_state ? (JSON.parse(row.section_state) as Record<string, SectionStateEntry>) : {};
+  const text = (d: NoteDoc, key: string) => JSON.stringify(d.sections.find((x) => x.key === key)?.paragraphs.map((p) => p.text) ?? []);
+  for (const sec of note.sections) if (text(prev, sec.key) !== text(note, sec.key)) states[sec.key] = { state: 'corrected', by: actor.display, at: nowIso() };
+  save(row.id, { note: JSON.stringify(note), section_state: JSON.stringify(states) });
   audit(actor, { action: 'U', subtype: 'scribe-edit', patientRef: row.patient_ref, detail: { session: row.id } });
   return toScribeView(rowById(row.id)!, { full: true });
 }
@@ -495,7 +572,10 @@ function compositionFor(row: Row, note: NoteDoc, user: AppUser, status: Composit
 
 export async function approveNote(row: Row, user: AppUser, actor: AuditActor): Promise<ScribeView> {
   if (row.status !== 'draft' || !row.note) throw conflict('scribe_not_approvable');
-  const note = JSON.parse(row.note) as NoteDoc;
+  // sekcje odrzucone przez lekarza nie trafiają do dokumentacji
+  const states = row.section_state ? (JSON.parse(row.section_state) as Record<string, SectionStateEntry>) : {};
+  const draft = JSON.parse(row.note) as NoteDoc;
+  const note: NoteDoc = { ...draft, sections: draft.sections.map((s) => (states[s.key]?.state === 'rejected' ? { ...s, paragraphs: [] } : s)) };
   if (!note.sections.some((s) => s.paragraphs.length)) throw badRequest('note_empty');
   const comp = await fhir().create<Composition>(compositionFor(row, note, user, 'final'));
   const compRef = `Composition/${comp.id}`;
@@ -505,7 +585,7 @@ export async function approveNote(row: Row, user: AppUser, actor: AuditActor): P
   const now = nowIso();
   const ratio = row.note_original ? correctedRatio(JSON.parse(row.note_original) as NoteDoc, note) : 0;
   const editSeconds = row.draft_ready_at ? (Date.parse(now) - Date.parse(row.draft_ready_at)) / 1000 : null;
-  save(row.id, { status: 'approved', approved_at: now, approved_by: user.display_name, composition_ref: compRef, corrected_ratio: ratio, edit_seconds: editSeconds });
+  save(row.id, { status: 'approved', approved_at: now, approved_by: user.display_name, composition_ref: compRef, corrected_ratio: ratio, edit_seconds: editSeconds, note: JSON.stringify(note) });
   audit(actor, { action: 'C', subtype: 'scribe-approve', entityRef: compRef, patientRef: row.patient_ref, detail: { session: row.id, correctedRatio: ratio, manual: !!note.manual } });
   recordMetric(row.org_id, 'scribe_approved', { userId: user.id, appointmentId: row.appointment_id ?? undefined, value: ratio, data: { editSeconds, manual: !!note.manual } });
   bus.publish({ type: 'document.changed', patientRef: row.patient_ref, resourceRef: compRef, orgIds: [row.org_id], staff: true });
@@ -746,4 +826,158 @@ export async function practitionerSpecialty(user: AppUser): Promise<string | und
 
 export function scribeCapabilities() {
   return { stt: sttMode(), ai: aiMode() };
+}
+
+// --- runda 5: uczestnicy, poprawki transkrypcji, akcje na sekcjach, formaty ------------------------------------
+
+function cleanParticipants(list: Participant[]): Participant[] {
+  if (list.length > 8) throw badRequest('too_many');
+  return list.map((p) => {
+    if (!PARTICIPANT_ROLES.includes(p.role)) throw badRequest('invalid_value');
+    return { role: p.role, name: p.name?.trim().slice(0, 80) || undefined, speaker: p.speaker?.trim().slice(0, 40) || undefined };
+  });
+}
+
+export function setParticipants(row: Row, actor: AuditActor, list: Participant[]): ScribeView {
+  if (['approved', 'cancelled'].includes(row.status)) throw conflict('scribe_not_editable');
+  save(row.id, { participants: JSON.stringify(cleanParticipants(list)) });
+  audit(actor, { action: 'U', subtype: 'scribe-participants', patientRef: row.patient_ref, detail: { session: row.id, count: list.length } });
+  return toScribeView(rowById(row.id)!, { full: true });
+}
+
+/** Poprawka fragmentu transkrypcji (tekst albo mówca): zapis „przed → po”, kto i kiedy; walidator notatki liczy od nowa. */
+export function editSegment(row: Row, user: AppUser, actor: AuditActor, segmentId: string, patch: { text?: string; speaker?: string }): ScribeView {
+  if (row.status !== 'draft' || !row.transcript) throw conflict('scribe_not_editable');
+  const t = JSON.parse(row.transcript) as Transcript;
+  const seg = t.segments.find((x) => x.id === segmentId);
+  if (!seg) throw notFound('segment_not_found');
+  const text = patch.text !== undefined ? patch.text.trim().slice(0, 2000) : seg.text;
+  if (!text) throw badRequest('text_required');
+  const speaker = patch.speaker !== undefined ? patch.speaker.trim().slice(0, 40) || undefined : seg.speaker;
+  if (text === seg.text && speaker === seg.speaker) return toScribeView(row, { full: true });
+  getDb()
+    .prepare('INSERT INTO transcript_edit (id, session_id, segment_id, before_text, after_text, before_speaker, after_speaker, user_id, user_name, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    .run(newId(), row.id, segmentId, seg.text, text, seg.speaker ?? null, speaker ?? null, user.id, user.display_name, nowIso());
+  seg.text = text;
+  seg.speaker = speaker;
+  const note = row.note ? validateNote(JSON.parse(row.note) as NoteDoc, t) : undefined;
+  save(row.id, { transcript: JSON.stringify(t), ...(note ? { note: JSON.stringify(note) } : {}) });
+  audit(actor, { action: 'U', subtype: 'scribe-transcript-edit', patientRef: row.patient_ref, detail: { session: row.id, segment: segmentId } });
+  return toScribeView(rowById(row.id)!, { full: true });
+}
+
+export function transcriptEdits(row: Row): { segmentId: string; before?: string; after?: string; beforeSpeaker?: string; afterSpeaker?: string; by?: string; at: string }[] {
+  return (getDb().prepare('SELECT * FROM transcript_edit WHERE session_id = ? ORDER BY at').all(row.id) as Record<string, string | null>[]).map((r) => ({
+    segmentId: r.segment_id!,
+    before: r.before_text ?? undefined,
+    after: r.after_text ?? undefined,
+    beforeSpeaker: r.before_speaker ?? undefined,
+    afterSpeaker: r.after_speaker ?? undefined,
+    by: r.user_name ?? undefined,
+    at: r.at!,
+  }));
+}
+
+/** Akcje lekarza na sekcji szkicu: akceptuj / odrzuć / przywróć do sprawdzenia. „Popraw” = edycja treści (saveNote). */
+export function sectionAction(row: Row, actor: AuditActor, key: string, action: 'accept' | 'reject' | 'reset'): ScribeView {
+  if (row.status !== 'draft' || !row.note) throw conflict('scribe_not_editable');
+  const note = JSON.parse(row.note) as NoteDoc;
+  if (!note.sections.some((s) => s.key === key)) throw notFound('section_not_found');
+  const states = row.section_state ? (JSON.parse(row.section_state) as Record<string, SectionStateEntry>) : {};
+  if (action === 'reset') delete states[key];
+  else states[key] = { state: action === 'accept' ? 'accepted' : 'rejected', by: actor.display, at: nowIso() };
+  save(row.id, { section_state: JSON.stringify(states) });
+  audit(actor, { action: 'U', subtype: `scribe-section-${action}`, patientRef: row.patient_ref, detail: { session: row.id, section: key } });
+  return toScribeView(rowById(row.id)!, { full: true });
+}
+
+/** Ponowne przygotowanie jednej sekcji z transkrypcji (ta sama ścieżka co szkic: model albo tryb pokazowy + walidator). */
+export async function regenerateSection(row: Row, actor: AuditActor, key: string): Promise<ScribeView> {
+  if (row.status !== 'draft' || !row.note || !row.transcript) throw conflict('scribe_not_editable');
+  const tpl = getTemplate(row.template_id);
+  if (!tpl.sections.some((s) => s.key === key)) throw notFound('section_not_found');
+  const transcript = JSON.parse(row.transcript) as Transcript;
+  const user = `Szablon sekcji (klucz: tytuł — wskazówka):\n${templatePrompt(tpl)}\n\nPrzygotuj ponownie wyłącznie sekcję „${key}”.\n\nTranskrypcja (fragmenty S#):\n${redactIdentifiers(transcriptText(transcript))}`;
+  const run = await runAiTask('scribe-note', { user, schema: ScribeNoteSchema, orgId: row.org_id, userId: row.practitioner_user_id, demo: () => demoNote(tpl, transcript) });
+  const fresh = withIds(run.data, tpl).sections.find((s) => s.key === key);
+  const note = JSON.parse(row.note) as NoteDoc;
+  const stamp = Date.now() % 100000;
+  const next = validateNote(
+    { ...note, sections: note.sections.map((s) => (s.key === key ? { ...s, paragraphs: (fresh?.paragraphs ?? []).map((p, i) => ({ ...p, id: `${key}-r${i + 1}-${stamp}` })) } : s)) },
+    transcript,
+  );
+  const states = row.section_state ? (JSON.parse(row.section_state) as Record<string, SectionStateEntry>) : {};
+  delete states[key];
+  save(row.id, { note: JSON.stringify(next), section_state: JSON.stringify(states) });
+  audit(actor, { action: 'U', subtype: 'scribe-section-regenerate', patientRef: row.patient_ref, detail: { session: row.id, section: key, provider: run.provider } });
+  return toScribeView(rowById(row.id)!, { full: true });
+}
+
+export interface FormattedNote {
+  format: NoteFormat;
+  title: string;
+  approved: boolean;
+  sections: { title: string; text: string }[];
+  fhir?: Composition;
+}
+
+/** Ta sama treść w innym układzie (SOAP, karta informacyjna, podsumowanie, pola EHR, FHIR) — nic nie jest dopisywane. */
+export function formatNote(row: Row, user: AppUser, format: NoteFormat): FormattedNote {
+  if (!row.note) throw conflict('scribe_no_note');
+  const states = row.section_state ? (JSON.parse(row.section_state) as Record<string, SectionStateEntry>) : {};
+  const draft = JSON.parse(row.note) as NoteDoc;
+  const note: NoteDoc = { ...draft, sections: draft.sections.map((s) => (states[s.key]?.state === 'rejected' ? { ...s, paragraphs: [] } : s)) };
+  const textOf = (keys: string[]) =>
+    note.sections
+      .filter((s) => keys.includes(s.key))
+      .flatMap((s) => s.paragraphs.map((p) => p.text))
+      .join('\n');
+  const approved = row.status === 'approved';
+  const title = NOTE_FORMAT_PL[format];
+  switch (format) {
+    case 'clinical':
+      return { format, title, approved, sections: note.sections.filter((s) => s.paragraphs.length).map((s) => ({ title: s.title, text: s.paragraphs.map((p) => p.text).join('\n') })) };
+    case 'soap': {
+      const by: Record<string, string[]> = { S: [], O: [], A: [], P: [] };
+      for (const s of note.sections) by[SOAP_OF[s.key] ?? 'S'].push(...s.paragraphs.map((p) => p.text));
+      const names: Record<string, string> = { S: 'S — dane podmiotowe', O: 'O — dane przedmiotowe', A: 'A — ocena lekarza', P: 'P — plan' };
+      return { format, title, approved, sections: (['S', 'O', 'A', 'P'] as const).map((k) => ({ title: names[k], text: by[k].join('\n') })) };
+    }
+    case 'discharge':
+      return { format, title, approved, sections: DISCHARGE_LAYOUT.map(([t, keys]) => ({ title: t, text: textOf(keys) })).filter((x) => x.text) };
+    case 'summary': {
+      const card = row.summary ? (JSON.parse(row.summary) as CardDoc) : undefined;
+      if (card)
+        return {
+          format,
+          title,
+          approved: row.summary_status === 'approved' || row.summary_status === 'sent',
+          sections: [
+            { title: 'Co zrobiliśmy na wizycie', text: card.whatWasDone.join('\n') },
+            { title: 'Co dalej', text: card.nextSteps.join('\n') },
+            { title: 'Kiedy wrócić', text: card.whenToReturn ?? '' },
+            { title: 'Kiedy zgłosić się wcześniej', text: card.warningSigns.join('\n') },
+          ].filter((x) => x.text),
+        };
+      return {
+        format,
+        title,
+        approved,
+        sections: [
+          { title: 'Powód wizyty', text: textOf(['powod', 'sytuacja', 'S']) || textOf(['wywiad']) },
+          { title: 'Ustalenia lekarza', text: textOf(['ocena', 'rozpoznanie', 'A']) },
+          { title: 'Plan i zalecenia', text: textOf(['plan', 'zalecenia', 'zalecenie', 'P']) },
+          { title: 'Kontrola', text: textOf(['kontrola']) },
+        ].filter((x) => x.text),
+      };
+    }
+    case 'ehr': {
+      const ex = ehrExport({ ...row, note: JSON.stringify(note) });
+      return { format, title: `${title} — układ ${ex.layout}`, approved, sections: ex.fields.map((f) => ({ title: f.field, text: f.text })) };
+    }
+    case 'fhir': {
+      const comp = compositionFor(row, note, user, approved ? 'final' : 'preliminary');
+      return { format, title, approved, sections: [], fhir: comp };
+    }
+  }
 }

@@ -31,6 +31,14 @@ const S = {
   zalecenia: { key: 'zalecenia', title: 'Zalecenia', hint: 'Zalecenia, zlecenia badań i leki wypowiedziane przez lekarza.', ehr: { generic: 'Zalecenia', soap: 'P' } },
   kontrola: { key: 'kontrola', title: 'Kontrola i dalsze postępowanie', hint: 'Termin kontroli i sytuacje, w których pacjent ma się zgłosić.', ehr: { generic: 'Zalecenia', soap: 'P' } },
   rozwoj: { key: 'rozwoj', title: 'Rozwój i szczepienia', hint: 'Tylko jeśli były omawiane.', ehr: { generic: 'Wywiad', soap: 'S' } },
+  // runda 5 — pełna struktura wizyty (A12.5)
+  powod: { key: 'powod', title: 'Powód wizyty', hint: 'Z czym pacjent przychodzi — jego słowami.', ehr: { generic: 'Wywiad', soap: 'S' } },
+  objawy: { key: 'objawy', title: 'Objawy', hint: 'Objawy wymienione przez pacjenta, z czasem trwania tylko jeśli padł.', ehr: { generic: 'Wywiad', soap: 'S' } },
+  historia: { key: 'historia', title: 'Historia chorób', hint: 'Choroby przebyte i przewlekłe wymienione w rozmowie.', ehr: { generic: 'Wywiad', soap: 'S' } },
+  alergie: { key: 'alergie', title: 'Alergie', hint: 'Uczulenia wymienione w rozmowie; jeśli pacjent zaprzeczył — zapisz to.', ehr: { generic: 'Wywiad', soap: 'S' } },
+  obserwacje: { key: 'obserwacje', title: 'Badanie / obserwacje', hint: 'Badanie przedmiotowe i pomiary podane przez lekarza.', ehr: { generic: 'Badanie przedmiotowe', soap: 'O' } },
+  ocena: { key: 'ocena', title: 'Ocena lekarza', hint: 'Wyłącznie słowa lekarza; model nie stawia oceny ani rozpoznania.', ehr: { generic: 'Rozpoznanie', soap: 'A' } },
+  plan: { key: 'plan', title: 'Plan', hint: 'Zlecone badania i dalsze kroki wypowiedziane przez lekarza.', ehr: { generic: 'Zalecenia', soap: 'P' } },
 } satisfies Record<string, TemplateSection>;
 
 export const NOTE_TEMPLATES: NoteTemplate[] = [
@@ -64,7 +72,44 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
   },
 ];
 
-export const NOTE_TEMPLATE_IDS = ['general', 'cardiology', 'pediatrics', 'soap', 'sbar'] as const;
+NOTE_TEMPLATES.push({
+  id: 'full',
+  version: 'note-full/2026-11-1',
+  name: 'Pełna struktura wizyty (11 sekcji)',
+  specialty: 'ogólna',
+  sections: [S.powod, S.wywiad, S.objawy, S.historia, { ...S.leki, title: 'Leki' }, S.alergie, S.obserwacje, S.ocena, S.plan, S.zalecenia, { ...S.kontrola, title: 'Kontrola' }],
+});
+
+export const NOTE_TEMPLATE_IDS = ['general', 'cardiology', 'pediatrics', 'soap', 'sbar', 'full'] as const;
+
+/** Formaty wyjściowe notatki (A12.5) — przekształcenie tej samej, zatwierdzanej treści, bez dopisywania. */
+export const NOTE_FORMATS = ['clinical', 'soap', 'discharge', 'summary', 'ehr', 'fhir'] as const;
+export type NoteFormat = (typeof NOTE_FORMATS)[number];
+export const NOTE_FORMAT_PL: Record<NoteFormat, string> = {
+  clinical: 'Notatka kliniczna',
+  soap: 'SOAP',
+  discharge: 'Karta informacyjna (wypis)',
+  summary: 'Podsumowanie wizyty dla pacjenta',
+  ehr: 'Pola do systemu gabinetowego (HIS/EHR/EDM)',
+  fhir: 'FHIR Composition (EDM, HL7 FHIR R4)',
+};
+/** Klucz sekcji → litera SOAP (dla szablonów innych niż SOAP). */
+export const SOAP_OF: Record<string, 'S' | 'O' | 'A' | 'P'> = {
+  powod: 'S', wywiad: 'S', objawy: 'S', historia: 'S', leki: 'S', alergie: 'S', rozwoj: 'S', sytuacja: 'S', tlo: 'S', S: 'S',
+  badanie: 'O', pomiary: 'O', wyniki: 'O', obserwacje: 'O', O: 'O',
+  rozpoznanie: 'A', ocena: 'A', A: 'A',
+  zalecenia: 'P', kontrola: 'P', plan: 'P', zalecenie: 'P', P: 'P',
+};
+/** Układ karty informacyjnej: sekcja docelowa → klucze sekcji notatki. */
+export const DISCHARGE_LAYOUT: [string, string[]][] = [
+  ['Rozpoznanie / ocena lekarza', ['rozpoznanie', 'ocena', 'A']],
+  ['Wywiad i przebieg wizyty', ['powod', 'wywiad', 'objawy', 'historia', 'sytuacja', 'tlo', 'S']],
+  ['Badanie i wyniki', ['badanie', 'pomiary', 'wyniki', 'obserwacje', 'O']],
+  ['Leki', ['leki']],
+  ['Alergie', ['alergie']],
+  ['Zalecenia', ['plan', 'zalecenia', 'zalecenie', 'P']],
+  ['Kontrola', ['kontrola']],
+];
 
 export function getTemplate(id: string): NoteTemplate {
   return NOTE_TEMPLATES.find((t) => t.id === id) ?? NOTE_TEMPLATES[0];

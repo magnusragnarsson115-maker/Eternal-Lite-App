@@ -103,7 +103,7 @@ export const LAYOUTS: Record<string, string[]> = {
 
 const KEY_GROUP = new Map(Object.entries(GROUPS).flatMap(([g, keys]) => keys.map((k) => [k, g] as const)));
 const LOINC_KEY = new Map(LAB_TESTS.map((t) => [t.loinc, t.key]));
-const OTHER = 'Pozostałe badania';
+export const OTHER = 'Pozostałe badania';
 
 function layoutFor(specialty?: string): { name: string; order: string[] } {
   const s = (specialty ?? '').toLowerCase();
@@ -111,7 +111,7 @@ function layoutFor(specialty?: string): { name: string; order: string[] } {
   return { name, order: [...LAYOUTS[name], OTHER] };
 }
 
-function testKey(o: { loinc?: string; name: string }): { key: string; group: string; name: string } {
+export function testKey(o: { loinc?: string; name: string }): { key: string; group: string; name: string } {
   const byLoinc = o.loinc ? LOINC_KEY.get(o.loinc) : undefined;
   const key = byLoinc ?? matchTestName(o.name)?.def.key;
   const def = key ? LAB_TESTS.find((t) => t.key === key) : undefined;
@@ -143,7 +143,7 @@ function addPoint(rows: Map<string, FactRow>, name: string, loinc: string | unde
   rows.set(k.key, row);
 }
 
-function finalize(rows: Map<string, FactRow>, order: string[]): FactRow[] {
+export function finalize(rows: Map<string, FactRow>, order: string[]): FactRow[] {
   const list = [...rows.values()];
   for (const r of list) {
     r.points.sort((a, b) => b.date.localeCompare(a.date));
@@ -278,7 +278,7 @@ export async function buildFacts(user: AppUser, actor: AuditActor, input: { pati
   const clinicDocs = await fhir().search<DocumentReference>('DocumentReference', { subject: patientRef, status: 'current', _count: '100' });
   for (const d of clinicDocs) {
     if (isVault(d, patientRef)) continue;
-    documents.push({ ref: `DocumentReference/${d.id}`, kind: 'clinic', title: d.description ?? d.type?.text ?? 'Dokument', date: (d.date ?? '').slice(0, 10), sections: [], source: 'clinic', binaryId: d.content[0]?.attachment.url ? idFromRef(d.content[0].attachment.url) : undefined });
+    documents.push({ ref: `DocumentReference/${d.id}`, kind: d.type?.coding?.[0]?.code === '72170-4' ? 'photo' : 'clinic', title: d.description ?? d.type?.text ?? 'Dokument', date: (d.date ?? '').slice(0, 10), sections: [], source: 'clinic', binaryId: d.content[0]?.attachment.url ? idFromRef(d.content[0].attachment.url) : undefined });
   }
   documents.sort((a, b) => b.date.localeCompare(a.date));
 

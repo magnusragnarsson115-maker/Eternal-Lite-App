@@ -32,6 +32,7 @@ import {
   startSession,
   toScribeView,
   uploadAudio,
+  PARTICIPANT_ROLES,
 } from '../services/scribe.js';
 import { runInScope } from '../tenancy.js';
 
@@ -94,7 +95,19 @@ export async function scribeRoutes(app: FastifyInstance): Promise<void> {
 
   app.post('/api/staff/scribe', async (req) => {
     const auth = clinician(req);
-    const input = body(req, z.object({ patientId: zId, appointmentId: zId.optional(), templateId: z.string().max(40), consent: z.literal(true), consentNote: z.string().max(300).optional() }));
+    const input = body(
+      req,
+      z.object({
+        patientId: zId,
+        appointmentId: zId.optional(),
+        templateId: z.string().max(40),
+        consent: z.literal(true),
+        consentNote: z.string().max(300).optional(),
+        // runda 5: obraz tylko za odrębną zgodą (dokumentacja, bez analizy), uczestnicy rozmowy
+        consentVideo: z.boolean().optional(),
+        participants: z.array(z.object({ role: z.enum(PARTICIPANT_ROLES), name: z.string().max(80).optional(), speaker: z.string().max(40).optional() })).max(8).optional(),
+      }),
+    );
     return startSession(auth.user, actorOf(req), input);
   });
 

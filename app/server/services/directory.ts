@@ -201,7 +201,7 @@ export function defaultClinicSettings(): ClinicSettings {
       { id: 'lab', label: 'Wyniki badań laboratoryjnych (ostatnie 6 miesięcy)', accept: ['lab'], maxAgeDays: 180 },
       { id: 'history', label: 'Dokumentacja z wcześniejszego leczenia (karta wypisowa, opis badania)', accept: ['discharge', 'imaging', 'referral', 'other'], optional: true },
     ],
-    noteTemplates: ['general', 'cardiology', 'pediatrics'],
+    noteTemplates: ['general', 'cardiology', 'pediatrics', 'full'],
     ehrLayout: 'generic',
     scribeMonthlyLimitPerDoctor: 300,
     inviteValidityDaysAfterVisit: 30,

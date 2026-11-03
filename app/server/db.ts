@@ -724,6 +724,109 @@ const MIGRATIONS: string[] = [
   );
   CREATE INDEX genomic_file_patient ON genomic_file(patient_ref);
   `,
+  // 17 — runda 5: sprawy pacjentów w przestrzeni pracy lekarza (status, właściciel, historia), rejestr poprawek
+  // odczytu dokumentów (OCR → poprawka → kto → kiedy), poprawki transkrypcji, uczestnicy i stan sekcji Scribe,
+  // wywiad czatowy z rozgałęzieniami
+  `
+  CREATE TABLE care_case (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    title TEXT NOT NULL,
+    status TEXT NOT NULL,
+    priority TEXT NOT NULL DEFAULT 'normal',
+    owner_user_id TEXT,
+    owner_name TEXT,
+    source TEXT NOT NULL,
+    source_ref TEXT,
+    appointment_id TEXT,
+    due_date TEXT,
+    note TEXT,
+    created_by TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    closed_at TEXT
+  );
+  CREATE INDEX care_case_org ON care_case(org_id, status);
+  CREATE INDEX care_case_patient ON care_case(patient_ref);
+  CREATE UNIQUE INDEX care_case_source ON care_case(org_id, source, source_ref) WHERE source_ref IS NOT NULL AND closed_at IS NULL;
+  CREATE TABLE care_case_event (
+    id TEXT PRIMARY KEY,
+    case_id TEXT NOT NULL REFERENCES care_case(id) ON DELETE CASCADE,
+    at TEXT NOT NULL,
+    actor_user_id TEXT,
+    actor_name TEXT,
+    kind TEXT NOT NULL,
+    from_value TEXT,
+    to_value TEXT,
+    note TEXT
+  );
+  CREATE INDEX care_case_event_case ON care_case_event(case_id, at);
+  CREATE TABLE extraction_correction (
+    id TEXT PRIMARY KEY,
+    intake_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    item_id TEXT NOT NULL,
+    field TEXT NOT NULL,
+    auto_value TEXT,
+    corrected_value TEXT,
+    actor_kind TEXT NOT NULL,
+    actor_ref TEXT,
+    actor_name TEXT,
+    at TEXT NOT NULL,
+    source_text TEXT,
+    loinc TEXT,
+    document_kind TEXT
+  );
+  CREATE INDEX extraction_correction_intake ON extraction_correction(intake_id);
+  CREATE INDEX extraction_correction_patient ON extraction_correction(patient_ref);
+  CREATE TABLE transcript_edit (
+    id TEXT PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    segment_id TEXT NOT NULL,
+    before_text TEXT,
+    after_text TEXT,
+    before_speaker TEXT,
+    after_speaker TEXT,
+    user_id TEXT NOT NULL,
+    user_name TEXT,
+    at TEXT NOT NULL
+  );
+  CREATE INDEX transcript_edit_session ON transcript_edit(session_id);
+  ALTER TABLE scribe_session ADD COLUMN participants TEXT;
+  ALTER TABLE scribe_session ADD COLUMN section_state TEXT;
+  ALTER TABLE scribe_session ADD COLUMN media_kind TEXT;
+  CREATE TABLE interview_session (
+    id TEXT PRIMARY KEY,
+    patient_ref TEXT NOT NULL,
+    org_id TEXT,
+    appointment_id TEXT,
+    tree_id TEXT NOT NULL,
+    tree_version TEXT NOT NULL,
+    answers TEXT NOT NULL,
+    path TEXT NOT NULL,
+    status TEXT NOT NULL,
+    summary TEXT,
+    response_ref TEXT,
+    created_by TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    completed_at TEXT
+  );
+  CREATE INDEX interview_session_patient ON interview_session(patient_ref, created_at);
+  CREATE TABLE eternal_id_link (
+    id TEXT PRIMARY KEY,
+    patient_ref TEXT NOT NULL,
+    token_hash TEXT NOT NULL UNIQUE,
+    label TEXT,
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    revoked_at TEXT,
+    last_used_at TEXT,
+    uses INTEGER NOT NULL DEFAULT 0
+  );
+  CREATE INDEX eternal_id_link_patient ON eternal_id_link(patient_ref);
+  `,
 ];
 
 export type Db = DatabaseSync;

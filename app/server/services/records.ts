@@ -46,10 +46,12 @@ export interface ReportInput {
 export interface DocumentInput {
   patientId: string;
   title: string;
-  kind: 'recommendations' | 'certificate' | 'referral-scan' | 'visit-summary' | 'other';
+  kind: 'recommendations' | 'certificate' | 'referral-scan' | 'visit-summary' | 'other' | 'photo';
   text?: string;
   binaryId?: string;
   appointmentId?: string;
+  /** Dokumentacja fotograficzna (runda 5): okolica ciała wskazana przez lekarza. Zdjęcie nie jest analizowane. */
+  bodyRegion?: string;
 }
 
 export interface RecordView {
@@ -86,6 +88,7 @@ const DOC_KINDS: Record<DocumentInput['kind'], { code: string; display: string; 
   'referral-scan': { code: '57133-1', display: 'Referral note', pl: 'Skierowanie' },
   'visit-summary': { code: '34133-9', display: 'Summary of episode note', pl: 'Podsumowanie wizyty' },
   other: { code: '51851-4', display: 'Administrative note', pl: 'Dokument' },
+  photo: { code: '72170-4', display: 'Photographic image', pl: 'Dokumentacja fotograficzna' },
 };
 
 const FLAG_DISPLAY: Record<string, string> = { H: 'High', L: 'Low', N: 'Normal', A: 'Abnormal', HH: 'Critical high', LL: 'Critical low' };
@@ -318,6 +321,7 @@ export async function createDocument(actor: AuditActor, input: DocumentInput): P
     description: input.title.trim(),
     content: [{ attachment }],
     context: input.appointmentId ? { related: [{ reference: `Appointment/${input.appointmentId}` }] } : undefined,
+    extension: input.bodyRegion ? [{ url: 'urn:eternal:ext:body-region', valueString: input.bodyRegion.slice(0, 40) }] : undefined,
   };
   const saved = await fhir().create(doc);
   audit(actor, { action: 'C', subtype: 'document-create', entityRef: `DocumentReference/${saved.id}`, patientRef });

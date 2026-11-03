@@ -74,6 +74,133 @@
   }
 }
 
+/* --- kolorystyka paneli (runda 5) -----------------------------------------------------------
+ * Panel pacjenta: ciepły fiolet z koralowym akcentem — przyjazny, „żywy”.
+ * Panel lekarza (Eternal Klinika): spokojny błękit kliniczny na chłodnym tle — gęsty, bez rozpraszania.
+ * Zasada wspólna: kolor nie ocenia zdrowia. Oznaczenia z dokumentu laboratorium (↑/↓) mają barwę
+ * informacyjną, a czerwień jest zarezerwowana dla błędów systemu i działań nieodwracalnych.
+ * Atrybut data-panel ustawia App.tsx według ścieżki. Tryb wysokiego kontrastu (niżej) ma pierwszeństwo.
+ */
+html[data-panel='patient'] {
+  --bg: #f7f5fb;
+  --surface: #ffffff;
+  --surface-2: #faf8fd;
+  --surface-3: #f0ecf7;
+  --ink: #1c1830;
+  --ink-2: #3d3655;
+  --muted: #5f5873;
+  --border: #e3ddef;
+  --border-strong: #c7bedb;
+  --primary: #5b3fc4;
+  --primary-ink: #ffffff;
+  --primary-hover: #4a32a3;
+  --primary-soft: #efeafc;
+  --primary-soft-ink: #3e2a8f;
+  --accent: #b93d0c;
+  --accent-soft: #fdeee6;
+  --focus: #5b3fc4;
+  --chart-line: #5b3fc4;
+  --chart-line-2: #d9480f;
+  --chart-grid: #e8e3f1;
+  --hero-a: #5b3fc4;
+  --hero-b: #8a3aa8;
+  --data-1: #e6e0fa;
+  --data-2: #b9a8f0;
+  --data-3: #7e62dd;
+  --data-4: #4a32a3;
+}
+html[data-panel='staff'] {
+  --bg: #f1f4f8;
+  --surface: #ffffff;
+  --surface-2: #f7f9fc;
+  --surface-3: #e9eef5;
+  --ink: #0f1b2d;
+  --ink-2: #2f3d52;
+  --muted: #536176;
+  --border: #d6dee8;
+  --border-strong: #b4c0cf;
+  --primary: #1f5fae;
+  --primary-ink: #ffffff;
+  --primary-hover: #184d8f;
+  --primary-soft: #e5eefa;
+  --primary-soft-ink: #143f75;
+  --accent: #0b6f78;
+  --accent-soft: #e1f2f3;
+  --focus: #1f5fae;
+  --chart-line: #1f5fae;
+  --chart-line-2: #c2570c;
+  --chart-grid: #e2e8f0;
+  --hero-a: #1f5fae;
+  --hero-b: #0b6f78;
+  --side-bg: #0f1d33;
+  --side-ink: #c9d6e8;
+  --side-muted: #8ea3c0;
+  --side-active: rgba(115, 171, 245, 0.2);
+  --data-1: #dfeaf8;
+  --data-2: #a9c6ee;
+  --data-3: #5b8fd6;
+  --data-4: #184d8f;
+}
+@media (prefers-color-scheme: dark) {
+  html[data-panel='patient']:not([data-theme='light']) {
+    --bg: #12101c;
+    --surface: #1a1727;
+    --surface-2: #201c30;
+    --surface-3: #282339;
+    --ink: #eeeaf7;
+    --ink-2: #d2cbe4;
+    --muted: #a69fbb;
+    --border: #322c46;
+    --border-strong: #453d5e;
+    --primary: #ab9bff;
+    --primary-ink: #1a1033;
+    --primary-hover: #c2b6ff;
+    --primary-soft: #2a2148;
+    --primary-soft-ink: #d6ccff;
+    --accent: #ff9f6e;
+    --accent-soft: #3a2116;
+    --focus: #ab9bff;
+    --chart-line: #ab9bff;
+    --chart-line-2: #ff9f6e;
+    --chart-grid: #2c2640;
+    --hero-a: #3b2a86;
+    --hero-b: #5e2a73;
+    --data-1: #2a2148;
+    --data-2: #4b3a8f;
+    --data-3: #7e68e0;
+    --data-4: #c2b6ff;
+  }
+  html[data-panel='staff']:not([data-theme='light']) {
+    --bg: #0b1220;
+    --surface: #111a2b;
+    --surface-2: #162135;
+    --surface-3: #1c2940;
+    --ink: #e6edf7;
+    --ink-2: #c5d1e2;
+    --muted: #93a3b9;
+    --border: #26344c;
+    --border-strong: #34465f;
+    --primary: #73abf5;
+    --primary-ink: #061a33;
+    --primary-hover: #93bff8;
+    --primary-soft: #142a4a;
+    --primary-soft-ink: #b5d3fb;
+    --accent: #5fc7cf;
+    --accent-soft: #10303a;
+    --focus: #73abf5;
+    --chart-line: #73abf5;
+    --chart-line-2: #f0a35e;
+    --chart-grid: #22314a;
+    --hero-a: #163f73;
+    --hero-b: #0d4a52;
+    --side-bg: #0a1322;
+    --data-1: #142a4a;
+    --data-2: #24508a;
+    --data-3: #4f86d0;
+    --data-4: #a9c9f7;
+  }
+}
+
 *,
 *::before,
 *::after {
@@ -249,9 +376,9 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 1rem 0; }
 .card-flush { padding: 0; overflow: hidden; }
 .card-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
 .card-title h2, .card-title h3 { margin: 0; }
-.card-hero { background: linear-gradient(135deg, var(--primary) 0%, #155e8a 100%); color: #fff; border: 0; }
+.card-hero { background: linear-gradient(135deg, var(--hero-a, var(--primary)) 0%, var(--hero-b, #155e8a) 100%); color: #fff; border: 0; }
 .card-hero .muted, .card-hero a { color: rgba(255, 255, 255, 0.86); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .card-hero { background: linear-gradient(135deg, #10545b 0%, #173f5c 100%); } }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']):not([data-panel]) .card-hero { background: linear-gradient(135deg, #10545b 0%, #173f5c 100%); } }
 .list { list-style: none; margin: 0; padding: 0; }
 .list > li + li { border-top: 1px solid var(--border); }
 .list-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; text-decoration: none; color: inherit; }
@@ -436,20 +563,21 @@ dialog.modal::backdrop { background: rgba(10, 20, 26, 0.5); }
 /* --- panel placówki ---------------------------------------------------------------------- */
 .s-shell { min-height: 100vh; display: grid; grid-template-columns: 248px 1fr; }
 .s-side {
-  position: sticky; top: 0; height: 100vh; overflow-y: auto; background: #0f2a33; color: #d5e4e8;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--side-bg, #0f2a33); color: var(--side-ink, #d5e4e8);
   display: flex; flex-direction: column; padding: 16px 12px;
 }
 .s-side .brand { color: #fff; padding: 6px 8px 18px; }
-.s-side .brand-mark { background: #1d8f99; }
-.s-side .brand-name em { color: #9fc1c8; }
+.s-side .brand-mark { background: var(--primary-hover, #1d8f99); }
+.s-side .brand-name em { color: var(--side-muted, #9fc1c8); }
 .s-side nav { display: flex; flex-direction: column; gap: 2px; }
 .s-side a {
   display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 10px; color: #c3d6db;
   text-decoration: none; font-weight: 550; font-size: 0.94rem;
 }
+html[data-panel='staff'] .s-side a { color: var(--side-ink); }
 .s-side a:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-.s-side a[aria-current='page'] { background: rgba(79, 179, 188, 0.18); color: #fff; }
-.s-side .nav-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #7fa1aa; padding: 16px 12px 6px; font-weight: 700; }
+.s-side a[aria-current='page'] { background: var(--side-active, rgba(79, 179, 188, 0.18)); color: #fff; box-shadow: inset 3px 0 0 var(--primary); }
+.s-side .nav-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--side-muted, #7fa1aa); padding: 16px 12px 6px; font-weight: 700; }
 .s-side .side-foot { margin-top: auto; padding: 12px 8px 4px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.85rem; }
 .s-side .count-badge { margin-left: auto; }
 .s-main { min-width: 0; display: flex; flex-direction: column; }

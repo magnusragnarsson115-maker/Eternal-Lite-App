@@ -410,12 +410,101 @@ function applyReview(extract: IntakeExtract, reviews: FieldReview[], who: 'patie
   return { ...extract, items };
 }
 
+// --- rejestr poprawek odczytu (runda 5): wartość automatyczna → poprawka → kto → kiedy ------------------------
+
+export interface ExtractionCorrection {
+  id: string;
+  intakeId: string;
+  itemId: string;
+  field: 'name' | 'value' | 'unit' | 'range' | 'status';
+  autoValue?: string;
+  correctedValue?: string;
+  actorKind: 'patient' | 'clinician';
+  actorName?: string;
+  at: string;
+  sourceText?: string;
+  loinc?: string;
+}
+
+const FIELD_OF: [ExtractionCorrection['field'], (i: IntakeField) => string | undefined][] = [
+  ['name', (i) => i.name],
+  ['value', (i) => i.value],
+  ['unit', (i) => i.unitRaw ?? i.unit],
+  ['range', (i) => i.rangeText],
+];
+
+/**
+ * Każda poprawka i odrzucenie pola zapisane osobno — lekarz i pacjent widzą historię przy wyniku, a zanonimizowany
+ * eksport (bez pacjenta i bez danych identyfikujących) zasila słownik mapowania (Mapping Engine).
+ */
+function logCorrections(row: IntakeRow, before: IntakeExtract, after: IntakeExtract, reviews: FieldReview[], actor: AuditActor, who: 'patient' | 'clinician'): void {
+  const stmt = getDb().prepare(
+    `INSERT INTO extraction_correction (id, intake_id, patient_ref, item_id, field, auto_value, corrected_value, actor_kind, actor_ref, actor_name, at, source_text, loinc, document_kind)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  );
+  const at = nowIso();
+  for (const r of reviews) {
+    if (r.action === 'confirm') continue;
+    const prev = before.items.find((i) => i.id === r.id);
+    const next = after.items.find((i) => i.id === r.id);
+    if (!prev || !next) continue;
+    const base = [row.id, row.patient_ref, r.id] as const;
+    const tail = [who, actor.actorRef ?? null, actor.display ?? null, at, prev.sourceText.slice(0, 300), next.match?.loinc ?? prev.match?.loinc ?? null, row.kind] as const;
+    if (r.action === 'reject') {
+      stmt.run(newId(), ...base, 'status', prev.value, 'odrzucone', ...tail);
+      continue;
+    }
+    for (const [field, get] of FIELD_OF) {
+      const a = get(prev);
+      const b = get(next);
+      if ((a ?? '') !== (b ?? '')) stmt.run(newId(), ...base, field, a ?? null, b ?? null, ...tail);
+    }
+  }
+}
+
+function toCorrection(r: Record<string, string | null>): ExtractionCorrection {
+  return {
+    id: r.id!,
+    intakeId: r.intake_id!,
+    itemId: r.item_id!,
+    field: r.field as ExtractionCorrection['field'],
+    autoValue: r.auto_value ?? undefined,
+    correctedValue: r.corrected_value ?? undefined,
+    actorKind: r.actor_kind as 'patient' | 'clinician',
+    actorName: r.actor_name ?? undefined,
+    at: r.at!,
+    sourceText: r.source_text ?? undefined,
+    loinc: r.loinc ?? undefined,
+  };
+}
+
+export function listCorrections(filter: { intakeId?: string; patientRef: string }): ExtractionCorrection[] {
+  const rows = (filter.intakeId
+    ? getDb().prepare('SELECT * FROM extraction_correction WHERE intake_id = ? AND patient_ref = ? ORDER BY at').all(filter.intakeId, filter.patientRef)
+    : getDb().prepare('SELECT * FROM extraction_correction WHERE patient_ref = ? ORDER BY at DESC LIMIT 500').all(filter.patientRef)) as Record<string, string | null>[];
+  return rows.map(toCorrection);
+}
+
+/** Eksport dla słownika mapowania: bez pacjenta, bez osoby, tekst źródłowy po usunięciu identyfikatorów, data bez godziny. */
+export function mappingCorrectionsCsv(since?: string): string {
+  const rows = getDb()
+    .prepare('SELECT field, auto_value, corrected_value, actor_kind, at, source_text, loinc, document_kind FROM extraction_correction WHERE at >= ? ORDER BY at')
+    .all(since ?? '1970-01-01') as Record<string, string | null>[];
+  const q = (v: string | null | undefined) => `"${(v ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
+  const head = 'data;rodzaj_dokumentu;pole;odczyt_automatyczny;poprawka;kto_poprawil;loinc;tekst_zrodlowy';
+  return [head, ...rows.map((r) => [q(r.at?.slice(0, 10)), q(r.document_kind), q(r.field), q(r.auto_value), q(r.corrected_value), q(r.actor_kind === 'patient' ? 'pacjent' : 'personel'), q(r.loinc), q(redactIdentifiers(r.source_text ?? ''))].join(';'))].join('\n');
+}
+
 export function reviewIntake(ctx: IntakeContext, id: string, input: { items?: FieldReview[]; collectedAt?: string; laboratory?: string }): IntakeView {
   const row = getIntake(id, { patientRef: ctx.patientRef });
   if (!['needs_review', 'submitted'].includes(row.status) || !row.extracted) throw conflict('intake_not_reviewable');
   if (row.status === 'submitted' && ctx.confirmer === 'patient') throw conflict('intake_already_submitted');
   let extract = JSON.parse(row.extracted) as IntakeExtract;
-  if (input.items?.length) extract = applyReview(extract, input.items, ctx.confirmer);
+  if (input.items?.length) {
+    const before = extract;
+    extract = applyReview(extract, input.items, ctx.confirmer);
+    logCorrections(row, before, extract, input.items, ctx.actor, ctx.confirmer);
+  }
   if (input.collectedAt) {
     const d = isoDate(input.collectedAt);
     if (!d) throw badRequest('invalid_date');
@@ -605,6 +694,7 @@ export async function clinicianConfirmObservations(actor: AuditActor, patientRef
   const row = getIntake(intakeId, { patientRef });
   if (row.status !== 'submitted' || !row.report_ref || !row.extracted) throw conflict('intake_not_submitted');
   const extract = applyReview(JSON.parse(row.extracted) as IntakeExtract, reviews, 'clinician');
+  logCorrections(row, JSON.parse(row.extracted) as IntakeExtract, extract, reviews, actor, 'clinician');
   const report = await fhirSystem().read<DiagnosticReport>('DiagnosticReport', row.report_ref.split('/')[1]);
   const kept = extract.items.filter((i) => i.state !== 'rejected');
   const prevKept = (JSON.parse(row.extracted) as IntakeExtract).items.filter((i) => i.state !== 'rejected');

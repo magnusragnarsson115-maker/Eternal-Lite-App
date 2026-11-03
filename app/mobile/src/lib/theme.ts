@@ -1,18 +1,18 @@
 import { useColorScheme } from 'react-native';
 import { useA11y } from './a11y';
 
-/** Te same tokeny wyglądu co panel i strona (web/src/styles.css) — R7: wspólny system wyglądu. */
+/** Te same tokeny wyglądu co panel pacjenta w przeglądarce (web/src/styles.css, html[data-panel='patient']) — kolorystyka rundy 5. */
 const light = {
-  bg: '#f3f6f7',
+  bg: '#f7f5fb',
   surface: '#ffffff',
-  surface2: '#f8fafb',
-  ink: '#102029',
-  ink2: '#33444e',
-  muted: '#56666f',
-  border: '#d9e2e6',
-  primary: '#0e6f78',
+  surface2: '#faf8fd',
+  ink: '#1c1830',
+  ink2: '#3d3655',
+  muted: '#5f5873',
+  border: '#e3ddef',
+  primary: '#5b3fc4',
   primaryInk: '#ffffff',
-  primarySoft: '#e3f1f2',
+  primarySoft: '#efeafc',
   success: '#17663f',
   successSoft: '#e4f4ea',
   warning: '#8a4b00',
@@ -22,16 +22,16 @@ const light = {
 };
 
 const dark: typeof light = {
-  bg: '#0d1418',
-  surface: '#141e23',
-  surface2: '#19252b',
-  ink: '#e6eef1',
-  ink2: '#c3d0d6',
-  muted: '#9aabb3',
-  border: '#2a3a42',
-  primary: '#4fb3bc',
-  primaryInk: '#04252a',
-  primarySoft: '#16343a',
+  bg: '#12101c',
+  surface: '#1a1727',
+  surface2: '#201c30',
+  ink: '#eeeaf7',
+  ink2: '#d2cbe4',
+  muted: '#a69fbb',
+  border: '#322c46',
+  primary: '#ab9bff',
+  primaryInk: '#1a1033',
+  primarySoft: '#2a2148',
   success: '#6fd39b',
   successSoft: '#163223',
   warning: '#f0b45c',
