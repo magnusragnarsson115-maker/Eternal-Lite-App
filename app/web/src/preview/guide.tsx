@@ -84,17 +84,17 @@ function sections(data: PreviewData): Section[] {
           route: card,
           title: { pl: 'Medical Snapshot z pochodzeniem danych', en: 'Medical Snapshot with data provenance' },
           what: {
-            pl: 'Karta Anny Kowalskiej otwiera się na podsumowaniu: problemy, leki, alergie, wyniki, parametry. Kliknij wynik → okno: wartość, data, laboratorium, dokument źródłowy, poprzednie wartości i kto je zatwierdził. Niżej: wywiady przed wizytą i log poprawek OCR (wartość automatyczna → poprawka → kto → kiedy).',
-            en: 'Anna Kowalska’s chart opens on the summary: problems, medicines, allergies, results, parameters. Click a result → value, date, laboratory, source document, previous values and who confirmed it. Below: pre-visit interviews and the OCR correction log (automatic value → correction → who → when).',
+            pl: 'Karta Anny Kowalskiej otwiera się na podsumowaniu: „Co się zmieniło od ostatniej wizyty” (lista nowych wpisów, bez oceny), problemy, leki, alergie, wyniki, parametry. Kliknij wynik → okno: wartość, data, laboratorium, dokument źródłowy, poprzednie wartości i kto je zatwierdził. Niżej: sprawy pacjenta, wywiady przed wizytą i log poprawek OCR (wartość automatyczna → poprawka → kto → kiedy).',
+            en: 'Anna Kowalska’s chart opens on the summary: “What changed since the last visit” (new entries listed, never assessed), problems, medicines, allergies, results, parameters. Click a result → value, date, laboratory, source document, previous values and who confirmed it. Below: the patient’s cases, pre-visit interviews and the OCR correction log (automatic value → correction → who → when).',
           },
         },
         {
           persona: 'doctor',
           route: `${card}?tab=timeline`,
-          title: { pl: 'Oś czasu i „Co się zmieniło”', en: 'Timeline and “What changed”' },
+          title: { pl: 'Oś czasu zdrowia', en: 'Health timeline' },
           what: {
-            pl: 'Filtry: leki, badania, objawy, wizyty, pomiary, hospitalizacje, dokumenty, rozpoznania. Na górze lista nowych wpisów od ostatniej wizyty — bez oceny, tylko co przybyło.',
-            en: 'Filters: medicines, tests, symptoms, visits, measurements, hospital stays, documents, diagnoses. At the top: new entries since the last visit — listed, never assessed.',
+            pl: 'Wszystko w jednej osi, od najnowszych. Filtry: leki, badania, objawy, wizyty, pomiary, hospitalizacje, dokumenty, rozpoznania; przy każdym wpisie źródło.',
+            en: 'Everything on one timeline, newest first. Filters: medicines, tests, symptoms, visits, measurements, hospital stays, documents, diagnoses; each entry shows its source.',
           },
         },
         {
@@ -126,8 +126,8 @@ function sections(data: PreviewData): Section[] {
           route: '/moje-zdrowie',
           title: { pl: 'Moje zdrowie i avatar 3D', en: 'My health and the 3D avatar' },
           what: {
-            pl: 'Avatar rośnie razem z dokumentacją: poziom zależy od liczby obszarów z danymi i ich świeżości, nie od stanu zdrowia. Obróć go palcem albo myszą. Niżej podsumowanie — kliknij wynik, by zobaczyć jego źródło.',
-            en: 'The avatar grows with the records: its level depends on how many areas have data and how fresh it is, never on health. Rotate it with a finger or mouse. Below: the summary — click a result to see its source.',
+            pl: 'Avatar rośnie razem z dokumentacją: poziom zależy od liczby obszarów z danymi i ich świeżości, nie od stanu zdrowia. Obróć go palcem albo myszą. Niżej „Co się zmieniło” i podsumowanie — kliknij wynik, by zobaczyć jego źródło.',
+            en: 'The avatar grows with the records: its level depends on how many areas have data and how fresh it is, never on health. Rotate it with a finger or mouse. Below: “What changed” and the summary — click a result to see its source.',
           },
         },
         {
