@@ -110,10 +110,12 @@ export function LoginPage({ staff }: { staff?: boolean }) {
         { email: 'piotr.zielinski@eternal.local', label: t('Lekarz (kardiologia)') },
         { email: 'recepcja@eternal.local', label: t('Rejestracja') },
         { email: 'admin@eternal.local', label: t('Administrator') },
+        { email: 'joanna.malinowska@eternal.local', label: t('Lekarka (klinika estetyczna)') },
       ]
     : [
         { email: 'pacjent@eternal.local', label: t('Pacjentka Anna Kowalska') },
         { email: 'maria@eternal.local', label: t('Pacjentka Maria (tożsamość niepotwierdzona)') },
+        { email: 'karolina@eternal.local', label: t('Pacjentka Karolina (klinika estetyczna)') },
       ];
   const submit = (e: FormEvent) => {
     e.preventDefault();

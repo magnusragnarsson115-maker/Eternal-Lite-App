@@ -103,6 +103,18 @@ przez `/dokument` z udziałem `ekspert-prawno-regulacyjny`; zweryfikuj aktualne 
 | Eternal ID i chip NFC | na chipie wyłącznie pola wybrane przez pacjenta (domyślnie imię, rok urodzenia, uczulenia, kontakt), ≤ 380 B; link odwoływalny, z terminem, każde otwarcie w dzienniku dostępu pacjenta |
 | Rejestr poprawek odczytu | eksport dla słownika mapowania bez pacjenta i osoby, tekst źródłowy po usunięciu identyfikatorów, data bez godziny (`mappingCorrectionsCsv`) |
 
+### Profile placówek — zasady w kodzie
+
+| Obszar | Realizacja |
+|---|---|
+| Zabiegi inwazyjne medycyny estetycznej | podpis karty wyłącznie przez lekarza albo lekarza dentystę (zawód w profilu personelu); kosmetolog — zabiegi bez naruszenia ciągłości skóry (komunikat MZ z 23.01.2026; status prawny sporny) |
+| Zgoda na zabieg o podwyższonym ryzyku | forma pisemna: wydruk podpisany odręcznie (skan w dokumentacji) albo kwalifikowany podpis elektroniczny; potwierdzenie przeczytania w aplikacji nie jest zgodą; karta z lekiem lub wyrobem medycznym wymaga podpisanej zgody |
+| Zdjęcia przed/po | tylko za zgodą na dokumentację fotograficzną; bez analizy obrazu (granica MDR §1, dane biometryczne); zgoda na rozpowszechnianie wizerunku osobna, domyślnie wyłączona, wycofywana przez pacjenta; brak funkcji publikacji |
+| Identyfikowalność produktów | numer serii, data ważności i UDI w karcie zabiegu; partia po terminie blokuje podpis; wyszukiwanie pacjentów po partii z wpisem w dzienniku dostępu |
+| Powikłania | nasilenie wpisuje lekarz; dane do zgłoszenia z inicjałami i rokiem urodzenia zamiast pełnych danych |
+| Deklaracje POZ | rejestr i statusy w placówce; zgłoszenie do NFZ poza Eternal; powód odrzucenia widoczny dla pacjenta |
+| IPOM i bilans | plan układa lekarz; aplikacja liczy wykorzystanie wobec limitów placówki i podaje orientacyjne uprawnienie do bilansu (potwierdza IKP) — bez kwalifikacji klinicznej; przypomnienia poza aplikacją bez danych o zdrowiu |
+
 ## 2. RODO (2016/679) i ochrona danych
 
 | Wymóg | Realizacja w kodzie |

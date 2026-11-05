@@ -224,6 +224,19 @@ Kolorystyka: osobne palety panelu pacjenta i panelu lekarza (`html[data-panel]` 
 | Dokumentacja fotograficzna za zgodą (bez analizy) | `POST /api/staff/patients/:id/photos` → dokument „photo” (`records.ts`) | `workspace.test.ts` |
 | Partnerzy przez API: Amazon Textract, ElevenLabs Scribe v2 Medical, Validic Inform, Docplanner/ZnanyLekarz, Infermedica (zablokowany bez oceny zgodności), przeglądarka 3D badań | `S/ai/ocr.ts` + `S/lib/sigv4.ts`, `S/ai/stt.ts`, `S/integrations/validic.ts`, `S/integrations/docplanner.ts`, `S/integrations/infermedica.ts`, `S/routes/partners.ts`, `W/staff/PartnersPanel.tsx` | `partners.test.ts` |
 
+### Profile placówek — POZ, medycyna estetyczna i pozostałe typy klinik
+
+Opis, braki i źródła: [`PROFILE_PLACOWEK.md`](PROFILE_PLACOWEK.md). Trasy: `S/routes/profiles.ts`; migracja 18 (deklaracje, IPOM, bilans,
+produkty i partie, karty zabiegów, zgody na zabieg i na wizerunek, powikłania).
+
+| Pozycje | Gdzie w kodzie | Testy |
+|---|---|---|
+| Rejestr profili (POZ, estetyka, AOS, rehabilitacja, zdrowie psychiczne, stomatologia i medycyna pracy — częściowe), podgląd i zastosowanie tylko dodające | `S/content/clinicProfiles.ts`, `S/services/clinicProfile.ts`, `W/staff/PozPages.tsx` (`ClinicProfilesTab`) | `profiles.test.ts` |
+| POZ: deklaracje, IPOM z koordynatorem i limitami, bilans „Moje Zdrowie”, przypomnienia | `S/services/poz.ts`, `W/staff/PozPages.tsx`, `W/patient/ClinicProfilePages.tsx` (`MyPozPage`) | `profiles.test.ts` |
+| Medycyna estetyczna: produkty i partie, karta zabiegu z mapą iniekcji, wymóg lekarza, zgoda pisemna (wydruk + skan), zgoda na wizerunek, zdjęcia przed/po, powikłania, VAT z celu | `S/services/aesthetic.ts`, `S/content/aestheticConsents.ts`, `W/staff/AestheticPages.tsx`, `W/patient/ClinicProfilePages.tsx` (`MyProceduresPage`) | `profiles.test.ts` |
+| Szablony notatek „Porada kompleksowa” i „Karta zabiegu”, wywiad kwalifikacyjny do zabiegu estetycznego | `S/scribe/templates.ts`, `S/content/interviews.ts` | `profiles.test.ts` |
+| Zawód w profilu personelu; VAT, wymóg lekarza, wzór zgody i kontrola w usłudze | `S/services/directory.ts`, `W/staff/OrgPages.tsx` (`CatalogTab`) | `profiles.test.ts` |
+
 ### Rdzeń wspólny (R1–R10) i D0
 
 | Nr | Pozycja | Etap | Gdzie w kodzie | Testy |

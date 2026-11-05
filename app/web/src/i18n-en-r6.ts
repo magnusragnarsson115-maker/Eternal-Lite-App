@@ -476,4 +476,6 @@ export const EN_R6: Record<string, string> = {
   'Zgoda na wykorzystanie moich zdjęć w materiałach informacyjnych placówki. Ta zgoda jest dobrowolna, niezależna od zabiegu i mogę ją w każdej chwili wycofać w aplikacji.': 'Consent to the use of my photos in the clinic’s information materials. This consent is voluntary, independent of the procedure, and I can withdraw it at any time in the app.',
   'Cel leczniczy ze wskazaniem w dokumentacji — zwolnienie (art. 43 ust. 1 pkt 18 ustawy o VAT) do potwierdzenia przez księgowość.': 'Therapeutic purpose with an indication in the records — exemption (Art. 43(1)(18) of the VAT Act) to be confirmed by the accountant.',
   'Cel estetyczny — stawka z usługi (co do zasady 23%).': 'Aesthetic purpose — rate from the service (23% as a rule).',
+  'Lekarka (klinika estetyczna)': 'Doctor (aesthetic clinic)',
+  'Pacjentka Karolina (klinika estetyczna)': 'Patient Karolina (aesthetic clinic)',
 };

@@ -22,6 +22,10 @@ Scribe z transkrypcją i notatką w 11 sekcjach, „Moje zdrowie” z avatarem 3
 przez API. „Pokaż” przełącza konto pokazowe i otwiera ekran bez logowania. Karty pacjenta, „Moje zdrowie” i
 administracja przyjmują `?tab=` (np. `/panel/pacjenci/<id>?tab=timeline`, `/panel/admin?tab=integrations`).
 
+**Profile placówek** ([`PROFILE_PLACOWEK.md`](PROFILE_PLACOWEK.md)): Centrum Medyczne Eternal działa w profilu POZ, a druga,
+fikcyjna placówka — Klinika Medycyny Estetycznej Aurora — w profilu „Medycyna estetyczna”. Konta: lekarka
+`joanna.malinowska@eternal.local` (panel), pacjentka `karolina@eternal.local`; hasło i sekret TOTP jak dla pozostałych kont.
+
 Ekran **„Moduły i funkcje”** (link na ekranie logowania i w menu, tylko w trybie demo) pokazuje wszystkie 42 moduły
 produktowe rejestru i 648 funkcji: co działa i gdzie to otworzyć, co jest w kolejce, czego sam kod nie zrobi i dlaczego.
 Dane pochodzą z [`FUNKCJE_648.md`](FUNKCJE_648.md) — po zmianie klasyfikacji: `npm run feature-map`.
