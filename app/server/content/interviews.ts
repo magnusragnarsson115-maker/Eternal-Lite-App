@@ -299,6 +299,32 @@ export const INTERVIEW_TREES: IvTree[] = [
       ...COMMON_TAIL.filter((n) => n.id !== 'family').map((n) => (n.id === 'alcohol' ? { ...n, next: 'issues' } : n)),
     ],
   },
+  {
+    // profil „Medycyna estetyczna”: informacje do kwalifikacji, które lekarz omawia przed zabiegiem — bez oceny
+    id: 'aesthetic',
+    version: 'wywiad-estetyka/2026-11-1',
+    title: 'Kwalifikacja do zabiegu medycyny estetycznej',
+    specialty: 'medycyna estetyczna',
+    description: 'Oczekiwania, wcześniejsze zabiegi, ciąża i karmienie, leki wpływające na krzepliwość, choroby autoimmunologiczne i nerwowo-mięśniowe, opryszczka, skłonność do bliznowców, uczulenia. Lekarz omawia odpowiedzi przy kwalifikacji.',
+    start: 'reason',
+    nodes: [
+      { id: 'reason', text: 'Czego oczekujesz po zabiegu? Napisz własnymi słowami.', type: 'text', next: 'previous', field: 'reason' },
+      { id: 'previous', text: 'Czy miałeś(-aś) wcześniej zabiegi medycyny estetycznej (toksyna, wypełniacze, nici, biostymulatory)?', type: 'yesno', options: yn('previous-what', 'pregnancy'), field: 'conditions', symptom: 'wcześniejsze zabiegi medycyny estetycznej' },
+      { id: 'previous-what', text: 'Jakie zabiegi, w jakich okolicach i kiedy? Jeśli znasz nazwę preparatu — wpisz ją.', type: 'text', next: 'pregnancy', field: 'conditions', hint: 'Np. „kwas hialuronowy w usta, maj 2026”.' },
+      { id: 'pregnancy', text: 'Czy jesteś w ciąży, planujesz ciążę w najbliższych miesiącach albo karmisz piersią?', type: 'yesno', options: yn('anticoag', 'anticoag'), field: 'risk', riskLabel: 'ciąża, planowana ciąża lub karmienie piersią' },
+      { id: 'anticoag', text: 'Czy przyjmujesz leki wpływające na krzepnięcie krwi (np. przeciwzakrzepowe, kwas acetylosalicylowy) albo suplementy jak omega-3 lub miłorząb?', type: 'yesno', options: yn('anticoag-what', 'autoimmune'), field: 'meds', symptom: 'leki lub suplementy wpływające na krzepnięcie' },
+      { id: 'anticoag-what', text: 'Jakie to leki lub suplementy?', type: 'text', next: 'autoimmune', field: 'meds' },
+      { id: 'autoimmune', text: 'Czy lekarz rozpoznał u Ciebie chorobę autoimmunologiczną (np. toczeń, reumatoidalne zapalenie stawów) albo chorobę nerwowo-mięśniową (np. miastenia)?', type: 'yesno', options: yn('autoimmune-what', 'herpes'), field: 'conditions', symptom: 'choroba autoimmunologiczna lub nerwowo-mięśniowa' },
+      { id: 'autoimmune-what', text: 'Jaka to choroba i jak jest leczona?', type: 'text', next: 'herpes', field: 'conditions' },
+      { id: 'herpes', text: 'Czy miewasz nawracającą opryszczkę wargową?', type: 'yesno', options: yn('keloid', 'keloid'), field: 'risk', riskLabel: 'nawracająca opryszczka wargowa' },
+      { id: 'keloid', text: 'Czy masz skłonność do przerostowych blizn lub bliznowców?', type: 'yesno', options: yn('skin', 'skin'), field: 'risk', riskLabel: 'skłonność do bliznowców' },
+      { id: 'skin', text: 'Czy w okolicy planowanego zabiegu masz teraz stan zapalny, zmiany skórne albo świeżą ranę?', type: 'yesno', options: yn('allergy', 'allergy'), field: 'symptoms', symptom: 'stan zapalny lub zmiany skórne w okolicy zabiegu' },
+      { id: 'allergy', text: 'Czy masz uczulenia na leki, środki znieczulające (np. lidokainę) albo inne substancje?', type: 'yesno', options: yn('allergy-what', 'meds-other'), field: 'allergies', symptom: 'uczulenia' },
+      { id: 'allergy-what', text: 'Na co jesteś uczulony(-a) i co się wtedy działo?', type: 'text', next: 'meds-other', field: 'allergies' },
+      { id: 'meds-other', text: 'Jakie inne leki przyjmujesz na stałe? (wpisz „brak”, jeśli żadne)', type: 'text', next: 'issues', field: 'meds' },
+      { id: 'issues', text: 'Czy jest coś, o co chcesz zapytać lekarza przed zabiegiem?', type: 'text', field: 'issues', optional: true },
+    ],
+  },
 ];
 
 export const INTERVIEW_IDS = INTERVIEW_TREES.map((t) => t.id);

@@ -39,6 +39,10 @@ export interface ClinicSettings {
   autoRemindMissingHours: number;
   /** Pomiar pilotażu (D12): tydzień bez Eternal i tydzień z Eternal. */
   pilot: { baselineWeekStart?: string; eternalWeekStart?: string; surveyEveryDays: number };
+  /** Profile placówki (POZ, medycyna estetyczna, …) — funkcje profilu i podpowiedzi konfiguracji. */
+  profiles: string[];
+  /** Opieka koordynowana: roczne limity pozycji IPOM według rodzaju (ustawia placówka według zarządzenia NFZ). */
+  ipomLimits: Partial<Record<'edukacja' | 'dietetyk' | 'konsultacja' | 'badanie' | 'wizyta', number>>;
 }
 
 export type DocumentKind = 'lab' | 'discharge' | 'imaging' | 'referral' | 'prescription' | 'certificate' | 'other';

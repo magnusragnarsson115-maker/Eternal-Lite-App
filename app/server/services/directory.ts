@@ -1,3 +1,4 @@
+import type { Profession, Vat } from '../content/clinicProfiles.js';
 import type {
   HealthcareService,
   Location,
@@ -34,6 +35,12 @@ export interface ServiceView {
   specialty?: string;
   active: boolean;
   locationIds: string[];
+  /** Profile placówek: stawka VAT dla celu estetycznego, wymóg lekarza, wzór zgody pisemnej, kontrola po N dniach. */
+  vat?: Vat;
+  requiresPhysician?: boolean;
+  consentTemplate?: string;
+  controlAfterDays?: number;
+  purposeDefault?: 'estetyczny' | 'leczniczy';
 }
 
 export interface PractitionerView {
@@ -46,6 +53,8 @@ export interface PractitionerView {
   locationIds: string[];
   active: boolean;
   bio?: string;
+  /** Zawód (lekarz, lekarz dentysta, pielęgniarka, …) — m.in. wymóg lekarza dla zabiegów inwazyjnych. */
+  profession?: Profession;
 }
 
 export interface LocationView {
@@ -87,8 +96,22 @@ export function toServiceView(s: HealthcareService): ServiceView {
     specialty: s.specialty?.[0]?.text,
     active: s.active !== false,
     locationIds: (s.location ?? []).map((l) => l.reference?.split('/')[1] ?? '').filter(Boolean),
+    vat: ext<Vat>(s, EXT.vat, 'valueCode'),
+    requiresPhysician: ext<boolean>(s, EXT.requiresPhysician, 'valueBoolean') || undefined,
+    consentTemplate: ext<string>(s, EXT.consentTemplate, 'valueString'),
+    controlAfterDays: ext<number>(s, EXT.controlAfterDays, 'valueInteger'),
+    purposeDefault: ext<'estetyczny' | 'leczniczy'>(s, EXT.purposeDefault, 'valueCode'),
   };
 }
+
+const EXT = {
+  vat: 'urn:eternal:ext:vat',
+  requiresPhysician: 'urn:eternal:ext:requires-physician',
+  consentTemplate: 'urn:eternal:ext:consent-template',
+  controlAfterDays: 'urn:eternal:ext:control-after-days',
+  purposeDefault: 'urn:eternal:ext:purpose-default',
+  profession: 'urn:eternal:profession',
+};
 
 async function load(): Promise<DirectoryCache> {
   const orgId = contextOrgId();
@@ -120,6 +143,7 @@ async function load(): Promise<DirectoryCache> {
           locationIds: pr.flatMap((r) => r.location ?? []).map((h) => h.reference?.split('/')[1] ?? ''),
           active: p.active !== false,
           bio: p.extension?.find((e) => e.url === 'urn:eternal:ext:bio')?.valueString,
+          profession: p.qualification?.flatMap((q) => q.code.coding ?? []).find((c) => c.system === EXT.profession)?.code as Profession | undefined,
         } satisfies PractitionerView;
       })
       .sort((a, b) => a.name.localeCompare(b.name, 'pl')),
@@ -208,6 +232,8 @@ export function defaultClinicSettings(): ClinicSettings {
     recordingRetentionDays: 30,
     autoRemindMissingHours: 48,
     pilot: { surveyEveryDays: 14 },
+    profiles: [],
+    ipomLimits: {},
   };
 }
 
@@ -257,6 +283,11 @@ export async function upsertService(actor: AuditActor, input: Omit<ServiceView, 
       ...(input.price !== undefined ? [{ url: ETERNAL.price, valueMoney: { value: input.price, currency: 'PLN' as const } }] : []),
       ...(input.preparation ? [{ url: ETERNAL.ext.preparation, valueString: input.preparation }] : []),
       ...(input.questionnaireId ? [{ url: ETERNAL.ext.questionnaire, valueReference: { reference: `Questionnaire/${input.questionnaireId}` } }] : []),
+      ...(input.vat ? [{ url: EXT.vat, valueCode: input.vat }] : []),
+      ...(input.requiresPhysician ? [{ url: EXT.requiresPhysician, valueBoolean: true }] : []),
+      ...(input.consentTemplate ? [{ url: EXT.consentTemplate, valueString: input.consentTemplate }] : []),
+      ...(input.controlAfterDays ? [{ url: EXT.controlAfterDays, valueInteger: input.controlAfterDays }] : []),
+      ...(input.purposeDefault ? [{ url: EXT.purposeDefault, valueCode: input.purposeDefault }] : []),
     ],
   };
   const saved = input.id ? await fhir().update(resource) : await fhir().create(resource);
@@ -267,7 +298,7 @@ export async function upsertService(actor: AuditActor, input: Omit<ServiceView, 
 
 export async function upsertPractitioner(
   actor: AuditActor,
-  input: { id?: string; prefix?: string; given: string; family: string; npwz?: string; specialty?: string; serviceIds: string[]; locationIds: string[]; active: boolean; bio?: string },
+  input: { id?: string; prefix?: string; given: string; family: string; npwz?: string; specialty?: string; serviceIds: string[]; locationIds: string[]; active: boolean; bio?: string; profession?: Profession },
 ): Promise<PractitionerView> {
   if (!input.given.trim() || !input.family.trim()) throw badRequest('name_required');
   if (input.npwz && !/^\d{7}$/.test(input.npwz)) throw badRequest('invalid_npwz');
@@ -278,6 +309,7 @@ export async function upsertPractitioner(
     name: [{ use: 'official', family: input.family.trim(), given: [input.given.trim()], prefix: input.prefix ? [input.prefix] : undefined }],
     identifier: input.npwz ? [{ system: NPWZ_SYSTEM, value: input.npwz }] : undefined,
     extension: input.bio ? [{ url: 'urn:eternal:ext:bio', valueString: input.bio }] : undefined,
+    qualification: input.profession ? [{ code: { coding: [{ system: EXT.profession, code: input.profession }], text: input.profession } }] : undefined,
   };
   const saved = input.id ? await fhir().update(practitioner) : await fhir().create(practitioner);
   const org = await getOrganization();

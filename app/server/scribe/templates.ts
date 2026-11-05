@@ -80,7 +80,40 @@ NOTE_TEMPLATES.push({
   sections: [S.powod, S.wywiad, S.objawy, S.historia, { ...S.leki, title: 'Leki' }, S.alergie, S.obserwacje, S.ocena, S.plan, S.zalecenia, { ...S.kontrola, title: 'Kontrola' }],
 });
 
-export const NOTE_TEMPLATE_IDS = ['general', 'cardiology', 'pediatrics', 'soap', 'sbar', 'full'] as const;
+// profile placówek: porada kompleksowa w opiece koordynowanej (POZ) i karta zabiegu medycyny estetycznej
+NOTE_TEMPLATES.push(
+  {
+    id: 'koz',
+    version: 'note-koz/2026-11-1',
+    name: 'Porada kompleksowa — opieka koordynowana (POZ)',
+    specialty: 'interna',
+    sections: [
+      { ...S.wywiad, hint: 'Przebieg choroby przewlekłej i dolegliwości z relacji pacjenta.' },
+      S.leki,
+      S.badanie,
+      { ...S.wyniki, hint: 'Wyniki badań i pomiary omówione na wizycie — liczby dokładnie jak padły.' },
+      S.rozpoznanie,
+      { key: 'ipom', title: 'Indywidualny Plan Opieki Medycznej', hint: 'Badania, konsultacje, porady edukacyjne i dietetyczne zaplanowane przez lekarza — tylko wypowiedziane.', ehr: { generic: 'Zalecenia', soap: 'P' } },
+      S.zalecenia,
+      S.kontrola,
+    ],
+  },
+  {
+    id: 'aesthetic',
+    version: 'note-aesthetic/2026-11-1',
+    name: 'Karta zabiegu — medycyna estetyczna',
+    specialty: 'medycyna estetyczna',
+    sections: [
+      { key: 'powod', title: 'Oczekiwania pacjenta', hint: 'Z czym pacjent przychodzi — jego słowami.', ehr: { generic: 'Wywiad', soap: 'S' } },
+      { key: 'kwalifikacja', title: 'Kwalifikacja i przeciwwskazania', hint: 'Omówione przeciwwskazania i odpowiedzi pacjenta (ciąża, leki, choroby, wcześniejsze zabiegi) — bez oceny modelu.', ehr: { generic: 'Wywiad', soap: 'S' } },
+      { key: 'zabieg', title: 'Przebieg zabiegu', hint: 'Okolice, technika i ilości podane przez lekarza; produkt i numer serii zapisuje karta zabiegu.', ehr: { generic: 'Badanie przedmiotowe', soap: 'O' } },
+      S.zalecenia,
+      { ...S.kontrola, title: 'Kontrola' },
+    ],
+  },
+);
+
+export const NOTE_TEMPLATE_IDS = ['general', 'cardiology', 'pediatrics', 'soap', 'sbar', 'full', 'koz', 'aesthetic'] as const;
 
 /** Formaty wyjściowe notatki (A12.5) — przekształcenie tej samej, zatwierdzanej treści, bez dopisywania. */
 export const NOTE_FORMATS = ['clinical', 'soap', 'discharge', 'summary', 'ehr', 'fhir'] as const;
@@ -98,16 +131,17 @@ export const SOAP_OF: Record<string, 'S' | 'O' | 'A' | 'P'> = {
   powod: 'S', wywiad: 'S', objawy: 'S', historia: 'S', leki: 'S', alergie: 'S', rozwoj: 'S', sytuacja: 'S', tlo: 'S', S: 'S',
   badanie: 'O', pomiary: 'O', wyniki: 'O', obserwacje: 'O', O: 'O',
   rozpoznanie: 'A', ocena: 'A', A: 'A',
-  zalecenia: 'P', kontrola: 'P', plan: 'P', zalecenie: 'P', P: 'P',
+  zalecenia: 'P', kontrola: 'P', plan: 'P', zalecenie: 'P', P: 'P', ipom: 'P',
+  kwalifikacja: 'S', zabieg: 'O',
 };
 /** Układ karty informacyjnej: sekcja docelowa → klucze sekcji notatki. */
 export const DISCHARGE_LAYOUT: [string, string[]][] = [
   ['Rozpoznanie / ocena lekarza', ['rozpoznanie', 'ocena', 'A']],
-  ['Wywiad i przebieg wizyty', ['powod', 'wywiad', 'objawy', 'historia', 'sytuacja', 'tlo', 'S']],
-  ['Badanie i wyniki', ['badanie', 'pomiary', 'wyniki', 'obserwacje', 'O']],
+  ['Wywiad i przebieg wizyty', ['powod', 'wywiad', 'objawy', 'historia', 'kwalifikacja', 'sytuacja', 'tlo', 'S']],
+  ['Badanie i wyniki', ['badanie', 'pomiary', 'wyniki', 'obserwacje', 'zabieg', 'O']],
   ['Leki', ['leki']],
   ['Alergie', ['alergie']],
-  ['Zalecenia', ['plan', 'zalecenia', 'zalecenie', 'P']],
+  ['Zalecenia', ['plan', 'ipom', 'zalecenia', 'zalecenie', 'P']],
   ['Kontrola', ['kontrola']],
 ];
 

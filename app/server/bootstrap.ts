@@ -14,6 +14,8 @@ import { runMonthlyReports } from './services/reports.js';
 import { runMedReminderSweep } from './services/medReminders.js';
 import { runAirAlertSweep } from './services/environment.js';
 import { runCustomReminderSweep, runMorningSweep, runPreventiveSweep } from './services/personalReminders.js';
+import { runIpomReminderSweep } from './services/poz.js';
+import { runAestheticReminderSweep } from './services/aesthetic.js';
 import { runValidicSweep } from './integrations/validic.js';
 import { runDocplannerSweep } from './integrations/docplanner.js';
 import { listOrganizations } from './services/orgs.js';
@@ -54,6 +56,8 @@ export function startJobs(log: (msg: string, err?: unknown) => void): () => void
     every(60_000, 'custom reminders', runCustomReminderSweep),
     every(60_000, 'morning summary', runMorningSweep),
     every(60 * 60_000, 'preventive reminders', runPreventiveSweep),
+    every(60 * 60_000, 'care plan reminders', runIpomReminderSweep),
+    every(60 * 60_000, 'aesthetic reminders', runAestheticReminderSweep),
     every(60 * 60_000, 'air quality alerts', runAirAlertSweep),
     every(6 * 60 * 60_000, 'validic sync', runValidicSweep),
     every(10 * 60_000, 'docplanner sync', async () => runDocplannerSweep((await listOrganizations()).map((o) => o.id))),

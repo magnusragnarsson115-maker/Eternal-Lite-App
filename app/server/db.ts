@@ -827,6 +827,167 @@ const MIGRATIONS: string[] = [
   );
   CREATE INDEX eternal_id_link_patient ON eternal_id_link(patient_ref);
   `,
+  // 18 — profile placówek: POZ (deklaracje wyboru, opieka koordynowana z IPOM, bilans „Moje Zdrowie”) i medycyna
+  // estetyczna (produkty i partie, karta zabiegu z mapą iniekcji, zgody na zabieg i na wizerunek, powikłania)
+  `
+  CREATE TABLE poz_declaration (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    practitioner_id TEXT NOT NULL,
+    source TEXT NOT NULL,
+    status TEXT NOT NULL,
+    reason TEXT,
+    submitted_on TEXT NOT NULL,
+    decided_at TEXT,
+    decided_by TEXT,
+    created_by TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX poz_declaration_org ON poz_declaration(org_id, status);
+  CREATE INDEX poz_declaration_patient ON poz_declaration(patient_ref);
+  CREATE TABLE ipom_plan (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    groups TEXT NOT NULL,
+    coordinator_user_id TEXT,
+    author_user_id TEXT NOT NULL,
+    author_name TEXT,
+    status TEXT NOT NULL,
+    note TEXT,
+    valid_from TEXT NOT NULL,
+    valid_to TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX ipom_plan_org ON ipom_plan(org_id, status);
+  CREATE INDEX ipom_plan_patient ON ipom_plan(patient_ref);
+  CREATE TABLE ipom_item (
+    id TEXT PRIMARY KEY,
+    plan_id TEXT NOT NULL REFERENCES ipom_plan(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    due_on TEXT,
+    status TEXT NOT NULL,
+    done_on TEXT,
+    done_by TEXT,
+    note TEXT,
+    patient_notified_at TEXT,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX ipom_item_plan ON ipom_item(plan_id);
+  CREATE TABLE program_visit (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    program TEXT NOT NULL,
+    done_on TEXT NOT NULL,
+    recorded_by TEXT,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX program_visit_patient ON program_visit(patient_ref, program);
+  CREATE TABLE aesthetic_product (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    category TEXT NOT NULL,
+    manufacturer TEXT,
+    unit TEXT NOT NULL,
+    requires_physician INTEGER NOT NULL DEFAULT 1,
+    active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL
+  );
+  CREATE TABLE aesthetic_lot (
+    id TEXT PRIMARY KEY,
+    product_id TEXT NOT NULL REFERENCES aesthetic_product(id),
+    org_id TEXT NOT NULL,
+    lot TEXT NOT NULL,
+    expiry TEXT NOT NULL,
+    udi TEXT,
+    received_on TEXT,
+    note TEXT,
+    active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX aesthetic_lot_product ON aesthetic_lot(product_id);
+  CREATE TABLE aesthetic_procedure (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    appointment_id TEXT,
+    service_id TEXT,
+    title TEXT NOT NULL,
+    purpose TEXT NOT NULL,
+    indication TEXT,
+    performer_user_id TEXT NOT NULL,
+    performer_name TEXT,
+    performed_at TEXT NOT NULL,
+    items TEXT NOT NULL,
+    points TEXT NOT NULL,
+    notes TEXT,
+    consent_id TEXT,
+    photo_ids TEXT NOT NULL,
+    aftercare TEXT,
+    control_on TEXT,
+    next_on TEXT,
+    status TEXT NOT NULL,
+    signed_at TEXT,
+    control_notified_at TEXT,
+    next_notified_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX aesthetic_procedure_org ON aesthetic_procedure(org_id, performed_at);
+  CREATE INDEX aesthetic_procedure_patient ON aesthetic_procedure(patient_ref);
+  CREATE TABLE procedure_consent (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    template_id TEXT NOT NULL,
+    template_version TEXT NOT NULL,
+    template_hash TEXT NOT NULL,
+    status TEXT NOT NULL,
+    read_at TEXT,
+    signed_on TEXT,
+    method TEXT,
+    document_id TEXT,
+    recorded_by TEXT,
+    withdrawn_at TEXT,
+    created_at TEXT NOT NULL
+  );
+  CREATE INDEX procedure_consent_patient ON procedure_consent(patient_ref);
+  CREATE TABLE image_consent (
+    org_id TEXT NOT NULL,
+    patient_ref TEXT NOT NULL,
+    documentation INTEGER NOT NULL DEFAULT 0,
+    marketing INTEGER NOT NULL DEFAULT 0,
+    updated_at TEXT NOT NULL,
+    updated_by TEXT,
+    PRIMARY KEY (org_id, patient_ref)
+  );
+  CREATE TABLE aesthetic_complication (
+    id TEXT PRIMARY KEY,
+    org_id TEXT NOT NULL,
+    procedure_id TEXT NOT NULL REFERENCES aesthetic_procedure(id),
+    patient_ref TEXT NOT NULL,
+    noticed_on TEXT NOT NULL,
+    description TEXT NOT NULL,
+    seriousness TEXT NOT NULL,
+    actions TEXT,
+    report_to TEXT NOT NULL,
+    reported_on TEXT,
+    report_ref TEXT,
+    status TEXT NOT NULL,
+    recorded_by TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+  CREATE INDEX aesthetic_complication_org ON aesthetic_complication(org_id, status);
+  `,
 ];
 
 export type Db = DatabaseSync;

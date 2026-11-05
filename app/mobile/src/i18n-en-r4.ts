@@ -45,5 +45,7 @@ export const EN_R4: Record<string, string> = {
   'Moje przypomnienia (np. światło, ćwiczenia)': 'My reminders (e.g. light, exercise)',
   'Badania profilaktyczne NFZ': 'NFZ preventive screening',
   'Poranne podsumowanie dnia': 'Morning summary of the day',
+  'Plan opieki koordynowanej (POZ)': 'Coordinated care plan (primary care)',
+  'Zabiegi: kontrola i kolejny termin': 'Procedures: follow-up and next date',
   'Jakość powietrza w mojej okolicy (GIOŚ)': 'Air quality in my area (GIOŚ)',
 };

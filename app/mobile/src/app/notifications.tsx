@@ -25,6 +25,8 @@ const KIND_LABEL: Record<string, string> = {
   'morning-summary': 'Poranne podsumowanie dnia',
   'air-alert': 'Jakość powietrza w mojej okolicy (GIOŚ)',
   'lab-flags': 'Oznaczenia laboratorium w moich dokumentach',
+  'care-plan': 'Plan opieki koordynowanej (POZ)',
+  aesthetic: 'Zabiegi: kontrola i kolejny termin',
 };
 
 /** Powiadomienia (P8): które rodzaje i godziny ciszy. Treść powiadomień nie zawiera danych o zdrowiu. */

@@ -27,6 +27,7 @@ import { applyPackage, listPackages } from '../services/packages.js';
 import { feedbackSummary } from '../services/surveys.js';
 import { listEmergencyForOrg, reviewEmergencyAccess } from '../services/emergencyAccess.js';
 import { NOTE_TEMPLATE_IDS } from '../scribe/templates.js';
+import { PROFESSIONS, type Profession } from '../content/clinicProfiles.js';
 
 function tempPassword(): string {
   // 16 znaków z alfabetu bez znaków mylących — przekazywane osobiście, wymuszona zmiana przy logowaniu
@@ -61,6 +62,11 @@ const ServiceSchema = z.object({
   specialty: z.string().max(80).optional(),
   active: z.boolean().default(true),
   locationIds: z.array(zId).max(10).default([]),
+  vat: z.enum(['zw', '8', '23']).optional(),
+  requiresPhysician: z.boolean().optional(),
+  consentTemplate: z.string().max(40).optional(),
+  controlAfterDays: z.number().int().min(1).max(365).optional(),
+  purposeDefault: z.enum(['estetyczny', 'leczniczy']).optional(),
 });
 
 const PractitionerSchema = z.object({
@@ -73,6 +79,7 @@ const PractitionerSchema = z.object({
   locationIds: z.array(zId).max(10).default([]),
   active: z.boolean().default(true),
   bio: z.string().max(500).optional(),
+  profession: z.enum(PROFESSIONS as [Profession, ...Profession[]]).optional(),
 });
 
 export async function adminRoutes(app: FastifyInstance): Promise<void> {
