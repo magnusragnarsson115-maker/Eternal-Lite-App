@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BadgeCheck, CalendarPlus, FilePlus2, FileText, FlaskConical, KeyRound, MessageSquarePlus, Paperclip, Plus, Search, Trash2, UserPlus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { AestheticConsentsPanel, AestheticPatientPanel } from './AestheticPages';
+import { IpomPanel, PatientPozSummary } from './PozPages';
 import { api, get, post, put, qs } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
@@ -163,7 +165,7 @@ interface ClinicalData {
   questionnaires: { id: string; authored: string; answers: { question: string; answer: string }[]; appointmentId: string }[];
 }
 
-const TAB_IDS = ['snapshot', 'timeline', 'data', 'appointments', 'records', 'measurements', 'medications', 'questionnaires', 'rehab', 'diagnoses', 'messages', 'consents'] as const;
+const TAB_IDS = ['snapshot', 'timeline', 'ipom', 'zabiegi', 'data', 'appointments', 'records', 'measurements', 'medications', 'questionnaires', 'rehab', 'diagnoses', 'messages', 'consents'] as const;
 type Tab = (typeof TAB_IDS)[number];
 
 export function PatientDetailPage() {
@@ -194,6 +196,7 @@ export function PatientDetailPage() {
   const [openRecord, setOpenRecord] = useState<RecordView | null>(null);
 
   const card = useQuery({ queryKey: ['patient', id], queryFn: () => get<PatientCard>(`/api/staff/patients/${id}`) });
+  const clinicFeatures = useQuery({ queryKey: ['clinic-profile'], queryFn: () => get<{ features: string[] }>('/api/staff/clinic-profile'), staleTime: 300_000 });
   const clinical = useQuery({ queryKey: ['patient-clinical', id], queryFn: () => get<ClinicalData>(`/api/staff/patients/${id}/clinical`), enabled: clinician && ['records', 'measurements', 'medications', 'questionnaires'].includes(tab) });
   const threads = useQuery({ queryKey: ['threads', 'patient', id], queryFn: () => get<{ items: ThreadView[] }>(`/api/staff/threads${qs({ patientId: id })}`), enabled: tab === 'messages' });
 
@@ -218,6 +221,7 @@ export function PatientDetailPage() {
   if (card.isLoading) return <Skeleton count={3} />;
   if (card.isError) return <QueryError error={card.error} />;
   const { patient: p, consents, appointments } = card.data!;
+  const features = clinicFeatures.data?.features ?? [];
   const upcoming = appointments.filter((a) => ['booked', 'arrived'].includes(a.status) && Date.parse(a.end) > Date.now());
 
   const tabs: { value: Tab; label: string }[] = [
@@ -227,6 +231,8 @@ export function PatientDetailPage() {
           { value: 'timeline', label: t('Oś czasu') },
         ] as { value: Tab; label: string }[])
       : []),
+    ...(features.includes('poz') && (clinician || hasRole(me, 'reception')) ? [{ value: 'ipom' as Tab, label: t('Opieka koordynowana') }] : []),
+    ...(features.includes('aesthetic') && (clinician || hasRole(me, 'reception')) ? [{ value: 'zabiegi' as Tab, label: t('Zabiegi') }] : []),
     { value: 'data', label: t('Dane') },
     { value: 'appointments', label: `${t('Wizyty')} (${appointments.length})` },
     ...(clinician
@@ -273,6 +279,13 @@ export function PatientDetailPage() {
 
       {tab === 'snapshot' && clinician && <SnapshotPanel patientId={id} patientName={p.name} />}
       {tab === 'timeline' && clinician && <TimelinePanel patientId={id} />}
+      {tab === 'ipom' && features.includes('poz') && (
+        <div className="stack">
+          <PatientPozSummary patientId={id} />
+          <IpomPanel patientId={id} />
+        </div>
+      )}
+      {tab === 'zabiegi' && features.includes('aesthetic') && (clinician ? <AestheticPatientPanel patientId={id} /> : <AestheticConsentsPanel patientId={id} />)}
       {tab === 'data' && (
         <div className="grid-2">
           <Card title={t('Dane osobowe i kontaktowe')} action={<Button size="sm" variant="secondary" onClick={() => setEditOpen(true)}>{t('Edytuj')}</Button>}>
@@ -835,3 +848,4 @@ function NewMessageModal({ patient, onClose }: { patient: PatientView; onClose: 
     </Modal>
   );
 }
+

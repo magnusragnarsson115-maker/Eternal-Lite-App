@@ -331,6 +331,16 @@ export async function upsertPractitioner(
   return getPractitioner(saved.id ?? '');
 }
 
+/** Zawód osoby z personelu (m.in. wymóg lekarza dla zabiegów inwazyjnych) — bez zmiany pozostałych danych. */
+export async function setPractitionerProfession(actor: AuditActor, id: string, profession: Profession | null): Promise<PractitionerView> {
+  const p = await fhir().read<Practitioner>('Practitioner', id);
+  const others = (p.qualification ?? []).filter((q) => !q.code.coding?.some((c) => c.system === EXT.profession));
+  await fhir().update<Practitioner>({ ...p, qualification: [...others, ...(profession ? [{ code: { coding: [{ system: EXT.profession, code: profession }], text: profession } }] : [])] });
+  audit(actor, { action: 'U', subtype: 'practitioner-profession', entityRef: `Practitioner/${id}`, detail: { profession } });
+  invalidateDirectory();
+  return getPractitioner(id);
+}
+
 export async function listQuestionnaires(): Promise<Questionnaire[]> {
   return fhir().search<Questionnaire>('Questionnaire', { status: 'active' });
 }

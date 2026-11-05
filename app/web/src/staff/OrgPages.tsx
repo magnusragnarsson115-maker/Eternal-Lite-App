@@ -6,7 +6,21 @@ import { get, post, put, qs } from '../api';
 import { errorMessage } from '../errors';
 import { addDaysIso, clinicDate, useI18n } from '../i18n';
 import { useSession } from '../session';
-import type { LocationView, PractitionerView, ServiceView, ThreadView } from '../types';
+import type { LocationView, PractitionerView, Profession, ServiceView, ThreadView } from '../types';
+import { ClinicProfilesTab } from './PozPages';
+
+export const PROFESSIONS: Profession[] = ['lekarz', 'lekarz-dentysta', 'pielegniarka', 'polozna', 'fizjoterapeuta', 'psycholog', 'dietetyk', 'kosmetolog', 'inny'];
+export const PROFESSION_LABEL: Record<Profession, string> = {
+  lekarz: 'lekarz',
+  'lekarz-dentysta': 'lekarz dentysta',
+  pielegniarka: 'pielęgniarka',
+  polozna: 'położna',
+  fizjoterapeuta: 'fizjoterapeuta',
+  psycholog: 'psycholog',
+  dietetyk: 'dietetyk',
+  kosmetolog: 'kosmetolog',
+  inny: 'inny zawód',
+};
 import { Badge, Button, Card, Checkbox, Empty, Modal, Notice, PageHead, QueryError, SelectField, Skeleton, Tabs, TextArea, TextField, useToast } from '../ui';
 import { ThreadConversation } from '../ui/ThreadView';
 import { PartnersPanel } from './PartnersPanel';
@@ -270,7 +284,7 @@ export function OutboxPage() {
 
 // --- administracja ---------------------------------------------------------------------------------------
 
-const ADMIN_TABS = ['settings', 'users', 'services', 'integrations', 'audit', 'requests'] as const;
+const ADMIN_TABS = ['settings', 'profiles', 'users', 'services', 'integrations', 'audit', 'requests'] as const;
 type AdminTab = (typeof ADMIN_TABS)[number];
 
 export function AdminPage() {
@@ -292,6 +306,7 @@ export function AdminPage() {
         onChange={setTab}
         tabs={[
           { value: 'settings', label: t('Placówka') },
+          { value: 'profiles', label: t('Profil placówki') },
           { value: 'users', label: t('Personel') },
           { value: 'services', label: t('Usługi i lekarze') },
           { value: 'integrations', label: t('Integracje') },
@@ -300,6 +315,7 @@ export function AdminPage() {
         ]}
       />
       {tab === 'settings' && <SettingsTab />}
+      {tab === 'profiles' && <ClinicProfilesTab />}
       {tab === 'users' && <UsersTab />}
       {tab === 'services' && <CatalogTab />}
       {tab === 'integrations' && <IntegrationsTab />}
@@ -521,6 +537,10 @@ function CatalogTab() {
       void qc.invalidateQueries({ queryKey: ['catalog'] });
     },
   });
+  const profession = useMutation({
+    mutationFn: (v: { id: string; profession: string | null }) => put(`/api/admin/practitioners/${v.id}/profession`, { profession: v.profession }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['admin-catalog'] }),
+  });
   if (q.isLoading) return <Skeleton />;
   if (q.isError) return <QueryError error={q.error} />;
   return (
@@ -543,16 +563,27 @@ function CatalogTab() {
           ))}
         </ul>
       </Card>
-      <Card title={t('Lekarze')} className="card-flush" as="section">
+      <Card title={t('Personel medyczny')} className="card-flush" as="section">
         <ul className="list">
           {q.data!.practitioners.map((p) => (
-            <li key={p.id} className="list-item">
+            <li key={p.id} className="list-item" style={{ flexWrap: 'wrap' }}>
               <span className="grow">
                 <span className="list-title" style={{ display: 'block' }}>{p.name}</span>
                 <span className="list-sub">
                   {p.specialty} · {p.serviceIds.map((id) => q.data!.services.find((s) => s.id === id)?.name).filter(Boolean).join(', ')}
                 </span>
               </span>
+              <label className="sr-only" htmlFor={`prof-${p.id}`}>
+                {t('Zawód')}
+              </label>
+              <select id={`prof-${p.id}`} className="select sm" value={p.profession ?? ''} onChange={(e) => profession.mutate({ id: p.id, profession: e.target.value || null })}>
+                <option value="">{t('zawód — nie podano')}</option>
+                {PROFESSIONS.map((x) => (
+                  <option key={x} value={x}>
+                    {t(PROFESSION_LABEL[x])}
+                  </option>
+                ))}
+              </select>
             </li>
           ))}
         </ul>
@@ -593,6 +624,32 @@ function CatalogTab() {
             </div>
             <TextArea label={t('Opis')} value={svc.description ?? ''} onChange={(e) => setSvc({ ...svc, description: e.target.value })} maxLength={500} />
             <TextArea label={t('Przygotowanie (widoczne dla pacjenta)')} value={svc.preparation ?? ''} onChange={(e) => setSvc({ ...svc, preparation: e.target.value })} maxLength={500} />
+            <fieldset className="fieldset">
+              <legend>{t('Rozliczenie i wymagania zabiegu')}</legend>
+              <div className="grid-2">
+                <SelectField label={t('Stawka VAT (cel estetyczny)')} value={svc.vat ?? ''} onChange={(e) => setSvc({ ...svc, vat: (e.target.value || undefined) as ServiceView['vat'] })}>
+                  <option value="">{t('nie dotyczy')}</option>
+                  <option value="23">23%</option>
+                  <option value="8">8%</option>
+                  <option value="zw">{t('zwolniona')}</option>
+                </SelectField>
+                <SelectField label={t('Cel domyślny')} value={svc.purposeDefault ?? ''} onChange={(e) => setSvc({ ...svc, purposeDefault: (e.target.value || undefined) as ServiceView['purposeDefault'] })}>
+                  <option value="">—</option>
+                  <option value="estetyczny">{t('estetyczny')}</option>
+                  <option value="leczniczy">{t('leczniczy')}</option>
+                </SelectField>
+                <SelectField label={t('Wzór zgody pisemnej')} value={svc.consentTemplate ?? ''} onChange={(e) => setSvc({ ...svc, consentTemplate: e.target.value || undefined })}>
+                  <option value="">{t('brak')}</option>
+                  <option value="toksyna">{t('Toksyna botulinowa')}</option>
+                  <option value="wypelniacz">{t('Wypełniacz z kwasem hialuronowym')}</option>
+                  <option value="biostymulator">{t('Stymulator tkankowy')}</option>
+                  <option value="mezoterapia">{t('Mezoterapia igłowa')}</option>
+                </SelectField>
+                <TextField label={t('Wizyta kontrolna po (dni)')} type="number" min={1} max={365} value={svc.controlAfterDays ?? ''} onChange={(e) => setSvc({ ...svc, controlAfterDays: e.target.value === '' ? undefined : Number(e.target.value) })} />
+              </div>
+              <Checkbox label={t('Zabieg wykonuje lekarz lub lekarz dentysta')} hint={t('Kartę zabiegu podpisze wyłącznie osoba z zawodem „lekarz” albo „lekarz dentysta” w profilu personelu.')} checked={!!svc.requiresPhysician} onChange={(e) => setSvc({ ...svc, requiresPhysician: e.target.checked || undefined })} />
+              <p className="small muted" style={{ margin: 0 }}>{t('O zwolnieniu z VAT decyduje cel zabiegu udokumentowany przez lekarza — w razie wątpliwości potwierdź z księgowością.')}</p>
+            </fieldset>
             <Checkbox label={t('Usługa aktywna (widoczna w rezerwacji)')} checked={svc.active ?? true} onChange={(e) => setSvc({ ...svc, active: e.target.checked })} />
             {saveSvc.isError && <Notice kind="danger">{errorMessage(saveSvc.error, t)}</Notice>}
           </div>

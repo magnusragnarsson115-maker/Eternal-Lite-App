@@ -31,7 +31,10 @@ export interface PractitionerView {
   locationIds: string[];
   active: boolean;
   bio?: string;
+  profession?: Profession;
 }
+
+export type Profession = 'lekarz' | 'lekarz-dentysta' | 'pielegniarka' | 'polozna' | 'fizjoterapeuta' | 'psycholog' | 'dietetyk' | 'kosmetolog' | 'inny';
 
 export interface ServiceView {
   id: string;
@@ -46,6 +49,11 @@ export interface ServiceView {
   specialty?: string;
   active: boolean;
   locationIds: string[];
+  vat?: 'zw' | '8' | '23';
+  requiresPhysician?: boolean;
+  consentTemplate?: string;
+  controlAfterDays?: number;
+  purposeDefault?: 'estetyczny' | 'leczniczy';
 }
 
 export interface LocationView {

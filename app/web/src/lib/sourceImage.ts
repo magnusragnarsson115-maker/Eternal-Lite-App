@@ -20,6 +20,11 @@ export function setFileSource(fn: (url: string) => Promise<string>): void {
   fileSource = fn;
 }
 
+/** Adres pliku do znacznika <img> — w podglądzie bez serwera lokalna kopia z nagrania. */
+export function resolveFileUrl(url: string): Promise<string> {
+  return fileSource(url);
+}
+
 export function pdfjs(): Promise<PdfJs> {
   lib ??= Promise.all([import('pdfjs-dist/legacy/build/pdf.mjs') as Promise<PdfJs>, import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?url')]).then(([m, worker]) => {
     m.GlobalWorkerOptions.workerSrc = worker.default;

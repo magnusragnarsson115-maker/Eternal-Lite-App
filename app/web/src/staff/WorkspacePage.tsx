@@ -9,6 +9,7 @@ import { useSession } from '../session';
 import type { PatientView } from '../types';
 import { Badge, Button, Card, Checkbox, Combobox, Empty, Modal, PageHead, QueryError, Segmented, Skeleton, Tabs, TextArea, TextField, useToast } from '../ui';
 import { WaitingRoomCard } from './ClinicPages';
+import { ProfileTasksCard } from './PozPages';
 
 /**
  * Eternal Klinika — przestrzeń pracy lekarza (runda 5). Ekran główny to kolejka spraw, nie sto wykresów:
@@ -388,6 +389,7 @@ export function WorkspacePage() {
           )}
         </Card>
         <div className="stack">
+          <ProfileTasksCard />
           <WaitingRoomCard />
           <Card title={t('Jak działa kolejka')}>
             <p className="small muted">{t(d.rule)}</p>

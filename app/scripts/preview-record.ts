@@ -29,8 +29,8 @@ interface Recorded {
   b64?: string;
 }
 
-const PATIENT_ROUTES = ['/', '/wizyty', '/rezerwacja', '/wyniki', '/dokumenty', '/os-czasu', '/raport', '/pomiary', '/leki', '/wiadomosci', '/kalendarz', '/dzienniki', '/historia-zdrowia', '/plan', '/dla-lekarza', '/rodzina', '/ankiety', '/udostepnianie', '/karty', '/bezpieczenstwo', '/pomoc', '/prywatnosc', '/profil', '/powiadomienia', '/nfz', '/wiecej', '/jak-dziala-ai', '/moje-zdrowie', '/wywiad', '/eternal-id', '/przypomnienia', '/profilaktyka', '/apteki', '/powietrze'];
-const STAFF_ROUTES = ['/panel', '/panel/pulpit', '/panel/kalendarz', '/panel/skrzynka', '/panel/pacjenci', '/panel/wiadomosci', '/panel/grafik', '/panel/udostepnienia', '/panel/mierniki', '/panel/wysylka', '/panel/powiadomienia', '/panel/admin', '/panel/organizacja', '/panel/konto'];
+const PATIENT_ROUTES = ['/', '/wizyty', '/rezerwacja', '/wyniki', '/dokumenty', '/os-czasu', '/raport', '/pomiary', '/leki', '/wiadomosci', '/kalendarz', '/dzienniki', '/historia-zdrowia', '/plan', '/dla-lekarza', '/rodzina', '/ankiety', '/udostepnianie', '/karty', '/bezpieczenstwo', '/pomoc', '/prywatnosc', '/profil', '/powiadomienia', '/nfz', '/wiecej', '/jak-dziala-ai', '/moje-zdrowie', '/wywiad', '/eternal-id', '/przypomnienia', '/profilaktyka', '/apteki', '/powietrze', '/moja-poz', '/moje-zabiegi'];
+const STAFF_ROUTES = ['/panel', '/panel/poz', '/panel/zabiegi', '/panel/pulpit', '/panel/kalendarz', '/panel/skrzynka', '/panel/pacjenci', '/panel/wiadomosci', '/panel/grafik', '/panel/udostepnienia', '/panel/mierniki', '/panel/wysylka', '/panel/powiadomienia', '/panel/admin', '/panel/organizacja', '/panel/konto'];
 const NEVER = [/\/wyloguj/, /\/logowanie/, /\/mfa/, /\/teleporada$/, /\/nagranie\//];
 
 const PERSONAS: { id: string; email: string; staff: boolean }[] = [
@@ -40,6 +40,9 @@ const PERSONAS: { id: string; email: string; staff: boolean }[] = [
   { id: 'cardio', email: 'piotr.zielinski@eternal.local', staff: true },
   { id: 'reception', email: 'recepcja@eternal.local', staff: true },
   { id: 'admin', email: 'admin@eternal.local', staff: true },
+  // profile placówek: klinika medycyny estetycznej Aurora (druga placówka) — lekarka i pacjentka
+  { id: 'aesthetic', email: 'joanna.malinowska@eternal.local', staff: true },
+  { id: 'karolina', email: 'karolina@eternal.local', staff: false },
 ];
 
 function keyOf(method: string, rawUrl: string, profile?: string): string {
@@ -208,9 +211,10 @@ async function staffExtras(page: Page): Promise<string[]> {
   // runda 4: słownik ICD-10 w panelu lekarza (pole wyszukiwania)
   for (const q of ['na', 'nad', 'nadc', 'nadci', 'nadciś', 'I1', 'I10', 'as', 'ast', 'astm', 'cu', 'cuk', 'cukr', 'mi', 'mig', 'migr']) urls.push(`/api/staff/diagnosis-codes?q=${encodeURIComponent(q)}`);
   await pageGet(page, urls);
-  const found = (await pageGet(page, ['Kowalska', 'Wiśniewski', 'Lewandowska', 'Anna', 'Jan', 'Maria', 'Ko'].map((q) => `/api/staff/patients?q=${encodeURIComponent(q)}`))) as ({ items?: { id: string }[] } | null)[];
+  const found = (await pageGet(page, ['Kowalska', 'Wiśniewski', 'Wiśniewska', 'Lewandowska', 'Anna', 'Jan', 'Maria', 'Karolina', 'Ko'].map((q) => `/api/staff/patients?q=${encodeURIComponent(q)}`))) as ({ items?: { id: string }[] } | null)[];
   const ids = new Set(found.flatMap((r) => r?.items?.map((i) => i.id) ?? []));
   await round5StaffExtras(page, [...ids]);
+  await profileStaffExtras(page, [...ids]);
   return [...ids].map((id) => `/panel/pacjenci/${id}`);
 }
 
@@ -249,10 +253,36 @@ async function round5StaffExtras(page: Page, patientIds: string[]): Promise<void
   await page.waitForTimeout(500);
 }
 
+/** Profile placówek: filtry deklaracji i planów, podglądy partii i powikłań, karty zabiegów pacjentów. */
+async function profileStaffExtras(page: Page, patientIds: string[]): Promise<void> {
+  const [prof] = (await pageGet(page, ['/api/staff/clinic-profile'])) as [{ features?: string[] } | null];
+  const f = prof?.features ?? [];
+  const urls: string[] = ['/api/staff/profile-tasks'];
+  if (f.includes('poz')) {
+    urls.push('/api/staff/poz/meta', '/api/staff/poz/bzod', '/api/staff/poz/ipom', '/api/staff/poz/ipom?overdue=1', '/api/staff/poz/ipom?mine=1', '/api/staff/poz/declarations');
+    for (const st of ['zlozona', 'przyjeta', 'odrzucona']) urls.push(`/api/staff/poz/declarations?status=${st}`);
+    for (const id of patientIds) urls.push(`/api/staff/patients/${id}/ipom`, `/api/staff/poz/declarations?patientId=${id}`);
+  }
+  if (f.includes('aesthetic')) {
+    urls.push('/api/staff/aesthetic/meta', '/api/staff/aesthetic/products', '/api/staff/aesthetic/procedures', '/api/staff/aesthetic/complications', '/api/staff/aesthetic/consent-templates');
+    for (const id of patientIds) urls.push(`/api/staff/aesthetic/procedures?patientId=${id}`, `/api/staff/patients/${id}/procedure-consents`);
+  }
+  await pageGet(page, urls);
+  if (f.includes('aesthetic')) {
+    const [prods, comps] = (await pageGet(page, ['/api/staff/aesthetic/products', '/api/staff/aesthetic/complications'])) as [{ items?: { lots: { id: string }[] }[] } | null, Items];
+    await pageGet(page, [
+      ...(prods?.items ?? []).flatMap((p) => p.lots.map((l) => `/api/staff/aesthetic/lots/${l.id}/recall`)),
+      ...(comps?.items ?? []).map((c) => `/api/staff/aesthetic/complications/${c.id}/report`),
+    ]);
+  }
+  await page.waitForTimeout(500);
+}
+
 async function round5PatientExtras(page: Page): Promise<void> {
   const [snap, ivs] = (await pageGet(page, ['/api/me/health-snapshot', '/api/me/interviews'])) as [Snap, Record<string, unknown> | null];
   const urls = resultKeys(snap).map((k) => `/api/me/health-snapshot/result?key=${encodeURIComponent(k)}`);
   urls.push('/api/me/corrections', ...TIMELINE_CATS.map((c) => `/api/me/health-timeline?categories=${c}`));
+  urls.push('/api/me/clinics', '/api/me/poz', '/api/me/aesthetic');
   for (const [k, v] of Object.entries(ivs ?? {})) {
     if (k === 'available' || !Array.isArray(v)) continue;
     for (const x of v as { id?: string }[]) if (x?.id) urls.push(`/api/me/interviews/${x.id}`);

@@ -59,13 +59,84 @@ function ids(data: PreviewData) {
     const m = /^GET \/api\/me\/interviews\/([^/?]+)$/.exec(k);
     if (m && (body(r) as { status?: string } | undefined)?.status === 'completed') interview = m[1];
   }
-  return { annaId, scribeVisit, interview };
+  let karolinaId: string | undefined;
+  for (const k of Object.keys(data.personas.aesthetic?.routes ?? {})) {
+    const m = /^GET \/api\/staff\/patients\/([^/?]+)\/procedure-consents$/.exec(k);
+    if (m) karolinaId = m[1];
+  }
+  return { annaId, scribeVisit, interview, karolinaId };
 }
 
 function sections(data: PreviewData): Section[] {
-  const { annaId, scribeVisit, interview } = ids(data);
+  const { annaId, scribeVisit, interview, karolinaId } = ids(data);
   const card = annaId ? `/panel/pacjenci/${annaId}` : '/panel/pacjenci';
   return [
+    {
+      title: { pl: 'Profile placówek — POZ i medycyna estetyczna', en: 'Clinic profiles — primary care and aesthetic medicine' },
+      who: { pl: 'Centrum Medyczne Eternal (POZ) i klinika Aurora (estetyka) — obie fikcyjne', en: 'Eternal Medical Centre (primary care) and Aurora clinic (aesthetics) — both fictional' },
+      steps: [
+        {
+          persona: 'admin',
+          route: '/panel/admin?tab=profiles',
+          title: { pl: 'Wybór profilu placówki', en: 'Choosing the clinic profile' },
+          what: {
+            pl: 'Siedem profili: POZ, medycyna estetyczna, poradnia specjalistyczna, rehabilitacja, zdrowie psychiczne, stomatologia i medycyna pracy (dwa ostatnie częściowe). Każdy pokazuje, co realnie potrzebuje taka placówka i gdzie to jest, czego jeszcze brakuje i jakie zasady uwzględnia. Zastosowanie tylko dodaje.',
+            en: 'Seven profiles: primary care, aesthetic medicine, specialist clinic, rehabilitation, mental health, dentistry and occupational medicine (the last two partial). Each shows what such a clinic really needs and where it is, what is still missing and which rules it follows. Applying only adds.',
+          },
+        },
+        {
+          persona: 'doctor',
+          route: '/panel/poz',
+          title: { pl: 'POZ: deklaracje, opieka koordynowana, bilans', en: 'Primary care: declarations, coordinated care, health check' },
+          what: {
+            pl: 'Deklaracje do przyjęcia (papier i IKP), lista aktywna; zakładki „Opieka koordynowana” (plany IPOM z zaległościami i koordynatorem) i „Bilans dorosłych” (kto może teraz skorzystać z „Moje Zdrowie”).',
+            en: 'Declarations to accept (paper and IKP), active list; “Coordinated care” (care plans with overdue items and coordinator) and “Adult health check” (who can use “Moje Zdrowie” now).',
+          },
+        },
+        {
+          persona: 'doctor',
+          route: `${card}?tab=ipom`,
+          title: { pl: 'IPOM w karcie pacjenta', en: 'Care plan in the patient chart' },
+          what: {
+            pl: 'Plan Anny Kowalskiej (nadciśnienie): koordynator, pozycje z terminami, zaległa kreatynina, wykorzystanie porad wobec limitów placówki.',
+            en: 'Anna Kowalska’s plan (hypertension): coordinator, items with dates, overdue creatinine, use of sessions against the clinic’s limits.',
+          },
+        },
+        {
+          persona: 'patient',
+          route: '/moja-poz',
+          title: { pl: 'Moja POZ — widok pacjentki', en: 'My primary care — patient view' },
+          what: { pl: 'Deklaracje, plan opieki z terminami, bilans „Moje Zdrowie” z linkiem do IKP.', en: 'Declarations, care plan with dates, “Moje Zdrowie” health check with a link to IKP.' },
+        },
+        {
+          persona: 'aesthetic',
+          route: '/panel/zabiegi?tab=produkty',
+          title: { pl: 'Produkty i partie', en: 'Products and batches' },
+          what: {
+            pl: 'Toksyna, wypełniacz i biostymulator (nazwy fikcyjne) z partiami: data ważności, UDI, partia po terminie i z krótką datą. „Kto dostał” — lista pacjentów przy komunikacie producenta.',
+            en: 'Toxin, filler and biostimulator (fictional names) with batches: expiry, UDI, an expired and a short-dated batch. “Who received it” — patient list for a manufacturer notice.',
+          },
+        },
+        {
+          persona: 'aesthetic',
+          route: karolinaId ? `/panel/pacjenci/${karolinaId}?tab=zabiegi` : '/panel/zabiegi',
+          title: { pl: 'Karta zabiegu z mapą iniekcji', en: 'Procedure record with injection map' },
+          what: {
+            pl: 'Zgody (pisemne do wydruku, zgoda na zdjęcia), karty zabiegów: produkt, seria, ilość, mapa iniekcji, zdjęcia przed/po obok siebie (rysunki poglądowe), zalecenia, kontrola, VAT z celu zabiegu, powikłanie; szkic do podpisu.',
+            en: 'Consents (written, printable; photo consent), procedure records: product, batch, amount, injection map, before/after photos side by side (illustrations), aftercare, follow-up, VAT from the purpose, a complication; a draft to sign.',
+          },
+        },
+        {
+          persona: 'karolina',
+          route: '/moje-zabiegi',
+          title: { pl: 'Moje zabiegi — widok pacjentki', en: 'My procedures — patient view' },
+          what: {
+            pl: 'Karty zabiegów z serią produktu, zalecenia, termin kontroli, zdjęcia, zgoda do przeczytania przed wizytą i decyzja o wykorzystaniu zdjęć (domyślnie nie).',
+            en: 'Procedure records with product batch, aftercare, follow-up date, photos, a consent to read before the visit and the decision on photo use (no by default).',
+          },
+        },
+      ],
+    },
     {
       title: { pl: 'Panel lekarza — Eternal Klinika', en: 'Doctor panel — Eternal Clinic' },
       who: { pl: 'lek. Anna Nowicka (interna)', en: 'Dr Anna Nowicka (internal medicine)' },

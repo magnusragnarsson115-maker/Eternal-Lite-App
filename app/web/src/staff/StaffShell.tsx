@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { BarChart3, Bell, Building2, CalendarDays, CalendarRange, Inbox, LayoutDashboard, LayoutGrid, LogOut, Menu, MessageSquare, Send, Settings, Share2, UserCog, Users, X } from 'lucide-react';
+import { BarChart3, Bell, Building2, CalendarDays, CalendarRange, HeartHandshake, Inbox, LayoutDashboard, LayoutGrid, LogOut, Menu, MessageSquare, Send, Settings, Share2, Syringe, UserCog, Users, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { get } from '../api';
@@ -21,6 +21,9 @@ export function StaffShell() {
   const threads = useQuery({ queryKey: ['threads', 'staff'], queryFn: () => get<{ items: { unread: boolean }[] }>('/api/staff/threads'), enabled: authed, refetchInterval: 120_000 });
   const modules = useQuery({ queryKey: ['modules'], queryFn: () => get<{ items: { id: string; active: boolean }[] }>('/api/modules'), enabled: authed, staleTime: 300_000 });
   const on = (id: string) => modules.data?.items.find((m) => m.id === id)?.active ?? true;
+  // profil placówki: funkcje POZ i medycyny estetycznej w menu
+  const profile = useQuery({ queryKey: ['clinic-profile'], queryFn: () => get<{ features: string[] }>('/api/staff/clinic-profile'), enabled: authed, staleTime: 300_000 });
+  const feat = (f: string) => !!profile.data?.features.includes(f);
   const live = useRealtime(authed, (e: LiveEvent) => {
     if (e.type === 'notification.created') void notifications.refetch();
     if (e.type === 'message.changed') void threads.refetch();
@@ -75,6 +78,16 @@ export function StaffShell() {
             <NavLink to="/panel/pacjenci">
               <Users size={19} /> {t('Pacjenci')}
             </NavLink>
+            {feat('poz') && (
+              <NavLink to="/panel/poz">
+                <HeartHandshake size={19} /> {t('POZ')}
+              </NavLink>
+            )}
+            {feat('aesthetic') && hasRole(me, 'practitioner', 'reception', 'admin') && (
+              <NavLink to="/panel/zabiegi">
+                <Syringe size={19} /> {t('Zabiegi')}
+              </NavLink>
+            )}
             <NavLink to="/panel/wiadomosci">
               <MessageSquare size={19} /> {t('Wiadomości')}
               {unreadThreads > 0 && <span className="count-badge">{unreadThreads}</span>}

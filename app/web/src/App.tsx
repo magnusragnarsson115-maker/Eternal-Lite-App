@@ -36,6 +36,10 @@ const StaffMessagesPage = lazy(() => import('./staff/OrgPages').then((m) => ({ d
 const SchedulePage = lazy(() => import('./staff/OrgPages').then((m) => ({ default: m.SchedulePage })));
 const OutboxPage = lazy(() => import('./staff/OrgPages').then((m) => ({ default: m.OutboxPage })));
 const AdminPage = lazy(() => import('./staff/OrgPages').then((m) => ({ default: m.AdminPage })));
+const PozPage = lazy(() => import('./staff/PozPages').then((m) => ({ default: m.PozPage })));
+const AestheticPage = lazy(() => import('./staff/AestheticPages').then((m) => ({ default: m.AestheticPage })));
+const MyPozPage = lazy(() => import('./patient/ClinicProfilePages').then((m) => ({ default: m.MyPozPage })));
+const MyProceduresPage = lazy(() => import('./patient/ClinicProfilePages').then((m) => ({ default: m.MyProceduresPage })));
 const InboxPage = lazy(() => import('./staff/VisitPages').then((m) => ({ default: m.InboxPage })));
 const VisitPage = lazy(() => import('./staff/VisitPages').then((m) => ({ default: m.VisitPage })));
 const SharedPatientsPage = lazy(() => import('./staff/VisitPages').then((m) => ({ default: m.SharedPatientsPage })));
@@ -111,6 +115,8 @@ export function App() {
         <Route path="mierniki" element={<MetricsPage />} />
         <Route path="organizacja" element={<AdminOnly><OrgManagePage /></AdminOnly>} />
         <Route path="konto" element={<StaffAccountPage />} />
+        <Route path="poz" element={<PozPage />} />
+        <Route path="zabiegi" element={<AestheticPage />} />
         <Route path="*" element={<Navigate to="/panel" replace />} />
       </Route>
 
@@ -149,6 +155,8 @@ export function App() {
         <Route path="wywiad" element={<InterviewListPage />} />
         <Route path="wywiad/:id" element={<InterviewChatPage />} />
         <Route path="eternal-id" element={<EternalIdPage />} />
+        <Route path="moja-poz" element={<MyPozPage />} />
+        <Route path="moje-zabiegi" element={<MyProceduresPage />} />
         <Route path="profilaktyka" element={<PreventivePage />} />
         <Route path="apteki" element={<PharmaciesPage />} />
         <Route path="powietrze" element={<AirWeatherPage />} />

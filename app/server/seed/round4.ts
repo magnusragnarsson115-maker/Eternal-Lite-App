@@ -21,7 +21,8 @@ export async function seedRound4Demo(log: (m: string) => void = console.log): Pr
   const actor: AuditActor = { userId: user.id, actorRef: ref, display: 'Anna Kowalska (dane pokazowe)', roles: ['patient'] };
   const tz = config.clinic.timezone;
   const today = localDate(new Date(), tz);
-  const at = (daysAgo: number, hour = 9) => new Date(Date.parse(`${addDays(today, -daysAgo)}T${String(hour).padStart(2, '0')}:00:00Z`)).toISOString();
+  // nie później niż teraz — seed uruchomiony wcześnie rano nie może zapisać śniadania „o 7:00” w przyszłości
+  const at = (daysAgo: number, hour = 9) => new Date(Math.min(Date.now() - 60_000, Date.parse(`${addDays(today, -daysAgo)}T${String(hour).padStart(2, '0')}:00:00Z`))).toISOString();
 
   createCustomReminder(actor, user.id, ref, { kind: 'light-therapy', times: ['07:30'], days: [1, 2, 3, 4, 5], place: 'Gabinet fototerapii, ul. Słoneczna 3, Warszawa (fikcyjny)' });
   createCustomReminder(actor, user.id, ref, { kind: 'exercise', title: 'Spacer', times: ['18:00'] });

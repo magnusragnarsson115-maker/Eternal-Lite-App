@@ -21,6 +21,7 @@ import {
   updateClinicSettings,
   upsertPractitioner,
   upsertService,
+  setPractitionerProfession,
 } from '../services/directory.js';
 import { closeAccount } from '../services/privacy.js';
 import { applyPackage, listPackages } from '../services/packages.js';
@@ -258,6 +259,13 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
   app.post('/api/admin/practitioners', async (req) => {
     admin(req);
     return upsertPractitioner(actorOf(req), body(req, PractitionerSchema));
+  });
+
+  app.put('/api/admin/practitioners/:id/profession', async (req) => {
+    admin(req);
+    const { id } = params(req, IdParams);
+    const { profession } = body(req, z.object({ profession: z.enum(PROFESSIONS as [Profession, ...Profession[]]).nullable() }));
+    return setPractitionerProfession(actorOf(req), id, profession);
   });
 
   app.put('/api/admin/practitioners/:id', async (req) => {

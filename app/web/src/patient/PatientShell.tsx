@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Activity, AlarmClock, BookHeart, Bell, BriefcaseMedical, CalendarCheck, Wind, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, Flower2, FolderOpen, Home, LayoutGrid, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users , Sparkles, MessageCircleQuestion, Fingerprint } from 'lucide-react';
+import { Activity, AlarmClock, BookHeart, Bell, BriefcaseMedical, CalendarCheck, Wind, CalendarRange, Dumbbell, Stethoscope, Syringe, CalendarDays, ClipboardCheck, ClipboardList, FileChartColumn, FileText, Flower2, FolderOpen, Home, LayoutGrid, LifeBuoy, LogOut, Menu, MessageSquare, Pill, Search, Share2, Shield, Siren, User, Users , Sparkles, MessageCircleQuestion, Fingerprint, HeartHandshake, Syringe as SyringeIcon } from 'lucide-react';
 import { useEffect, type ReactNode } from 'react';
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { get, msSinceOwnMutation } from '../api';
@@ -49,6 +49,9 @@ export function PatientShell() {
     enabled: authed,
     refetchInterval: 120_000,
   });
+  // profile placówek pacjenta (POZ, medycyna estetyczna) — dodatkowe pozycje menu
+  const clinics = useQuery({ queryKey: ['me-clinics'], queryFn: () => get<{ features: string[] }>('/api/me/clinics'), enabled: authed, staleTime: 300_000 });
+  const feat = (f: string) => !!clinics.data?.features.includes(f);
   // link z powiadomienia dla opiekuna (…?profile=<id>) otwiera właściwy profil
   const linkProfile = new URLSearchParams(location.search).get('profile');
   useEffect(() => {
@@ -113,6 +116,8 @@ export function PatientShell() {
           <nav>
             <NavItem to="/" end icon={<Home size={20} />} label={t('Start')} />
             <NavItem to="/moje-zdrowie" icon={<Sparkles size={20} />} label={t('Moje zdrowie')} />
+            {feat('poz') && <NavItem to="/moja-poz" icon={<HeartHandshake size={20} />} label={t('Moja POZ')} />}
+            {feat('aesthetic') && <NavItem to="/moje-zabiegi" icon={<SyringeIcon size={20} />} label={t('Moje zabiegi')} />}
             <NavItem to="/wizyty" icon={<CalendarDays size={20} />} label={t('Wizyty')} />
             <NavItem to="/kalendarz" icon={<CalendarRange size={20} />} label={t('Kalendarz zdrowia')} />
             <NavItem to="/wyniki" icon={<FileText size={20} />} label={t('Wyniki od placówki')} />
@@ -188,8 +193,12 @@ export function MorePage() {
   const { t } = useI18n();
   const { me, config, logout, profile } = useSession();
   const own = (x: [string, ReactNode, string]) => (profile ? [] : [x]);
+  const clinics = useQuery({ queryKey: ['me-clinics'], queryFn: () => get<{ features: string[] }>('/api/me/clinics'), staleTime: 300_000 });
+  const feat = (f: string, x: [string, ReactNode, string]) => (clinics.data?.features.includes(f) ? [x] : []);
   const items: [string, ReactNode, string][] = [
     ['/moje-zdrowie', <Sparkles size={20} key="mz" />, t('Moje zdrowie')],
+    ...feat('poz', ['/moja-poz', <HeartHandshake size={20} key="poz" />, t('Moja POZ')]),
+    ...feat('aesthetic', ['/moje-zabiegi', <SyringeIcon size={20} key="zab" />, t('Moje zabiegi')]),
     ['/wywiad', <MessageCircleQuestion size={20} key="wy" />, t('Wywiad przed wizytą')],
     ...own(['/eternal-id', <Fingerprint size={20} key="ei" />, t('Eternal ID')]),
     ['/pomoc', <LifeBuoy size={20} key="h" />, t('Pomoc · 112 · 116 123')],

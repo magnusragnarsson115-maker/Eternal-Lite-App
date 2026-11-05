@@ -201,7 +201,7 @@ describe('Profile placówek — API', () => {
     await fx.clients.admin.req('PUT', `/api/admin/practitioners/${fx.ctx.doctor.id}`, { ...prBody, profession: 'kosmetolog' });
     expect((await fx.clients.doctor.req('POST', `/api/staff/aesthetic/procedures/${procId}/sign`)).json.error).toBe('physician_required');
     await fx.clients.admin.req('PUT', `/api/admin/practitioners/${fx.ctx.doctor.id}`, { ...prBody, profession: 'lekarz' });
-    expect((await fx.clients.doctor.req('POST', `/api/staff/aesthetic/procedures/${procId}/sign`)).json.error).toBe('consent_required');
+    expect((await fx.clients.doctor.req('POST', `/api/staff/aesthetic/procedures/${procId}/sign`)).json.error).toBe('procedure_consent_required');
     expect((await fx.clients.reception.req('POST', `/api/staff/aesthetic/consents/${consentId}/signed`, { signedOn: today(), method: 'papier' })).json.status).toBe('podpisana');
     // przeterminowana partia blokuje podpis innej karty
     const bad = await fx.clients.doctor.req('POST', '/api/staff/aesthetic/procedures', { patientId: pid(), serviceId: svc.id, title: 'x', purpose: 'estetyczny', items: [{ productId, lotId: expiredLotId, quantity: 10, area: 'czoło' }], points: [], consentId });

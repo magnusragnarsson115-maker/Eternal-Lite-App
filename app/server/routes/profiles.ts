@@ -27,6 +27,7 @@ import {
   lotRecall,
   MAP_VIEWS,
   markConsentRead,
+  procedurePhotoFile,
   PHOTO_ANGLES,
   PRODUCT_CATEGORIES,
   PRODUCT_KINDS,
@@ -340,6 +341,13 @@ export async function profileRoutes(app: FastifyInstance): Promise<void> {
     return addProcedurePhoto(actorOf(req), orgId, id, { data, filename: file.filename, contentType: file.mimetype, phase, angle });
   });
 
+  app.get('/api/staff/aesthetic/procedures/:id/photos/:docId', async (req, reply) => {
+    const { orgId } = feature(req, 'aesthetic', ['practitioner']);
+    const { id, docId } = params(req, z.object({ id: zId, docId: zId }));
+    const f = await procedurePhotoFile(actorOf(req), id, docId, { orgId });
+    return reply.type(f.contentType).header('Cache-Control', 'private, no-store').send(f.data);
+  });
+
   // --- zgody -------------------------------------------------------------------------------------------------------
   app.get('/api/staff/aesthetic/consent-templates', async (req) => {
     const { orgId } = feature(req, 'aesthetic');
@@ -449,6 +457,13 @@ export async function profileRoutes(app: FastifyInstance): Promise<void> {
   app.get('/api/me/aesthetic', async (req) => {
     const auth = requirePatient(req);
     return aestheticForPatient(auth.patientRef);
+  });
+
+  app.get('/api/me/aesthetic/procedures/:id/photos/:docId', async (req, reply) => {
+    const auth = requirePatient(req);
+    const { id, docId } = params(req, z.object({ id: zId, docId: zId }));
+    const f = await procedurePhotoFile(actorOf(req), id, docId, { patientRef: auth.patientRef });
+    return reply.type(f.contentType).header('Cache-Control', 'private, no-store').send(f.data);
   });
 
   app.post('/api/me/aesthetic/consents/:id/read', async (req) => {

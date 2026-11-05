@@ -645,7 +645,7 @@ export async function signProcedure(user: AppUser, actor: AuditActor, orgId: str
   const needsConsent = !!svc?.consentTemplate || products.some((p) => p.category === 'lek' || p.category === 'wyrob-medyczny');
   if (needsConsent) {
     const c = r.consent_id ? consentRow(r.consent_id) : undefined;
-    if (!c || c.patient_ref !== r.patient_ref || c.org_id !== orgId || c.status !== 'podpisana') throw conflict('consent_required');
+    if (!c || c.patient_ref !== r.patient_ref || c.org_id !== orgId || c.status !== 'podpisana') throw conflict('procedure_consent_required');
   }
   const now = nowIso();
   getDb().prepare("UPDATE aesthetic_procedure SET status = 'podpisana', signed_at = ?, updated_at = ? WHERE id = ?").run(now, now, id);
@@ -704,6 +704,19 @@ export async function addProcedurePhoto(
   getDb().prepare('UPDATE aesthetic_procedure SET photo_ids = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(photos), nowIso(), id);
   audit(actor, { action: 'C', subtype: 'aesthetic-photo', patientRef: r.patient_ref, detail: { id, phase: file.phase, angle: file.angle } });
   return procView(procRow(id)!, true);
+}
+
+/** Plik zdjęcia z karty zabiegu (personel placówki albo pacjent — tylko z podpisanej karty). */
+export async function procedurePhotoFile(actor: AuditActor, procedureId: string, documentId: string, check: { orgId?: string; patientRef?: string }): Promise<{ data: Buffer; contentType: string }> {
+  const r = procRow(procedureId);
+  if (!r || (check.orgId && r.org_id !== check.orgId) || (check.patientRef && (r.patient_ref !== check.patientRef || r.status !== 'podpisana'))) throw notFound('procedure_not_found');
+  if (!(JSON.parse(r.photo_ids) as ProcPhoto[]).some((p) => p.documentId === documentId)) throw notFound('photo_not_found');
+  const d = await fhirSystem().readOptional<import('@medplum/fhirtypes').DocumentReference>('DocumentReference', documentId);
+  const url = d?.content[0]?.attachment.url;
+  if (!url) throw notFound('file_not_found');
+  const bin = await fhirSystem().readBinary(url.split('/').pop() ?? '');
+  audit(actor, { action: 'R', subtype: 'aesthetic-photo', patientRef: r.patient_ref, detail: { procedureId, documentId } });
+  return { data: bin.data, contentType: d?.content[0]?.attachment.contentType ?? bin.contentType };
 }
 
 /** Komunikat bezpieczeństwa producenta: którzy pacjenci dostali produkt z tej partii (z kontaktem do placówki). */
