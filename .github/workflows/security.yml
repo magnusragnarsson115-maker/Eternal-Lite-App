@@ -1,0 +1,46 @@
+# Skan podatności i wykaz składników oprogramowania (R8, A18.9).
+# Uruchamiany co tydzień, ręcznie i po zmianach na gałęzi głównej — nie blokuje pull requestów.
+name: security
+
+on:
+  schedule:
+    - cron: '17 5 * * 1'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['app/package.json', 'app/package-lock.json', 'app/Dockerfile']
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci --ignore-scripts
+      - name: Wykaz składników (CycloneDX)
+        run: npm run sbom
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: app/sbom.cdx.json
+      - name: Znane podatności w zależnościach produkcyjnych
+        run: npm run audit:deps
+      - name: Trivy — system plików (zależności, sekrety, konfiguracja)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: app
+          scanners: vuln,secret,misconfig
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
