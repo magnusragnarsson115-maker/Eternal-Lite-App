@@ -70,7 +70,8 @@ Aktualny stan każdego składnika pokazuje polecenie **`npm run cli -- check --l
 - **Obraz Docker z Chromium** — etap budowania z `Dockerfile` zbudowany i uruchomiony tutaj (instalacja z paczki,
   HTTPS przez Caddy, PDF w kontenerze, kopia i odtworzenie, 4 testy e2e na kontenerze); krok `apt-get install chromium`
   z repozytoriów Debiana był zablokowany w tym środowisku, więc warstwę uruchomieniową zastąpiono tu obrazem z tym
-  samym Chromium od Playwright. Pełny `Dockerfile` buduje i testuje workflow `ci` w GitHub Actions.
+  samym Chromium od Playwright. Pełny `Dockerfile` (z Chromium z Debiana) zbudował i sprawdził workflow `ci`
+  w GitHub Actions: instalacja z paczki, PDF w kontenerze, kopia zapasowa, 4 testy e2e na kontenerze.
 - **Klucze dostępu (WebAuthn)** — bez testu automatycznego (wymaga uwierzytelniacza).
 - **Aplikacja mobilna** — sprawdzona typami i pełnym pakietem JS; biometria, PIN, schowek systemu i push wymagają testu na telefonach.
 - **Runda 4 — usługi publiczne** — GIOŚ, IMGW, Open Food Facts i strona rejestrów CeZ były zablokowane przez politykę sieci środowiska budowy; kod napisany według opublikowanego formatu (dokumentacja i wzorcowe odpowiedzi), testy na danych wzorcowych. Po wdrożeniu: sprawdzić ekran „Powietrze i pogoda” i wyszukiwarkę produktów na serwerze z dostępem do tych hostów.
