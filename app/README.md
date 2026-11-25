@@ -90,6 +90,18 @@ niepotwierdzona), `recepcja@eternal.local`, `anna.nowicka@eternal.local`, `piotr
 
 ### Produkcja
 
+Serwer (VPS w UE) — jedno polecenie, opis krok po kroku w [`docs/WDROZENIE_SERWER.md`](docs/WDROZENIE_SERWER.md):
+
+```bash
+npm run package:server                      # release/eternal-serwer-<wersja>.tar.gz — wyślij na serwer
+tar xzf eternal-serwer-*.tar.gz && cd eternal && sudo ./deploy/eternal.sh install   # na serwerze
+```
+
+Instalator: Docker, `.env` z sekretami, HTTPS (Caddy), tryb `pokaz` (dane fikcyjne) albo `pilotaz` (pusta placówka
+i administrator), kopie co noc; obsługa: `./deploy/eternal.sh status | check | restart | backup | restore | update`.
+
+Bez kontenera:
+
 ```bash
 cp .env.example .env     # uzupełnij: PUBLIC_URL, AUDIT_HMAC_KEY, SMTP_URL, JITSI_DOMAIN, DEMO_MODE=false …
 npm run build

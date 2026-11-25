@@ -67,7 +67,10 @@ Aktualny stan każdego składnika pokazuje polecenie **`npm run cli -- check --l
 ### 2.3. Sprawdzone tylko częściowo (w tym środowisku nie było kont ani urządzeń)
 
 - **Dostawcy AI, mowy, OCR, wideo, SMS, e-mail** — kod według dokumentacji dostawców, test tylko w trybie demo.
-- **Obraz Docker z Chromium** — sieć środowiska blokowała repozytoria Debiana, więc obrazu nie zbudowano; Chromium i PDF sprawdzone poza kontenerem.
+- **Obraz Docker z Chromium** — etap budowania z `Dockerfile` zbudowany i uruchomiony tutaj (instalacja z paczki,
+  HTTPS przez Caddy, PDF w kontenerze, kopia i odtworzenie, 4 testy e2e na kontenerze); krok `apt-get install chromium`
+  z repozytoriów Debiana był zablokowany w tym środowisku, więc warstwę uruchomieniową zastąpiono tu obrazem z tym
+  samym Chromium od Playwright. Pełny `Dockerfile` buduje i testuje workflow `ci` w GitHub Actions.
 - **Klucze dostępu (WebAuthn)** — bez testu automatycznego (wymaga uwierzytelniacza).
 - **Aplikacja mobilna** — sprawdzona typami i pełnym pakietem JS; biometria, PIN, schowek systemu i push wymagają testu na telefonach.
 - **Runda 4 — usługi publiczne** — GIOŚ, IMGW, Open Food Facts i strona rejestrów CeZ były zablokowane przez politykę sieci środowiska budowy; kod napisany według opublikowanego formatu (dokumentacja i wzorcowe odpowiedzi), testy na danych wzorcowych. Po wdrożeniu: sprawdzić ekran „Powietrze i pogoda” i wyszukiwarkę produktów na serwerze z dostępem do tych hostów.
@@ -87,9 +90,9 @@ kwalifikacji (MDR, AI Act) przez `/dokument`, szkolenie personelu z AI (art. 4 A
 | Krok | Co zrobić | Zmienne / polecenia |
 |---|---|---|
 | 0 | Sprawdzić stan | `npm run cli -- check --live` |
-| 1 | Serwer w UE i domena z HTTPS (VPS albo AWS Frankfurt według A7) | `NODE_ENV=production`, `DEMO_MODE=false`, `PUBLIC_URL=https://…`, `docker compose up -d --build` |
-| 2 | Sekrety i bezpieczeństwo | `AUDIT_HMAC_KEY` (z menedżera sekretów), `SECURITY_CONTACT`, opcjonalnie `SENTRY_DSN` (UE) |
-| 3 | Kopie zapasowe | codziennie `npm run cli -- backup <katalog>`, szyfrowanie, kopia poza serwerem, test odtworzenia |
+| 1 | Serwer w UE i domena z HTTPS (VPS albo AWS Frankfurt według A7) | `./deploy/eternal.sh install --mode pilotaz` ([`WDROZENIE_SERWER.md`](WDROZENIE_SERWER.md)) — ustawia `NODE_ENV=production`, `DEMO_MODE=false`, `PUBLIC_URL=https://…` |
+| 2 | Sekrety i bezpieczeństwo | `AUDIT_HMAC_KEY` (instalator losuje; docelowo z menedżera sekretów), `SECURITY_CONTACT`, opcjonalnie `SENTRY_DSN` (UE) |
+| 3 | Kopie zapasowe | instalator ustawia codzienne `./deploy/eternal.sh backup` (szyfrowanie z `BACKUP_PASSPHRASE`); kopia poza serwerem, test odtworzenia (`restore`) |
 | 4 | SMS i e-mail (bez nich zaproszenia nie wychodzą) | `SMS_PROVIDER=smsapi`, `SMSAPI_TOKEN`, `SMS_SENDER`; `SMTP_URL` (np. Amazon SES Frankfurt), `MAIL_FROM` |
 | 5 | Model językowy | `AI_PROVIDER=bedrock` + dostęp IAM do Bedrock w `eu-central-1` z włączonymi modelami Claude (albo `AI_PROVIDER=anthropic` + `ANTHROPIC_API_KEY`); zapas `AI_SECONDARY_PROVIDER=mistral` |
 | 6 | Mowa na tekst — po teście D48 | `STT_PROVIDER=elevenlabs` + `ELEVENLABS_API_KEY` (rezydencja UE) / `azure` / `openai` |

@@ -56,19 +56,19 @@ Polecenie `npm run cli -- check` pokazuje, co działa naprawdę, a co w trybie d
 
 ## 3. Instancja pokazowa w internecie (link dla inwestorów)
 
-Najprościej: mały serwer w UE (np. 2 vCPU, 4 GB RAM) z Dockerem i domena (rekord A na adres serwera).
+Najprościej: mały serwer w UE (2 vCPU, 4 GB RAM) i domena (rekord A na adres serwera) — albo bez domeny
+(adres `<ip>.sslip.io`). Pełna instrukcja: [`WDROZENIE_SERWER.md`](WDROZENIE_SERWER.md).
 
 ```bash
-git clone <adres repozytorium> && cd Eternal-Lite-App/app
-cp .env.example .env
-ETERNAL_DOMAIN=demo.twoja-domena.pl docker compose -f docker-compose.yml -f docker-compose.demo.yml up -d --build
+scp eternal-serwer-*.tar.gz root@ADRES_SERWERA:/opt/        # paczka: npm run package:server
+ssh root@ADRES_SERWERA 'cd /opt && tar xzf eternal-serwer-*.tar.gz && cd eternal && ./deploy/eternal.sh install --domain demo.twoja-domena.pl --mode pokaz --yes'
 ```
 
-- Certyfikat HTTPS wystawi Caddy automatycznie; dane fikcyjne utworzą się przy pierwszym starcie (`DEMO_SEED_ON_START`).
-- Reset danych po pokazie: `docker compose -f docker-compose.yml -f docker-compose.demo.yml down -v` i ponownie `up -d`.
+- Instalator zakłada Dockera, tworzy `.env` z sekretami, uruchamia aplikację za Caddy (certyfikat HTTPS automatycznie)
+  i ustawia codzienną kopię; dane fikcyjne powstają przy pierwszym starcie.
+- Reset danych po pokazie: `./deploy/eternal.sh reset-demo` (certyfikaty zostają).
 - Link przekazuj tylko zaproszonym osobom i wyłącz instancję po pokazach. Nigdy nie wpisuj tam prawdziwych danych.
-- Obraz Docker nie był budowany w środowisku, w którym powstał kod (blokada sieci) — po pierwszym `up` sprawdź
-  `docker compose logs eternal` i panel *Organizacja kliniki → Gotowość do pracy* (pozycja „Raporty PDF”).
+- Model językowy i mowę na tekst można podłączyć także w pokazie (klucze w `.env`, potem `./deploy/eternal.sh restart`).
 
 ## 4. Aplikacja mobilna na telefonie
 

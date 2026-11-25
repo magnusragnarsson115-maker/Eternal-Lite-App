@@ -1,0 +1,98 @@
+# Testy aplikacji i próbne wdrożenie: obraz Docker z app/Dockerfile, instalacja z paczki serwerowej
+# (./deploy/eternal.sh install, tryb pokazowy, HTTPS przez Caddy na localhost) i testy e2e na działającym kontenerze.
+# Paczka do wgrania na serwer jest dołączona do każdego przebiegu jako artefakt „eternal-serwer”.
+name: ci
+
+on:
+  push:
+    branches: [main]
+    paths: ['app/**', '.github/workflows/ci.yml']
+  pull_request:
+    paths: ['app/**', '.github/workflows/ci.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: typy, testy jednostkowe, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  deploy-smoke:
+    name: obraz Docker + instalacja z paczki + e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Paczka serwerowa
+        working-directory: app
+        run: npm run package:server
+
+      - name: Obraz z app/Dockerfile (Debian + Chromium)
+        run: docker build -t eternal:ci app
+
+      - name: Instalacja z paczki (tryb pokazowy, HTTPS na localhost)
+        run: |
+          mkdir -p "$RUNNER_TEMP/srv"
+          tar xzf app/release/eternal-serwer-*.tar.gz -C "$RUNNER_TEMP/srv"
+          cd "$RUNNER_TEMP/srv/eternal"
+          cp .env.example .env
+          sed -i 's/^ETERNAL_IMAGE=.*/ETERNAL_IMAGE=eternal:ci/' .env
+          sudo ./deploy/eternal.sh install --domain localhost --mode pokaz --no-build --yes
+
+      - name: Zdrowie, gotowość, PDF w kontenerze, kopia zapasowa
+        run: |
+          cd "$RUNNER_TEMP/srv/eternal"
+          curl -fsk https://localhost/api/health
+          sudo ./deploy/eternal.sh check
+          sudo docker compose exec -T eternal node --input-type=module -e "
+            const { renderPdf, closePdfBrowser } = await import('/app/dist/server/pdf/render.js');
+            const pdf = await renderPdf('<h1>Raport faktów — zażółć gęślą jaźń</h1>', { footerLeft: 'Eternal' });
+            if (pdf.subarray(0, 5).toString() !== '%PDF-') throw new Error('PDF nie powstał');
+            console.log('PDF:', pdf.length, 'B');
+            await closePdfBrowser();"
+          sudo ./deploy/eternal.sh backup
+          sudo ls -la backups
+
+      - name: Testy e2e na wdrożonym kontenerze
+        working-directory: app
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          E2E_BASE_URL=https://localhost E2E_IGNORE_HTTPS_ERRORS=true npx playwright test
+
+      - name: Logi przy błędzie
+        if: failure()
+        run: cd "$RUNNER_TEMP/srv/eternal" && sudo docker compose logs --tail 200 || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eternal-serwer
+          path: app/release/eternal-serwer-*.tar.gz
+          retention-days: 30

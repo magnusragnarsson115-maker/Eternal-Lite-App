@@ -27,7 +27,8 @@
     "feature-map": "tsx scripts/feature-map.ts",
     "icons": "tsx scripts/icons.ts",
     "sbom": "npm sbom --sbom-format cyclonedx --omit dev > sbom.cdx.json && echo Zapisano sbom.cdx.json",
-    "audit:deps": "npm audit --omit dev --audit-level high"
+    "audit:deps": "npm audit --omit dev --audit-level high",
+    "package:server": "bash scripts/package-server.sh"
   },
   "dependencies": {
     "@anthropic-ai/bedrock-sdk": "^0.34.4",

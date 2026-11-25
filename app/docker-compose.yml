@@ -1,8 +1,22 @@
-# Uruchomienie: cp .env.example .env  (uzupełnij)  &&  docker compose up -d --build
-# Aplikacja musi działać za reverse proxy z TLS (np. Caddy poniżej) — ciasteczka sesji mają flagę Secure.
+# Eternal na serwerze: aplikacja + Caddy (automatyczny certyfikat HTTPS Let's Encrypt).
+#
+# Najprościej:  ./deploy/eternal.sh install        (instrukcja krok po kroku: docs/WDROZENIE_SERWER.md)
+# Ręcznie:      cp .env.example .env  (uzupełnij)  &&  docker compose up -d --build
+#
+# Aplikacja musi działać za reverse proxy z TLS — ciasteczka sesji mają flagę Secure.
+# Instancja pokazowa (dane fikcyjne) dokłada docker-compose.demo.yml — instalator wpisuje to do .env (COMPOSE_FILE).
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   eternal:
     build: .
+    # nazwa obrazu po zbudowaniu; gotowy obraz z rejestru: ETERNAL_IMAGE=... i ./deploy/eternal.sh install --no-build
+    image: ${ETERNAL_IMAGE:-eternal:local}
     restart: unless-stopped
     env_file: .env
     environment:
@@ -12,23 +26,28 @@ services:
       - eternal-data:/data
     expose:
       - "3000"
+    logging: *logging
 
-  # Opcjonalny reverse proxy z automatycznym certyfikatem Let's Encrypt.
-  # Ustaw domenę w zmiennej ETERNAL_DOMAIN (np. pacjent.twoja-placowka.pl) i PUBLIC_URL=https://<domena> w .env.
+  # Reverse proxy z automatycznym certyfikatem. Domena: ETERNAL_DOMAIN w .env (np. demo.twoja-firma.pl),
+  # rekord DNS typu A musi wskazywać adres serwera, porty 80 i 443 otwarte. PUBLIC_URL=https://<domena>.
   caddy:
     image: caddy:2
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
+      - "443:443/udp"
     environment:
       ETERNAL_DOMAIN: ${ETERNAL_DOMAIN:-localhost}
     command: caddy reverse-proxy --from ${ETERNAL_DOMAIN:-localhost} --to eternal:3000
     volumes:
       - caddy-data:/data
+      - caddy-config:/config
     depends_on:
       - eternal
+    logging: *logging
 
 volumes:
   eternal-data:
   caddy-data:
+  caddy-config:

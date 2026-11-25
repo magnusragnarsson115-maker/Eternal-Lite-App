@@ -6,3 +6,5 @@ test-results/
 playwright-report/
 *.log
 sbom.cdx.json
+backups/
+release/
