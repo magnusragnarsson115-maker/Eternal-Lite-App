@@ -14,7 +14,7 @@ w trybie demonstracyjnym — patrz [`BRAKI_I_WDROZENIE.md`](BRAKI_I_WDROZENIE.md
 Klikalna aplikacja pacjenta i panel placówki na danych fikcyjnych, z kontami pokazowymi (pacjentka Anna, Maria,
 lekarze, rejestracja, administrator). Odpowiedzi API są nagrane z instancji pokazowej, więc podgląd działa jako
 zwykła strona — **tylko do odczytu**: zapis kończy się komunikatem „zmiany nie są zapisywane”, pliki PDF i CSV
-otwierają się w oknie na stronie, wideo nie działa. Czas w podglądzie płynie od chwili nagrania.
+otwierają się w oknie na stronie, wideo nie działa. Przykładową rozmowę Scribe odtwarza synteza mowy przeglądarki (przycisk „Odtwórz rozmowę” albo kliknięcie zdania). Czas w podglądzie płynie od chwili nagrania.
 
 **Przewodnik** (przycisk w prawym dolnym rogu, otwiera się sam przy pierwszym wejściu) opisuje aplikację i prowadzi
 po najważniejszych ekranach: kolejka lekarza, Medical Snapshot z pochodzeniem wyników, oś czasu i „Co się zmieniło”,

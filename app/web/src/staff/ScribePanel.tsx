@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, CheckCircle2, ClipboardCopy, Download, FilePenLine, History, Mic, Pencil, Play, Plus, RotateCcw, Send, Smartphone, Sparkles, Trash2, UserCheck, Users, Video, X } from 'lucide-react';
+import { Check, CheckCircle2, ClipboardCopy, Download, FilePenLine, History, Mic, Pencil, Play, Plus, RotateCcw, Send, Smartphone, Sparkles, Square, Trash2, UserCheck, Users, Video, Volume2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { del, get, post, put, qs } from '../api';
 import { errorMessage } from '../errors';
 import { useI18n } from '../i18n';
 import { RecorderControls } from '../shared/LinkShared';
+import { useDemoSpeech } from '../lib/demoSpeech';
 import { useRecorder } from '../lib/recorder';
 import { uploadFile } from '../lib/upload';
 import type { CardDoc, NoteDoc, ScribeConfig, ScribeRole, ScribeView } from '../mvp-types';
@@ -215,10 +216,19 @@ function DraftEditor({ s, onChange, cancelBtn }: { s: ScribeView; onChange: () =
     },
     onError: (e) => toast(errorMessage(e, t), 'error'),
   });
+  // tryb pokazowy: przykładowa rozmowa bez prawdziwego nagrania — czytana syntezą mowy przeglądarki
+  const demoTalk = s.transcript?.provider === 'demo';
+  const speech = useDemoSpeech((id) => {
+    if (!id) return;
+    setSeg(id);
+    document.getElementById(`seg-${id}`)?.scrollIntoView({ block: 'nearest' });
+  });
   const seek = (id: string) => {
     setSeg(id);
     const x = segText(id);
-    if (media.current && x?.start !== undefined) {
+    if (demoTalk && s.transcript) {
+      speech.play(s.transcript.segments, id, true);
+    } else if (media.current && x?.start !== undefined) {
       media.current.currentTime = x.start;
       void media.current.play().catch(() => undefined);
     }
@@ -295,7 +305,7 @@ function DraftEditor({ s, onChange, cancelBtn }: { s: ScribeView; onChange: () =
               </div>
             ))}
           </div>
-          {s.transcript && <TranscriptPanel s={s} selected={seg} onSeek={seek} mediaRef={media} onChange={onChange} />}
+          {s.transcript && <TranscriptPanel s={s} selected={seg} onSeek={seek} mediaRef={media} onChange={onChange} demo={demoTalk ? speech : undefined} />}
         </div>
         <p className="small muted">{t('AI przygotowuje — lekarz zatwierdza. Dokumentacją staje się wyłącznie zatwierdzona wersja; sekcje odrzucone nie trafiają do dokumentacji.')}</p>
         {(save.isError || approve.isError) && <Notice kind="danger">{errorMessage(save.error ?? approve.error, t)}</Notice>}
@@ -649,7 +659,21 @@ function SectionActions({ state, busy, onAction }: { state?: string; busy: boole
  * Transkrypcja (A12.2): mówcy, znaczniki czasu, odsłuch fragmentu po kliknięciu, poprawka tekstu lub mówcy
  * (każda poprawka zapisana: przed → po, kto, kiedy). Obraz z wizyty tylko gdy była na niego zgoda.
  */
-function TranscriptPanel({ s, selected, onSeek, mediaRef, onChange }: { s: ScribeView; selected: string | null; onSeek: (id: string) => void; mediaRef: React.MutableRefObject<HTMLMediaElement | null>; onChange: () => void }) {
+function TranscriptPanel({
+  s,
+  selected,
+  onSeek,
+  mediaRef,
+  onChange,
+  demo,
+}: {
+  s: ScribeView;
+  selected: string | null;
+  onSeek: (id: string) => void;
+  mediaRef: React.MutableRefObject<HTMLMediaElement | null>;
+  onChange: () => void;
+  demo?: ReturnType<typeof useDemoSpeech>;
+}) {
   const { t, fmt } = useI18n();
   const toast = useToast();
   const label = useRoleLabel();
@@ -681,12 +705,35 @@ function TranscriptPanel({ s, selected, onSeek, mediaRef, onChange }: { s: Scrib
           </button>
         ) : null}
       </div>
-      {s.audio.present &&
+      {demo ? (
+        <div className="demo-talk" role="group" aria-label={t('Odtwarzanie przykładowej rozmowy')}>
+          <p className="small muted">
+            <Volume2 size={14} aria-hidden /> {t('Przykładowa rozmowa z trybu pokazowego — bez prawdziwego nagrania. „Odtwórz rozmowę” czyta transkrypcję polskim głosem przeglądarki.')}
+          </p>
+          {demo.supported ? (
+            <div className="btn-row">
+              {demo.playing ? (
+                <Button size="sm" variant="secondary" icon={<Square size={15} />} onClick={demo.stop}>
+                  {t('Zatrzymaj')}
+                </Button>
+              ) : (
+                <Button size="sm" icon={<Play size={15} />} onClick={() => demo.play(s.transcript!.segments, selected ?? undefined)}>
+                  {t('Odtwórz rozmowę')}
+                </Button>
+              )}
+            </div>
+          ) : (
+            <p className="small">{t('Ta przeglądarka nie ma syntezy mowy — przeczytaj transkrypcję poniżej.')}</p>
+          )}
+        </div>
+      ) : (
+        s.audio.present &&
         (s.mediaKind === 'video' ? (
           <video ref={(el) => { mediaRef.current = el; }} src={src} controls preload="metadata" className="rec-player" aria-label={t('Nagranie wizyty')} />
         ) : (
           <audio ref={(el) => { mediaRef.current = el; }} src={src} controls preload="metadata" className="rec-player" aria-label={t('Nagranie wizyty')} />
-        ))}
+        ))
+      )}
       {(s.participants ?? []).length > 0 && (
         <p className="small muted">
           {t('Uczestnicy')}: {(s.participants ?? []).map((p) => `${label(p.role)}${p.name ? ` ${p.name}` : ''}`).join(', ')}

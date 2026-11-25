@@ -1277,6 +1277,9 @@ html[data-contrast='high'] .step-progress { border: 1px solid var(--border-stron
 .seg-row { display: flex; gap: 8px; align-items: flex-start; }
 .seg-play { display: inline-flex; align-items: center; gap: 3px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); padding: 1px 6px; font: inherit; font-size: 0.76rem; cursor: pointer; color: var(--primary); flex-shrink: 0; }
 .rec-player { width: 100%; margin: 8px 0; border-radius: 10px; }
+.demo-talk { margin: 8px 0; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+.demo-talk p { margin: 0 0 8px; }
+.demo-talk svg { vertical-align: -2px; }
 .rec-preview { width: 100%; max-width: 360px; border-radius: 12px; background: #000; }
 .note-section { border-left: 3px solid transparent; padding-left: 8px; }
 .note-section.accepted { border-left-color: var(--primary); }

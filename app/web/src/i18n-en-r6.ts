@@ -478,4 +478,8 @@ export const EN_R6: Record<string, string> = {
   'Cel estetyczny — stawka z usługi (co do zasady 23%).': 'Aesthetic purpose — rate from the service (23% as a rule).',
   'Lekarka (klinika estetyczna)': 'Doctor (aesthetic clinic)',
   'Pacjentka Karolina (klinika estetyczna)': 'Patient Karolina (aesthetic clinic)',
+  'Odtwarzanie przykładowej rozmowy': 'Playing the sample conversation',
+  'Przykładowa rozmowa z trybu pokazowego — bez prawdziwego nagrania. „Odtwórz rozmowę” czyta transkrypcję polskim głosem przeglądarki.': 'Sample conversation from demo mode — there is no real recording. “Play conversation” reads the transcript aloud with the browser’s Polish voice.',
+  'Odtwórz rozmowę': 'Play conversation',
+  'Ta przeglądarka nie ma syntezy mowy — przeczytaj transkrypcję poniżej.': 'This browser has no speech synthesis — read the transcript below.',
 };
