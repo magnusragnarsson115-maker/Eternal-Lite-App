@@ -1,0 +1,18 @@
+# Instancja pokazowa / prototyp na danych fikcyjnych (np. dla inwestorów i klinik).
+#   ./deploy/eternal.sh install --mode pokaz        (instalator ustawia COMPOSE_FILE w .env)
+# albo ręcznie:
+#   ETERNAL_DOMAIN=demo.twoja-domena.pl docker compose -f docker-compose.yml -f docker-compose.demo.yml up -d --build
+# Reset danych pokazowych: ./deploy/eternal.sh reset-demo  (certyfikaty HTTPS zostają)
+#
+# Dostawców (model językowy, mowa na tekst, OCR, e-mail, SMS) podłączasz w .env — wartości poniżej są tylko domyślne.
+services:
+  eternal:
+    environment:
+      NODE_ENV: production
+      DEMO_MODE: "true"
+      DEMO_SEED_ON_START: "true"
+      AI_PROVIDER: ${AI_PROVIDER:-demo}
+      PUBLIC_URL: https://${ETERNAL_DOMAIN:-localhost}
+      HIBP_ENABLED: ${HIBP_ENABLED:-false}
+      # bez serwera poczty nowe konta pacjentów nie potwierdziłyby adresu; z SMTP_URL instalator włącza weryfikację
+      REQUIRE_EMAIL_VERIFICATION: ${REQUIRE_EMAIL_VERIFICATION:-false}

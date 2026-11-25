@@ -1,0 +1,132 @@
+/* Przewodnik po podglądzie — tylko wersja bez serwera; kolory z tokenów aplikacji (jasny, ciemny, wysoki kontrast). */
+.pg-fab {
+  position: fixed;
+  right: 12px;
+  bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom, 0px));
+  z-index: 150;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--surface);
+  font: inherit;
+  font-weight: 650;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+}
+.pg-fab:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (min-width: 900px) { .pg-fab { bottom: 16px; } }
+
+.pg-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 160;
+  width: min(460px, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  color: var(--ink);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+}
+.pg-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.pg-top h2 { margin: 0; font-size: 1.15rem; }
+.pg-top h2:focus { outline: none; }
+.pg-x {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.pg-scroll { overflow-y: auto; padding: 14px 16px 32px; font-size: 0.95rem; }
+.pg-scroll p { margin: 0 0 10px; }
+.pg-note { padding: 10px 12px; border-radius: 10px; background: var(--info-soft); }
+.pg-muted { color: var(--muted); font-size: 0.88rem; }
+.pg-sec { margin-top: 18px; }
+.pg-sec h3 { margin: 0 0 2px; font-size: 1.02rem; }
+.pg-steps { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.pg-steps li { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--surface-2); }
+.pg-steps li p { margin: 6px 0 0; color: var(--ink-2); font-size: 0.9rem; }
+.pg-step-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pg-show {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--primary);
+  color: var(--primary-ink);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+.pg-show:disabled { opacity: 0.6; cursor: progress; }
+.pg-show:focus-visible, .pg-x:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* zakładki: przewodnik | wszystkie moduły */
+.pg-tabs { display: flex; gap: 6px; padding: 10px 16px 0; border-bottom: 1px solid var(--border); }
+.pg-tabs button {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+.pg-tabs button.on { color: var(--ink); border-bottom-color: var(--primary); }
+.pg-tabs button:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+
+/* lista modułów */
+.pg-count {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0 6px;
+  border-radius: 99px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+  text-align: center;
+  vertical-align: middle;
+}
+.pg-mods { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.pg-mods li { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--surface-2); }
+.pg-mods li p { margin: 4px 0 8px; color: var(--ink-2); font-size: 0.88rem; }
+.pg-mod-head { display: flex; align-items: baseline; gap: 8px; }
+.pg-code {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--info-soft);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.76rem;
+}
+.pg-mod-actions { display: flex; flex-wrap: wrap; gap: 6px; }
