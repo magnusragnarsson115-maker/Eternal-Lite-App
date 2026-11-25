@@ -163,8 +163,19 @@ export function Segmented<T extends string>({ value, onChange, options, label }:
 }
 
 export function Tabs<T extends string>({ value, onChange, tabs, label }: { value: T; onChange: (v: T) => void; tabs: { value: T; label: ReactNode }[]; label: string }) {
+  const box = useRef<HTMLDivElement>(null);
+  // zakładka otwarta z linku (?tab=…) może leżeć poza widocznym paskiem — przewijamy tylko pasek, nie stronę
+  useEffect(() => {
+    const el = box.current;
+    const on = el?.querySelector<HTMLElement>('[aria-selected="true"]');
+    if (!el || !on) return;
+    const b = el.getBoundingClientRect();
+    const r = on.getBoundingClientRect();
+    if (r.left < b.left) el.scrollLeft -= b.left - r.left + 16;
+    else if (r.right > b.right) el.scrollLeft += r.right - b.right + 16;
+  }, [value]);
   return (
-    <div className="tabs" role="tablist" aria-label={label}>
+    <div className="tabs" role="tablist" aria-label={label} ref={box}>
       {tabs.map((tab) => (
         <button key={tab.value} type="button" role="tab" aria-selected={value === tab.value} onClick={() => onChange(tab.value)}>
           {tab.label}

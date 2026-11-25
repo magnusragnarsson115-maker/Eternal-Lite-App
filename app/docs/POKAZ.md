@@ -19,7 +19,9 @@ otwierają się w oknie na stronie, wideo nie działa. Czas w podglądzie płyni
 **Przewodnik** (przycisk w prawym dolnym rogu, otwiera się sam przy pierwszym wejściu) opisuje aplikację i prowadzi
 po najważniejszych ekranach: kolejka lekarza, Medical Snapshot z pochodzeniem wyników, oś czasu i „Co się zmieniło”,
 Scribe z transkrypcją i notatką w 11 sekcjach, „Moje zdrowie” z avatarem 3D, wywiad czatowy, Eternal ID, integracje
-przez API. „Pokaż” przełącza konto pokazowe i otwiera ekran bez logowania. Karty pacjenta, „Moje zdrowie” i
+przez API. „Pokaż” przełącza konto pokazowe i otwiera ekran bez logowania. Zakładka **„Wszystkie moduły”** w przewodniku
+wymienia każdy moduł aplikacji (32 z rejestru, profile placówek, administracja) z krótkim opisem i przyciskami „Otwórz”,
+„Panel” albo „Pacjent”, które otwierają ekran modułu na właściwym koncie pokazowym. Karty pacjenta, „Moje zdrowie” i
 administracja przyjmują `?tab=` (np. `/panel/pacjenci/<id>?tab=timeline`, `/panel/admin?tab=integrations`).
 
 **Profile placówek** ([`PROFILE_PLACOWEK.md`](PROFILE_PLACOWEK.md)): Centrum Medyczne Eternal działa w profilu POZ, a druga,

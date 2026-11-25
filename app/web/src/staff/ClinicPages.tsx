@@ -831,6 +831,7 @@ function UsageTab() {
 }
 
 const SEVERITY_KIND = { low: undefined, medium: 'info', high: 'warn', critical: 'danger' } as const;
+const SEVERITY_PL: Record<string, string> = { low: 'niska', medium: 'średnia', high: 'wysoka', critical: 'krytyczna' };
 const STATUS_PL: Record<string, string> = { new: 'nowe', triage: 'ocena', 'in-progress': 'w obsłudze', resolved: 'rozwiązane', closed: 'zamknięte' };
 const CATEGORY_PL: Record<string, string> = { 'data-error': 'błąd w danych', 'ai-content': 'treść AI', privacy: 'prywatność', security: 'bezpieczeństwo', availability: 'dostępność', other: 'inne' };
 
@@ -856,7 +857,7 @@ function IncidentsTab() {
                     {i.reporter ?? t('pacjent')} · {fmt.dateTime(i.createdAt)} · {t('termin {d}', { d: fmt.dateTime(i.dueAt) })} {i.overdue && <strong style={{ color: 'var(--danger)' }}>{t('po terminie')}</strong>}
                   </span>
                 </span>
-                <Badge kind={SEVERITY_KIND[i.severity]}>{i.severity}</Badge>
+                <Badge kind={SEVERITY_KIND[i.severity]}>{t(SEVERITY_PL[i.severity] ?? i.severity)}</Badge>
                 <Badge>{t(STATUS_PL[i.status])}</Badge>
               </button>
             </li>

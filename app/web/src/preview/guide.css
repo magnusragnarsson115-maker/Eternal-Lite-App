@@ -85,3 +85,48 @@
 }
 .pg-show:disabled { opacity: 0.6; cursor: progress; }
 .pg-show:focus-visible, .pg-x:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* zakładki: przewodnik | wszystkie moduły */
+.pg-tabs { display: flex; gap: 6px; padding: 10px 16px 0; border-bottom: 1px solid var(--border); }
+.pg-tabs button {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+.pg-tabs button.on { color: var(--ink); border-bottom-color: var(--primary); }
+.pg-tabs button:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; }
+
+/* lista modułów */
+.pg-count {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0 6px;
+  border-radius: 99px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+  text-align: center;
+  vertical-align: middle;
+}
+.pg-mods { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.pg-mods li { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--surface-2); }
+.pg-mods li p { margin: 4px 0 8px; color: var(--ink-2); font-size: 0.88rem; }
+.pg-mod-head { display: flex; align-items: baseline; gap: 8px; }
+.pg-code {
+  flex: none;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--info-soft);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.76rem;
+}
+.pg-mod-actions { display: flex; flex-wrap: wrap; gap: 6px; }

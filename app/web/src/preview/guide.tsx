@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, Compass, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { moduleCount, moduleGroups, type ModuleOpen } from './modules';
 import { setPreviewPersona, type PreviewData } from './shim';
 import './guide.css';
 
@@ -267,6 +268,13 @@ const UI: Record<string, Text> = {
   },
   how: { pl: '„Pokaż” loguje na właściwe konto pokazowe i otwiera ekran.', en: '“Show” signs in to the right demo account and opens the screen.' },
   show: { pl: 'Pokaż', en: 'Show' },
+  tabGuide: { pl: 'Przewodnik', en: 'Guide' },
+  tabModules: { pl: 'Wszystkie moduły', en: 'All modules' },
+  views: { pl: 'Widok przewodnika', en: 'Guide view' },
+  modulesIntro: {
+    pl: 'Każdy moduł aplikacji z krótkim opisem. Przycisk loguje na właściwe konto pokazowe i otwiera ekran modułu; „Panel” to widok placówki, „Pacjent” — aplikacja pacjenta.',
+    en: 'Every module of the app with a short description. A button signs in to the right demo account and opens the module screen; “Panel” is the clinic view, “Patient” the patient app.',
+  },
   close: { pl: 'Zamknij przewodnik', en: 'Close guide' },
   limits: {
     pl: 'Podgląd jest tylko do odczytu: zapis, nagrywanie, wysyłka, NFC i integracje partnerów działają w pełnej aplikacji na serwerze.',
@@ -298,10 +306,12 @@ export function PreviewGuide({ data }: { data: PreviewData }) {
   const [open, setOpen] = useState(() => !seen());
   const [lang, setLang] = useState<Lang>(currentLang);
   const [busy, setBusy] = useState<string | null>(null);
+  const [view, setView] = useState<'guide' | 'modules'>('guide');
   const head = useRef<HTMLHeadingElement>(null);
   const nav = useNavigate();
   const qc = useQueryClient();
   const list = sections(data);
+  const groups = moduleGroups(ids(data));
 
   useEffect(() => {
     setLang(currentLang());
@@ -323,7 +333,7 @@ export function PreviewGuide({ data }: { data: PreviewData }) {
     setOpen(false);
   }
 
-  async function show(step: Step) {
+  async function show(step: Pick<Step, 'persona' | 'route'> | ModuleOpen) {
     setBusy(step.route);
     setPreviewPersona(step.persona);
     try {
@@ -357,29 +367,85 @@ export function PreviewGuide({ data }: { data: PreviewData }) {
               <X size={20} aria-hidden />
             </button>
           </div>
-          <div className="pg-scroll">
-            <p>{tx(UI.intro)}</p>
-            <p className="pg-note">{tx(UI.boundary)}</p>
-            <p className="pg-muted">{tx(UI.how)}</p>
-            {list.map((sec) => (
-              <section key={sec.title.pl} className="pg-sec">
-                <h3>{tx(sec.title)}</h3>
-                <p className="pg-muted">{tx(sec.who)}</p>
-                <ol className="pg-steps">
-                  {sec.steps.map((st) => (
-                    <li key={st.title.pl}>
-                      <div className="pg-step-head">
-                        <strong>{tx(st.title)}</strong>
-                        <button type="button" className="pg-show" disabled={!!busy} onClick={() => void show(st)}>
-                          {tx(UI.show)} <ArrowRight size={14} aria-hidden />
-                        </button>
-                      </div>
-                      <p>{tx(st.what)}</p>
-                    </li>
-                  ))}
-                </ol>
-              </section>
+          <div className="pg-tabs" role="tablist" aria-label={tx(UI.views)}>
+            {(['guide', 'modules'] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                role="tab"
+                id={`pg-tab-${v}`}
+                aria-selected={view === v}
+                aria-controls="pg-view"
+                className={view === v ? 'on' : undefined}
+                onClick={() => setView(v)}
+              >
+                {v === 'guide' ? tx(UI.tabGuide) : `${tx(UI.tabModules)} (${moduleCount(groups)})`}
+              </button>
             ))}
+          </div>
+          <div className="pg-scroll" id="pg-view" role="tabpanel" aria-labelledby={`pg-tab-${view}`}>
+            {view === 'guide' ? (
+              <>
+                <p>{tx(UI.intro)}</p>
+                <p className="pg-note">{tx(UI.boundary)}</p>
+                <p className="pg-muted">{tx(UI.how)}</p>
+                {list.map((sec) => (
+                  <section key={sec.title.pl} className="pg-sec">
+                    <h3>{tx(sec.title)}</h3>
+                    <p className="pg-muted">{tx(sec.who)}</p>
+                    <ol className="pg-steps">
+                      {sec.steps.map((st) => (
+                        <li key={st.title.pl}>
+                          <div className="pg-step-head">
+                            <strong>{tx(st.title)}</strong>
+                            <button type="button" className="pg-show" disabled={!!busy} onClick={() => void show(st)}>
+                              {tx(UI.show)} <ArrowRight size={14} aria-hidden />
+                            </button>
+                          </div>
+                          <p>{tx(st.what)}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
+                ))}
+              </>
+            ) : (
+              <>
+                <p className="pg-muted">{tx(UI.modulesIntro)}</p>
+                {groups.map((g) => (
+                  <section key={g.title.pl} className="pg-sec">
+                    <h3>
+                      {tx(g.title)} <span className="pg-count">{g.items.length}</span>
+                    </h3>
+                    <ul className="pg-mods">
+                      {g.items.map((m) => (
+                        <li key={`${m.code}-${m.name.pl}`}>
+                          <div className="pg-mod-head">
+                            <span className="pg-code">{m.code}</span>
+                            <strong>{tx(m.name)}</strong>
+                          </div>
+                          <p>{tx(m.what)}</p>
+                          <div className="pg-mod-actions">
+                            {m.open.map((o) => (
+                              <button
+                                key={o.label.pl}
+                                type="button"
+                                className="pg-show"
+                                disabled={!!busy}
+                                onClick={() => void show(o)}
+                                aria-label={`${tx(o.label)}: ${tx(m.name)}`}
+                              >
+                                {tx(o.label)} <ArrowRight size={14} aria-hidden />
+                              </button>
+                            ))}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </>
+            )}
             <p className="pg-muted">{tx(UI.limits)}</p>
           </div>
         </aside>
